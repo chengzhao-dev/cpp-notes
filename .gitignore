@@ -1,0 +1,14 @@
+_book/
+.quarto/
+node_modules/
+*.local
+.DS_Store
+
+/.quarto/
+**/*.quarto_ipynb
+
+# 本机指定的 Python 解释器（机器相关，不入库；解析协议见 AGENTS.md）
+/scripts/python.json
+
+# opencode 会话级计划草稿（机器相关，不入库；skills 本体正常入库）
+.opencode/plans/

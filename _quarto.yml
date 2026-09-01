@@ -1,0 +1,71 @@
+project:
+  type: book
+
+# 站点级（GitHub Pages / 社交分享）
+repo-url: "https://github.com/chengzhao-dev/cpp-notes"
+site-url: "https://chengzhao-dev.github.io/cpp-notes"
+repo-actions: [edit, issue]
+
+book:
+  title: "C++ 备忘录"
+  navbar:
+    title: "C++ 备忘录"
+    search: true
+  chapters:
+    - index.qmd
+    - part: content/environment/index.qmd
+      chapters:
+        - content/environment/setup-wsl2.qmd
+
+# Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
+language:
+  callout-note-title: "注意"
+  callout-tip-title: "提示"
+  callout-important-title: "重要"
+  callout-warning-title: "警告"
+  callout-caution-title: "危险"
+
+format:
+  html:
+    theme:
+      light: [cosmo, theme/scss/theme-light.scss]
+      dark: [darkly, theme/scss/theme-dark.scss]
+    pandoc-args:
+      - "-f"
+      - "markdown-smart"
+    grid:
+      sidebar-width: 300px
+      body-width: 860px
+      margin-width: 260px
+      gutter-width: 1.5em
+    respect-user-color-scheme: true
+    toc: true
+    toc-depth: 4
+    toc-location: right
+    anchor-sections: true
+    code-copy: true
+    code-overflow: wrap
+    css:
+      - theme/css/tokens.css
+      - theme/css/base.css
+      - theme/css/code.css
+      - theme/css/content.css
+      - theme/css/mermaid.css
+      - theme/css/nav.css
+      - theme/css/sidebar.css
+      - theme/css/callouts.css
+      - theme/css/landing.css
+      - theme/css/misc.css
+    number-sections: false
+    highlight-style:
+      light: github-light
+      dark: github-dark
+    # mermaid 不配置 theme：quarto-diagram 的 init.js 走 --mermaid-* 变量驱动的
+    # 内置 themeCSS 路径，配色/字体由 theme/css/mermaid.css 控制（明暗自适应）
+    include-in-header:
+      - theme/includes/fonts.html
+    include-after-body:
+      - theme/includes/footer.html
+    open-graph: true
+    twitter-card: true
+    lang: zh

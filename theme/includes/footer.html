@@ -1,0 +1,49 @@
+<div class="footer">
+  © 2026 C++ 备忘录 · 用 <a href="https://quarto.org">Quarto</a> 构建 · 内容持续更新
+</div>
+<button id="back-to-top" type="button" title="返回顶部" aria-label="返回顶部">↑</button>
+<script>
+(function () {
+  var btn = document.getElementById('back-to-top');
+  if (!btn) return;
+  var onScroll = function () {
+    if (window.scrollY > 400) btn.classList.add('show');
+    else btn.classList.remove('show');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  btn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+<script>
+(function () {
+  var meta = document.getElementById('meta-theme-color');
+  if (!meta) return;
+  var sync = function () {
+    var dark = document.body.classList.contains('quarto-dark');
+    meta.setAttribute('content', dark ? '#181a1b' : '#ffffff');
+  };
+  sync();
+  if (window.MutationObserver) {
+    new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+</script>
+<script>
+(function () {
+  var setPlaceholder = function () {
+    var input = document.querySelector('#quarto-search input, .quarto-navbar-search input');
+    if (input && input.getAttribute('placeholder') !== 'Search') {
+      input.setAttribute('placeholder', 'Search');
+    }
+  };
+  setPlaceholder();
+  window.addEventListener('load', setPlaceholder);
+  var box = document.getElementById('quarto-search');
+  if (box && window.MutationObserver) {
+    new MutationObserver(setPlaceholder).observe(box, { childList: true, subtree: true });
+  }
+})();
+</script>

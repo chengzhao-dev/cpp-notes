@@ -1,0 +1,25 @@
+---
+title: "准备开发环境与工具链"
+description: "先在 Windows 上把 C++ 开发环境搭起来，跑通工具链，你就能编译、调试自己的程序了。"
+number-sections: false
+---
+
+::: {.hero-eyebrow}
+起步 · 环境
+:::
+
+## 环境搭建
+
+::: {.landing-card}
+### [在 WSL2 上配置 C++ 环境](setup-wsl2.qmd)
+在 Windows 上用 WSL2 搭一套 Ubuntu 开发环境，装好并验证 C++ 构建工具链。
+
+[开始学习 →](setup-wsl2.qmd){.cta}
+:::
+
+## 构建系统
+
+::: {.landing-card .coming-soon}
+### 用 CMake 构建 C++ 项目
+用现代 CMake 的目标式写法管理构建，支持多配置与集成测试。
+:::

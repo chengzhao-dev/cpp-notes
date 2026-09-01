@@ -1,0 +1,20 @@
+---
+title: "C++ 备忘录"
+description: "覆盖开发环境、构建系统、语言核心与标准库，帮你动手写出并构建自己的 C++ 程序。"
+number-sections: false
+body-classes: homepage
+---
+
+::: {.feature-grid}
+::: {.landing-card}
+### [准备开发环境与工具链](content/environment/index.qmd)
+先在 Windows 上把 C++ 开发环境搭起来，跑通工具链，你就能编译、调试自己的程序了。
+
+[开始学习 →](content/environment/index.qmd){.cta}
+:::
+
+::: {.landing-card .coming-soon}
+### 语言核心
+梳理类型系统、RAII、智能指针、移动语义与模板等核心机制。
+:::
+:::

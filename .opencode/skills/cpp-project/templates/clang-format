@@ -1,0 +1,9 @@
+---
+# 本仓库 C++ 排版基准：LLVM 风格（2 空格缩进、80 列）。
+# 风格说明与命名规则见 .opencode/skills/cpp-content/references/cpp/code-style.md
+---
+Language: Cpp
+BasedOnStyle: LLVM
+Standard: Latest
+ColumnLimit: 80
+IndentWidth: 2

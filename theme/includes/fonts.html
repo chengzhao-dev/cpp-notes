@@ -1,0 +1,10 @@
+<!-- Web 字体（loli.net = Google Fonts 国内镜像，css2 接口同构）：首选 Inter（拉丁）+
+     Noto Sans SC 思源黑体（中文）+ IBM Plex Mono（代码，opencode 同款）；
+     unicode-range 切片按需加载、display=swap 防首屏阻塞；
+     CDN 不可达时无感降级到系统字体栈（栈见 theme-*.scss 与 tokens.css 的 --ui-font/--mono-font） -->
+<link rel="preconnect" href="https://fonts.loli.net" crossorigin>
+<link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+<link href="https://fonts.loli.net/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- 移动端浏览器地址栏主题色（由脚本随明暗同步，见 _includes/footer.html） -->
+<meta name="theme-color" id="meta-theme-color" content="#ffffff">

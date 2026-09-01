@@ -1,0 +1,175 @@
+/* cpp-memo 共享主题 · 提示卡片 callout / 验证块（自 common.css 拆分） */
+
+/* 自定义「验证结果」块：与 callout 同体系（绿色浅底，跟随 --callout-best-practice-*），并加 ✓ 强化“通过/已验证”语义 */
+.callout-verify {
+  border: none;
+  background-color: var(--callout-best-practice-bg);
+  border-radius: 0;
+  padding: 0.9375rem 1rem 0.875rem;
+}
+.callout-verify::before {
+  content: "\2713\00a0" attr(title);
+  display: block;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.5px;
+  color: var(--callout-best-practice-border);
+  margin-bottom: 0.3rem;
+}
+
+/* ---------- 提示卡片（callout：note / tip / warning / important / caution） ---------- */
+/* opencode aside 风：无边框、无圆角、彩色浅底；标题（图标+小号大写加粗）在左、内容在右，
+   <768px 上下堆叠。语义色双轨：SASS 层 $callout-color-*（theme-*.scss，驱动编译期烧入的
+   图标 data URI），CSS 层 --callout-*（标题字色/底色）。
+   选择器镜像 Quarto 默认规则的特异性（0,3,x ~ 0,4,2），组件 css 后加载胜出。 */
+div.callout.callout-style-default,
+div.callout.callout-style-simple {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  padding: 0.9375rem 1rem 0.875rem;
+  overflow-wrap: break-word;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+/* 头部（图标 + 标题）：压掉 Quarto 的头部不透明底色条、内边距与 85% 整体透明度 */
+div.callout.callout-style-default > .callout-header,
+div.callout.callout-style-simple > .callout-header {
+  flex: 0 0 auto;
+  margin: 3px 0 0;       /* opencode 标题与内容首行的 optical 对齐 */
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+  opacity: 1;
+  font-weight: 700;
+  align-items: center;
+}
+div.callout.callout-style-default:not(.no-icon) div.callout-icon-container,
+div.callout.callout-style-simple:not(.no-icon) div.callout-icon-container,
+div.callout.callout-style-default.callout-caution:not(.no-icon) div.callout-icon-container {
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+}
+div.callout.callout-style-default .callout-icon::before,
+div.callout.callout-style-simple .callout-icon::before {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  background-size: 0.8125rem 0.8125rem;
+}
+div.callout.callout-style-default:not(.no-icon) div.callout-title-container,
+.callout .callout-title-container {
+  margin-top: 0;
+  overflow-wrap: anywhere;
+}
+.callout .callout-title-container {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+/* 内容（右列）：字号 0.875rem（opencode --sl-text-sm），清掉 Quarto 的内部补白 */
+div.callout .callout-body,
+div.callout.callout-style-default .callout-body {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+div.callout.callout-style-default .callout-body > :first-child,
+.callout:not(.callout-titled) .callout-body > :first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+div.callout.callout-titled .callout-body > :last-child:not(.sourceCode),
+div.callout.callout-style-default .callout-body > :last-child:not(.sourceCode) {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+/* 内容里的链接跟随所属类型的 accent 色（opencode aside__content a 同款；带 ID 前缀压过正文近黑链接规则） */
+#quarto-document-content .callout.callout-note .callout-body a { color: var(--callout-note-border); }
+#quarto-document-content .callout.callout-tip .callout-body a { color: var(--callout-tip-border); }
+#quarto-document-content .callout.callout-warning .callout-body a { color: var(--callout-warning-border); }
+#quarto-document-content .callout.callout-important .callout-body a { color: var(--callout-important-border); }
+#quarto-document-content .callout.callout-caution .callout-body a { color: var(--callout-caution-border); }
+#quarto-document-content .callout.callout-best-practice .callout-body a { color: var(--callout-best-practice-border); }
+#quarto-document-content .callout.callout-key-insight .callout-body a { color: var(--callout-key-insight-border); }
+/* 内容里的行内代码透明底 + 0.8125rem（opencode aside 同款） */
+.callout .callout-body code {
+  background-color: transparent;
+  font-size: 0.8125rem;
+}
+/* 间距节奏（opencode）：元素→callout 1.8125rem（1.375+0.4375），callout→callout 2.5rem */
+#quarto-document-content > .callout,
+#quarto-document-content section > .callout {
+  margin-top: 1.8125rem;
+}
+#quarto-document-content > .callout + .callout,
+#quarto-document-content section > .callout + .callout {
+  margin-top: 2.5rem;
+}
+/* <768px 上下堆叠（opencode aside 移动端同款） */
+@media (max-width: 767.98px) {
+  div.callout.callout-style-default,
+  div.callout.callout-style-simple {
+    flex-direction: column;
+    gap: 6px;
+  }
+  div.callout.callout-style-default > .callout-header,
+  div.callout.callout-style-simple > .callout-header {
+    margin-top: 0;
+  }
+}
+/* 类型 accent 色：标题与图标（图标本体色由 SASS 编译期的 data URI 决定，此处兜底标题字色） */
+.callout.callout-note .callout-title-container,
+.callout.callout-note .callout-icon {
+  color: var(--callout-note-border);
+}
+.callout.callout-tip .callout-title-container,
+.callout.callout-tip .callout-icon {
+  color: var(--callout-tip-border);
+}
+.callout.callout-warning .callout-title-container,
+.callout.callout-warning .callout-icon {
+  color: var(--callout-warning-border);
+}
+.callout.callout-important .callout-title-container,
+.callout.callout-important .callout-icon {
+  color: var(--callout-important-border);
+}
+.callout.callout-caution .callout-title-container,
+.callout.callout-caution .callout-icon {
+  color: var(--callout-caution-border);
+}
+.callout.callout-best-practice .callout-title-container,
+.callout.callout-best-practice .callout-icon {
+  color: var(--callout-best-practice-border);
+}
+.callout.callout-key-insight .callout-title-container,
+.callout.callout-key-insight .callout-icon {
+  color: var(--callout-key-insight-border);
+}
+/* 类型底色（压过 Quarto 编译产物的同名规则：div.callout-note.callout 等） */
+.callout.callout-note {
+  background-color: var(--callout-note-bg);
+}
+.callout.callout-tip {
+  background-color: var(--callout-tip-bg);
+}
+.callout.callout-warning {
+  background-color: var(--callout-warning-bg);
+}
+.callout.callout-important {
+  background-color: var(--callout-important-bg);
+}
+.callout.callout-caution {
+  background-color: var(--callout-caution-bg);
+}
+.callout.callout-best-practice {
+  background-color: var(--callout-best-practice-bg);
+}
+.callout.callout-key-insight {
+  background-color: var(--callout-key-insight-bg);
+}

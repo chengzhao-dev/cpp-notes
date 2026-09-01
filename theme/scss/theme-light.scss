@@ -1,0 +1,40 @@
+/*-- scss:defaults --*/
+
+// 字体：首选 Web 字体（经 theme/includes/fonts.html 以 loli.net 镜像加载）——
+// Inter（拉丁）+ Noto Sans SC/思源黑体（中文）；系统栈完整保留为回退，
+// CDN 不可达时无感降级（原「纯系统字体栈」约定已修订，三处栈需同步：
+// 本文件 + theme-dark.scss + tokens.css 的 --ui-font/--mono-font）
+$font-family-sans-serif: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !default;
+
+$font-family-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Noto Sans Mono", "Noto Sans SC", "Courier New", monospace !default;
+
+// 关闭 cosmo 自带的 Google Fonts 引入（Source Sans Pro，大陆访问慢；字体改用 include-in-header 的 CDN）
+$web-font-path: false !default;
+
+// 阅读排版（中文友好）：正文 16px；行高 1.6875（opencode 同款）
+$font-size-root: 16px !default;
+$line-height-base: 1.6875 !default;
+$font-size-base: 1rem !default;
+
+// 主色：GitHub Primer accent（链接、强调；组件规则见 scss/ 按域拆分的组件 css）
+$primary: #0969da !default;
+
+// 正文基调（与 tokens.css 的 --body-color 同值归一；body 底色由 --page-bg 统一驱动）
+$body-color: #201d1d !default;
+
+// 导航条：与页面同底色 + 1px 发丝线（opencode 风，组件细节见 scss/nav.css）
+$navbar-bg: #ffffff !default;
+$navbar-fg: #201d1d !default;
+
+// Callout 语义色（opencode aside 色板：note 蓝 / tip 紫 / warning 橙 / important 蓝紫 /
+// caution·danger 红，与 tokens.css 的 --callout-*-border 亮色一致）。
+// Quarto 在编译期把这些值烧进 callout 图标的 data URI（标题式取 90% 亮度），
+// 故必须在 SASS 层设置；标题字色/底色细调见 tokens.css 的 --callout-* 变量。
+$callout-color-note: hsl(234, 80%, 30%) !default;
+$callout-color-tip: hsl(281, 90%, 30%) !default;
+$callout-color-warning: hsl(41, 80%, 25%) !default;
+$callout-color-important: hsl(262, 90%, 34%) !default;
+$callout-color-caution: hsl(339, 80%, 30%) !default;
+$callout-color-danger: hsl(339, 80%, 30%) !default;
+
+/*-- scss:rules --*/
