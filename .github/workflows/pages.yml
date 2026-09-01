@@ -36,15 +36,14 @@ jobs:
           api=https://api.github.com/repos/${{ github.repository }}/pages
           auth="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
           accept="Accept: application/vnd.github+json"
-          body='{"source":{"branch":"gh-pages","path":"/"}}'
-          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api" -d "$body")
-          echo "POST /pages -> HTTP $code"
-          if [ "$code" = "409" ]; then
-            code=$(curl -s -o /dev/null -w "%{http_code}" -X PUT -H "$auth" -H "$accept" "$api" -d "$body")
-            echo "PUT /pages (source correction) -> HTTP $code"
-          fi
-          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api/builds")
-          echo "POST /pages/builds (force build) -> HTTP $code"
+          code=$(curl -s -o /tmp/pages_create.json -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api" \
+            -d '{"source":{"branch":"gh-pages","path":"/"}}')
+          echo "POST /pages (create) -> HTTP $code: $(cat /tmp/pages_create.json)"
+          code=$(curl -s -o /tmp/pages_update.json -w "%{http_code}" -X PUT -H "$auth" -H "$accept" "$api" \
+            -d '{"source":{"branch":"gh-pages","path":"/"},"https_enforced":true}')
+          echo "PUT /pages (source correction) -> HTTP $code: $(cat /tmp/pages_update.json)"
+          code=$(curl -s -o /tmp/pages_build.json -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api/builds")
+          echo "POST /pages/builds (force build) -> HTTP $code: $(cat /tmp/pages_build.json)"
           if [ "$code" != "201" ] && [ "$code" != "202" ] && [ "$code" != "409" ]; then
             echo "WARNING: Pages build request returned HTTP $code (non-fatal)."
             echo "Check Settings -> Pages -> Build history if the site does not update."
