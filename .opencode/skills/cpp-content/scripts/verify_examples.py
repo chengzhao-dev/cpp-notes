@@ -15,7 +15,8 @@
 风格阶段（仅 --style；规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
   S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
-clang 工具缺失时降级为警告；编译始终是硬门槛。
+  配置显式指向 cpp-project skill 模板（templates/clang-format、templates/clang-tidy）；
+  clang 工具缺失/过旧时降级为警告；编译始终是硬门槛。
 """
 
 import argparse
@@ -24,10 +25,21 @@ import re
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
 
 BLOCK_RE = re.compile(r"`{3}(?:\{\.cpp[^`]*\}|cpp)\r?\n(.*?)`{3}", re.S)
 MAIN_RE = re.compile(r"int\s+main\s*\(")
 SKIP_RE = re.compile(r"//\s*verify-skip")
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+CPP_PROJECT_TEMPLATES = SKILL_ROOT.parent / "cpp-project" / "templates"
+
+
+def tool_major_version(tool):
+    """返回 WSL 内工具的主版本号；无法探测时返回 0。"""
+    result = wsl(f"{tool} --version 2>&1")
+    m = re.search(r"version\s+(\d+)\.", result.stdout or "")
+    return int(m.group(1)) if m else 0
 
 
 def to_wsl_path(win_path):
@@ -204,10 +216,19 @@ def main():
         elif not style_targets:
             print("  no compilable .cpp under code/, nothing to check.")
         else:
+            fmt_cfg = to_wsl_path(str(CPP_PROJECT_TEMPLATES / "clang-format"))
+            tidy_cfg = to_wsl_path(str(CPP_PROJECT_TEMPLATES / "clang-tidy"))
+            fmt_arg = (f"--style=file:'{fmt_cfg}'"
+                       if tool_major_version("clang-format") >= 14 else "")
+            tidy_arg = (f"--config-file='{tidy_cfg}'"
+                        if tool_major_version("clang-tidy") >= 12 else "")
+            if not fmt_arg or not tidy_arg:
+                print("  clang-format/clang-tidy 版本过旧，无法显式指定 skill 模板配置，"
+                      "回退到工程内 .clang-format/.clang-tidy 向上发现。")
             for f in style_targets:
                 rel = os.path.relpath(f, repo_root)
                 print(f"format: {rel}")
-                result = wsl(f"clang-format --dry-run -Werror '{to_wsl_path(f)}' 2>&1")
+                result = wsl(f"clang-format {fmt_arg} --dry-run -Werror '{to_wsl_path(f)}' 2>&1")
                 if result.returncode == 0:
                     print("  OK")
                 else:
@@ -218,7 +239,7 @@ def main():
             for f in style_targets:
                 rel = os.path.relpath(f, repo_root)
                 print(f"tidy: {rel} (informational)")
-                result = wsl(f"clang-tidy --quiet '{to_wsl_path(f)}' -- -std=c++20 2>&1")
+                result = wsl(f"clang-tidy --quiet {tidy_arg} '{to_wsl_path(f)}' -- -std=c++20 2>&1")
                 out = "\n".join((result.stdout or "").splitlines() + (result.stderr or "").splitlines())
                 for line in out.splitlines():
                     print(f"    {line}")

@@ -10,8 +10,7 @@
   auto    目标目录在本仓库 code/ 下 -> bare；否则 -> simple。
 
 clang 配置（.clang-format / .clang-tidy）：
-  本仓库内生成时不复制（仓库根配置沿目录向上自动生效）；
-  仓库外生成时优先复制仓库根配置，缺失则回退到本 skill 内置模板；
+  统一从本 skill 内置模板复制到新工程（仓库根不放配置文件）；
   --no-clang 可显式关闭复制。
 
 用法：
@@ -47,32 +46,18 @@ def render(template_path, target_path, name):
     write(target_path, text.replace(PLACEHOLDER, name))
 
 
-def copy_if_exists(src, dst):
-    if src.is_file():
-        shutil.copyfile(src, dst)
-        print(f"  copy   {dst.name}  (from {src})")
-        return True
-    return False
-
-
-def setup_clang_configs(target_dir, in_repo, no_clang):
+def setup_clang_configs(target_dir, no_clang):
     if no_clang:
-        return
-    if in_repo:
-        print("  clang 配置：仓库内生成，跳过复制（仓库根 .clang-format/.clang-tidy 沿目录向上自动生效）")
         return
     copied = False
     for name in (".clang-format", ".clang-tidy"):
-        if copy_if_exists(REPO_ROOT / name, target_dir / name):
-            copied = True
-            continue
         bundled = TEMPLATE_DIR / name.lstrip(".")
         if bundled.is_file():
             shutil.copyfile(bundled, target_dir / name)
             print(f"  copy   {name}  (bundled template)")
             copied = True
     if not copied:
-        print("  警告：未找到 clang 配置源（仓库根与内置模板均缺失），已跳过。")
+        print("  警告：未找到内置 clang 配置模板，已跳过。")
 
 
 def readme_text(name, layout):
@@ -136,12 +121,6 @@ def main():
 
     # auto 布局：仓库 code/ 下 -> bare，否则 -> simple
     layout = args.layout
-    in_repo = False
-    try:
-        target.resolve().relative_to(REPO_ROOT)
-        in_repo = True
-    except ValueError:
-        pass
     if layout == "auto":
         try:
             under_code = target.resolve().relative_to(REPO_ROOT / "code")
@@ -167,7 +146,7 @@ def main():
         render(TEMPLATE_DIR / "full" / "tests_CMakeLists.txt", target / "tests" / "CMakeLists.txt", name)
         render(TEMPLATE_DIR / "full" / "test_main.cpp", target / "tests" / "test_main.cpp", name)
 
-    setup_clang_configs(target, in_repo, args.no_clang)
+    setup_clang_configs(target, args.no_clang)
     if args.readme:
         write(target / "README.md", readme_text(name, layout))
 

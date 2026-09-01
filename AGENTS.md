@@ -13,7 +13,7 @@
 ```bash
 quarto render             # 渲染整本 Book → _book/（产物可直接打开，零服务器延迟，最省事）
 quarto preview            # 本地实时预览（Windows 上可能卡死/首屏转圈，见下）
-quarto publish gh-pages   # 渲染并发布到 GitHub Pages
+git push                  # 推送即自动部署：Actions 渲染 _book/ → 推 gh-pages 分支 → Pages 发布
 ```
 
 ## 运行 Python 脚本（解释器解析协议）
@@ -217,8 +217,9 @@ Get-ChildItem _book\site_libs\bootstrap -Filter *.min.css | Select-String -Simpl
   新建示例目录可直接用 `cpp-project` skill 的 `init_project.py`（`code/` 下默认 bare 布局，仅生成 `main.cpp`）。
 - **代码风格：排版 LLVM / 命名 Google / 异常启用**，
   唯一出处 `.opencode/skills/cpp-content/references/cpp/code-style.md`；
-  配置在仓库根 `.clang-format`（2 空格缩进、80 列）与 `.clang-tidy`
-  （modernize + Core Guidelines 子集 + Google 命名规则）。
+  配置模板在 `.opencode/skills/cpp-project/templates/clang-format`（2 空格缩进、80 列）与
+  `clang-tidy`（modernize + Core Guidelines 子集 + Google 命名规则），
+  由 `init_project.py` 复制到各 cpp 工程（仓库根不放 `.clang-format`/`.clang-tidy`）。
 - 校验：`python .opencode/skills/cpp-content/scripts/verify_examples.py --style`
   （clang-format 为硬门槛，clang-tidy 出报告；工具缺失时降级为警告；解释器解析见「运行 Python 脚本」）。
 - 默认运行环境：Windows 上的 WSL2。

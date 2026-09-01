@@ -79,6 +79,43 @@ jobs:
 
 适合：多章节 Book、持续集成、团队协作、与 CI 检查（编译/测试）合并。
 
+## 方式四：Actions 渲染 + 推 `gh-pages` 产物分支（本仓库现行模式）
+
+1. Pages 设置选 **Deploy from a branch** → 分支 `gh-pages`、目录 `/ (root)`（可由工作流内调用 Pages API 自动设置，见下）。
+2. 工作流渲染后用 `peaceiris/actions-gh-pages@v4` 把 `_book/` 推到 `gh-pages` 分支：
+
+```yaml
+permissions:
+  contents: write   # 推 gh-pages 分支
+  pages: write      # 调 Pages API 自动启用
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - run: quarto render
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_book
+          publish_branch: gh-pages
+          force_orphan: true   # 每次部署一个孤立提交，分支只含编译产物 + .nojekyll
+```
+
+3. 首次启用可用 API 自动设置源（已配置时返回 409，容忍即可；失败兜底手动在 Settings → Pages 选 `gh-pages` 分支）：
+
+```bash
+curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/<owner>/<repo>/pages \
+  -d '{"source":{"branch":"gh-pages","path":"/"}}'
+```
+
+- 优点：Pages 网页端能看到「实际 HTML」的 `gh-pages` 分支；源码 `main` 与产物分支彻底分离，`force_orphan` 保证产物分支无历史噪音。
+- 注意：不再需要 `configure-pages` / `upload-pages-artifact` / `deploy-pages`（那是方式三的 Actions 部署件）；`id-token: write` 也不需要。
+
 ## 站点路径与 baseurl
 
 - GitHub Pages 站点 URL 形如 `https://<user>.github.io/<repo>/`（项目站点）或 `https://<user>.github.io/`（用户/组织站点）。

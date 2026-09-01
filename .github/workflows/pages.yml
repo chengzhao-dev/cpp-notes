@@ -6,9 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -17,9 +16,6 @@ concurrency:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: quarto-dev/quarto-actions/setup@v2
@@ -28,9 +24,25 @@ jobs:
           python-version: "3.12"
       - run: quarto render
       - run: python3 scripts/defer-mermaid.py
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Publish _book to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: _book
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_book
+          publish_branch: gh-pages
+          force_orphan: true
+      - name: Ensure Pages source = gh-pages /(root)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/pages \
+            -d '{"source":{"branch":"gh-pages","path":"/"}}')
+          if [ "$code" = "409" ]; then
+            echo "Pages already configured."
+          elif [ "$code" = "201" ]; then
+            echo "Pages source set to gh-pages /(root)."
+          else
+            echo "Pages API returned HTTP $code (non-fatal). Set it manually: Settings -> Pages -> Deploy from a branch -> gh-pages /(root)."
+          fi

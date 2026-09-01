@@ -58,7 +58,7 @@ description: C++ 语言知识库、代码风格与可编译示例。当用户编
 ## 核心约定
 
 - 示例必须可编译：统一 `-std=c++20 -Wall -Wextra`；完整代码优先，片段显式标注「片段」。
-- 代码风格：排版 LLVM（2 空格、80 列）/ 命名 Google / 异常启用，唯一出处见 `references/cpp/code-style.md`；配置文件在仓库根 `.clang-format` / `.clang-tidy`。
+- 代码风格：排版 LLVM（2 空格、80 列）/ 命名 Google / 异常启用，唯一出处见 `references/cpp/code-style.md`；配置模板在 `../cpp-project/templates/clang-format` / `clang-tidy`（由 `init_project.py` 落到各 cpp 工程，仓库根不放配置）。
 - 文件/目录名纯 ASCII，连字符用 `-`（U+002D）。
 - 术语中英对照，新特性标注引入版本（`C++20 引入`）。
 - 写法节奏：动机 + 规则 → 正确/错误写法对照 → 常见误区 → 常见问题

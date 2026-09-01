@@ -31,13 +31,13 @@
 
 ## 排版与格式化（clang-format）
 
-- 仓库根 `.clang-format`：`BasedOnStyle: LLVM` + `Standard: Latest` + `ColumnLimit: 80` + `IndentWidth: 2`。
+- 配置模板：`.opencode/skills/cpp-project/templates/clang-format`（`BasedOnStyle: LLVM` + `Standard: Latest` + `ColumnLimit: 80` + `IndentWidth: 2`），由 `init_project.py` 复制到各 cpp 工程根；仓库根不放 `.clang-format`。
 - **80 列**同时适配 860px 正文栏的代码块（不折行）与 LLVM 工具链习惯。
 - 提交/落章前先过格式化检查（见下「工具用法」），不要手工对齐空格。
 
 ## 静态检查（clang-tidy）
 
-- 仓库根 `.clang-tidy`：
+- 配置模板：`.opencode/skills/cpp-project/templates/clang-tidy`（随工程复制，仓库根不放 `.clang-tidy`）：
   - `modernize-*`：把旧写法升级为当前标准写法（新语法主力）；
   - `cppcoreguidelines-*` + `bugprone-*` + `performance-*` + `portability-*` + `readability-*`：Core Guidelines 规则与常见缺陷兜底；
   - 已豁免的高噪声项：`-bugprone-easily-swappable-parameters`、`-modernize-use-trailing-return-type`（Google 用前置返回类型）、`-readability-identifier-length`、`-readability-magic-numbers` 等；

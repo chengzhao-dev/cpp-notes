@@ -14,7 +14,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
 - **Sanitizer**（C++11 起普遍可用）：`-fsanitize=address,undefined`（ASan + UBSan）在开发/测试期检测泄漏、越界、UB；MSVC 用 `/fsanitize=address`。
 - **优化/调试分级**：调试 `-O0 -g`，发布 `-O2`（或 `-O3` 谨慎）；不要把 sanitizer 与高优化混用。
 - **格式化与静态检查**：排版与命名交给 clang-format / clang-tidy
-  （配置在仓库根 `.clang-format` / `.clang-tidy`，LLVM 排版 + Google 命名，见 `./code-style.md`）；
+  （配置模板在 `cpp-project` skill 的 `templates/clang-format` / `templates/clang-tidy`，LLVM 排版 + Google 命名，见 `./code-style.md`）；
   校验用 `clang-format --dry-run -Werror`，
   clang-tidy 启用 `modernize-*` 与 `cppcoreguidelines-*` 子集。
 - **CMake 最小骨架**（C++20）：`cmake_minimum_required(VERSION 3.16)`、`set(CMAKE_CXX_STANDARD 20)` 且 `REQUIRED ON`。

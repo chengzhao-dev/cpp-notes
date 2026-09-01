@@ -41,9 +41,9 @@ python .opencode/skills/cpp-project/scripts/init_project.py \
 
 ## clang 配置策略（单源防漂移）
 
-- **仓库内生成不复制**：根目录 `.clang-format` / `.clang-tidy` 沿目录向上自动生效。
-- **仓库外生成**：优先复制仓库根配置；缺失时回退到本 skill 的 `templates/clang-format` / `templates/clang-tidy`（内置副本）。
-- 根配置是**唯一事实源**；改动根配置后需同步内置副本。规则说明见 `../cpp-content/references/cpp/code-style.md`。
+- 配置模板存放在本 skill 的 `templates/clang-format` / `templates/clang-tidy`（内置副本），**仓库根不放** `.clang-format` / `.clang-tidy`。
+- 生成任何新工程（仓库内/外一律）都复制内置模板到工程目录；`verify_examples.py` 的 `--style` 阶段也显式指向这套模板，工程内沿目录向上同样能发现。
+- 改动模板即改动全仓风格；规则说明见 `../cpp-content/references/cpp/code-style.md`。
 
 ## 与兄弟 skill 的分工（单一信息源）
 
