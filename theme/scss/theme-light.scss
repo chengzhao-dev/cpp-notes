@@ -22,8 +22,9 @@ $primary: #0969da !default;
 // 正文基调（与 tokens.css 的 --body-color 同值归一；body 底色由 --page-bg 统一驱动）
 $body-color: #201d1d !default;
 
-// 导航条：与页面同底色 + 1px 发丝线（opencode 风，组件细节见 scss/nav.css）
-$navbar-bg: #ffffff !default;
+// 导航条：与页面同底色（--page-bg 同值 #fdfcfc，与 tokens.css 的 --navbar-bg 归一）+ 1px 发丝线
+// （opencode 风，组件细节见 css/nav.css）
+$navbar-bg: #fdfcfc !default;
 $navbar-fg: #201d1d !default;
 
 // Callout 语义色（opencode aside 色板：note 蓝 / tip 紫 / warning 橙 / important 蓝紫 /

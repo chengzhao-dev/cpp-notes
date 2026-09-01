@@ -6,15 +6,16 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
+  id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: false
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,27 +25,18 @@ jobs:
           python-version: "3.12"
       - run: quarto render
       - run: python3 scripts/defer-mermaid.py
-      - name: Publish _book to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./_book
-          publish_branch: gh-pages
-          force_orphan: true
-      - name: Ensure Pages source = gh-pages /(root) and request a build
-        run: |
-          api=https://api.github.com/repos/${{ github.repository }}/pages
-          auth="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
-          accept="Accept: application/vnd.github+json"
-          code=$(curl -s -o /tmp/pages_create.json -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api" \
-            -d '{"source":{"branch":"gh-pages","path":"/"}}')
-          echo "POST /pages (create) -> HTTP $code: $(cat /tmp/pages_create.json)"
-          code=$(curl -s -o /tmp/pages_update.json -w "%{http_code}" -X PUT -H "$auth" -H "$accept" "$api" \
-            -d '{"source":{"branch":"gh-pages","path":"/"},"https_enforced":true}')
-          echo "PUT /pages (source correction) -> HTTP $code: $(cat /tmp/pages_update.json)"
-          code=$(curl -s -o /tmp/pages_build.json -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api/builds")
-          echo "POST /pages/builds (force build) -> HTTP $code: $(cat /tmp/pages_build.json)"
-          if [ "$code" != "201" ] && [ "$code" != "202" ] && [ "$code" != "409" ]; then
-            echo "WARNING: Pages build request returned HTTP $code (non-fatal)."
-            echo "Check Settings -> Pages -> Build history if the site does not update."
-          fi
+          path: ./_book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

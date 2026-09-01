@@ -1,13 +1,16 @@
 project:
   type: book
 
-# 站点级（GitHub Pages / 社交分享）
-repo-url: "https://github.com/chengzhao-dev/cpp-notes"
-site-url: "https://chengzhao-dev.github.io/cpp-notes"
-repo-actions: [edit, issue]
-
 book:
   title: "cpp-notes"
+  # 站点级（GitHub Pages / 社交分享）：Book 的站点工具选项归 book: 键（Quarto 官方约定），
+  # 放在顶层不会被识别（sitemap 等据此生成）
+  site-url: "https://chengzhao-dev.github.io/cpp-notes"
+  repo-url: "https://github.com/chengzhao-dev/cpp-notes"
+  repo-actions: [edit, issue]
+  favicon: assets/favicon.png
+  image: assets/og-cover.png        # og:image / twitter-card 默认分享图
+  page-navigation: true            # 章末上一页/下一页（显式声明，勿依赖默认）
   navbar:
     title: "cpp-notes"
     search: true

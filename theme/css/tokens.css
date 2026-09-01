@@ -34,8 +34,8 @@ body {
   --copy-btn-bg: #fdfcfc;
   --copy-btn-border: #d9d8d8;
   --scrollbar-thumb: #d4d1d1;
-  --console-bar-bg: #eeeded;
   --selection-bg: rgba(9, 105, 218, 0.18);
+  --mark-bg: rgba(255, 212, 0, 0.4);           /* mark 高亮底（墨色文字在浅黄底上，对比度达标） */
   --sidebar-hover-bg: rgba(0, 0, 0, 0.045);
   --sidebar-active-bg: rgba(0, 0, 0, 0.045);
   --sidebar-fg: #5c5858;
@@ -86,8 +86,8 @@ body.quarto-dark {
   --inline-code-bg: rgba(255, 255, 255, 0.06);
   --inline-code-fg: #e8e6e3;
   --text-secondary: #a7a29a;
-  --link-color: #4da3ff;
-  --link-underline: rgba(77, 163, 255, 0.5);
+  --link-color: #58a6ff;                    /* 与 theme-dark.scss 的 $primary/$link-color 归一（GitHub dark accent） */
+  --link-underline: rgba(88, 166, 255, 0.5);
   --table-header-bg: #1b1818;
   --table-border: #3c3a3a;
   --table-hairline: #242121;                /* 表格行底线（比表头线更淡一档） */
@@ -104,8 +104,8 @@ body.quarto-dark {
   --copy-btn-bg: #262323;
   --copy-btn-border: #3c3a3a;
   --scrollbar-thumb: #454141;
-  --console-bar-bg: #262323;
   --selection-bg: rgba(88, 166, 255, 0.3);
+  --mark-bg: rgba(210, 153, 34, 0.3);           /* mark 高亮底（暗色用深金底，浅字对比度约 9:1） */
   --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
   --sidebar-active-bg: rgba(255, 255, 255, 0.05);
   --sidebar-fg: #a7a29a;

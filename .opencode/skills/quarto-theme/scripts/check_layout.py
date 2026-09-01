@@ -22,7 +22,7 @@ CHECKS = [
     ("accent green dot #2da44e", "#2da44e"),
     ("dark page #131010", "#131010"),
     ("dark body #e8e6e3", "#e8e6e3"),
-    ("dark link #4da3ff", "#4da3ff"),
+    ("dark link #58a6ff", "#58a6ff"),
     ("dark primary-green #238636", "#238636"),
     ("best-practice callout", "callout-best-practice"),
     ("key-insight callout", "callout-key-insight"),

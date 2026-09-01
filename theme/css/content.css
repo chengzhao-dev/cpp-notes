@@ -89,7 +89,7 @@ blockquote.blockquote {
 
 /* 防御性：可能写到但尚未使用的组件，统一走主题 token，避免裸 Bootstrap 默认风 */
 mark {
-  background-color: rgba(255, 212, 0, 0.35);
+  background-color: var(--mark-bg); /* 明暗两值见 tokens.css（暗色深金底，保证对比度） */
   color: inherit;
   padding: 0 0.15em;
   border-radius: 3px;

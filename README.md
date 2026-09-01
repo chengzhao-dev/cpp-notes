@@ -1,6 +1,9 @@
 # cpp-notes
 
-基于 [Quarto Book](https://quarto.org/docs/books/) 的 C++ 编程备忘文档，渲染为 HTML 并发布到 GitHub Pages。
+[![quarto build & deploy](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml/badge.svg)](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
+
+基于 [Quarto Book](https://quarto.org/docs/books/) 的 C++ 编程备忘文档：**在线阅读 <https://chengzhao-dev.github.io/cpp-notes/>**。
 
 ## 环境
 
@@ -12,7 +15,7 @@
 ```bash
 quarto render      # 渲染整本 Book，输出到 _book/
 quarto preview     # 本地实时预览
-git push           # 推送即自动部署（Actions 渲染 → gh-pages 分支 → Pages）
+git push           # 推送即自动部署（Actions 渲染 → Pages 发布）
 ```
 
 > 改 `theme/scss/`（主题 `*.scss`）、`theme/css/`（组件 `*.css`）或 `theme/includes/fonts.html`（全局）会整本重渲染，较慢；`quarto preview` 在 Windows 上偶发卡死，清理方式见 `AGENTS.md`。
@@ -31,5 +34,9 @@ git push           # 推送即自动部署（Actions 渲染 → gh-pages 分支 
 
 ## 发布
 
-- 推送到 `main` 后由 `.github/workflows/pages.yml` 自动 `quarto render`，并把 `_book/` 编译产物（纯 HTML/CSS/JS）推到 `gh-pages` 分支发布到 GitHub Pages；`gh-pages` 由工作流维护，不要手动编辑。
-- 发布前把 `_quarto.yml` 里的 `repo-url` / `site-url` 占位地址替换为真实仓库。
+- 推送到 `main` 后由 `.github/workflows/pages.yml` 自动 `quarto render`，产物经官方 `upload-pages-artifact` + `deploy-pages` actions 发布到 GitHub Pages（Pages 来源须为 **GitHub Actions**，见仓库 Settings → Pages）。
+- Pull Request 由 `.github/workflows/render-check.yml` 做渲染检查，防断渲染进主干。
+
+## 内容规划
+
+按 part 逐步扩写：`environment` 环境与工具链 → `core` 语言核心 → `memory` 对象与内存（RAII/智能指针/移动语义）→ `stl` 容器与算法 → `templates` 模板 → `concurrency` 并发 → `toolchain` CMake 与工程实践 → 速查表。

@@ -21,9 +21,12 @@
 (function () {
   var meta = document.getElementById('meta-theme-color');
   if (!meta) return;
+  // 地址栏主题色直接读 tokens.css 的 --page-bg 计算值（body.quarto-dark 切换后自动取暗色），
+  // 避免与令牌双写漂移；取不到时按当前明暗兜底
   var sync = function () {
-    var dark = document.body.classList.contains('quarto-dark');
-    meta.setAttribute('content', dark ? '#181a1b' : '#ffffff');
+    var v = window.getComputedStyle(document.body).getPropertyValue('--page-bg').trim();
+    if (!v) v = document.body.classList.contains('quarto-dark') ? '#131010' : '#fdfcfc';
+    meta.setAttribute('content', v);
   };
   sync();
   if (window.MutationObserver) {
@@ -33,6 +36,8 @@
 </script>
 <script>
 (function () {
+  // Quarto zh 语言包给搜索框注入的 placeholder 是「搜索」，统一改回 Search
+  // （与 GitHub / opencode 观感一致；input 由 JS 运行时注入，需 MutationObserver 兜底）
   var setPlaceholder = function () {
     var input = document.querySelector('#quarto-search input, .quarto-navbar-search input');
     if (input && input.getAttribute('placeholder') !== 'Search') {

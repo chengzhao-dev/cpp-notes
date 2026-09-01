@@ -107,7 +107,9 @@ $ wsl --list --verbose
 
 默认情况下，Ubuntu 使用[官方源](http://archive.ubuntu.com/ubuntu)。更新或下载明显卡顿时，再换用[清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/ubuntu)加速，做法以[清华镜像帮助页](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)为准。
 
-> 注意：换源只影响下载速度，不改软件包内容。不卡顿就保留官方源，不必强制替换。
+::: {.callout-note}
+换源只影响下载速度，不改软件包内容。不卡顿就保留官方源，不必强制替换。
+:::
 
 ---
 
@@ -130,25 +132,25 @@ sudo apt upgrade -y
 **第 3 步：编译与调试工具链。**
 
 ```bash
-# build-essential：gcc、g++、make 与标准库，编译 C++ 的最低依赖
-# gdb：GNU 调试器
+# build-essential: gcc、g++、make 与标准库，编译 C++ 的最低依赖
+# gdb: GNU 调试器
 sudo apt install -y build-essential gdb
 ```
 
 **第 4 步：安装构建系统。**
 
 ```bash
-# cmake：构建系统，把源码组织、编译成可执行程序
-# ninja-build：配合 cmake 的高速构建工具，加快编译
+# cmake: 构建系统，把源码组织、编译成可执行程序
+# ninja-build: 配合 cmake 的高速构建工具，加快编译
 sudo apt install -y cmake ninja-build
 ```
 
 **第 5 步：安装 LLVM/Clang 工具集。**
 
 ```bash
-# clang：LLVM 的 C/C++ 编译器，命令为 clang++
-# clang-tidy：静态分析，编译前找出潜在 bug 与风格问题
-# clang-format：一键统一代码风格
+# clang: LLVM 的 C/C++ 编译器，命令为 clang++
+# clang-tidy: 静态分析，编译前找出潜在 bug 与风格问题
+# clang-format: 一键统一代码风格
 sudo apt install -y clang clang-tidy clang-format
 ```
 
@@ -157,11 +159,11 @@ sudo apt install -y clang clang-tidy clang-format
 验证方法对每个工具都一样，运行它的 `--version`，输出首行打印出版本号，就说明这个工具可用。工具链里装的工具不止一个，逐个确认不现实，先挑最常用的两个，比如 `g++` 与 `cmake`：
 
 ```bash
-# g++：编译器版本
+# g++: 编译器版本
 $ g++ --version
 g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
 
-# cmake：构建系统版本
+# cmake: 构建系统版本
 $ cmake --version
 cmake version 4.2.3
 ```
@@ -219,7 +221,9 @@ wsl --import Ubuntu "D:\ProgramData\WSL\Ubuntu" "D:\ProgramData\WSL\ubuntu-backu
 wsl --set-default Ubuntu
 ```
 
-> 注意：`wsl --import` 不保留原有用户，首次进入会以 root 登录。若需恢复普通用户，进入 Ubuntu 后编辑 `/etc/wsl.conf`，在 `[user]` 段下写入 `default=<user>`，再终止 Ubuntu 后重新进入。
+::: {.callout-note}
+`wsl --import` 不保留原有用户，首次进入会以 root 登录。若需恢复普通用户，进入 Ubuntu 后编辑 `/etc/wsl.conf`，在 `[user]` 段下写入 `default=<user>`，再终止 Ubuntu 后重新进入。
+:::
 
 **方法 2：一步迁移（需 `wsl` 2.3.11+，推荐）。** 自动保留用户与注册表项。以后重装系统时，也能一步指定安装位置，免去再迁移。在 PowerShell 中运行：
 
@@ -235,7 +239,14 @@ wsl --install Ubuntu --location "D:\ProgramData\WSL\Ubuntu"
 
 ## 本章回顾
 
-你在 Windows 上已经有了一套能编写 C++ 的 WSL2 Ubuntu 环境。`wsl --status` 与 `--version` 随时能确认环境和工具链就位。接下来，就可以动手写第一个 C++ 程序。
+你在 Windows 上已经有了一套能编写 C++ 的 WSL2 Ubuntu 环境。`wsl --status` 与各工具的 `--version` 随时能确认环境和工具链就位。
+
+---
+
+### 下一步
+
+- 工具链已就位，可以先写一个单文件的 C++ 程序，用 `g++` 编译并运行，跑通「编写 → 编译 → 运行」全链路。
+- 之后进入本部分的下一章《用 CMake 构建 C++ 项目》（规划中，见[部分路线图](index.qmd)），学习把源码组织成可维护的工程。
 
 ---
 

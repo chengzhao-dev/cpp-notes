@@ -1,0 +1,21 @@
+name: "render check"
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: quarto render
+      - run: python3 scripts/defer-mermaid.py

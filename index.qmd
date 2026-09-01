@@ -1,6 +1,6 @@
 ---
 title: "cpp-notes"
-description: "覆盖开发环境、构建系统、语言核心与标准库，帮你动手写出并构建自己的 C++ 程序。"
+description: "覆盖开发环境、构建系统、语言核心与标准库，帮你动手写出并构建自己的 C++ 程序。内容持续更新中。"
 number-sections: false
 body-classes: homepage
 ---

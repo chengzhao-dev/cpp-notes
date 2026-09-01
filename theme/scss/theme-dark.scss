@@ -27,7 +27,7 @@ $code-color: #e8e6e3 !default;
 // 次级文字
 $body-secondary: #a7a29a !default;
 
-// 导航条：与页面同底色（Dark Reader #181a1b）+ 发丝线（底色/文字由 tokens.css 的 --navbar-bg / --navbar-fg 驱动）
+// 导航条：与页面同底色（底色/文字由 tokens.css 的 --navbar-bg / --navbar-fg 驱动，暗色 #131010）
 $navbar-fg: #e8e6e3 !default;
 
 // Callout 语义色（opencode aside 暗色：亮色 accent 字，与 tokens.css 的 --callout-*-border 暗色一致；

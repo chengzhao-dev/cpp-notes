@@ -85,8 +85,10 @@ nav.navbar.navbar-expand-lg {
   width: 11rem;
   padding-left: 1.9rem;
   font-size: 0.8125rem;
-  transition: border-color var(--transition);
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%2359636e" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+   transition: border-color var(--transition);
+  /* 图标 fill 无法引用 CSS 变量（data URI 是隔离文档）：取值须与 --navbar-muted 保持同步
+     （亮 #5c5858 / 暗 #a7a29a，改令牌时此处一并改） */
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%235c5858" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
   background-repeat: no-repeat;
   background-position: 0.6rem center;
   background-size: 1.125rem 1.125rem;

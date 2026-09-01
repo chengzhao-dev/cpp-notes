@@ -27,12 +27,12 @@
   }
 }
 
-/* ---------- 页脚（对齐 gitcn：通栏浅灰带 + #666 12px；暗色走 Dark Reader 适配） ----------
+/* ---------- 页脚（通栏浅灰带 + 12px 次级灰；颜色走令牌，明暗自动适配） ----------
    .footer 挂在 #quarto-content 网格内（main 之后），用 grid-column: 1/-1 横跨全部列实现通栏 */
 .footer {
   grid-column: 1 / -1;
-  color: #6e6a6a;
-  background-color: #f8f7f7;
+  color: var(--text-secondary);
+  background-color: var(--code-bg);
   font-family: var(--ui-font);
   font-weight: 400;
   font-size: 0.75rem;
@@ -40,10 +40,6 @@
   padding: 1.25rem 1rem 1rem;
   margin-top: 3rem;
   text-align: center;
-}
-body.quarto-dark .footer {
-  color: #a7a29a;
-  background-color: #1b1818;
 }
 
 /* ---------- 顶栏 / 底栏：对齐 gitcn.org（GitHub 深色顶栏 + 绿色/蓝色强调） ---------- */
@@ -56,11 +52,8 @@ body.quarto-dark .navbar {
   --bs-navbar-brand-color: var(--navbar-fg);
   box-shadow: none;
 }
-/* 底栏：上一页 / 下一页 与页脚链接悬浮点亮主色蓝 */
-.nav-page .pagination-link:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
+/* 翻页卡片（.nav-page .pagination-link:hover）的完整 hover 规则在 sidebar.css 单点维护
+   （主色蓝 + 卡片 hover 边 + 上移阴影），此处不重复定义 */
 .footer a {
   color: var(--text-link);
 }

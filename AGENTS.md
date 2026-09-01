@@ -13,7 +13,7 @@
 ```bash
 quarto render             # 渲染整本 Book → _book/（产物可直接打开，零服务器延迟，最省事）
 quarto preview            # 本地实时预览（Windows 上可能卡死/首屏转圈，见下）
-git push                  # 推送即自动部署：Actions 渲染 _book/ → 推 gh-pages 分支 → Pages 发布
+git push                  # 推送即自动部署：Actions 渲染 _book/ → 官方 Pages actions 发布（见 .github/workflows/pages.yml）
 ```
 
 ## 运行 Python 脚本（解释器解析协议）
@@ -161,7 +161,7 @@ Get-ChildItem _book\site_libs\bootstrap -Filter *.min.css | Select-String -Simpl
 - **演示块（命令 + 预期输出）：统一用 `$` 作为唯一提示符**，`$` 后跟命令、输出紧跟其后，与命令同块；
   PowerShell 与 Bash 演示块均用 `$`（即全站只有 `$` 一种提示符，不再出现 `PS>`）。
 - **性质相近的命令可合并演示块**：同一主题的多条查看命令（如多个 `--version`）合并到一个块，
-  每条命令上方 `#` 注释标明身份（如「# g++：编译器版本」），命令对之间空一行；
+  每条命令上方 `#` 注释标明身份（如「# g++: 编译器版本」），命令对之间空一行；
   正文只负责介绍（判据 + 挑代表演示），不逐条铺正文、不逐条分块（细则见 quarto-docs skill 的 authoring.md）。
 - **代码配色完全交给 GitHub 风格高亮**：`highlight-style: github-light` / `github-dark`（已在 `_quarto.yml` 配置）
   ——已实测与 opencode 代码取色逐项一致，`code.css` 不再为代码块/终端额外设置配色或外壳（`.console`）样式。
@@ -169,7 +169,8 @@ Get-ChildItem _book\site_libs\bootstrap -Filter *.min.css | Select-String -Simpl
   C++ 等语言的括号/分号保持正文色）。
 - **每块代码都要有说明**：代码块上方用一句正文说明（这条命令 / 这段源码做什么）。
   说明段为次要灰色、与代码块收紧；**切勿**给代码块本身（`pre`）着灰色——代码文本必须保持高对比正文色。
-- **正文用中文标点**：中文正文使用全角标点（，。：；！？「」（）），代码块与内联代码（`...`）内保持 ASCII 标点不变。
+- **正文用中文标点**：中文正文使用全角标点（，。：；！？「」（）），代码块与内联代码（`...`）内保持 ASCII 标点不变；
+  代码块内 `#` 注释属中文行文，可用全角顿号/逗号，但注释中的冒号等标签分隔符用 ASCII（`# g++: 编译器版本`）。
 - C++ 示例统一放 `code/`，编译选项 `-std=c++20 -Wall -Wextra`（见「示例源码」）。
 
 ## 章节标题约定
@@ -183,6 +184,8 @@ Get-ChildItem _book\site_libs\bootstrap -Filter *.min.css | Select-String -Simpl
   改前先 grep 确认无 `@sec-` / `#anchor` 交叉引用这些标题，以免断链。
   `content/environment/setup-wsl2.qmd` 即采用：章首 `## 本章目标` 以目标列表 + 路线图作总览，
   其后 `## 准备与安装` 下挂 `### 先决条件` / `### 安装 WSL2`（内含基本验证与常见问题 callout）/ `### 启动与关闭` 的写法。
+- **交叉引用锚点**：会被他章引用的稳定小节，标题后写显式 ID（`## 速查 {#sec-env-cheatsheet}` 风，
+  `sec-<主题>-<名>` 命名），引用用 `@sec-...`；无显式 ID 的标题锚点随标题文本变化，勿跨章引用。
 - 每章（位于 `content/` 下）YAML **只需** `title:`，**不要**写 `description:`
   ——Book 章节页既不把 `description` 渲染进标题块，章节页也不需要该元信息。
   章节可见引言用**正文普通段落**写在标题下（不套 `.description` 样式）。
@@ -227,6 +230,10 @@ Get-ChildItem _book\site_libs\bootstrap -Filter *.min.css | Select-String -Simpl
 ## 目录职责
 
 - `content/`：备忘录章节（`.qmd`）；`code/`：C++ 示例源码（与 content 主题同名目录）。
+  内容按 part 扩写，主题目录规划：`environment` 环境与工具链（已有）→ `core` 语言核心 →
+  `memory` 对象与内存 → `stl` 容器与算法 → `templates` 模板 → `concurrency` 并发 →
+  `toolchain` CMake 与工程实践 → 速查表/术语表（速查类章节用 `cpp-content` skill 的 `api-doc.qmd` 骨架）。
+- `assets/`：品牌资产（`favicon.png`、`og-cover.png`，由 `_quarto.yml` 的 `book.favicon` / `book.image` 引用）。
 - `theme/scss/`：明暗主题变量（仅 `.scss`）；`theme/css/`：按域拆分的组件规则（`.css`）；
   `theme/includes/`：fonts/footer 注入片段。
 - `scripts/`：仓库级构建/CI 脚本（如 `defer-mermaid.py`，发布时由 Actions 执行）与 `python.json`
