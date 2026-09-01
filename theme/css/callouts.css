@@ -1,4 +1,4 @@
-/* cpp-memo 共享主题 · 提示卡片 callout / 验证块（自 common.css 拆分） */
+/* cpp-notes 共享主题 · 提示卡片 callout / 验证块（自 common.css 拆分） */
 
 /* 自定义「验证结果」块：与 callout 同体系（绿色浅底，跟随 --callout-best-practice-*），并加 ✓ 强化“通过/已验证”语义 */
 .callout-verify {

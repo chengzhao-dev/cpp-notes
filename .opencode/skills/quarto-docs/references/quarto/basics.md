@@ -64,7 +64,7 @@ project:
   type: book
 
 book:
-  title: "C++ 备忘录"
+  title: "cpp-notes"
   chapters:
     - index.qmd
     - part: "准备开发环境与工具链"

@@ -31,18 +31,21 @@ jobs:
           publish_dir: ./_book
           publish_branch: gh-pages
           force_orphan: true
-      - name: Ensure Pages source = gh-pages /(root)
+      - name: Ensure Pages source = gh-pages /(root) and request a build
         run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/pages \
-            -d '{"source":{"branch":"gh-pages","path":"/"}}')
+          api=https://api.github.com/repos/${{ github.repository }}/pages
+          auth="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
+          accept="Accept: application/vnd.github+json"
+          body='{"source":{"branch":"gh-pages","path":"/"}}'
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api" -d "$body")
+          echo "POST /pages -> HTTP $code"
           if [ "$code" = "409" ]; then
-            echo "Pages already configured."
-          elif [ "$code" = "201" ]; then
-            echo "Pages source set to gh-pages /(root)."
-          else
-            echo "Pages API returned HTTP $code (non-fatal). Set it manually: Settings -> Pages -> Deploy from a branch -> gh-pages /(root)."
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X PUT -H "$auth" -H "$accept" "$api" -d "$body")
+            echo "PUT /pages (source correction) -> HTTP $code"
+          fi
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api/builds")
+          echo "POST /pages/builds (force build) -> HTTP $code"
+          if [ "$code" != "201" ] && [ "$code" != "202" ] && [ "$code" != "409" ]; then
+            echo "WARNING: Pages build request returned HTTP $code (non-fatal)."
+            echo "Check Settings -> Pages -> Build history if the site does not update."
           fi

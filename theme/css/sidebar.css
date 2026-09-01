@@ -1,4 +1,4 @@
-/* cpp-memo 共享主题 · 侧栏 / TOC / 翻页卡片（自 common.css 拆分） */
+/* cpp-notes 共享主题 · 侧栏 / TOC / 翻页卡片（自 common.css 拆分） */
 
 /* ---------- 侧栏 / TOC ---------- */
 /* 分组标题（sidebar 含分组时生成，向前兼容）：opencode docs 风——13px 半粗、不大写、正文色 */
@@ -202,7 +202,7 @@ nav.page-navigation {
 #quarto-sidebar ul.list-unstyled.mt-1 > li.sidebar-item-section {
   margin-top: 1.25rem;
 }
-/* 首个 part（紧跟首页「C++ 备忘录」）：留出呼吸位，又不过分离群 */
+/* 首个 part（紧跟首页（cpp-notes））：留出呼吸位，又不过分离群 */
 #quarto-sidebar ul.list-unstyled.mt-1 > li.sidebar-item-section:first-child {
   margin-top: 0.375rem;
 }

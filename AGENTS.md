@@ -1,6 +1,6 @@
 # AGENTS.md
 
-本仓库是 Quarto Book 项目（C++ 备忘录）。
+本仓库是 Quarto Book 项目（cpp-notes）。
 
 - 写作规范 → `.opencode/skills/quarto-docs/`
 - C++ 知识 / 代码风格 → `cpp-content`

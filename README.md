@@ -1,4 +1,4 @@
-# C++ 备忘录
+# cpp-notes
 
 基于 [Quarto Book](https://quarto.org/docs/books/) 的 C++ 编程备忘文档，渲染为 HTML 并发布到 GitHub Pages。
 

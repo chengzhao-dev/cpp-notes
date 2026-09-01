@@ -7,9 +7,9 @@ site-url: "https://chengzhao-dev.github.io/cpp-notes"
 repo-actions: [edit, issue]
 
 book:
-  title: "C++ 备忘录"
+  title: "cpp-notes"
   navbar:
-    title: "C++ 备忘录"
+    title: "cpp-notes"
     search: true
   chapters:
     - index.qmd

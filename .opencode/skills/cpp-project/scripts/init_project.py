@@ -64,7 +64,7 @@ def readme_text(name, layout):
     lines = [f"# {name}", ""]
     if layout == "bare":
         lines += [
-            "单文件验证代码，由 cpp-memo 的 verify_examples.py 直接编译：",
+            "单文件验证代码，由本仓库的 verify_examples.py 直接编译：",
             "",
             "```bash",
             "python .opencode/skills/cpp-content/scripts/verify_examples.py",

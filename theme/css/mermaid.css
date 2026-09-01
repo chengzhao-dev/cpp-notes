@@ -1,4 +1,4 @@
-/* cpp-memo 共享主题 · mermaid 图表（中性灰 opencode 风，自 common.css 拆分时新增） */
+/* cpp-notes 共享主题 · mermaid 图表（中性灰 opencode 风，自 common.css 拆分时新增） */
 
 /* 依赖条件：_quarto.yml 不配置 format.html.mermaid.theme——此时 quarto-diagram 的
    mermaid-init.js 会注入内置 themeCSS（mkdocs-material 适配版），全部取色走

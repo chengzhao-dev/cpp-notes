@@ -1,4 +1,4 @@
-# 中文技术写作与润色指南（C++ 备忘录）
+# 中文技术写作与润色指南（cpp-notes）
 
 本文件是本仓库 `.qmd` 的**中文写作唯一出处**（怎么用词、怎么造句、怎么收尾）。C++ 专属术语表见 `../../../cpp-content/references/cpp/cpp.md`；内容结构（代码块/终端/callout 怎么写）见 `../quarto/authoring.md`。本文件只管「中文怎么写」。参照：[learncpp.com](https://www.learncpp.com/) 与微软 / 谷歌官方文档。
 
