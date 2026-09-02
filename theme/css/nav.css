@@ -62,7 +62,7 @@ nav.navbar.navbar-expand-lg {
   color: var(--navbar-fg);
   opacity: 0.85;
 }
-/* 顶栏导航文本：紧凑 14px / 500，hover 下划线（offset 4px，opencode 风） */
+/* 顶栏导航文本：紧凑 14px / 500，hover 下划线（offset 4px，docs 风） */
 .navbar-expand-lg .navbar-nav .nav-link {
   font-size: 0.875rem;
   font-weight: 500;
@@ -88,14 +88,14 @@ nav.navbar.navbar-expand-lg {
    transition: border-color var(--transition);
   /* 图标 fill 无法引用 CSS 变量（data URI 是隔离文档）：取值须与 --navbar-muted 保持同步
      （亮 #5c5858 / 暗 #a7a29a，改令牌时此处一并改） */
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%235c5858" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23737373" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
   background-repeat: no-repeat;
   background-position: 0.6rem center;
   background-size: 1.125rem 1.125rem;
 }
 body.quarto-dark #quarto-search input,
 body.quarto-dark .quarto-navbar-search input {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23a7a29a" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23A3A3A3" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
 }
 #quarto-search input:focus,
 .quarto-navbar-search input:focus {
@@ -146,7 +146,7 @@ nav.quarto-secondary-nav {
 nav.quarto-secondary-nav .quarto-btn-toggle {
   color: var(--body-color);
 }
-/* 滚动后不另加阴影：顶栏/次级导航仅靠 1px 发丝线分隔（opencode 风） */
+/* 滚动后不另加阴影：顶栏/次级导航仅靠 1px 发丝线分隔（docs 风） */
 .quarto-page-breadcrumbs .breadcrumb,
 .quarto-page-breadcrumbs .breadcrumb-item,
 .quarto-page-breadcrumbs .breadcrumb-item a {
@@ -159,7 +159,7 @@ nav.quarto-secondary-nav .quarto-btn-toggle {
 }
 /* 修「>」与前后文字不在一条水平线：条目做成 flex 行（清掉 Quarto 的 .33em padding）；
    分隔符不用 ">" 字符——Segoe UI 的 ">" 在字框内光学偏高（盒居中≠光学居中，CJK 字形
-   偏满放大观感），改用 SVG chevron（mask + currentColor，opencode/GitHub 同款）几何居中、
+   偏满放大观感），改用 SVG chevron（mask + currentColor，docs/GitHub 同款）几何居中、
    与字体度量彻底解耦；箭头左右等距：左距 = 本元素 margin-left，右距 = li 的 flex gap；
    ol 自身 margin 清零，标题块 nav→标题的间距由 .quarto-title-breadcrumbs 统一控制 */
 .quarto-page-breadcrumbs .breadcrumb {

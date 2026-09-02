@@ -2,72 +2,52 @@
 title: "搭建 WSL2 环境"
 ---
 
-WSL2 是 Windows 里的 Linux 子系统。本章在 Windows 上用它搭好一套 C++ 开发环境，装好 Ubuntu，并配齐编译、构建与调试工具链。
+WSL2（Windows Subsystem for Linux，Windows 里的 Linux 子系统）让你在 Windows 里运行完整的 Ubuntu，而不必单独装一台 Linux 电脑或虚拟机。本章在 Windows 上搭好 Ubuntu 开发环境，并配齐编译、构建 C++ 程序所需的工具链。
 
 ::: {.callout-note}
-本章示例在 Ubuntu 26.04 LTS 上验证（g++ 15.2.0、CMake 4.2.3）。大部分用法在更早版本同样可用，个别命令的输出与包名可能有差异。
+本章命令在 Ubuntu 26.04 LTS 上验证，对应工具版本为 g++ 15.2.0 与 CMake 4.2.3。Ubuntu 24.04、22.04 等老版本大多同样可用，命令输出与包名可能略有差异。
 :::
-
----
 
 ## 本章目标
 
 学完本章，你就能：
 
-- 装好并启用 WSL2，让 Ubuntu 成为开发环境。
-- 在 WSL2 Ubuntu 环境里装好并验证 C++ 构建工具链。
-
-本章的路线是先装好 WSL2 与 Ubuntu，再在它里面装好并验证 C++ 构建工具链，下图就是这条路线。
+- 在 Windows 上装好并启用 WSL2，把 Ubuntu 当作日常开发环境。
+- 在 Ubuntu 终端里安装 C++ 工具链，并用 `--version` 确认各工具可用。
 
 ```{mermaid}
-%%{init: {"fontFamily": "Inter, Noto Sans SC, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Noto Sans CJK SC, sans-serif", "flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-  A[装好并启用 WSL2] --> B[用 Ubuntu 作为开发环境]
-  B --> C{软件源网速慢吗？}
-  C -- 不慢，用官方源 --> D[安装并验证 C++ 构建工具链]
-  C -- 慢，换国内镜像 --> D
+  A[启用 WSL2] --> B[安装 Ubuntu]
+  B --> C[安装 C++ 工具链]
+  C --> D[验证 g++ 与 cmake]
 ```
-
----
 
 ## 准备与安装
 
-本节先确认先决条件，再按三步装好 WSL2 与 Ubuntu。
-
----
+以下步骤在 **Windows 的 PowerShell** 中完成（开始菜单搜索「PowerShell」，右键「以管理员身份运行」）。
 
 ### 先决条件
 
-安装前，先确认系统满足这两项要求：
-
 1. **操作系统**：Windows 10 版本 2004 及以上，或 Windows 11。
-2. **CPU 虚拟化**：已在 BIOS/UEFI 中开启。
-
-两项都满足，就可以开始安装。
-
----
+2. **CPU 虚拟化**：已在 BIOS/UEFI 中开启（任务管理器 → 性能 → CPU，「虚拟化」应显示「已启用」）。未开启时 `wsl --install` 可能失败。
 
 ### 安装 WSL2
 
-跟着下面三步，装好 WSL2 与 Ubuntu 发行版。本节只演示最简安装方式，更多安装选项与排错请看 [WSL 官方文档](https://learn.microsoft.com/windows/wsl/)。
+**第 1 步：以管理员身份打开 PowerShell**
 
-**第 1 步：以管理员身份打开 PowerShell。**
+**第 2 步：运行安装命令**
 
-安装与注册 WSL2 都需要管理员权限，否则会因权限不足而失败。
-
-**第 2 步：运行安装命令。**
-
-在 PowerShell 中运行下面这条命令，开始安装 WSL2 与 Ubuntu 发行版：
+该命令会启用 WSL 相关 Windows 功能，并默认安装 Ubuntu：
 
 ```powershell
 wsl --install
 ```
 
-装完后需要重启一次电脑。重启后首次启动 Ubuntu 会先解压系统文件，随后弹出窗口让你设置 Linux 用户名与密码。
+装完后**重启电脑**。重启后从开始菜单打开 **Ubuntu**，首次进入会提示创建 Linux **用户名**和**密码**，密码与 Windows 登录无关，输入时不显示字符，属正常现象。
 
-**第 3 步：验证安装结果。**
+**第 3 步：验证 WSL 版本**
 
-装好后在 PowerShell 中运行 `wsl --status`，看到如下输出就说明 WSL2 已装好：
+仍在 PowerShell 中执行：
 
 ```powershell
 $ wsl --status
@@ -75,182 +55,114 @@ $ wsl --status
 默认版本: 2
 ```
 
-::: {.callout-note}
-若 `wsl --status` 提示未启用「虚拟机平台」，或默认分发为空，先以管理员身份运行 `wsl --install`。仍不行就到「控制面板 → 程序 → 启用或关闭 Windows 功能」勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」，重启电脑后再运行一次 `wsl --install`。
-:::
+「默认版本: 2」表示 WSL2 已启用；「默认分发」是你输入 `wsl` 时进入的 Linux 发行版名称。
 
----
+::: {.callout-note}
+若提示未启用「虚拟机平台」，以管理员重新运行 `wsl --install`；仍不行则在「启用或关闭 Windows 功能」中勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」，重启后再试。
+:::
 
 ### 启动与关闭
 
-启动就是进入 Ubuntu 的 shell，在 PowerShell 中运行 `wsl`，或直接打开 Ubuntu 应用。进入后终端停在你启动时的 Windows 目录。要回到 Linux 主目录，进入后运行 `cd ~`，或启动时就运行 `wsl ~`。
+- **启动 Ubuntu**
 
-关闭就是停掉整个环境、释放内存，在 PowerShell 中运行 `wsl --shutdown` 终止所有 Linux 系统及底层轻量虚拟机。只终止指定的系统时，改用 `wsl --terminate <distro>`，如 `wsl --terminate Ubuntu`。
+  在 Windows 开始菜单打开 **Ubuntu** 应用（与在 PowerShell 输入 `wsl` 效果相同，都会进入默认 Linux 发行版）。若你已在 PowerShell，可用 `wsl ~` 直接进入 Linux 的**家目录**（`~`，类似 Windows 的「用户文件夹」）。
 
-不确定处于哪种状态时，在 PowerShell 中运行 `wsl --list --verbose`，看 STATE 一列：Running 表示运行中，Stopped 表示已停止。
+- **关闭全部实例**
+
+  在 PowerShell 执行 `wsl --shutdown`，会停止所有正在后台运行的 Linux 环境。
+
+- **关闭指定发行版**
+
+  `wsl --terminate Ubuntu` 只停止名为 Ubuntu 的实例，其它发行版不受影响。
+
+- **查看是否在运行**
+
+  在 PowerShell 执行 `wsl --list --verbose`（可简写 `wsl -l -v`）。`STATE` 为 `Running` 表示该发行版正在运行；`Stopped` 表示已关闭。星号 `*` 所在行是默认分发：
 
 ```powershell
-$ wsl --list --verbose
+$ wsl -l -v
   NAME      STATE           VERSION
-* Ubuntu    Stopped         2
+* Ubuntu    Running         2
 ```
-
----
 
 ## 安装 C++ 构建工具链
 
-进入 WSL2 后，后续操作都在这个 Linux 环境里进行。
-
----
+从本节起，请在 **Ubuntu 终端**（黑色或紫色窗口，提示符类似 `username@hostname:~$`）中操作，而不是 PowerShell。
 
 ### 软件源
 
-默认情况下，Ubuntu 使用[官方源](http://archive.ubuntu.com/ubuntu)。更新或下载明显卡顿时，再换用[清华大学开源软件镜像站](https://mirrors.tuna.tsinghua.edu.cn/ubuntu)加速，做法以[清华镜像帮助页](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)为准。
+Ubuntu 通过**软件源**（远程软件仓库）安装包。默认使用官方源；若 `apt update` 或下载很慢，可按 [清华镜像帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 换源。网络正常则不必改。
 
-::: {.callout-note}
-换源只影响下载速度，不改软件包内容。不卡顿就保留官方源，不必强制替换。
-:::
+### 安装与验证
 
----
+**第 1 步：更新软件包索引**
 
-### 安装编译器、调试器与构建系统
-
-C++ 开发需要编译器、构建系统与调试器，下面按顺序把它们装齐。
-
-**第 1 步：更新软件包索引。**
+`apt update` 拉取最新包列表；`upgrade` 升级已安装包（可选但建议）：
 
 ```bash
-sudo apt update
+sudo apt update && sudo apt upgrade -y
 ```
 
-**第 2 步：升级已装包以保持系统最新。**
+`sudo` 会要求输入你在首次进入 Ubuntu 时设置的 Linux 密码。
+
+**第 2 步：安装工具**
+
+下表列出本章要装的包及其用途：
+
+| 包名 | 提供什么 | 你什么时候会用到 |
+|---|---|---|
+| build-essential | g++、make 等编译基础 | 编译 `.cpp` 源文件 |
+| gdb | GNU 调试器 | 单步调试、查看变量 |
+| cmake | 跨平台构建系统 | 管理多文件 C++ 项目 |
+| ninja-build | 快速构建后端 | CMake 生成构建文件时常用 |
+| clang / clang-tidy / clang-format | 另一套编译器与静态检查、格式化 | 代码风格检查、与 g++ 对照 |
+
+一条命令安装：
 
 ```bash
-sudo apt upgrade -y
+sudo apt install -y build-essential gdb cmake ninja-build clang clang-tidy clang-format
 ```
 
-**第 3 步：编译与调试工具链。**
+**第 3 步：验证安装**
+
+在 Ubuntu 终端执行以下命令；看到版本号且无报错即表示该工具可用：
 
 ```bash
-# build-essential: gcc、g++、make 与标准库，编译 C++ 的最低依赖
-# gdb: GNU 调试器
-sudo apt install -y build-essential gdb
-```
-
-**第 4 步：安装构建系统。**
-
-```bash
-# cmake: 构建系统，把源码组织、编译成可执行程序
-# ninja-build: 配合 cmake 的高速构建工具，加快编译
-sudo apt install -y cmake ninja-build
-```
-
-**第 5 步：安装 LLVM/Clang 工具集。**
-
-```bash
-# clang: LLVM 的 C/C++ 编译器，命令为 clang++
-# clang-tidy: 静态分析，编译前找出潜在 bug 与风格问题
-# clang-format: 一键统一代码风格
-sudo apt install -y clang clang-tidy clang-format
-```
-
-**第 6 步：验证工具链。**
-
-验证方法对每个工具都一样，运行它的 `--version`，输出首行打印出版本号，就说明这个工具可用。工具链里装的工具不止一个，逐个确认不现实，先挑最常用的两个，比如 `g++` 与 `cmake`：
-
-```bash
-# g++: 编译器版本
 $ g++ --version
-g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+g++ (Ubuntu 15.2.0-...) 15.2.0
+Copyright (C) 2025 Free Software Foundation, Inc.
 
-# cmake: 构建系统版本
 $ cmake --version
 cmake version 4.2.3
+CMake suite maintained and supported by Kitware
 ```
 
-其余工具同理，需要用哪个，就运行哪个的 `--version`。
-
----
+`gdb`、`clang` 等同理，需要时在终端执行 `gdb --version` 或 `clang --version` 即可。
 
 ## 常见问题
 
-下面是安装过程中最常见的排错场景，遇到对应现象时对照处理。
+### wsl 不是内部或外部命令
 
----
+表示 Windows 尚未安装或未识别 WSL 组件。按顺序排查：
 
-### WSL2 提示不是内部或外部命令
+1. 确认 Windows 版本满足先决条件（设置 → 系统 → 关于）。
+2. 以**管理员**身份在 PowerShell 运行 `wsl --install`，或在 Windows 功能中启用 WSL 相关项。
+3. **重启电脑**后再试。
 
-系统不认识 `wsl` 这条命令，多半是安装前提或功能开关的问题，依次排查。
-
-排查步骤：
-
-1. **确认系统版本**：WSL2 需要 Windows 10 版本 2004 及以上，或 Windows 11。版本不满足时无法安装 WSL2，先升级系统。
-2. **启用 WSL2 组件**：功能没启用时 `wsl` 命令还不存在。以**管理员身份**运行 `wsl --install`；仍未解决，在「控制面板 → 程序 → 启用或关闭 Windows 功能」勾选**虚拟机平台**与**适用于 Linux 的 Windows 子系统**。
-3. **装好后仍报错**：重启电脑让组件生效，再运行一次 `wsl --install`。
-
-排查完成后运行 `wsl --status`，看到「安装 WSL2」第 3 步的输出就说明修复成功。
-
----
-
-## 延伸内容
-
-环境就绪后，还有一项按需查阅的延伸内容，遇到对应场景再来看。
-
----
-
-### 迁移 WSL2 系统到其他磁盘
-
-Ubuntu 系统默认装在系统盘的用户目录 `C:\Users\<user>\AppData\Local\Packages\` 里，会随使用增长持续占用系统盘空间。系统盘空间不足时，可把 Ubuntu 整体迁移到其他磁盘，使用以下方法之一。
-
-**方法 1：导出再导入（通用）。** 以管理员身份打开 PowerShell 后运行：
-
-```powershell
-# 先关闭所有 WSL2 实例，确保导出时文件不被占用
-wsl --shutdown
-
-# 把 Ubuntu 导出为 tar 备份包
-wsl --export Ubuntu "D:\ProgramData\WSL\ubuntu-backup.tar"
-
-# 注销原发行版，释放 C 盘空间
-wsl --unregister Ubuntu
-
-# 从备份包导入到 D 盘新位置，并指定 WSL2
-wsl --import Ubuntu "D:\ProgramData\WSL\Ubuntu" "D:\ProgramData\WSL\ubuntu-backup.tar" --version 2
-
-# 设为默认发行版
-wsl --set-default Ubuntu
-```
-
-::: {.callout-note}
-`wsl --import` 不保留原有用户，首次进入会以 root 登录。若需恢复普通用户，进入 Ubuntu 后编辑 `/etc/wsl.conf`，在 `[user]` 段下写入 `default=<user>`，再终止 Ubuntu 后重新进入。
-:::
-
-**方法 2：一步迁移（需 `wsl` 2.3.11+，推荐）。** 自动保留用户与注册表项。以后重装系统时，也能一步指定安装位置，免去再迁移。在 PowerShell 中运行：
-
-```powershell
-# 一步迁移（wsl 2.3.11+）
-wsl --manage Ubuntu --move "D:\ProgramData\WSL\Ubuntu"
-
-# 重装系统后一步指定位置
-wsl --install Ubuntu --location "D:\ProgramData\WSL\Ubuntu"
-```
-
----
+成功后 `wsl --status` 应显示「默认版本: 2」。
 
 ## 本章回顾
 
-你在 Windows 上已经有了一套能编写 C++ 的 WSL2 Ubuntu 环境。`wsl --status` 与各工具的 `--version` 随时能确认环境和工具链就位。
-
----
+你已在 Windows 上拥有可用的 WSL2 Ubuntu 环境，并装好了 C++ 编译与构建工具。日后可随时用 `wsl --status` 确认 WSL 状态，用各工具的 `--version` 确认工具链是否正常。
 
 ### 下一步
 
-- 工具链已就位，可以先写一个单文件的 C++ 程序，用 `g++` 编译并运行，跑通「编写 → 编译 → 运行」全链路。
-- 之后进入本部分的下一章《用 CMake 构建 C++ 项目》（规划中，见[部分路线图](index.qmd)），学习把源码组织成可维护的工程。
-
----
+- 写单文件程序，用 `g++` 编译并运行。
+- 下一章《用 CMake 构建 C++ 项目》（见[部分路线图](index.qmd)）。
 
 ### 相关资源
 
 - [WSL 官方文档](https://learn.microsoft.com/windows/wsl/)
 - [Ubuntu 换源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
+
+<!-- 磁盘迁移等进阶内容见独立章 wsl-disk-migration（规划中） -->

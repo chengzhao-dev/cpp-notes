@@ -25,7 +25,7 @@
   // 避免与令牌双写漂移；取不到时按当前明暗兜底
   var sync = function () {
     var v = window.getComputedStyle(document.body).getPropertyValue('--page-bg').trim();
-    if (!v) v = document.body.classList.contains('quarto-dark') ? '#131010' : '#fdfcfc';
+    if (!v) v = document.body.classList.contains('quarto-dark') ? '#0A0A0A' : '#FFFFFF';
     meta.setAttribute('content', v);
   };
   sync();
@@ -37,7 +37,6 @@
 <script>
 (function () {
   // Quarto zh 语言包给搜索框注入的 placeholder 是「搜索」，统一改回 Search
-  // （与 GitHub / opencode 观感一致；input 由 JS 运行时注入，需 MutationObserver 兜底）
   var setPlaceholder = function () {
     var input = document.querySelector('#quarto-search input, .quarto-navbar-search input');
     if (input && input.getAttribute('placeholder') !== 'Search') {

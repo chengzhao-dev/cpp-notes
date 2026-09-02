@@ -39,8 +39,6 @@
 }
 .landing-card:hover {
   border-color: var(--card-hover-border);
-  box-shadow: var(--card-shadow);
-  transform: translateY(-2px);
 }
 #quarto-document-content .landing-card h3 {
   margin-top: 0;

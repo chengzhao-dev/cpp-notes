@@ -1,141 +1,148 @@
 /* ============================================================
-   cpp-notes 共享主题 · 设计令牌（颜色 / 字体变量，明暗统一）
-   body.quarto-light / body.quarto-dark 由 Quarto 自动切换；
-   组件规则按域拆分在同目录其余 *.css，加载顺序见 _quarto.yml 的 css: 列表
+   cpp-notes 共享主题 · 设计令牌（冷灰 docs 风，明暗统一）
+   body.quarto-light / body.quarto-dark 由 Quarto 自动切换
    ============================================================ */
 
-/* ---------- 颜色变量 ---------- */
 body {
-  /* 亮色（默认）：opencode 暖灰令牌（hsl 色温对齐 opencode.ai/docs，结构沿用 Primer 值域） */
-  --body-color: #201d1d;
-  --code-bg: #f8f7f7;
-  --code-border: #d9d8d8;
-  --line-num-color: #5c5858;
-  --inline-code-bg: rgba(178, 172, 172, 0.2);
-  --inline-code-fg: #201d1d;
-  --text-secondary: #5c5858;
-  --link-color: #0969da;                    /* UI 强调色（复制按钮 / focus ring / CTA）保留蓝 */
-  --link-underline: rgba(9, 105, 218, 0.4);
-  --text-link: var(--body-color);           /* 正文链接：opencode 近黑 */
-  --text-underline: rgba(32, 29, 29, 0.4);  /* 正文链接常驻下划线（半透明正文色） */
-  --table-header-bg: #f8f7f7;
-  --table-border: #d9d8d8;
-  --table-hairline: #eceaea;                /* 表格行底线（比表头线更淡一档） */
-  --quote-bg: #f8f7f7;
-  /* opencode aside 色板：亮色 = 深色 accent 字 + 高饱和浅底（hue 随类型漂移） */
-  --callout-note-border: hsl(234, 80%, 30%);          --callout-note-bg: hsl(234, 88%, 90%);
-  --callout-tip-border: hsl(281, 90%, 30%);           --callout-tip-bg: hsl(281, 80%, 90%);
-  --callout-warning-border: hsl(41, 80%, 25%);        --callout-warning-bg: hsl(41, 90%, 88%);
-  --callout-important-border: hsl(262, 90%, 34%);     --callout-important-bg: hsl(262, 88%, 91%);
-  --callout-caution-border: hsl(339, 80%, 30%);       --callout-caution-bg: hsl(339, 80%, 90%);
-  --callout-best-practice-border: hsl(101, 80%, 22%); --callout-best-practice-bg: hsl(101, 85%, 90%);
-  --callout-key-insight-border: hsl(45, 80%, 25%);    --callout-key-insight-bg: hsl(45, 90%, 88%);
-  --quote-border: #d9d8d8;
-  --copy-btn-bg: #fdfcfc;
-  --copy-btn-border: #d9d8d8;
-  --scrollbar-thumb: #d4d1d1;
-  --selection-bg: rgba(9, 105, 218, 0.18);
-  --mark-bg: rgba(255, 212, 0, 0.4);           /* mark 高亮底（墨色文字在浅黄底上，对比度达标） */
-  --sidebar-hover-bg: rgba(0, 0, 0, 0.045);
-  --sidebar-active-bg: rgba(0, 0, 0, 0.045);
-  --sidebar-fg: #5c5858;
-  /* 设计令牌（统一强调入口与组件色；顶栏与页面同底 + 发丝线，opencode 风） */
+  /* 亮色：冷灰 docs 令牌 */
+  --body-color: #171717;
+  --code-bg: #F7F7F8;
+  --code-border: #E5E5E5;
+  --line-num-color: #737373;
+  --inline-code-bg: rgba(0, 0, 0, 0.06);
+  --inline-code-fg: #171717;
+  --text-secondary: #737373;
+  --link-color: #F54E00;
+  --link-underline: rgba(245, 78, 0, 0.35);
+  --text-link: var(--link-color);
+  --text-underline: var(--link-underline);
+  --table-header-bg: #F7F7F8;
+  --table-border: #E5E5E5;
+  --table-hairline: #F0F0F0;
+  --quote-bg: #F7F7F8;
+  /* callout：左条色 + 浅底（Mintlify 语法） */
+  --callout-note-border: #2563EB;
+  --callout-note-bg: #EFF6FF;
+  --callout-tip-border: #16A34A;
+  --callout-tip-bg: #F0FDF4;
+  --callout-warning-border: #D97706;
+  --callout-warning-bg: #FFFBEB;
+  --callout-important-border: #7C3AED;
+  --callout-important-bg: #F5F3FF;
+  --callout-caution-border: #DC2626;
+  --callout-caution-bg: #FEF2F2;
+  --callout-best-practice-border: #16A34A;
+  --callout-best-practice-bg: #F0FDF4;
+  --callout-key-insight-border: #D97706;
+  --callout-key-insight-bg: #FFFBEB;
+  --quote-border: #E5E5E5;
+  --copy-btn-bg: #FFFFFF;
+  --copy-btn-border: #E5E5E5;
+  --scrollbar-thumb: #D4D4D4;
+  --selection-bg: rgba(245, 78, 0, 0.15);
+  --mark-bg: rgba(255, 212, 0, 0.4);
+  --sidebar-hover-bg: rgba(0, 0, 0, 0.04);
+  --sidebar-active-bg: rgba(245, 78, 0, 0.08);
+  --sidebar-fg: #737373;
   --accent: var(--link-color);
-  --navbar-bg: #fdfcfc;
-  --navbar-fg: #201d1d;
-  --navbar-muted: #5c5858;
-  --navbar-border: #d9d8d8;
-  --navbar-shadow: rgba(0, 0, 0, 0.08);
-  --navbar-input-bg: #f8f7f7;
-  --navbar-hover-bg: rgba(0, 0, 0, 0.05);
-  --navbar-secondary-bg: rgba(253, 252, 252, 0.72);
-  --btn-primary-bg: #1f883d;
-  --btn-primary-hover-bg: #1c8139;
-  --btn-primary-fg: #ffffff;
-  --dot-green: #2da44e;
-  --card-bg: var(--surface-raised);
-  --card-border: #d9d8d8;
+  --navbar-bg: #FFFFFF;
+  --navbar-fg: #171717;
+  --navbar-muted: #737373;
+  --navbar-border: #E5E5E5;
+  --navbar-shadow: rgba(0, 0, 0, 0.06);
+  --navbar-input-bg: #F7F7F8;
+  --navbar-hover-bg: rgba(0, 0, 0, 0.04);
+  --navbar-secondary-bg: rgba(255, 255, 255, 0.85);
+  --btn-primary-bg: #F54E00;
+  --btn-primary-hover-bg: #E04600;
+  --btn-primary-fg: #FFFFFF;
+  --dot-accent: #F54E00;
+  --card-bg: #FFFFFF;
+  --card-border: #E5E5E5;
   --card-hover-border: var(--link-color);
-  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.07);
-  --toc-active: var(--body-color);
+  --card-shadow: none;
+  --toc-active: var(--link-color);
   --toc-indent: 0.75rem;
   --transition: 0.15s ease-in-out;
-  --ui-font: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --mono-font: "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Noto Sans Mono", "Noto Sans SC", "Courier New", monospace;
-  /* 层级表面体系：页面 / 浮起层（opencode 暖纸白 hsl(0,20%,99%)） */
-  --page-bg: #fdfcfc;
-  --surface-raised: #fdfcfc;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --ui-font: "Inter", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --mono-font: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+  --page-bg: #FFFFFF;
+  --surface-raised: #F7F7F8;
   --sidebar-bg: transparent;
-  --line-num-bg: rgba(178, 172, 172, 0.14);
-  --line-hover-bg: rgba(9, 105, 218, 0.05);
-  /* 基础排版润色（F3）：正文色由 --body-color 统一驱动（Bootstrap $body-color 仅为回退），
-     行高 1.6875（opencode 同款） */
+  --line-num-bg: rgba(0, 0, 0, 0.04);
+  --line-hover-bg: rgba(245, 78, 0, 0.06);
   color: var(--body-color);
   background-color: var(--page-bg);
-  line-height: 1.6875;
+  line-height: 1.625;
+  font-size: 0.9375rem;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   text-wrap: pretty;
 }
 
 body.quarto-dark {
-  --body-color: #e8e6e3;
-  --code-bg: #1b1818;
-  --code-border: #3c3a3a;
-  --line-num-color: #8a8680;
-  --inline-code-bg: rgba(255, 255, 255, 0.06);
-  --inline-code-fg: #e8e6e3;
-  --text-secondary: #a7a29a;
-  --link-color: #58a6ff;                    /* 与 theme-dark.scss 的 $primary/$link-color 归一（GitHub dark accent） */
-  --link-underline: rgba(88, 166, 255, 0.5);
-  --table-header-bg: #1b1818;
-  --table-border: #3c3a3a;
-  --table-hairline: #242121;                /* 表格行底线（比表头线更淡一档） */
+  --body-color: #EDEDED;
+  --code-bg: #141414;
+  --code-border: #262626;
+  --line-num-color: #A3A3A3;
+  --inline-code-bg: rgba(255, 255, 255, 0.08);
+  --inline-code-fg: #EDEDED;
+  --text-secondary: #A3A3A3;
+  --link-color: #FF6A1A;
+  --link-underline: rgba(255, 106, 26, 0.4);
+  --text-link: var(--link-color);
+  --text-underline: var(--link-underline);
+  --table-header-bg: #141414;
+  --table-border: #262626;
+  --table-hairline: #1F1F1F;
   --quote-bg: rgba(255, 255, 255, 0.03);
-  /* opencode aside 色板：暗色 = 亮色 accent 字 + 低饱和深底 */
-  --callout-note-border: hsl(234, 100%, 87%);         --callout-note-bg: hsl(234, 54%, 20%);
-  --callout-tip-border: hsl(281, 82%, 89%);           --callout-tip-bg: hsl(281, 39%, 22%);
-  --callout-warning-border: hsl(41, 82%, 87%);        --callout-warning-bg: hsl(41, 39%, 22%);
-  --callout-important-border: hsl(262, 90%, 80%);     --callout-important-bg: hsl(262, 39%, 24%);
-  --callout-caution-border: hsl(339, 82%, 87%);       --callout-caution-bg: hsl(339, 39%, 22%);
-  --callout-best-practice-border: hsl(101, 82%, 80%); --callout-best-practice-bg: hsl(101, 39%, 22%);
-  --callout-key-insight-border: hsl(45, 82%, 87%);    --callout-key-insight-bg: hsl(45, 39%, 22%);
-  --quote-border: #3c3a3a;
-  --copy-btn-bg: #262323;
-  --copy-btn-border: #3c3a3a;
-  --scrollbar-thumb: #454141;
-  --selection-bg: rgba(88, 166, 255, 0.3);
-  --mark-bg: rgba(210, 153, 34, 0.3);           /* mark 高亮底（暗色用深金底，浅字对比度约 9:1） */
+  --callout-note-border: #60A5FA;
+  --callout-note-bg: #172554;
+  --callout-tip-border: #4ADE80;
+  --callout-tip-bg: #14532D;
+  --callout-warning-border: #FBBF24;
+  --callout-warning-bg: #451A03;
+  --callout-important-border: #A78BFA;
+  --callout-important-bg: #2E1065;
+  --callout-caution-border: #F87171;
+  --callout-caution-bg: #450A0A;
+  --callout-best-practice-border: #4ADE80;
+  --callout-best-practice-bg: #14532D;
+  --callout-key-insight-border: #FBBF24;
+  --callout-key-insight-bg: #451A03;
+  --quote-border: #262626;
+  --copy-btn-bg: #141414;
+  --copy-btn-border: #262626;
+  --scrollbar-thumb: #404040;
+  --selection-bg: rgba(255, 106, 26, 0.25);
+  --mark-bg: rgba(210, 153, 34, 0.3);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
-  --sidebar-active-bg: rgba(255, 255, 255, 0.05);
-  --sidebar-fg: #a7a29a;
-  /* 设计令牌（明暗统一派生；顶栏与页面同底 + 发丝线，opencode 风） */
+  --sidebar-active-bg: rgba(255, 106, 26, 0.12);
+  --sidebar-fg: #A3A3A3;
   --accent: var(--link-color);
-  --navbar-bg: #131010;
-  --navbar-fg: #e8e6e3;
-  --navbar-muted: #a7a29a;
-  --navbar-border: #3c3a3a;
+  --navbar-bg: #0A0A0A;
+  --navbar-fg: #EDEDED;
+  --navbar-muted: #A3A3A3;
+  --navbar-border: #262626;
   --navbar-shadow: rgba(0, 0, 0, 0.4);
-  --navbar-input-bg: #1b1818;
+  --navbar-input-bg: #141414;
   --navbar-hover-bg: rgba(255, 255, 255, 0.06);
-  --navbar-secondary-bg: rgba(19, 16, 16, 0.72);
-  --btn-primary-bg: #238636;
-  --btn-primary-hover-bg: #29903b;
-  --btn-primary-fg: #ffffff;
-  --dot-green: #3fb950;
-  --card-bg: var(--surface-raised);
-  --card-border: #3c3a3a;
+  --navbar-secondary-bg: rgba(10, 10, 10, 0.85);
+  --btn-primary-bg: #FF6A1A;
+  --btn-primary-hover-bg: #F54E00;
+  --btn-primary-fg: #FFFFFF;
+  --dot-accent: #FF6A1A;
+  --card-bg: #141414;
+  --card-border: #262626;
   --card-hover-border: var(--link-color);
-  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.38);
-  --toc-active: var(--body-color);
-  --toc-indent: 0.75rem;
-  --transition: 0.15s ease-in-out;
-  --ui-font: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  /* 层级表面体系：opencode 暖黑风（hsl(0,9%,7%) / hsl(0,6%,10%)，护眼非纯黑） */
-  --page-bg: #131010;
-  --surface-raised: #1b1818;
+  --card-shadow: none;
+  --toc-active: var(--link-color);
+  --page-bg: #0A0A0A;
+  --surface-raised: #141414;
   --sidebar-bg: transparent;
   --line-num-bg: rgba(255, 255, 255, 0.04);
-  --line-hover-bg: rgba(88, 166, 255, 0.10);
+  --line-hover-bg: rgba(255, 106, 26, 0.10);
   color-scheme: dark;
 }

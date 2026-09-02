@@ -1,6 +1,5 @@
-/* cpp-notes 共享主题 · 代码块 / 行号 / 行内代码 / 复制按钮（自 common.css 拆分） */
+/* cpp-notes 共享主题 · 代码块 / 行号 / 行内代码 / 复制按钮 */
 
-/* ---------- 代码块 ---------- */
 pre {
   font-family: var(--mono-font);
   font-variant-numeric: tabular-nums;
@@ -9,7 +8,7 @@ pre {
   overflow-x: auto;
   tab-size: 4;
   -moz-tab-size: 4;
-  margin: 0; /* 间距交给 #quarto-document-content 的垂直节奏，避免嵌套 pre 残留 Bootstrap 默认边距 */
+  margin: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
@@ -24,49 +23,34 @@ pre::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
-pre::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb);
-  filter: brightness(0.9);
-}
 
-/* 代码文件块 / 终端命令块：opencode Expressive Code 卡片风——外观在 div.sourceCode
-   卡片上（见下方「卡片容器」），pre 本体透明无边框；底色/边框令牌与 opencode 的
-   --color-background-weak / --sl-color-gray-5 值一致 */
+/* 简洁圆角 pre：弱底 + 细边，无顶栏/交通灯 */
 pre.sourceCode {
-  background-color: transparent !important; /* 卡片承担底色，避免双底叠加 */
-  border: none;
-  border-radius: 0;
+  background-color: var(--code-bg) !important;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   overflow: auto;
 }
 
-/* 裸 pre（无语言围栏，当前仓库不产生，兜底保留单框样式） */
 pre:not(.sourceCode) {
   background-color: var(--code-bg) !important;
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  padding: 0.75rem 1rem; /* 与代码文本同列对齐（左缩进一致） */
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
   overflow: auto;
 }
 
-/* （文件名条规则已移除：本仓库统一用代码块上方的正文段落说明，不用 title= 与 ::: {.code-caption}） */
-
-/* 长行软换行（对齐系统已兼容：行号只移动数字、终端续行无提示符、独立输出块续行从 1.2em 起，与代码文本同列） */
 pre.sourceCode code,
 pre:not(.sourceCode) code {
   white-space: pre-wrap;
 }
 
-/* 修正 pandoc 内联样式 pre>code.sourceCode>span{line-height:1.25} 对行距的覆盖 */
 pre.sourceCode code > span {
   line-height: 1.6;
 }
 
-/* 语法高亮以 highlight-style: github-light / github-dark（_quarto.yml）为准——
-   已实测与 opencode 代码取色逐项一致（函数 #6F42C1/#B392F0、常量 #005CC5/#79B8FF、
-   字符串 #032F62/#9ECBFF、正文 #24292E/#E1E4E8），不再手动覆盖其余令牌。
-   唯一微调：shell 运算符 .op——pandoc 给正文色，opencode 为红（亮 #BF3441 / 暗 #F97583）；
-   限定 bash/powershell，C++ 等语言的括号/分号保持正文色（opencode C++ 同款） */
+/* 语法高亮交给 highlight-style: github-light / github-dark */
 body.quarto-light pre.sourceCode:is(.bash, .powershell) .op {
   color: #BF3441;
 }
@@ -74,65 +58,32 @@ body.quarto-dark pre.sourceCode:is(.bash, .powershell) .op {
   color: #F97583;
 }
 
-/* 卡片容器（pandoc 把语言代码块包在 div.sourceCode 里）：外框 + 圆角 + 弱底色；
-   头行为 ::before 空占位条（opencode figcaption.header 同款：底部发丝线），
-   高 2.25rem，复制按钮（2rem）垂直居中其中；::after 为三点装饰（见下） */
 div.sourceCode {
-  position: relative; /* 锚定 ::after 圆点 */
+  position: relative;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-sm);
   background-color: var(--code-bg);
 }
-div.sourceCode::before {
-  content: "";
-  display: block;
-  height: 2.25rem;
-  padding: 0 1rem;
-  background-color: var(--surface-raised); /* 头行比代码区浅一档（opencode trmTtbBg 同思路） */
-  border-bottom: 1px solid var(--card-border);
-}
-/* 三点装饰（opencode EC 同款：单个 mask 元素 + 三圆 SVG，文字色 15% 透明度） */
-div.sourceCode::after {
-  content: "";
-  position: absolute;
-  top: calc((2.25rem - 0.56rem) / 2);
-  left: 1rem;
-  width: 2.1rem;
-  height: 0.56rem;
-  background-color: var(--body-color);
-  opacity: 0.15;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 16'%3E%3Ccircle cx='8' cy='8' r='8'/%3E%3Ccircle cx='30' cy='8' r='8'/%3E%3Ccircle cx='52' cy='8' r='8'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 16'%3E%3Ccircle cx='8' cy='8' r='8'/%3E%3Ccircle cx='30' cy='8' r='8'/%3E%3Ccircle cx='52' cy='8' r='8'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-/* 标了 filename="..." 的块（pandoc 透传为 data-filename）：头行显示文件名、隐藏圆点 */
-div.sourceCode[data-filename]::before {
-  content: attr(data-filename);
-  display: flex;
-  align-items: center;
-  font-family: var(--mono-font);
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-}
-div.sourceCode[data-filename]::after {
-  display: none;
+
+div.sourceCode pre.sourceCode {
+  border: none;
+  border-radius: 0;
 }
 
-/* 代码块内的 code：透明继承，不套行内样式 */
 pre code {
   background-color: transparent !important;
   border: none;
   padding: 0;
 }
 
-/* 复位正文 0.01em 字距对等宽代码的微错位（含行内代码） */
 pre,
 code {
   letter-spacing: normal;
 }
 
-/* ---------- 行号（仅代码文件块，.numberLines 开启） ---------- */
+/* 行号 */
 pre.sourceCode.numberSource {
   margin-left: 0;
   padding-left: 2.5em;
@@ -159,53 +110,46 @@ pre.numberSource code > span > a:first-child::before {
   border-right: 1px solid var(--code-border);
   vertical-align: baseline;
   user-select: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
-/* 行 hover 高亮（C2，GitHub 式） */
 pre.sourceCode code > span:hover {
   background-color: var(--line-hover-bg);
 }
 
-/* 终端/命令块：提示符直接写在 qmd 源码里（全站统一 `$`，指令块不加提示符）；说明写在代码块上方正文段落。
-   代码配色完全交给 highlight-style: github-light / github-dark，此处不再额外设置终端配色或外壳样式。 */
-
-
-/* ---------- 行内代码 ---------- */
 :not(pre) > code {
   background-color: var(--inline-code-bg);
   color: var(--inline-code-fg);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 0.15em 0.4em;
   font-size: 0.85em;
 }
 
-/* ---------- 复制按钮（opencode 风：2rem 方形、常显、页面底色 + 发丝边框） ---------- */
+/* 复制按钮：右上角，默认淡出，hover/focus 显示 */
 .code-copy-button {
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 2px; /* quarto 默认 5px；改为垂直居中于 2.25rem 空头行 */
-  background-color: var(--page-bg);
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: var(--copy-btn-bg);
   border: 1px solid var(--copy-btn-border);
-  border-radius: 0;
-  color: var(--link-color); /* 驱动图标 SVG 的 currentColor，明暗自动跟随主题 */
-  transition: background-color var(--transition), border-color var(--transition);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  opacity: 0;
+  transition: opacity var(--transition), background-color var(--transition), color var(--transition);
+}
+div.sourceCode:hover .code-copy-button,
+div.sourceCode:focus-within .code-copy-button,
+.code-copy-button:focus {
+  opacity: 1;
 }
 .code-copy-button:hover {
-  background-color: var(--sidebar-hover-bg); /* 半透明叠加：与代码块底色混合出轻微变暗 */
-  border-color: var(--copy-btn-border);
+  background-color: var(--sidebar-hover-bg);
+  color: var(--link-color);
+  border-color: var(--code-border);
 }
-.code-copy-button:hover > .bi::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>');
-}
-
-
-/* 复制成功反馈（Quarto 原生 .code-copy-button-checked，主色 ✓） */
-.code-copy-button-checked > .bi::before {
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 0 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>');
+.code-copy-button-checked {
+  opacity: 1;
+  color: var(--link-color);
 }

@@ -1,0 +1,1 @@
+#include <iostream>  // 鏈€灏忓彲杩愯鍏ュ彛锛氶獙璇佸伐鍏烽摼鍙紪璇戙€佸彲杩愯銆?int main() {   const int kAnswer = 42;  // 甯搁噺锛歬 鍓嶇紑 + 澶ч┘宄帮紙Google 鍛藉悕锛?  std::cout << "answer: " << kAnswer << "\n";   return 0; }

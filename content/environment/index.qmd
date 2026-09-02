@@ -8,11 +8,13 @@ number-sections: false
 起步 · 环境
 :::
 
+本部分帮你在 Windows 上搭好 Linux 开发环境：先装 WSL2 与 Ubuntu，再装编译器和 CMake，为后续写 C++ 程序做准备。
+
 ## 环境搭建
 
 ::: {.landing-card}
 ### [在 WSL2 上配置 C++ 环境](setup-wsl2.qmd)
-在 Windows 上用 WSL2 搭一套 Ubuntu 开发环境，装好并验证 C++ 构建工具链。
+在 Windows 里运行 Ubuntu，安装 g++、CMake 等工具，并用 `--version` 确认环境就绪。
 
 [开始学习 →](setup-wsl2.qmd){.cta}
 :::
@@ -21,5 +23,5 @@ number-sections: false
 
 ::: {.landing-card .coming-soon}
 ### 用 CMake 构建 C++ 项目
-用现代 CMake 的目标式写法管理构建，支持多配置与集成测试。
+用现代 CMake 管理多文件工程：定义目标、链接库、跑测试，告别手写一长串 g++ 命令。
 :::

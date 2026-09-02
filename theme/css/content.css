@@ -1,6 +1,6 @@
 /* cpp-notes 共享主题 · 正文内容（表格 / 引用 / 正文组件与排版；自 common.css 拆分） */
 
-/* ---------- 表格（opencode 风：无外框、无斑马纹、无 hover 底色；表头底线 + 行 hairline，首尾列贴边） ---------- */
+/* ---------- 表格（冷灰 docs：无外框、表头底线 + 行 hairline） ---------- */
 .table {
   --bs-table-hover-bg: transparent;
   font-size: 0.875rem;
@@ -19,7 +19,7 @@
   vertical-align: baseline;
   border-bottom: 1px solid var(--table-hairline);
 }
-/* 首尾列贴边（opencode 表格无左右内边距） */
+/* 首尾列贴边（docs 表格无左右内边距） */
 .table > :not(caption) > * > :first-child {
   padding-inline-start: 0;
 }
@@ -42,16 +42,15 @@ blockquote,
 blockquote.blockquote {
   font-size: 0.9375rem; /* 略小于正文（次要提示定位），并压掉 Quarto .blockquote 命中的 Bootstrap 1.25rem */
   margin: 1.375rem 0;
-  border-left: 2px solid var(--quote-border); /* 2px 左条（opencode 风，原 4px） */
+  border-left: 2px solid var(--quote-border);
   color: var(--text-secondary);
   padding: 0 1rem;
   font-style: normal;
 }
-/* 分隔线（---）样式与节奏统一在下方「正文排版」段定义（opencode 风：每个小节标题前一条细线，上方 3.375rem） */
+/* 分隔线（---）样式与节奏统一在下方「正文排版」段定义（docs 风：每个小节标题前一条细线，上方 3.375rem） */
 
 /* ---------- 正文组件润色 ---------- */
-/* 正文链接：opencode 风——近黑正文色 + 常驻细下划线（offset 0.2em），hover 不变色。
-   UI 强调（CTA / 复制按钮 / focus ring / 卡片 hover 边）仍走 --link-color 蓝色 */
+/* 正文链接：强调色 + 细下划线 */
 #quarto-document-content a {
   color: var(--text-link);
   text-decoration: underline;
@@ -60,8 +59,8 @@ blockquote.blockquote {
   text-underline-offset: 0.2em;
 }
 #quarto-document-content a:hover {
-  color: var(--text-link);
-  text-decoration-color: var(--text-underline);
+  color: var(--link-color);
+  text-decoration-color: var(--link-underline);
 }
 /* 图片 / 图：圆角 + 细边 + 居中图注 */
 #quarto-document-content img:not(.no-border) {
@@ -124,7 +123,7 @@ details[open] summary {
 html {
   color-scheme: light dark;
   scroll-behavior: smooth;
-  scroll-padding-top: 6.5rem;
+  scroll-padding-top: 7rem;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
@@ -150,13 +149,26 @@ html {
   outline-offset: 2px;
   border-radius: 2px;
 }
-/* 列表项间距：li+li 0.625rem、嵌套列表上距 0.625rem（opencode 节奏；仅正文内容，不碰侧栏） */
+/* 列表项间距：li+li 0.625rem、嵌套列表上距 0.625rem（docs 节奏；仅正文内容，不碰侧栏） */
 #quarto-document-content li + li {
   margin-top: 0.625rem;
 }
 #quarto-document-content li > ul,
 #quarto-document-content li > ol {
   margin-top: 0.625rem;
+}
+/* 列表内「标题段 + 正文段」：粗体首段仅当其为唯一子元素（拆分写法 - **标题** 独占行）
+   时渲染为块级小标题；同行写法 - **标题**：正文 的 strong 后接文字，非 only-child，不受影响。
+   这样既统一「长项拆分」观感，又不误伤普通加粗列表项。 */
+#quarto-document-content li > p:first-child > strong:only-child {
+  display: block;
+  font-weight: 600;
+  color: var(--body-color);
+  margin-bottom: 0.15rem;
+}
+/* 同一 li 内标题段↔正文段间距（全局 > * + * 规则够不到 li > p，这里补回 docs 节奏） */
+#quarto-document-content li > p + p {
+  margin-top: 0.35rem;
 }
 /* 正文基色统一到 token，避免与 h1–h3 微妙色差 */
 #quarto-document-content {
@@ -168,22 +180,9 @@ html {
 }
 /* 锚点 / 深链跳转后的目标标题轻微高亮，便于定位（复用行 hover 的浅强调底） */
 #quarto-document-content :is(h2, h3, h4, h5, h6):target {
-  scroll-margin-top: 6.5rem;
+  scroll-margin-top: 7rem;
   background-color: var(--line-hover-bg);
   border-radius: 6px;
   padding: 0.05em 0.35em;
   margin-left: -0.35em;
-}
-/* 分隔线（---）：opencode 风——qmd 源里每个小节标题（##/###）前一条细线（上下各空一行）。
-   线上方 3.375rem（与标题上边距同刻度）；线下交由后续元素自身节奏
-   （标题 3.375/2.5/2.0，正文 1.375），旧 hr+* 1.75rem 覆盖已删除，避免把 hr 后标题压近 */
-hr {
-  border: none;
-  border-top: 1px solid var(--card-border);
-  opacity: 1;
-  margin: 0;
-}
-#quarto-document-content > hr,
-#quarto-document-content section > hr {
-  margin-top: 3.375rem;
 }

@@ -1,7 +1,7 @@
 /* cpp-notes 共享主题 · 侧栏 / TOC / 翻页卡片（自 common.css 拆分） */
 
 /* ---------- 侧栏 / TOC ---------- */
-/* 分组标题（sidebar 含分组时生成，向前兼容）：opencode docs 风——13px 半粗、不大写、正文色 */
+/* 分组标题（sidebar 含分组时生成，向前兼容）：冷灰 docs 风——13px 半粗、不大写、正文色 */
 #quarto-sidebar .sidebar-section .sidebar-item-section > .sidebar-item-text,
 #quarto-sidebar .sidebar-item-section .sidebar-item-text {
   font-size: 0.8125rem;
@@ -44,7 +44,7 @@ body::-webkit-scrollbar-thumb {
   border-radius: 5px;
 }
 /* 章节链接：通栏条目（margin 0 + 1.5rem 内边距），默认灰字 14px/400/1.4；
-   当前项 = 左侧 2px 竖条 + 弱背景 + 半粗（opencode docs 风，无圆角）。
+   当前项 = 左侧 2px 竖条 + 弱背景 + 半粗（冷灰 docs 风，无圆角）。
    非激活项补 2px 透明左边框，激活切换时不抖动 */
 #quarto-sidebar .sidebar-item-text.sidebar-link {
   display: block;
@@ -68,7 +68,7 @@ body::-webkit-scrollbar-thumb {
   color: var(--body-color);
   font-weight: 600;
   background-color: var(--sidebar-active-bg);
-  border-left: 2px solid var(--body-color);
+  border-left: 2px solid var(--accent);
   border-radius: 0;
 }
 /* 嵌套子项（章节分组 / 小节）：缩进由条目 padding-left 提供，色条与 part 标题左缘对齐 */
@@ -88,18 +88,18 @@ body::-webkit-scrollbar-thumb {
   color: var(--body-color);
   font-weight: 600;
   background-color: var(--sidebar-active-bg);
-  border-left: 2px solid var(--body-color);
+  border-left: 2px solid var(--accent);
   border-radius: 0;
 }
 
-/* 右 TOC：分组标题 + 滚动高亮（opencode docs "On this page" 观感：14px 常规、不大写） */
+/* 右 TOC：分组标题 + 滚动高亮（冷灰 docs "On this page" 观感：14px 常规、不大写） */
 .sidebar.margin-sidebar nav[role="doc-toc"] h2#toc-title {
   font-size: 0.875rem;
   font-weight: 400;
   color: var(--body-color);
   margin-bottom: 0.75rem;
 }
-/* 基础项（含嵌套）：13px 灰字、无底色圆角（opencode TOC 风）。
+/* 基础项（含嵌套）：13px 灰字、无底色圆角（docs TOC 风）。
    每项保留 1px 左竖线（Quarto 原生），竖线↔文字 0.75rem（覆盖 Quarto 的 .6rem 并修复贴字），
    边框色令牌化（替换硬编码 #e9ecef，暗色下可见度走 --card-border） */
 .sidebar.margin-sidebar nav[role="doc-toc"] a.nav-link {
@@ -119,10 +119,10 @@ body::-webkit-scrollbar-thumb {
 }
 /* 右 TOC 激活项：黑色竖线 + 加粗正文色（!important 压过 Quarto 的蓝色激活规则），无背景 */
 .sidebar.margin-sidebar nav[role="doc-toc"] a.nav-link.active {
-  color: var(--body-color) !important;
+  color: var(--toc-active) !important;
   font-weight: 600;
   background-color: transparent;
-  border-left: 1px solid var(--body-color);
+  border-left: 2px solid var(--accent);
 }
 /* 收口非激活态：按下/聚焦/已访问 不再回退到全局 a 的蓝色（修「点击 TOC 变蓝」） */
 .sidebar.margin-sidebar nav[role="doc-toc"] a.nav-link:not(.active):active,
@@ -186,8 +186,6 @@ nav.page-navigation {
 .nav-page .pagination-link:hover {
   color: var(--accent);
   border-color: var(--card-hover-border);
-  box-shadow: var(--card-shadow);
-  transform: translateY(-2px);
 }
 .nav-page .nav-page-text {
   color: var(--body-color);

@@ -2,17 +2,14 @@ project:
   type: book
 
 book:
-  title: "cpp-notes"
+  title: "C++ 笔记"
   # 站点级（GitHub Pages / 社交分享）：Book 的站点工具选项归 book: 键（Quarto 官方约定），
   # 放在顶层不会被识别（sitemap 等据此生成）
   site-url: "https://chengzhao-dev.github.io/cpp-notes"
   repo-url: "https://github.com/chengzhao-dev/cpp-notes"
-  repo-actions: [edit, issue]
-  favicon: assets/favicon.png
-  image: assets/og-cover.png        # og:image / twitter-card 默认分享图
-  page-navigation: true            # 章末上一页/下一页（显式声明，勿依赖默认）
+  page-navigation: true
   navbar:
-    title: "cpp-notes"
+    title: "C++ 笔记"
     search: true
   chapters:
     - index.qmd
@@ -49,6 +46,7 @@ format:
     code-copy: true
     code-overflow: wrap
     css:
+      - theme/css/fonts.css
       - theme/css/tokens.css
       - theme/css/base.css
       - theme/css/code.css
@@ -58,7 +56,6 @@ format:
       - theme/css/sidebar.css
       - theme/css/callouts.css
       - theme/css/landing.css
-      - theme/css/misc.css
     number-sections: false
     highlight-style:
       light: github-light
@@ -72,3 +69,6 @@ format:
     open-graph: true
     twitter-card: true
     lang: zh
+
+resources:
+  - theme/assets/fonts   # 自托管 woff2，随 _book/ 发布

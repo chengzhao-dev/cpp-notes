@@ -1,45 +1,33 @@
 /*-- scss:defaults --*/
 
-// 字体（与亮色一致，保证切换无跳动）：首选 Web 字体（经 fonts.html 以 loli.net 镜像加载），
-// 系统栈完整保留为回退；与 theme-light.scss / tokens.css 的字体栈三处同步
-$font-family-sans-serif: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !default;
+$font-family-sans-serif: "Inter", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !default;
 
-$font-family-monospace: "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Noto Sans Mono", "Noto Sans SC", "Courier New", monospace !default;
+$font-family-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New", monospace !default;
 
-// 关闭 darkly 自带的 Google Fonts 引入（Lato，大陆访问慢）
 $web-font-path: false !default;
 
-// 阅读排版（与亮色一致）
 $font-size-root: 16px !default;
-$line-height-base: 1.6875 !default;
-$font-size-base: 1rem !default;
+$line-height-base: 1.625 !default;
+$font-size-base: 0.9375rem !default;
 
-// 主色：GitHub accent（链接、强调；组件规则见 scss/ 按域拆分的组件 css）
-$primary: #58a6ff !default;
+$primary: #FF6A1A !default;
 
-// 暗色基调（Dark Reader 默认暖灰风：文字 #e8e6e3；页面/导航底色由 tokens.css 的 --page-bg / --navbar-bg 统一驱动）
-$body-color: #e8e6e3 !default;
-$link-color: #58a6ff !default;
+$body-color: #EDEDED !default;
+$link-color: #FF6A1A !default;
 
-// 行内代码字色随正文（GitHub 现代风，背景/圆角见 content.css）
-$code-color: #e8e6e3 !default;
+$code-color: #EDEDED !default;
 
-// 次级文字
-$body-secondary: #a7a29a !default;
+$body-secondary: #A3A3A3 !default;
 
-// 导航条：与页面同底色（底色/文字由 tokens.css 的 --navbar-bg / --navbar-fg 驱动，暗色 #131010）
-$navbar-fg: #e8e6e3 !default;
+$navbar-fg: #EDEDED !default;
 
-// Callout 语义色（opencode aside 暗色：亮色 accent 字，与 tokens.css 的 --callout-*-border 暗色一致；
-// 驱动编译期烧入 callout 图标 data URI 的取色）
-$callout-color-note: hsl(234, 100%, 87%) !default;
-$callout-color-tip: hsl(281, 82%, 89%) !default;
-$callout-color-warning: hsl(41, 82%, 87%) !default;
-$callout-color-important: hsl(262, 90%, 80%) !default;
-$callout-color-caution: hsl(339, 82%, 87%) !default;
-$callout-color-danger: hsl(339, 82%, 87%) !default;
+$callout-color-note: #60A5FA !default;
+$callout-color-tip: #4ADE80 !default;
+$callout-color-warning: #FBBF24 !default;
+$callout-color-important: #A78BFA !default;
+$callout-color-caution: #F87171 !default;
+$callout-color-danger: #F87171 !default;
 
-// 边框与分隔：暗色下更淡
 $border-color: rgba(255, 255, 255, 0.1) !default;
 $table-bg: transparent !default;
 

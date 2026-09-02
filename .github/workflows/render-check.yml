@@ -18,4 +18,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: quarto render
-      - run: python3 scripts/defer-mermaid.py
+      - run: python3 scripts/build/defer-mermaid.py
+      - run: python3 .cursor/skills/cpp-content/scripts/verify_examples.py
