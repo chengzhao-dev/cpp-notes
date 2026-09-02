@@ -22,5 +22,5 @@ Git 工作流、Pages 发布、CI。Book 产物目录 `_book/`。
 ## 要点
 
 - 只在用户明确要求时提交；不 force-push main
-- Actions 上传 `path: _book`
+- 远端仅 `main` + `gh-pages`；Actions 用 peaceiris 推 `_book/` 到 `gh-pages`
 - 推送 main → `.github/workflows/pages.yml` 自动部署

@@ -35,7 +35,7 @@ quarto preview
 
 ## 发布
 
-推送到 `main` 后由 GitHub Actions 渲染并发布 Pages。
+推送到 `main` 后，GitHub Actions 渲染 Book，并把 `_book/` 推到 `gh-pages` 分支（Pages：Deploy from a branch → `gh-pages` / `(root)`）。
 
 ## 内容规划
 

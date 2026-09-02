@@ -59,11 +59,19 @@ git push                      # 推送到远端
 
 ## 分支与协作
 
+**远端只保留两个分支**：`main`（源码）与 `gh-pages`（Quarto `_book/` 产物）。仓库 Ruleset 禁止创建其它远端分支。
+
+- 本地可建临时分支做实验，**不要** `git push -u origin <feat-branch>`。
+- 改动直接提交并推到 `main`；合并/推送后本地临时分支可删。
+- `gh-pages` 仅由 Actions（`peaceiris/actions-gh-pages`）更新，勿手工推源码上去。
+
 ```powershell
-git branch <name>             # 建分支
+git branch <name>             # 本地临时分支
 git switch <name>             # 切换分支
 git switch -c <name>          # 建并切换
-git merge <name>              # 合并
+git merge <name>              # 合并进当前分支（通常是 main）
+git push origin main          # 只推 main
+git branch -d <name>          # 删本地临时分支
 git pull                      # 拉取并合并
 ```
 

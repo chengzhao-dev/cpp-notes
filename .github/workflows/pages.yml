@@ -6,16 +6,15 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,18 +24,25 @@ jobs:
           python-version: "3.12"
       - run: quarto render
       - run: python3 scripts/build/defer-mermaid.py
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Publish _book to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ./_book
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_book
+          publish_branch: gh-pages
+          force_orphan: true
+      - name: Ensure Pages source = gh-pages /(root)
+        run: |
+          api=https://api.github.com/repos/${{ github.repository }}/pages
+          auth="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
+          accept="Accept: application/vnd.github+json"
+          code=$(curl -s -o /tmp/pages_create.json -w "%{http_code}" -X POST -H "$auth" -H "$accept" "$api" \
+            -d '{"source":{"branch":"gh-pages","path":"/"}}')
+          echo "POST /pages (create) -> HTTP $code: $(cat /tmp/pages_create.json)"
+          code=$(curl -s -o /tmp/pages_update.json -w "%{http_code}" -X PUT -H "$auth" -H "$accept" "$api" \
+            -d '{"source":{"branch":"gh-pages","path":"/"}}')
+          echo "PUT /pages (source correction) -> HTTP $code: $(cat /tmp/pages_update.json)"
+          if [ "$code" != "200" ] && [ "$code" != "201" ] && [ "$code" != "202" ] && [ "$code" != "409" ]; then
+            echo "WARNING: Pages source update returned HTTP $code (non-fatal)."
+            echo "Check Settings -> Pages -> Deploy from a branch -> gh-pages /(root)."
+          fi
