@@ -30,7 +30,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 |---|---|---|
 | 可执行脚手架 / 校验 | `scripts/` 或 skill 内 `scripts/` | `init_project.py`、`verify_examples.py`、`check_callouts.py` |
 | 写作 / 领域规范 | `.cursor/skills/*/references/` | `writing-style-core.md`、`code-style.md` |
-| 任务清单 | `docs/tasks/` | `INDEX.md`、各章任务单文件 |
+| 任务清单 | `docs/tasks/` | `INDEX.md`、各章任务单文件（已完成任务归档在 `infra/DONE.md`） |
 | Python 格式 | `scripts/pyproject.toml` + `docs/agent/ops.md` | Black 格式化 |
 
 **不做 skill 的重复**：C++ 工程脚手架只用 `scripts/cpp/init_project.py`，不建 `cpp-project` skill。
@@ -72,6 +72,8 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 
 ## 扩展文档
 
-- 渲染排错：`docs/agent/ops.md`
+- 渲染与脚本运维：`docs/agent/ops.md`
+- 上下文预算与省 token 实测：`docs/agent/context-budget.md`
+- 任务作用域怎么定：`python scripts/agent/run.py scope <part>/<chapter>`
 - Python 脚本规范：`docs/agent/ops.md`
 - 任务总表：`docs/tasks/INDEX.md`
