@@ -17,6 +17,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # 渲染以暴露结构性错误（缺文件/引用失效等）
       - run: quarto render
+      # 同时验证后处理脚本本身可用
       - run: python3 scripts/build/defer-mermaid.py
+      # 硬性门槛：书中所有 C++ 示例必须能编译
       - run: python3 .cursor/skills/cpp-content/scripts/verify_examples.py

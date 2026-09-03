@@ -9,6 +9,7 @@ permissions:
   contents: write
   pages: write
 
+# 同一时刻只允许一个部署任务，后来者排队（不取消进行中的发布，避免 gh-pages 半更新）
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -22,7 +23,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # 渲染整本 Book 到 _book/
       - run: quarto render
+      # 把 mermaid 图改为懒加载，减小首屏体积（本地 render 不自动跑，故 CI 必须执行）
       - run: python3 scripts/build/defer-mermaid.py
       - name: Publish _book to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
@@ -30,7 +33,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_book
           publish_branch: gh-pages
+          # 每次部署用孤立分支覆盖 gh-pages：产物是生成物，不累积历史
           force_orphan: true
+      # 幂等纠正 Pages 源分支：首次部署可能未设置 source，重复 PUT 会返回 409，属正常
       - name: Ensure Pages source = gh-pages /(root)
         run: |
           api=https://api.github.com/repos/${{ github.repository }}/pages

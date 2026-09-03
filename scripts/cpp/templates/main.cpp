@@ -1,1 +1,14 @@
-#include <iostream>  // 鏈€灏忓彲杩愯鍏ュ彛锛氶獙璇佸伐鍏烽摼鍙紪璇戙€佸彲杩愯銆?int main() {   const int kAnswer = 42;  // 甯搁噺锛歬 鍓嶇紑 + 澶ч┘宄帮紙Google 鍛藉悕锛?  std::cout << "answer: " << kAnswer << "\n";   return 0; }
+// 最小可运行示例：验证工具链（编译 / 链接）是否可用
+// 标准库的输入 / 输出功能都在 iostream 里
+#include <iostream>
+
+int main() {
+    // 常量命名约定：k 前缀 + 大驼峰（Google 风格）
+    const int kAnswer = 42;
+
+    // 把结果写入标准输出；"\n" 比 std::endl 少一次刷新
+    std::cout << "answer: " << kAnswer << "\n";
+
+    // 返回 0 表示程序正常结束
+    return 0;
+}
