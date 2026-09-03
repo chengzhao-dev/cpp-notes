@@ -123,7 +123,10 @@ pre.sourceCode code > span:hover {
   font-size: 0.85em;
 }
 
-/* 复制按钮：右上角，默认淡出，hover/focus 显示 */
+/* 复制按钮：右上角，默认淡出，hover/focus 显示。
+   注意 Quarto 1.10 的 DOM：button.code-copy-button 是 div.sourceCode 的**兄弟**，
+   两者同被 div.code-copy-outer-scaffold 包裹，故 hover 作用域必须是 scaffold，
+   不能写成 div.sourceCode:hover .code-copy-button（后代选择器永不匹配）。 */
 .code-copy-button {
   width: 1.75rem;
   height: 1.75rem;
@@ -139,10 +142,16 @@ pre.sourceCode code > span:hover {
   opacity: 0;
   transition: opacity var(--transition), background-color var(--transition), color var(--transition);
 }
-div.sourceCode:hover .code-copy-button,
-div.sourceCode:focus-within .code-copy-button,
+.code-copy-outer-scaffold:hover .code-copy-button,
+.code-copy-outer-scaffold:focus-within .code-copy-button,
 .code-copy-button:focus {
   opacity: 1;
+}
+/* 触屏无 hover：始终可见，否则移动端永远复制不了 */
+@media (hover: none) {
+  .code-copy-button {
+    opacity: 1;
+  }
 }
 .code-copy-button:hover {
   background-color: var(--sidebar-hover-bg);

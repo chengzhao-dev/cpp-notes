@@ -1,21 +1,5 @@
 /* cpp-notes 共享主题 · 提示卡片 callout（左色条 + 浅底 + 小圆角） */
 
-.callout-verify {
-  border: none;
-  border-left: 3px solid var(--callout-best-practice-border);
-  background-color: var(--callout-best-practice-bg);
-  border-radius: var(--radius-sm);
-  padding: 0.875rem 1rem;
-}
-.callout-verify::before {
-  content: "\2713\00a0" attr(title);
-  display: block;
-  font-weight: 600;
-  font-size: 0.8125rem;
-  color: var(--callout-best-practice-border);
-  margin-bottom: 0.3rem;
-}
-
 div.callout.callout-style-default,
 div.callout.callout-style-simple {
   border: none;
@@ -117,12 +101,4 @@ div.callout.callout-style-default .callout-body > :first-child,
 .callout.callout-caution {
   border-left-color: var(--callout-caution-border);
   background-color: var(--callout-caution-bg);
-}
-.callout.callout-best-practice {
-  border-left-color: var(--callout-best-practice-border);
-  background-color: var(--callout-best-practice-bg);
-}
-.callout.callout-key-insight {
-  border-left-color: var(--callout-key-insight-border);
-  background-color: var(--callout-key-insight-bg);
 }

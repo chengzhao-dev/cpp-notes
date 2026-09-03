@@ -7,15 +7,18 @@ book:
   # 放在顶层不会被识别（sitemap 等据此生成）
   site-url: "https://chengzhao-dev.github.io/cpp-notes"
   repo-url: "https://github.com/chengzhao-dev/cpp-notes"
+  # 站点图标：由 scripts/maint/gen_favicon.py 生成（矢量源在同一脚本里）
+  favicon: "theme/assets/favicon.svg"
   page-navigation: true
   navbar:
     title: "C++ 笔记"
     search: true
   chapters:
     - index.qmd
-    - part: content/environment/index.qmd
+    - part: content/getting-started/index.qmd
       chapters:
-        - content/environment/setup-wsl2.qmd
+        - content/getting-started/setup-wsl2.qmd
+        - content/getting-started/first-program.qmd
 
 # Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
 language:
@@ -71,4 +74,5 @@ format:
     lang: zh
 
 resources:
-  - theme/assets/fonts   # 自托管 woff2，随 _book/ 发布
+  # 整目录发布：自托管 woff2 + 站点图标 favicon.svg
+  - theme/assets

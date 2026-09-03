@@ -319,10 +319,11 @@ blockquote {
 }
 
 @media print {
+  /* 只隐藏复制按钮：Quarto 1.10 起 .code-copy-outer-scaffold 包裹着代码本身，
+     把它一起 display:none 会导致打印/导出 PDF 时所有代码块消失。 */
   #quarto-sidebar,
   #quarto-margin-sidebar,
   .nav-page,
-  .code-copy-outer-scaffold,
   .code-copy-button,
   #back-to-top {
     display: none;
