@@ -1,0 +1,63 @@
+// VSCode 工作区设置。
+// 格式为 JSONC（允许注释）：这是 VSCode 自己的配置，故可注释；
+// 严格 JSON（如 scripts/config/python.json）不适用，那里说明写在 AGENTS.md。
+//
+// 本机环境：Windows + WSL2 Ubuntu + g++；补全交给 clangd 插件，格式化交给 clang-format。
+// 注意：clangd 路径按「通过 Remote-WSL 在 Ubuntu 内打开仓库」这一常见场景写；
+// 若改为纯 Windows 端 clangd，需把 /usr/bin/g++ 换成本机编译器路径。
+{
+    // 关闭 cpptools 自带的 IntelliSense 与格式化，避免与 clangd 双引擎抢补全
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.formatting": "disabled",
+
+    // clangd 参数
+    // --query-driver：允许 clangd 调用 g++ 查询真实的系统头文件路径（WSL 内关键）
+    // --header-insertion=never：新手示例保持手写 include，不让补全擅自插头文件
+    // --background-index：建立工程索引，跨文件跳转才准
+    "clangd.arguments": [
+        "--query-driver=/usr/bin/g++,/usr/bin/clang++",
+        "--header-insertion=never",
+        "--background-index",
+        "--clang-tidy=false"
+    ],
+
+    // 保存即格式化：排版规则取自仓库根 .clang-format
+    "editor.formatOnSave": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    // CMake 无内置 formatter，关掉避免每次保存弹错误提示
+    "[cmake]": {
+        "editor.formatOnSave": false
+    },
+
+    // 缩进与 .editorconfig、.clang-format 三者一致（4 空格），防止互相改写产生噪声 diff
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.eol": "\n",
+    "files.encoding": "utf8",
+
+    // 构建产物与渲染产物不参与搜索/监听：与 .gitignore 同范围
+    // 这既防误读（CMakeCXXCompilerId.cpp 等含 int main 的生成物会污染判断），也降索引开销
+    "search.exclude": {
+        "**/build": true,
+        "**/_book": true,
+        "**/.quarto": true,
+        "**/__pycache__": true,
+        "**/site_libs": true
+    },
+    "files.watcherExclude": {
+        "**/build/**": true,
+        "**/_book/**": true,
+        "**/.quarto/**": true
+    },
+
+    // 打开仓库时不自动跑 CMake 配置：本仓库有数十个示例目录，自动配置会刷屏且拖慢启动
+    "cmake.configureOnOpen": false,
+
+    // 集成终端默认进 WSL，与书中所有 bash 示例的运行环境一致
+    "terminal.integrated.defaultProfile.linux": "Ubuntu"
+}

@@ -1,0 +1,12 @@
+// 打开本仓库时 VSCode 会据此提示安装推荐扩展。
+// 分工：clangd 负责补全/跳转（配置见仓库根 .clangd 与本文件 clangd.arguments）；
+//       cpptools 仅作为调试器后端，其 IntelliSense 引擎在 settings.json 里已关闭。
+//       cmake-tools 提供图形化构建；twxs.cmake 提供 CMakeLists.txt 语法高亮。
+{
+    "recommendations": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake"
+    ]
+}

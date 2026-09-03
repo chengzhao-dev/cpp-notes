@@ -1,0 +1,18 @@
+# clangd 配置（仓库根）：VSCode 的 clangd 插件会自动读取本文件。
+#
+# 真实编译参数来自 compile_commands.json，由 build-and-run.sh 里的
+# -DCMAKE_EXPORT_COMPILE_COMMANDS=ON 生成在 build/ 下。clangd 会从源文件所在目录
+# 逐级向上查找（并顺带检查每级的 build/ 子目录），所以示例构建过一次就自动拿到准确参数。
+# 尚未构建过的文件（例如新写的单文件 .cpp）没有这个数据库，就用下面的兜底参数，
+# 保证编辑时仍能补全标准库、不因找不到头文件而满屏刷红。
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -Wall
+    - -Wextra
+
+Diagnostics:
+  # 抑制「找不到头文件」这一类噪声：WSL 的系统头路径由 --query-driver 现场探测，
+  # 在数据库缺失时未必能解析到，此时不该把每个 include 都报成错误
+  Suppress:
+    - pp_file_not_found
