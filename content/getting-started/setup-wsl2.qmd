@@ -33,9 +33,7 @@ flowchart TD
 
 ### 安装 WSL2
 
-**第 1 步：以管理员身份打开 PowerShell**
-
-**第 2 步：运行安装命令**
+**第 1 步：运行安装命令**
 
 该命令会启用 WSL 相关 Windows 功能，并默认安装 Ubuntu：
 
@@ -45,7 +43,7 @@ wsl --install
 
 装完后**重启电脑**。重启后从开始菜单打开 **Ubuntu**，首次进入会提示创建 Linux **用户名**和**密码**，密码与 Windows 登录无关，输入时不显示字符，属正常现象。
 
-**第 3 步：验证 WSL 版本**
+**第 2 步：验证 WSL 版本**
 
 仍在 PowerShell 中执行：
 
@@ -73,7 +71,7 @@ $ wsl --status
 
 - **关闭指定发行版**
 
-  `wsl --terminate Ubuntu` 只停止名为 Ubuntu 的实例，其它发行版不受影响。
+  `wsl --terminate Ubuntu` 只停止名为 Ubuntu 的实例，其他发行版不受影响。
 
 - **查看是否在运行**
 
@@ -125,19 +123,34 @@ sudo apt install -y build-essential gdb cmake ninja-build clang clang-tidy clang
 
 **第 3 步：验证安装**
 
-在 Ubuntu 终端执行以下命令；看到版本号且无报错即表示该工具可用：
+逐条运行各工具的 `--version`，只看输出第一行：出现版本号且没有 `command not found`，该工具即就绪：
 
 ```bash
+# g++：C++ 编译器（build-essential 提供）
 $ g++ --version
-g++ (Ubuntu 15.2.0-...) 15.2.0
-Copyright (C) 2025 Free Software Foundation, Inc.
+g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
 
+# cmake：构建系统
 $ cmake --version
 cmake version 4.2.3
-CMake suite maintained and supported by Kitware
+
+# gdb：调试器
+$ gdb --version
+GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1
+
+# clang：另一套编译器，可与 g++ 对照
+$ clang --version
+Ubuntu clang version 21.1.8 (6ubuntu1)
+
+# clang-format / clang-tidy：格式化与静态检查
+$ clang-format --version
+Ubuntu clang-format version 21.1.8 (6ubuntu1)
+
+$ clang-tidy --version
+Ubuntu LLVM version 21.1.8
 ```
 
-`gdb`、`clang` 等同理，需要时在终端执行 `gdb --version` 或 `clang --version` 即可。
+某一行报 `command not found`，说明对应的包没装上，重跑第 2 步的安装命令再验证。
 
 ## 常见问题
 
@@ -157,8 +170,7 @@ CMake suite maintained and supported by Kitware
 
 ### 下一步
 
-- 写单文件程序，用 `g++` 编译并运行。
-- 下一章《用 CMake 构建 C++ 项目》（见[部分路线图](index.qmd)）。
+下一章[写出第一个 C++ 程序](first-program.qmd)：用 `g++` 编译运行 Hello World，再用 CMake 把它管起来。
 
 ### 相关资源
 

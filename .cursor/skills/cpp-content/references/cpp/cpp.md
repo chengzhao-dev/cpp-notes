@@ -15,6 +15,20 @@
 
 动机 + 规则 → 正确/错误对照 → 常见误区 → FAQ（≤2–3 条）。
 
+## 内容参考依据
+
+| 来源 | 用作 |
+|---|---|
+| C++ Primer (5th ed.) | 主线讲解顺序与术语 |
+| learncpp.com | 章节拆分粒度、渐进式披露 |
+| zh.cppreference.com | 译名、标准措辞、复杂度（`## 深入` 引标准时以此为准） |
+| CMake 官方文档 | 构建章节的 command/variable 语义与注释措辞 |
+| Google C++ Style Guide | 命名与排版；**例外：本仓库启用异常**，不用「不使用异常」条款 |
+
+## Callout（只用内置类型）
+
+`{.callout-tip}` + `## 最佳实践` · `{.callout-warning}` + `## 关键洞察` · `{.callout-important}` + `## 深入`（大师向，章末）。自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `quarto-docs` 的 `pitfalls.md` #12。
+
 ## 核心主题索引
 
 | 主题 | 参考 |

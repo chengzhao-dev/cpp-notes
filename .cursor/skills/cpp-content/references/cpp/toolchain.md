@@ -17,7 +17,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
   （配置模板在 `scripts/cpp/templates/` 的 `clang-format` / `clang-tidy`，LLVM 排版 + Google 命名，见 `./code-style.md`）；
   校验用 `clang-format --dry-run -Werror`，
   clang-tidy 启用 `modernize-*` 与 `cppcoreguidelines-*` 子集。
-- **CMake 最小骨架**（C++20）：`cmake_minimum_required(VERSION 3.16)`、`set(CMAKE_CXX_STANDARD 20)` 且 `REQUIRED ON`。
+- **CMake 最小骨架**（C++20）：`cmake_minimum_required(VERSION 3.31)`、`set(CMAKE_CXX_STANDARD 20)` 且 `REQUIRED ON`。
 - **头文件规范**：每个头文件自给自足（能独立编译）；用 include guard 或 `#pragma once`；只包含所需头文件，减少编译依赖。
 
 ::: {.callout-important}
@@ -30,7 +30,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
 ✓ 标准 CMake 工程 + 警告当错误 + sanitizer 开发配置：
 
 ```cmake
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.31)
 project(cpp_memo LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -60,7 +60,7 @@ add_executable(main main.cpp)   # 没设 C++ 标准、没开 -Wall
 
 对应命令行（反模式）：`g++ main.cpp -o main` —— 没开警告、没开 sanitizer，越界访问与内存泄漏都"静默通过"。
 
-对照说明：正例用 `CMAKE_CXX_STANDARD_REQUIRED ON` 锁死 C++20，避免误用旧标准特性；`-Werror` 把"警告"升级为"必须修"。反例放任编译器默认（往往 C++14 且无警告），UB 与可疑写法在开发期完全不可见，代价是线上崩溃更难定位。
+对照说明：正例用 `CMAKE_CXX_STANDARD_REQUIRED ON` 把标准固定为 C++20，避免误用旧标准特性；`-Werror` 把"警告"升级为"必须修"。反例放任编译器默认（往往 C++14 且无警告），UB 与可疑写法在开发期完全不可见，代价是线上崩溃更难定位。
 
 ## 常见误区
 
@@ -73,7 +73,7 @@ add_executable(main main.cpp)   # 没设 C++ 标准、没开 -Wall
 ## 小结
 - 统一标准与警告：`-std=c++20 -Wall -Wextra -Wpedantic`，生产代码加 `-Werror`，MSVC 对应 `/std:c++20` 与 `/W4`。
 - 开发/测试期用 `-fsanitize=address,undefined`（ASan+UBSan）兜底内存与 UB，但切勿编入发布产物（显著运行时开销）。
-- CMake 用 `CXX_STANDARD 20` + `REQUIRED ON` 锁死标准；头文件需自给自足并加 include guard/`#pragma once`，减少重定义与编译依赖。
+- CMake 用 `CXX_STANDARD 20` + `REQUIRED ON` 固定标准；头文件需自给自足并加 include guard/`#pragma once`，减少重定义与编译依赖。
 - 排版（clang-format：LLVM、2 空格、80 列）与命名（Google 规则）交给工具链兜底，不手工对齐；规则唯一出处见 `./code-style.md`。
 
 ## 延伸阅读

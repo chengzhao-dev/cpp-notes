@@ -63,7 +63,7 @@ def readme_text(name, layout):
             "```bash",
             "cmake -S . -B build",
             "cmake --build build",
-            "./build/" + name,
+            "./build/bin/app",
             "```",
         ]
     return "\n".join(lines) + "\n"

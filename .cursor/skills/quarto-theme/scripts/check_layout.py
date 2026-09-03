@@ -18,14 +18,16 @@ CHECKS = [
     ("light accent orange #F54E00", "#F54E00"),
     ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
     ("dark navbar page-bg token", "--navbar-bg: #0A0A0A"),
-    ("body line-height 1.6875", "line-height: 1.6875"),
+    ("body line-height 1.625", "line-height: 1.625"),
     ("accent dot token", "--dot-accent"),
     ("dark page #0A0A0A", "#0A0A0A"),
     ("dark body #EDEDED", "#EDEDED"),
     ("dark link #FF6A1A", "#FF6A1A"),
     ("callout note border light", "--callout-note-border: #2563EB"),
-    ("best-practice callout", "callout-best-practice"),
-    ("key-insight callout", "callout-key-insight"),
+    # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 pitfalls.md #12）
+    ("callout tip (best-practice semantics)", "--callout-tip-border"),
+    ("callout warning (key-insight semantics)", "--callout-warning-border"),
+    ("callout important (deep-dive semantics)", "--callout-important-border"),
 ]
 
 

@@ -1,0 +1,14 @@
+# 构建产物与生成物：不作为上下文喂给 agent（源码与文档才是需要读的内容）
+# 语法同 .gitignore
+
+# CMake 一键构建产物：与文档内容无关，且 CMakeCXXCompilerId.cpp 等含 int main，易污染校验
+/code/**/build/
+
+# Quarto 渲染产物与缓存
+/_book/
+/.quarto/
+/_site/
+/_cache/
+
+# 依赖
+/node_modules/

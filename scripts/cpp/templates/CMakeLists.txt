@@ -1,1 +1,15 @@
-cmake_minimum_required(VERSION 3.16) project({{PROJECT_NAME}} LANGUAGES CXX)  set(CMAKE_CXX_STANDARD 20) set(CMAKE_CXX_STANDARD_REQUIRED ON)  add_executable({{PROJECT_NAME}} main.cpp) target_compile_options({{PROJECT_NAME}} PRIVATE -Wall -Wextra -Werror)  # 寮€鍙戞湡鍏滃簳锛堝彲閫夛級锛氬唴瀛樹笌 UB 妫€娴嬶紝鍒囧嬁缂栧叆鍙戝竷浜х墿 # target_compile_options({{PROJECT_NAME}} PRIVATE -fsanitize=address,undefined -g) # target_link_options({{PROJECT_NAME}} PRIVATE -fsanitize=address,undefined)
+cmake_minimum_required(VERSION 3.31)
+project({{PROJECT_NAME}} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 固定可执行文件输出到 build/bin（与一键脚本约定一致）
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+add_executable(app main.cpp)
+target_compile_options(app PRIVATE -Wall -Wextra -Werror)
+
+# 开发期兜底（可选）：内存与 UB 检测，切勿编入发布产物
+# target_compile_options(app PRIVATE -fsanitize=address,undefined -g)
+# target_link_options(app PRIVATE -fsanitize=address,undefined)

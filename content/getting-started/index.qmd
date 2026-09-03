@@ -1,14 +1,14 @@
 ---
-title: "准备开发环境与工具链"
-description: "先在 Windows 上把 C++ 开发环境搭起来，跑通工具链，你就能编译、调试自己的程序了。"
+title: "搭建开发环境"
+description: "先在 Windows 上把 C++ 开发环境搭起来，跑通工具链，写出并构建第一个程序，你就能编译、调试自己的代码了。"
 number-sections: false
 ---
 
 ::: {.hero-eyebrow}
-起步 · 环境
+准备环境
 :::
 
-本部分帮你在 Windows 上搭好 Linux 开发环境：先装 WSL2 与 Ubuntu，再装编译器和 CMake，为后续写 C++ 程序做准备。
+本部分帮你在 Windows 上搭好 Linux 开发环境：先装 WSL2 与 Ubuntu，再装编译器和 CMake，写出并构建你的第一个 C++ 程序。
 
 ## 环境搭建
 
@@ -17,6 +17,13 @@ number-sections: false
 在 Windows 里运行 Ubuntu，安装 g++、CMake 等工具，并用 `--version` 确认环境就绪。
 
 [开始学习 →](setup-wsl2.qmd){.cta}
+:::
+
+::: {.landing-card}
+### [写出第一个 C++ 程序](first-program.qmd)
+用 `g++` 编译运行 Hello World，再用 CMake 把它管起来，跑通第一段属于你的代码。
+
+[开始学习 →](first-program.qmd){.cta}
 :::
 
 ## 构建系统

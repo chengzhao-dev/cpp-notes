@@ -7,10 +7,10 @@ body-classes: homepage
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [环境与工具链](content/environment/index.qmd)
-在 WSL2 / Linux 上安装编译器与 CMake，搭好能编译、调试 C++ 的工作环境。
+### [搭建开发环境](content/getting-started/index.qmd)
+在 WSL2 / Linux 上安装编译器与 CMake，写出并构建第一个 C++ 程序，搭好能编译、调试的工作环境。
 
-[开始学习 →](content/environment/index.qmd){.cta}
+[开始学习 →](content/getting-started/index.qmd){.cta}
 :::
 
 ::: {.landing-card .coming-soon}

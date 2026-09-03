@@ -9,3 +9,17 @@ node_modules/
 
 # 本机指定的 Python 解释器（机器相关，不入库；解析协议见 AGENTS.md）
 /scripts/config/python.json
+
+# 示例目录下的 CMake 构建产物（code/<part>/<chapter>/build/），不入库
+# 用 /code/**/ 锚定：避免无锚定的 build/ 误伤仓库工具脚本目录 scripts/build/
+/code/**/build/
+
+# 章节示例里用 g++ 直接编译（-o app）产生的可执行文件/目标文件
+# （build/ 已由上面统一忽略；以下是源码目录下的临时产物）
+code/**/app
+*.o
+*.obj
+a.out
+
+# 运行仓库 Python 脚本（含 py_compile）产生的字节码缓存
+__pycache__/
