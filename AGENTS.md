@@ -1,56 +1,36 @@
 # AGENTS.md
 
-**C++ 笔记** Quarto Book：面向新手的 Linux C++ 渐进式中文教程。框架见 [`docs/structure.md`](docs/structure.md)。
+**C++ 笔记** Quarto Book：面向新手的 Linux C++ 渐进式中文教程。目录职责与内容路线图见 [`docs/structure.md`](docs/structure.md)。
 
-## Skills（`.cursor/skills/`）
+## 上下文纪律（每次任务先照此办）
+
+1. 先跑一次 `python scripts/agent/run.py scope <part>/<chapter>`（或 `theme` / `dev` / `repo`），**只读**它列出的 UNIT + READ；DENY 内的文件不读、不检索、不索引。
+2. `_book/**`、`code/**/build/**`、`.quarto/**` 永不入上下文：`build/` 里的 CMake 生成物（`CMakeCXXCompilerId.cpp` 等）含 `int main`，误读会污染示例校验与写作判断。三层拦截：`.gitignore` + `.cursorignore`/`.cursorindexingignore`（访问与索引）+ `verify_examples.py` 的 `SKIP_DIRS` 剪枝。产物检查走 `run.py check`（脚本内部读大文件，只回一行结论）。
+3. 诊断逃生舱：只有当某项 check 报 FAIL 需定位、或出现断言未覆盖的新症状时，才允许真读产物，且先一句声明理由；查明后把结论回写成 `check_dom_contracts.py` 的一条断言（经验只沉淀一次）。
+4. 子代理阈值：预计要读 >8 个文件、或需全仓检索时，派 sub-agent 侦察并只回一段摘要；≤3 个文件本地直读更省。编辑类任务不派（改动须回主线程）。
+5. 一次任务只读路由指向的那一个 reference；跨章引用只写 `@sec-` 锚点，不去读对方正文。
+6. 改 `theme/**` 或 `_quarto.yml` 会触发整本重渲染：先声明代价，再 `run.py render`，之后只看校验结果、不回读 HTML。
+
+## Skill 路由
 
 | 领域 | Skill |
 |---|---|
-| 写作 / qmd | `quarto-docs` |
-| C++ 内容与示例 | `cpp-content` |
-| HTML 主题 | `quarto-theme` |
-| GitHub / 发布 | `github-ops` |
+| 写作 / qmd / 中文润色 | `quarto-docs` |
+| C++ 内容、示例、工具链 | `cpp-content` |
+| HTML 主题与设计令牌 | `quarto-theme` |
+| Git / Actions / Pages（未明确要求不 commit/push） | `github-ops` |
 
-## 常用命令
+全部 reference 的「管什么 · 何时读」：`.cursor/skills/_CATALOG.md`；按章任务与读写边界：`docs/tasks/INDEX.md`。
 
-```bash
-quarto render          # → _book/
-quarto preview         # 热更新（Windows 偶发卡死，见 docs/agent/render-ops.md）
-git push               # Actions → Pages
-```
+## 命令（统一经 run.py，避免 PowerShell 引号与 GBK 反复重试）
 
-## Python 脚本
-
-| 脚本 | 用途 |
+| 命令 | 用途 |
 |---|---|
-| `scripts/cpp/init_project.py` | 最小 CMake 工程（bare/simple） |
-| `scripts/build/defer-mermaid.py` | CI：mermaid 懒加载 |
+| `run.py check` | 一次跑完 layout / callouts / dom / ascii / links / size |
+| `run.py render` | 渲染 Book 并自动跑 check |
+| `run.py verify [--style]` | 编译校验全部 C++ 示例（Windows 走 WSL） |
+| `run.py build <part>/<chapter>` | WSL 一键构建示例，顺带生成 clangd 编译数据库 |
+| `run.py scope <目标>` / `run.py status` | 作用域清单 / 精简 git 状态 |
 
-解释器：`scripts/config/python.json` → `CPP_MEMO_PYTHON` → 自动搜索（≥3.9）。格式用 Black，细则 [`docs/agent/python-scripts.md`](docs/agent/python-scripts.md)。
-
-Skill 内脚本：`verify_examples.py`、`scaffold_chapter.py`、`check_*`。
-
-## 目录职责
-
-| 路径 | 职责 |
-|---|---|
-| `content/` | 章节 `.qmd` |
-| `code/` | 示例 `.cpp` |
-| `theme/` | SCSS + CSS + includes + 自托管字体 |
-| `scripts/` | 仓库级 Python（`cpp/`、`build/`、`maint/`、`config/`） |
-| `docs/` | 框架、任务清单、Agent 运维细则 |
-| `.cursor/skills/` | Cursor 项目 skills |
-
-## 任务清单
-
-按章隔离写作：[`docs/tasks/INDEX.md`](docs/tasks/INDEX.md)。
-
-## 规范指针
-
-写作 → `quarto-docs` · 主题 → `quarto-theme` · C++ → `cpp-content` · Git → `github-ops`
-
-渲染排错 → [`docs/agent/render-ops.md`](docs/agent/render-ops.md)
-
-## 仓库格式
-
-文本 LF、UTF-8 无 BOM（`.gitattributes`）。
+排错与细则（渲染、Python 脚本、WSL 路径）：[`docs/agent/ops.md`](docs/agent/ops.md)。
+格式：Python ≥3.9 仅标准库，解释器见 `scripts/config/python.json`；文本 LF、UTF-8 无 BOM（`.gitattributes`）；缩进以 `.editorconfig` 与 `.clang-format` 为准（4 空格）。

@@ -6,9 +6,10 @@
 
 ## 读写边界
 
-- **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；`.cursor/skills/cpp-content/references/cpp/<topic>.md`
-- **可写**: `content/<part>/<chapter>.qmd`；`code/<part>/<chapter>*.cpp`；`_quarto.yml`（仅追加本章一行）
-- **禁止**: `theme/`、`content/<其他 part>/`、`.github/`（除非任务 ID 明确允许）
+- **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/quarto/authoring-elements.md`；`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；`.cursor/skills/cpp-content/references/cpp/<topic>.md`
+- **可写**: `content/<part>/<chapter>.qmd`；`code/<part>/<chapter>.cpp`
+  （需构建工程则改用同名子目录 `code/<part>/<chapter>/`，其 `build/` 为产物：不入库、不读、不校验）；`_quarto.yml`（仅追加本章一行）
+- **禁止**: `theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）、`.github/`（除非任务 ID 明确允许）
 
 ## 验收
 

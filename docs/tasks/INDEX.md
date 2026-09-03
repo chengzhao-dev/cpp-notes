@@ -1,19 +1,12 @@
 # 任务总表
 
-执行单任务：`@docs/tasks/<path>.md` + 「执行 TASK-xxx」。进度只改本表「状态」列。
+执行单任务：先 `python scripts/agent/run.py scope <part>/<chapter>` 取读写边界，再按任务单执行。
+进度只改本表「状态」列（任务单文件本身不回改）。
 
 ## 基础设施（infra）
 
-| ID | 状态 | Skill | 任务文件 | 依赖 |
-|---|---|---|---|---|
-| TASK-INFRA-001 | done | quarto-docs / cpp-content | [infra/001-skill-migrate.md](infra/001-skill-migrate.md) | — |
-| TASK-INFRA-002 | done | github-ops | [infra/002-delete-opencode.md](infra/002-delete-opencode.md) | 001 |
-| TASK-INFRA-003 | done | quarto-docs | [infra/003-docs-framework.md](infra/003-docs-framework.md) | — |
-| TASK-INFRA-004 | done | cpp-content | [infra/004-script-cleanup.md](infra/004-script-cleanup.md) | 002 |
-| TASK-INFRA-004b | done | quarto-docs | [infra/004b-python-style.md](infra/004b-python-style.md) | 004 |
-| TASK-INFRA-005 | done | github-ops | [infra/005-ci-verify.md](infra/005-ci-verify.md) | 004 |
-| TASK-INFRA-006 | done | quarto-docs / quarto-theme | [infra/006-prune-merge.md](infra/006-prune-merge.md) | 004b |
-| TASK-INFRA-007 | done | quarto-docs / cpp-content | [infra/007-slim-content.md](infra/007-slim-content.md) | 006 |
+TASK-INFRA-001 ~ 007 已全部完成，逐条任务单已归档到 [infra/DONE.md](infra/DONE.md)。
+新的基建任务直接在 `docs/tasks/infra/` 建文件并在此登记。
 
 ## 主题（theme）
 
@@ -26,14 +19,14 @@
 | TASK-THEME-005 | todo | quarto-theme | [theme/005-mermaid-includes.md](theme/005-mermaid-includes.md) | 006 |
 | TASK-THEME-006 | todo | quarto-theme | [theme/006-layout-check.md](theme/006-layout-check.md) | 001–005 |
 
-## 内容 · environment
+## 内容 · getting-started
 
 | ID | 状态 | Skill | 任务文件 | 依赖 |
 |---|---|---|---|---|
-| TASK-ENV-001 | done | quarto-docs / cpp-content | [content/environment/setup-wsl2.md](content/environment/setup-wsl2.md) | 007 |
-| TASK-ENV-002 | todo | quarto-docs / cpp-content | [content/environment/install-toolchain.md](content/environment/install-toolchain.md) | 001 |
-| TASK-ENV-003 | todo | quarto-docs / cpp-content | [content/environment/first-program.md](content/environment/first-program.md) | 002 |
-| TASK-ENV-004 | todo | quarto-docs / cpp-content | [content/environment/cmake-intro.md](content/environment/cmake-intro.md) | 003 |
+| TASK-ENV-001 | done | quarto-docs / cpp-content | [content/getting-started/setup-wsl2.md](content/getting-started/setup-wsl2.md) | 007 |
+| TASK-ENV-002 | merged | quarto-docs / cpp-content | [content/getting-started/install-toolchain.md](content/getting-started/install-toolchain.md) | 001 |
+| TASK-ENV-003 | done | quarto-docs / cpp-content | [content/getting-started/first-program.md](content/getting-started/first-program.md) | 001 |
+| TASK-ENV-004 | todo | quarto-docs / cpp-content | [content/getting-started/cmake-intro.md](content/getting-started/cmake-intro.md) | 003 |
 
 ## 内容 · core
 

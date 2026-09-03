@@ -31,6 +31,7 @@ CHECKS = [
     ("layout", ".cursor/skills/quarto-theme/scripts/check_layout.py", True),
     ("callouts", ".cursor/skills/quarto-docs/scripts/check_callouts.py", True),
     ("dom", "scripts/agent/check_dom_contracts.py", True),
+    ("size", "scripts/agent/check_skill_size.py", False),
     ("ascii", ".cursor/skills/quarto-docs/scripts/check_ascii_names.py", False),
     ("links", ".cursor/skills/quarto-docs/scripts/check_skill_links.py", False),
 ]
@@ -210,23 +211,26 @@ def main():
     except Exception:
         pass
 
+    # 公共参数：用 parents 挂到每个子命令上，这样 --verbose 放前放后都能识别
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--verbose", action="store_true", help="展开完整原始输出")
+
     parser = argparse.ArgumentParser(description="agent 命令统一入口（默认 terse 输出）")
-    parser.add_argument("--verbose", action="store_true", help="展开完整原始输出")
     subs = parser.add_subparsers(dest="cmd", required=True)
 
-    subs.add_parser("check", help="一次跑完全部校验")
-    p = subs.add_parser("verify", help="编译校验 C++ 示例")
+    subs.add_parser("check", parents=[common], help="一次跑完全部校验")
+    p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
-    p = subs.add_parser("render", help="渲染并自动校验")
+    p = subs.add_parser("render", parents=[common], help="渲染并自动校验")
     p.add_argument("--no-ignore", action="store_true", help="传给 quarto --no-quartoignore")
     p.add_argument("--skip-check", action="store_true", help="渲染后不跑校验")
     p.add_argument("--quiet-warn", action="store_true", help="不提示整本重渲染代价")
-    p = subs.add_parser("scope", help="输出任务作用域清单")
+    p = subs.add_parser("scope", parents=[common], help="输出任务作用域清单")
     p.add_argument("target", nargs="?")
     p.add_argument("--list", action="store_true")
-    p = subs.add_parser("build", help="WSL 内跑章节示例一键构建")
+    p = subs.add_parser("build", parents=[common], help="WSL 内跑章节示例一键构建")
     p.add_argument("target")
-    p = subs.add_parser("status", help="精简 git 状态")
+    p = subs.add_parser("status", parents=[common], help="精简 git 状态")
     p.add_argument("--all", action="store_true", help="同时列出用户既有改动")
 
     args = parser.parse_args()

@@ -69,7 +69,7 @@ book:
     - index.qmd
     - part: "准备开发环境与工具链"
       chapters:
-        - content/environment/setup-wsl2.qmd
+        - content/getting-started/setup-wsl2.qmd
 
 format:
   html:
@@ -96,8 +96,8 @@ format:
 
 - `book:` 下的 `title`、`author`、`date` 为书目信息；`chapters` 定义章节顺序。
 - **`index.qmd` 必须存在**，作为 Book 首页/入口。
-- 章节可放子目录（如 `content/environment/setup-wsl2.qmd`），在 `chapters` 写相对路径。
-- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/environment/index.qmd`，本书在用；索引页含 `.hero-eyebrow`，不写 `---`），产生分卷/分部标题。
+- 章节可放子目录（如 `content/getting-started/setup-wsl2.qmd`），在 `chapters` 写相对路径。
+- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本书在用；索引页含 `.hero-eyebrow`，不写 `---`），产生分卷/分部标题。
 - 章节间交叉引用用 `@sec-...`、`@tbl-...`、`@fig-...`。
 - 渲染：`quarto render`，Book **默认输出到 `_book/`**（区别于 website 的 `_site/`）。
 
@@ -142,7 +142,7 @@ report_files/        # 依赖资源（图片、CSS、JS）
 
 ## 延伸
 
-- 写作内容（代码块/图表/表格/callout/交叉引用/终端约定）：`authoring.md`
+- 正文结构与代码块/终端约定：`authoring.md`；图表/表格/callout/交叉引用：`authoring-elements.md`
 - 外观配置（toc/theme/grid/code-fold）：`html-output.md`
 - 发布 GitHub Pages：见 `github-ops` skill
 - 渲染/路径/编码坑：本目录 `pitfalls.md`

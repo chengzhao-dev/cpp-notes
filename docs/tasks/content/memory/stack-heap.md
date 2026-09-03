@@ -6,9 +6,9 @@
 
 ## 读写边界
 
-- **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；`.cursor/skills/cpp-content/references/cpp/modern-cpp.md`
-- **可写**: `content/memory/stack-heap.qmd`；`code/memory/stack-heap*.cpp`；`_quarto.yml`（追加本章）
-- **禁止**: `theme/`、`content/<其他 part>/`
+- **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/quarto/authoring-elements.md`；`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；`.cursor/skills/cpp-content/references/cpp/modern-cpp.md`
+- **可写**: `content/memory/stack-heap.qmd`；示例 `code/memory/stack-heap.cpp`（单文件 `*.cpp`，需构建工程则用同名子目录，产物落其 `build/`）；`_quarto.yml`（追加本章）
+- **禁止**: `theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
 
 ## 验收
 

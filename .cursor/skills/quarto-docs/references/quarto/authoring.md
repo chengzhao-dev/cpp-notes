@@ -1,6 +1,11 @@
 # 文档内容写作
 
-本文件讲**内容怎么写**：代码块、终端、callout、图表。中文见 `../zh/writing-style-core.md`；结构见 `basics.md`。
+> **何时读我**：写或改任何 `.qmd` 的正文结构、代码块、终端命令块时。
+> **读我之前不需要读别的**。页面元素（图表 / 表格 / Callout / FAQ / 交叉引用）
+> 见同目录 `authoring-elements.md`。
+
+本文件讲**内容怎么写**：正文结构、代码块、终端命令。
+图表 / 表格 / Callout / FAQ / 交叉引用见同目录 `authoring-elements.md`。中文见 `../zh/writing-style-core.md`；结构见 `basics.md`。
 
 > 速查：`title:` 提供标题、不写 `# H1` · 代码块标 `cpp` · 终端全站 `$` · callout 七类 · 交叉引用 `@sec-/@tbl-/@fig-`
 
@@ -42,6 +47,35 @@ int main() {
 
 - 示例必须是**可编译/可运行的完整片段**（或显式标注「片段」），统一 `-std=c++20 -Wall -Wextra`。
 - 每块代码上方用一句中文说明它做什么。
+
+### 配置文件代码块（CMake 等）
+
+`CMakeLists.txt`、`*.yml`、`Dockerfile` 等**声明式/配置型**文件，逐行说明直接写在代码块**内部**用其原生注释符（CMake 用 `#`），且注释写在**对应行上方独立一行**（`# 说明` 换行 `语句`），不在代码块下方用 bullets 逐行解释。CMake 注释的措辞以官方中文文档为准（参考 `https://cmake.com.cn/cmake/help/latest` 下对应 command / variable 页面），平实中性、不渲染警示语气。若展示仓库中真实存在的文件（如 `code/` 下的示例），优先用 `{{< include /code/.../file >}}` 引用真实文件，保证文档与代码库唯一来源、永不失配；上面注释约定仍然适用。
+
+````markdown
+下面是与上面等价的最小 `CMakeLists.txt`：
+
+```cmake
+# 要求的最低 CMake 版本；低于 3.31 直接报错，保证所有人行为一致
+cmake_minimum_required(VERSION 3.31)
+
+# 项目名 app，语言用 C++
+project(app LANGUAGES CXX)
+
+# 默认按 C++20 标准构建
+set(CMAKE_CXX_STANDARD 20)
+# 强制必须支持 C++20，编译器不支持就报错（而不是悄悄降级）
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 固定把可执行文件输出到 build/bin/（和一键脚本约定一致，方便直接用）
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# 用 first-program.cpp 生成名为 app 的可执行文件
+add_executable(app first-program.cpp)
+```
+````
+
+理由：这类文件的「说明」本身就是配置语义，放块内更贴近读者视线、与仓库 C++ 参考（`cpp-content` 的 `toolchain.md`）及 bash 约定保持一致；块下 bullets 既重复又割裂。注释只讲该行为什么存在，不延伸长篇原理。
 
 ## 终端命令约定
 
@@ -89,90 +123,3 @@ cmake version 4.2.3
 - 需要逐条说明时，在每条指令上方用 shell 注释符（`#`）加一句中文说明作用；只对易误解/关键/顺序敏感的指令加注释。
 - **多包安装逐包注释**：一条命令装多个包时，每个包在命令上方用一行 `# 包名：核心用途` 注释，只讲核心用途不延伸细节，代码块后不再用 bullet 逐包解释。
 - 不写 `title=`、不用 `.console` div、不手写 `PS>`——文件名/环境名用正文段落说明。
-
-## 图表
-
-**图表围栏必须加大括号**。mermaid 字体由 `theme/css/mermaid.css` 控制，块内不必写超长 `%%{init}%%`：
-
-````markdown
-```{mermaid}
-flowchart TD
-  A[步骤一] --> B[步骤二]
-```
-````
-
-带题注的 Markdown 图：
-
-```markdown
-![题注文本](images/架构图.png){#fig-arch}
-参见 @fig-arch。
-```
-
-## 表格
-
-```markdown
-| 列1 | 列2 |
-|-----|-----|
-| 数据 | 数据 |
-
-: 表题注。{#tbl-example}
-```
-
-引用：`参见 @tbl-example`。
-
-默认各列等宽：Pandoc 按分隔行横杠生成等宽 `<colgroup>`，浏览器的内容自适应被其覆盖。需要侧重某列时，把分隔行横杠写成大致比例（横杠数量比 ≈ 列宽比，只影响当前表格，逐表手动设置）：
-
-```markdown
-| 适用状态 | 命令 | 作用 |
-|:----|:--------|:---------|
-```
-
-上例约 19% / 38% / 43%。
-
-## Callout 提示框
-
-七类：`note`、`tip`、`warning`、`important`、`caution`、`best-practice`、`key-insight`（后两类为命名 callout）。
-
-```markdown
-::: {.callout-best-practice}
-## 最佳实践
-永远初始化变量。
-:::
-
-::: {.callout-key-insight}
-## 关键洞察
-现代 C++ 的核心心智模型是「把靠纪律保证的事，变成靠类型和编译器保证」。
-:::
-```
-
-- **最佳实践**（绿）：给出「应该这样做」的规则。
-- **关键洞察**（金）：点出核心心智模型，帮助理解而非死记。
-- 简短提醒用 `>` 引用块而非 callout，首句以「注意：」起头：
-
-```markdown
-> 注意：`wsl --import` 不会保留原来的普通用户，首次进入会以 `root` 登录。
-```
-
-  - 自定义「验证结果」块 `.callout-verify`（绿色 ✓，标注「通过/已验证」语义）为预留组件（当前内容未使用），按需启用。
-  - 所有 callout 渲染为 docs 左条风：**左 3px 色条 + 浅底 + 小圆角**；视觉规范见 `quarto-theme` skill 与 `theme/css/callouts.css`。
-
-## 交叉引用
-
-```markdown
-## 章节 {#sec-intro}
-见 @sec-intro；图 @fig-plot；表 @tbl-data。
-```
-
-## Divs 与 Spans
-
-```markdown
-::: {.callout-tip .content-box}
-自定义 div 内容。
-:::
-
-这是[重要文本]{.highlight}。
-```
-
-## 标题命名（面向新手）
-
-标题要让人一眼看懂在做什么：优先用「目标/结果」式表述（「迁移 WSL 系统到其他磁盘」），避免堆砌操作动作（「导出备份与导入迁移」）。命名前先问：读者只看标题，能否知道这一节要解决什么问题？

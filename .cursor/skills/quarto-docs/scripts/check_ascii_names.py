@@ -13,7 +13,8 @@ import os
 import sys
 
 # 需要排除的目录（生成产物 / 依赖 / VCS）
-EXCLUDE_DIRS = {"node_modules", "_book", ".quarto", ".git", "_site"}
+# 生成产物 / 依赖 / VCS / CMake 构建目录（build/ 非源码，不属校验对象）
+EXCLUDE_DIRS = {"node_modules", "_book", ".quarto", ".git", "_site", "build"}
 
 
 def first_non_ascii(name):

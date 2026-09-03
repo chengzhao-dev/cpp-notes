@@ -28,50 +28,29 @@ TEMPLATE = """# {task_id} · {title}
 """
 
 
+SKIPPED = []
+WRITTEN = []
+
+
 def write(path: Path, text: str):
+    """写任务文件；已存在且内容不同则判定为手工编辑过，跳过不覆盖。"""
     path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        if path.read_text(encoding="utf-8") != text:
+            SKIPPED.append(path)
+        return
     path.write_text(text, encoding="utf-8", newline="\n")
+    WRITTEN.append(path)
 
 
 def infra():
-    items = [
-        ("001-skill-migrate", "TASK-INFRA-001", "Skill 迁移", "done",
-         "quarto-docs / cpp-content", "—",
-         "`.cursor/skills/**`", "`content/`、`theme/`",
-         "- [x] cpp/quarto/github 参考补齐\n- [x] cases 合并为 4 文件\n- [x] writing-style-core.md"),
-        ("002-delete-opencode", "TASK-INFRA-002", "删除 opencode", "done",
-         "github-ops", "001",
-         "根文档", "`.opencode/`（已删）",
-         "- [x] 无 `.opencode/` 引用"),
-        ("003-docs-framework", "TASK-INFRA-003", "docs 框架", "done",
-         "quarto-docs", "—",
-         "`docs/**`、瘦身 `AGENTS.md`", "—",
-         "- [x] structure.md、tasks/INDEX.md、agent/"),
-        ("004-script-cleanup", "TASK-INFRA-004", "脚本收尾", "done",
-         "cpp-content", "002",
-         "`scripts/**`", "—",
-         "- [x] init_cpp_project bare/simple\n- [x] 无 cpp-project skill"),
-        ("004b-python-style", "TASK-INFRA-004b", "Python 规范", "done",
-         "quarto-docs", "004",
-          "`.py`、`scripts/pyproject.toml`、`docs/agent/python-scripts.md`", "—",
-         "- [x] Black + 中文注释约定"),
-        ("005-ci-verify", "TASK-INFRA-005", "CI 校验", "done",
-         "github-ops", "004",
-         "`.github/workflows/*`", "—",
-         "- [x] render-check 跑 verify_examples.py"),
-        ("006-prune-merge", "TASK-INFRA-006", "精简合并", "done",
-         "quarto-docs / quarto-theme", "004b",
-         "见计划 §八", "—",
-         "- [x] 删 assets、full 模板\n- [x] misc.css→base.css"),
-        ("007-slim-content", "TASK-INFRA-007", "内容精简", "done",
-         "quarto-docs / cpp-content", "006",
-         "skills 参考、现有 qmd", "—",
-         "- [x] writing-style-core\n- [x] setup-wsl2 ≤180 行"),
-    ]
-    for fname, tid, title, status, skill, deps, writable, forbidden, acc in items:
-        write(TASKS / "infra" / f"{fname}.md", TEMPLATE.format(
-            task_id=tid, title=title, status=status, skill=skill, deps=deps,
-            extra_read="", writable=writable, forbidden=forbidden, acceptance=acc))
+    """已完成的基建任务不再重生成。
+
+    001-007 全部 done，历史记录折叠在 docs/tasks/infra/DONE.md。若继续按模板
+    生成，会把已完成任务复活成 todo 并污染 INDEX.md，故此处只保留说明。
+    后续新的基建任务请直接在 docs/tasks/infra/ 下新建文件并登记 INDEX.md。
+    """
+    return
 
 
 def theme():
@@ -99,10 +78,10 @@ def theme():
 
 def content():
     chapters = [
-        ("environment", "setup-wsl2", "TASK-ENV-001", "搭建 WSL2 环境", "done", "007", "toolchain.md"),
-        ("environment", "install-toolchain", "TASK-ENV-002", "安装工具链", "todo", "001", "toolchain.md"),
-        ("environment", "first-program", "TASK-ENV-003", "第一个程序", "todo", "002", "cpp.md"),
-        ("environment", "cmake-intro", "TASK-ENV-004", "CMake 入门", "todo", "003", "toolchain.md"),
+        ("getting-started", "setup-wsl2", "TASK-ENV-001", "搭建 WSL2 环境", "done", "007", "toolchain.md"),
+        ("getting-started", "install-toolchain", "TASK-ENV-002", "安装工具链（已并入 ENV-001）", "merged", "001", "toolchain.md"),
+        ("getting-started", "first-program", "TASK-ENV-003", "第一个程序", "done", "001", "cpp.md"),
+        ("getting-started", "cmake-intro", "TASK-ENV-004", "CMake 入门", "todo", "003", "toolchain.md"),
         ("core", "intro", "TASK-CORE-001", "C++ 简介", "todo", "ENV-003", "cpp.md"),
         ("core", "variables", "TASK-CORE-002", "变量与类型", "todo", "001", "cpp.md"),
         ("core", "operators", "TASK-CORE-003", "运算符", "todo", "002", "cpp.md"),
@@ -134,12 +113,13 @@ def content():
     ]
     for part, chapter, tid, title, status, dep, ref in chapters:
         extra = (
-            f"；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；"
+            f"；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/quarto/authoring-elements.md`；"
             f"`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；"
             f"`.cursor/skills/cpp-content/references/cpp/{ref}`"
         )
         writable = (
-            f"`content/{part}/{chapter}.qmd`；`code/{part}/{chapter}*.cpp`；"
+            f"`content/{part}/{chapter}.qmd`；示例 `code/{part}/{chapter}.cpp`"
+            f"（需构建工程则用 `code/{part}/{chapter}/`，产物落其 build/）；"
             f"`_quarto.yml`（追加本章）"
         )
         acc = (
@@ -153,7 +133,11 @@ def content():
         write(TASKS / "content" / part / f"{chapter}.md", TEMPLATE.format(
             task_id=tid, title=title, status=status,
             skill="cpp-content + quarto-docs", deps=f"TASK-{dep}" if not dep.startswith("TASK") else dep,
-            extra_read=extra, writable=writable, forbidden=f"`theme/`、`content/<其他 part>/`",
+            extra_read=extra,
+            writable=writable,
+            forbidden=(
+                f"`theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）"
+            ),
             acceptance=acc))
 
 
@@ -161,4 +145,10 @@ if __name__ == "__main__":
     infra()
     theme()
     content()
-    print("Generated task files.")
+    print(f"新建 {len(WRITTEN)} 个，跳过（已存在）{len(SKIPPED)} 个。")
+    if SKIPPED:
+        print()
+        print("已存在的任务文件不会被覆盖：其状态与「读写边界」可能已由人工细化，")
+        print("请以 docs/tasks/ 下的实际文件为准；确需按脚本重生成时，先删除对应文件再运行。")
+        for p in SKIPPED:
+            print(f"  skip {p.relative_to(ROOT)}")
