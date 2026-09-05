@@ -12,7 +12,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | `theme/` | 明暗 SCSS + 按域 CSS + includes + 自托管字体 |
 | `.config/` | C++ 工程配置源与仓库工具配置 |
 | `scripts/` | 仓库级 Python（见下表） |
-| `docs/` | 项目元信息、任务清单、Agent 运维细则 |
+| `handbook/` | 项目结构、任务清单和 Agent 运维细则 |
 | `.cursor/skills/` | Cursor 项目 skills |
 
 ### scripts/ 子目录
@@ -30,14 +30,14 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 |---|---|---|
 | 可执行脚手架 / 校验 | `scripts/` 或 skill 内 `scripts/` | `init_project.py`、`verify_examples.py`、`check_callouts.py` |
 | 写作 / 领域规范 | `.cursor/skills/*/references/` | `writing-style-core.md`、`code-style.md` |
-| 任务清单 | `docs/tasks/` | `INDEX.md`、各章任务单文件（已完成任务归档在 `infra/DONE.md`） |
-| Python 格式 | `.config/python/pyproject.toml` + `docs/agent/ops.md` | Black 格式化 |
+| 任务清单 | `handbook/tasks/` | `INDEX.md`、各章任务单文件（已完成任务归档在 `infra/DONE.md`） |
+| Python 格式 | `.config/python/pyproject.toml` + `handbook/operations/agent-operations.md` | Black 格式化 |
 
 **不做 skill 的重复**：C++ 工程脚手架只用 `scripts/cpp/init_project.py`，不建 `cpp-project` skill。
 
 ## 内容路线图
 
-渐进式 part（每章对应 `docs/tasks/content/<part>/<chapter>.md` 一个任务）：
+渐进式 part（每章对应 `handbook/tasks/content/<part>/<chapter>.md` 一个任务）：
 
 | Part | 章节 |
 |---|---|
@@ -50,7 +50,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | **toolchain** | `cmake-targets`、`clang-tools`、`project-layout` |
 | **cheatsheet** | `syntax-ref`、`stl-ref` |
 
-目录对齐：`content/<part>/` ↔ `code/<part>/` ↔ `docs/tasks/content/<part>/`。
+目录对齐：`content/<part>/` ↔ `code/<part>/` ↔ `handbook/tasks/content/<part>/`。
 
 ## 章节体量预算
 
@@ -64,16 +64,16 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 
 ## Agent 写单章工作流
 
-1. 读 `docs/tasks/content/<part>/<chapter>.md` 读写边界
+1. 读 `handbook/tasks/content/<part>/<chapter>.md` 读写边界
 2. `python .cursor/skills/cpp-content/scripts/scaffold_chapter.py --topic … --part …`
 3. 扩写 `.qmd`（`authoring.md` + `writing-style-core.md`）
 4. 写 `code/<part>/*.cpp`，跑 `verify_examples.py`
-5. `_quarto.yml` 注册；更新 part 索引页与 `docs/tasks/INDEX.md`
+5. `_quarto.yml` 注册；更新 part 索引页与 `handbook/tasks/INDEX.md`
 
 ## 扩展文档
 
-- 渲染与脚本运维：`docs/agent/ops.md`
-- 上下文预算与省 token 实测：`docs/agent/context-budget.md`
+- 渲染与脚本运维：`handbook/operations/agent-operations.md`
+- 上下文预算与省 token 实测：`handbook/operations/context-budget.md`
 - 任务作用域怎么定：`python scripts/agent/run.py scope <part>/<chapter>`
-- Python 脚本规范：`docs/agent/ops.md`
-- 任务总表：`docs/tasks/INDEX.md`
+- Python 脚本规范：`handbook/operations/agent-operations.md`
+- 任务总表：`handbook/tasks/INDEX.md`

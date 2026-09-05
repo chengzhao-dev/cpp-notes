@@ -6,13 +6,19 @@
 
 C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接决定你能否在开发期抓住 bug**。很多未定义行为（UB）、内存泄漏、数据竞争在 `-O2` 下才暴露，或只在某编译器下报错。现代 C++ 工程默认把警告当错误（`-Werror`）、用 sanitizer 在测试阶段兜底——这比上线后崩溃便宜得多。本备忘录以 Windows 上的 WSL2（GCC/Clang/CMake）为默认环境，MSVC 仅作对照。Windows 校验由 `wsl.exe` 按需启动默认 Ubuntu，不需要手动保持 WSL 会话。
 
+工具链章节先保证一条最小成功路径：确认编译器存在，编译并运行一个程序，再引入 CMake 及其他工具。每组命令前说明目的，命令后说明成功判据；高级选项放到后续小节。
+
+如果正文要求读者在 Ubuntu 中运行只读验证命令，先通过 `wsl bash -lc` 实际执行，再把命令和关键输出放入代码块。只保留判断工具是否可用所需的行，不虚构版本号、路径或成功结果。`apt install` 等会改变系统状态的命令只展示操作和后续验证，不在写作过程中重复执行。WSL 不可用时明确报告限制，不伪造输出。
+
+安装工具和验证工具分开写：安装命令只说明操作，验证使用版本命令确认工具已经安装并可调用。源码、构建目标和运行输出必须同步核对，不能让示例代码与文档结果不一致。
+
 ## 核心规则
 
-展示工具链命令时，一两条简单命令直接写进正文；连续安装、配置或验证步骤才使用代码块。代码块中的关键命令在上一行使用简短的 Shell 注释，命令与输出演示使用 `text` 代码块，避免提示符、括号和版本号被错误拆成不同颜色。
+展示工具链命令时，一两条简单命令直接写进正文；连续安装、配置或验证步骤才使用代码块。版本检查直接使用 `g++ --version`、`cmake --version` 等完整命令，不为新手引入未解释的 `| head -n 1`。代码块中的关键命令在上一行使用简短的 Shell 注释，命令与输出演示使用 `text` 代码块，避免提示符、括号和版本号被错误拆成不同颜色。
 
 - **编译器**（默认 WSL2）：`g++`（GCC）、`clang++`（Clang）；对照 MSVC（`cl`）。跨编译器验证可揪出非标准写法。
 - **标准与选项统一**（C++20）：`-std=c++20`；MSVC 用 `/std:c++20`（`/std:c++latest` 追新特性）。
-- **警告即错误**：`-Wall -Wextra -Wpedantic`，生产代码加 `-Werror`；MSVC 用 `/W4`。
+- **警告即错误**：入门示例统一使用 `-Wall -Wextra -Werror`；需要更严格检查时再加入 `-Wpedantic`，MSVC 用 `/W4`。
 - **Sanitizer**（C++11 起普遍可用）：`-fsanitize=address,undefined`（ASan + UBSan）在开发/测试期检测泄漏、越界、UB；MSVC 用 `/fsanitize=address`。
 - **优化/调试分级**：调试 `-O0 -g`，发布 `-O2`（或 `-O3` 谨慎）；不要把 sanitizer 与高优化混用。
 - **格式化与静态检查**：排版与命名交给 clang-format / clang-tidy
@@ -29,7 +35,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
 
 ## 正例 ✓ vs 反例 ✗
 
-✓ 标准 CMake 工程 + 警告当错误 + sanitizer 开发配置：
+✓ 标准 CMake 工程 + 警告当错误：
 
 ```cmake
 cmake_minimum_required(VERSION 3.31)
@@ -40,8 +46,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(main main.cpp)
 target_compile_options(main PRIVATE -Wall -Wextra -Werror)
-# 开发期可加：target_compile_options(main PRIVATE -fsanitize=address,undefined -g)
-#             target_link_options(main PRIVATE -fsanitize=address,undefined)
 ```
 
 构建与运行（WSL2）：
@@ -75,7 +79,7 @@ add_executable(main main.cpp)   # 没设 C++ 标准、没开 -Wall
 - 把 sanitizer 编进发布产物——sanitizer 有显著运行时开销，仅用于开发/测试。
 
 ## 小结
-- 统一标准与警告：`-std=c++20 -Wall -Wextra -Wpedantic`，生产代码加 `-Werror`，MSVC 对应 `/std:c++20` 与 `/W4`。
+- 统一标准与警告：入门示例使用 `-std=c++20 -Wall -Wextra -Werror`；更严格的检查再加入 `-Wpedantic`，MSVC 对应 `/std:c++20` 与 `/W4`。
 - 开发/测试期用 `-fsanitize=address,undefined`（ASan+UBSan）兜底内存与 UB，但切勿编入发布产物（显著运行时开销）。
 - CMake 用 `CXX_STANDARD 20` + `REQUIRED ON` 固定标准；头文件需自给自足并加 include guard/`#pragma once`，减少重定义与编译依赖。
 - 排版（clang-format：LLVM、2 空格、80 列）与命名（Google 规则）交给工具链兜底，不手工对齐；规则唯一出处见 `./code-style.md`。

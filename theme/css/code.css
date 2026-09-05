@@ -41,6 +41,9 @@ pre:not(.sourceCode) code {
 }
 pre.sourceCode code > span { line-height: 1.6; }
 
+/* GitHub 风格高亮只区分颜色，不用额外字重强调命令名或输出 token。 */
+pre.sourceCode code span { font-weight: 400; }
+
 /*
  * 颜色只由 GitHub 风格的语义 token 提供。不要按字符、位置或命令名
  * 覆盖 span，否则同一行的括号、版本号和普通文本会出现突兀的颜色切换。

@@ -13,10 +13,10 @@
 
 ## 验收
 
-- [ ] qmd 符合 authoring 约定与章节体量预算（见 `docs/structure.md`）
+- [ ] qmd 符合 authoring 约定与章节体量预算（见 `handbook/repository-structure.md`）
 - [ ] `python .cursor/skills/cpp-content/scripts/verify_examples.py` 通过
 - [ ] `quarto render` 无阻塞警告
-- [ ] `docs/tasks/INDEX.md` 状态更新为 done
+- [ ] `handbook/tasks/INDEX.md` 状态更新为 done
 
 ## Cursor 提示词
 

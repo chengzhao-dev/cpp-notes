@@ -19,7 +19,7 @@ description: Quarto Book HTML 主题与设计系统。涉及 theme/scss、theme/
 | TASK-THEME-006 | 跑 `run.py check` |
 
 必读：`references/design-tokens.md` + **目标那一个** css 文件（不要通读整个 `theme/css/`）。
-改样式的代价与流程见 `docs/agent/ops.md`（会触发整本重渲染）。
+改样式的代价与流程见 `handbook/operations/agent-operations.md`（会触发整本重渲染）。
 
 ## 已固化的产物契约
 

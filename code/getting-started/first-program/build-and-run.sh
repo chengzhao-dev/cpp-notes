@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # 一键配置、构建并运行当前 CMake 示例。
 # 用法：在项目根目录运行 bash build-and-run.sh。
-# 配置阶段会生成 compile_commands.json，供 clangd 还原真实编译参数。
+# 配置阶段会生成构建所需的辅助文件。
+
+# 命令失败、未定义变量或管道出错时停止脚本。
 set -euo pipefail
 
 # 无论从哪里调用，都先切换到脚本所在的项目目录。
@@ -12,7 +14,7 @@ BUILD_DIR="build"
 BIN_DIR="$BUILD_DIR/bin"
 TARGET="app"
 
-# 导出编译数据库，让 clangd 的诊断与实际构建保持一致。
+# 保存完整构建参数，便于开发工具读取当前工程配置。
 printf '\n==> 配置\n\n'
 cmake -S . -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 

@@ -7,13 +7,13 @@
   complete 完整工程文件，适合需要直接构建的章节示例。
   auto   目标在仓库 code/ 下 -> complete，否则 -> simple。
 
-Windows 示例（使用仓库配置的 Python 3.12）：
-  D:/ProgramData/miniforge3/python.exe D:/Github/cpp-notes/scripts/cpp/init_project.py `
+标准用法（使用仓库配置的 Python 3.12）：
+  python scripts/cpp/init_project.py `
     --name first-program `
-    --dir D:/Github/cpp-notes/code/getting-started
-上例会自动创建 D:/Github/cpp-notes/code/getting-started/first-program。
-随后在 WSL2 Ubuntu 中运行：
-  bash /mnt/d/Github/cpp-notes/code/getting-started/first-program/build-and-run.sh
+    --dir code/getting-started
+上例会自动创建 code/getting-started/first-program。
+随后在 WSL2 Ubuntu 中进入项目目录并运行：
+  bash build-and-run.sh
 
 仓库根目录已配置好 Python 时，也可以使用：
   python scripts/cpp/init_project.py --name first-program --dir code/getting-started

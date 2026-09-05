@@ -58,7 +58,7 @@ nav.navbar.navbar-expand-lg {
   min-height: 2rem;
   gap: 0.625rem;
 }
-/* 品牌图标：与站点 favicon 同源，顶栏与标签页视觉连贯（对齐 GitHub/Cursor） */
+/* 品牌图标：顶部栏使用中性文档标记，favicon 保留 C++ 标记。 */
 .navbar-brand::before {
   content: "";
   display: inline-block;
@@ -66,8 +66,9 @@ nav.navbar.navbar-expand-lg {
   height: 1.75rem;
   flex: 0 0 auto;
   margin-right: 0;
-  border-radius: 0.28rem;
-  background: url("../assets/favicon.svg") center / contain no-repeat;
+  background-color: var(--navbar-fg);
+  -webkit-mask: url("../assets/brand-mark.svg") center / contain no-repeat;
+  mask: url("../assets/brand-mark.svg") center / contain no-repeat;
 }
 .navbar-brand:hover {
   color: var(--navbar-fg);
@@ -161,6 +162,10 @@ body.quarto-dark .quarto-navbar-search input {
   .navbar-brand::before {
     width: 1.4rem;
     height: 1.4rem;
+  }
+
+  .navbar-title {
+    display: none;
   }
 }
 /* 主题切换按钮（navbar 内，与侧栏切换复用观感）；固定尺寸与搜索框（32px）一致 */

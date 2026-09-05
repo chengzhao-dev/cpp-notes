@@ -1,30 +1,36 @@
 ---
 title: "C++ 笔记"
-description: "从 WSL2 与 Ubuntu 开始，使用 VS Code 和 clangd 搭建 C++ 开发环境，逐步学习语言、标准库和对象管理。"
+description: "从 WSL2 与 Ubuntu 开始，完成第一个 C++ 程序，再逐步学习语言、标准库和工程实践。"
 number-sections: false
 body-classes: homepage
 ---
 
+这是一份面向初学者的中文 C++ 教程。内容从可运行的小例子开始，逐步连接语言基础、标准库和工程实践。
+
+## 从可运行的程序开始
+
+先完成开发环境和第一个程序，再进入语言基础。完成这条路线后，可以边阅读边编译和运行后续示例。
+
 ::: {.feature-grid}
 ::: {.landing-card}
 ### [搭建开发环境](content/getting-started/index.qmd)
-从 Linux 环境和工具链开始，完成第一个程序的编译与运行。
+配置 WSL2 上的 Ubuntu、VS Code 和 CMake，准备可重复的 C++ 开发环境。
 
 [开始学习 →](content/getting-started/index.qmd){.cta}
 :::
 
-::: {.landing-card .coming-soon}
-### 语言基础
-学习变量、类型、控制流、函数和类，逐步建立语言基础。
+::: {.landing-card}
+### C++ 语言基础
+从变量、类型、函数和控制流开始，建立理解后续章节所需的语言模型。
 :::
 
 ::: {.landing-card .coming-soon}
-### 标准库（STL）
-学习常用容器、算法和迭代器，掌握标准库的日常用法。
+### 标准库与对象管理
+学习容器、算法和资源管理，理解对象生命周期与所有权。
 :::
 
 ::: {.landing-card .coming-soon}
-### 内存与对象
-学习 RAII、智能指针和移动语义，理解对象生命周期与资源管理。
+### 调试与工程实践
+继续学习构建、调试、性能和多文件工程，把语言知识放进真实项目。
 :::
 :::

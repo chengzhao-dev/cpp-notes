@@ -1,39 +1,39 @@
 ---
 title: "搭建开发环境"
-description: "在 Windows 上用 WSL2、Ubuntu、VS Code 和 clangd 搭建 C++ 开发环境，并完成第一个程序的构建。"
+description: "先配置 Ubuntu C++ 开发环境，再编译、运行和管理第一个程序。"
 number-sections: false
 body-classes: index-page
 ---
 
-::: {.hero-eyebrow}
-准备环境
-:::
+本部分只完成一条最短路径：准备 WSL2 上的 Ubuntu，编译 `main.cpp`，再用 CMake 固化构建流程。每一步都以前一步的可验证结果为基础，读者可以在每个阶段确认自己是否具备继续阅读的条件。
 
-本部分使用 Windows、WSL2、Ubuntu、VS Code 和 clangd 搭建 C++ 开发环境，再用 CMake 配置和构建第一个程序。完成后，你可以在 Linux 环境中编译、调试和维护示例。
+## 准备环境
 
-## 环境搭建
+先完成 Windows、WSL2 上的 Ubuntu、VS Code 和 C++ 工具链的配置。完成后，Ubuntu 中应能找到 `g++` 和 CMake。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [在 WSL2 上配置 C++ 环境](setup-wsl2.qmd)
-配置 Ubuntu、编译器和 CMake，并验证工具链是否可用。
+### [配置 WSL2 开发环境](setup-wsl2.qmd)
+安装 Ubuntu 和 C++ 工具链，准备后续示例所需的编译环境。
 
 [开始学习 →](setup-wsl2.qmd){.cta}
 :::
 
 ::: {.landing-card}
-### [写出第一个 C++ 程序](first-program.qmd)
-编译并运行第一个 C++ 程序，再用 CMake 管理构建过程。
+### [编译并运行第一个程序](first-program.qmd)
+从 `main.cpp` 开始，先用 g++ 编译，再用 CMake 重复同一构建过程。
 
 [开始学习 →](first-program.qmd){.cta}
 :::
 :::
 
-## 构建系统
+## 下一步
+
+完成前两章后，再进入 CMake 多文件工程和 C++ 语言基础。对应章节完成后，这张卡片会成为下一条学习入口。
 
 ::: {.feature-grid}
 ::: {.landing-card .coming-soon}
-### 用 CMake 构建 C++ 项目
-学习用现代 CMake 管理多文件工程、库和测试。
+### CMake 与多文件工程
+学习用目标、库和测试组织更大的 C++ 工程。
 :::
 :::

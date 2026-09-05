@@ -7,9 +7,10 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py
   python verify_examples.py --compiler clang++
   python verify_examples.py --style        # 追加 clang-format / clang-tidy
+  python verify_examples.py --paths code/core/hello.cpp content/core/intro.qmd
 
-Windows 下建议从仓库配置的 Python 3.12 运行：
-  D:/ProgramData/miniforge3/python.exe D:/Github/cpp-notes/scripts/agent/run.py verify
+Windows 下使用仓库配置的 Python 3.12 运行：
+  python scripts/agent/run.py verify
 退出码：0 = 全部通过；1 = 至少一处失败。
 
 编译阶段：
@@ -133,11 +134,16 @@ def main():
     parser.add_argument("--compiler", default="g++")
     parser.add_argument("--standard", default="c++20")
     parser.add_argument("--source-dir", default="code")
+    parser.add_argument("--paths", nargs="*", help="只校验指定的 .cpp 或 .qmd 文件")
     parser.add_argument("--style", action="store_true",
                         help="追加 clang-format（硬门槛）与 clang-tidy（报告）检查")
     args = parser.parse_args()
 
     repo_root = os.getcwd()
+    selected_paths = {
+        os.path.normpath(os.path.join(repo_root, path))
+        for path in (args.paths or [])
+    }
     fail = 0
     style_targets = []
 
@@ -155,7 +161,9 @@ def main():
             dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
             cpp_files.extend(
                 os.path.join(dirpath, fn)
-                for fn in filenames if fn.endswith(".cpp")
+                for fn in filenames
+                if fn.endswith(".cpp")
+                and (not args.paths or os.path.normpath(os.path.join(dirpath, fn)) in selected_paths)
             )
         cpp_files.sort()
     if cpp_files:
@@ -188,7 +196,7 @@ def main():
     print()
     print("=== Phase 2: full examples embedded in skill C++ references ===")
     total2 = 0
-    if os.path.isdir(ref_dir):
+    if os.path.isdir(ref_dir) and not args.paths:
         for name in sorted(os.listdir(ref_dir)):
             if not name.endswith(".md"):
                 continue
@@ -215,6 +223,8 @@ def main():
         )
         for qf in qmd_files:
             rel = os.path.relpath(qf, repo_root)
+            if args.paths and os.path.normpath(qf) not in selected_paths:
+                continue
             for idx, body in extract_full_blocks(qf):
                 total3 += 1
                 ok, msg = compile_block(args.compiler, args.standard, body, f"{rel} #{idx}")

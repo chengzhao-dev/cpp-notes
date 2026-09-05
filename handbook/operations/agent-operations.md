@@ -1,6 +1,6 @@
 # Agent 运维细则
 
-由 `ops.md` 与 `ops.md` 合并而来（两者都是 agent 侧细则，分开放会被反复成对读取）。日常命令见根 [`AGENTS.md`](../../AGENTS.md)。
+本文件集中记录 Agent 侧的渲染、脚本、校验和维护细则。日常命令见根 [`AGENTS.md`](../../AGENTS.md)。
 
 ## 渲染与预览
 
@@ -43,7 +43,7 @@ Quarto 升级最常破的就是这几条。破了就 FAIL 并给修复方向；`
 
 ## Python 工具脚本
 
-均为 Python ≥ 3.12，**运行时仅用标准库**。格式用 Black（见 `.config/python/pyproject.toml`）。Windows 优先使用 `.config/python/runtime.json` 指定的解释器，例如 `D:/ProgramData/miniforge3/python.exe`；若终端已配置仓库解释器，才使用简写 `python`。
+均为 Python ≥ 3.12，**运行时仅用标准库**。格式用 Black（见 `.config/python/pyproject.toml`）。日常命令统一使用 `python scripts/...`，不把个人电脑上的绝对解释器路径写入文档。
 
 | 路径 | 用途 |
 |---|---|
@@ -58,9 +58,23 @@ Quarto 升级最常破的就是这几条。破了就 FAIL 并给修复方向；`
 
 **新建脚手架/校验 → 写 Python 脚本，不新建 skill。**
 
+### Skill 维护与体量控制
+
+修改 `.cursor/skills/` 前先读取 `skill-maintenance`。L1 `SKILL.md` 只保留任务路由和关键约束；L2 reference 只承载一个主题的按需知识。先运行 `check_skill_size.py --verbose`，再搜索已有相近规则。
+
+新规则优先合并到职责匹配的现有文件，并删除重复表述。若仍超出 L1/L2 预算，先压缩措辞、合并相关主题和移除一次性案例；精简后仍超出时，同一 skill 新增独立主题的 L2 reference。只有出现独立任务领域和独立触发条件时，才创建新的 L1 skill。
+
+每条规则只保留一个权威出处，不为单次案例创建通用规则。新增或拆分后同步更新父级 `SKILL.md`、`.cursor/skills/_CATALOG.md` 和路由说明，并运行体量、编码、仓库检查及 `git diff --check`。
+
+重构文档、代码或 skill 时，先阅读原文件、相关引用和任务边界，再在原内容上局部调整。除非用户明确要求，或原结构确实无法安全修复，不直接删除后重新生成。需要改名、提取或拆分时，先比较新旧文件的职责和关联，完成后从整体检查术语、链接、顺序和重复内容。目录、文件名、版本号和命令输出可通过磁盘或环境获得时，先实际获取；无法确认的内容只写检查方法，不伪造结果。
+
 ### 解释器
 
-环境变量 `CPP_MEMO_PYTHON` → `.config/python/runtime.json` → 自动搜索（≥3.12）。`run.py` 会拒绝低于 Python 3.12 的解释器。
+### Python 解释器选择
+
+仓库脚本要求 Python 3.12 或更高版本，运行时只依赖标准库。解释器按以下顺序选择：环境变量 `CPP_MEMO_PYTHON`、`.config/python/runtime.json`、系统中自动搜索的符合版本要求的解释器。`run.py` 会拒绝低于 Python 3.12 的解释器。
+
+文档和 skills 统一使用 `python scripts/...`，这样命令不绑定某台电脑的安装位置。若当前终端中的 `python` 不是 3.12 或不可用，请在本机设置 `CPP_MEMO_PYTHON`，或按 `runtime.json` 的约定配置本地解释器；不要把个人路径写回仓库。
 本仓库工具脚本自身要打印中文，故 Windows 上建议设 `$env:PYTHONIOENCODING='utf-8'`，否则 PowerShell 的 GBK 控制台会把中文打成乱码。
 
 中文源文件必须以 UTF-8 无 BOM、LF 保存。禁止使用系统代码页或 GBK 读取后回写；PowerShell 5.1 写文件应改用 Python `encoding="utf-8"` 或显式 `UTF8Encoding($false)`。修改 `.qmd`、Skill 文档或主题 CSS 后先运行 `python scripts/agent/check_encoding.py`，检查失败时从 Git 可读版本恢复并重新应用补丁。
@@ -103,7 +117,7 @@ $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
 - [ ] 放对目录（`scripts/<域>/` 或 skill `scripts/`）
 - [ ] 中文模块 docstring + 中文 argparse help
 - [ ] 仅标准库依赖；默认输出 ≤1 行结论
-- [ ] 在 `docs/structure.md` 或对应 skill 中登记用途
+- [ ] 在 `handbook/repository-structure.md` 或对应 skill 中登记用途
 
 ## 开发环境配置
 
@@ -115,3 +129,7 @@ $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
 clangd 会逐级向上查找并自动进入 `build/`；未构建过的文件由项目 `.clangd` 的兜底参数接管。
 
 Windows 下 `run.py verify` 和 `run.py build` 会调用 `wsl.exe`，按需启动默认 WSL2 Ubuntu，在其中执行编译器和 CMake。默认只返回精简结论；仅在失败排查时使用 `--verbose`，避免将完整编译流水带入上下文。
+
+日常修改使用 `run.py verify --changed`。它读取工作区、暂存区和未跟踪文件相对 `HEAD` 的路径，只验证修改的 `code/**/*.cpp` 和 `.qmd` 内嵌示例，并跳过 `build/`、`.cache/`、`.tmp/` 和 Python 缓存。修改 `.config/cpp/`、`scripts/cpp/`、C++ skill 校验脚本或 `run.py` 时，会自动回退全量 C++ 校验；没有相关改动时只输出 `SKIP`。`run.py check` 仍是轻量仓库检查，不会因此扫描全部 C++ 示例。
+
+大更新先按逻辑分组，再使用显式路径暂存。文档、工具、主题和配置应尽量形成可独立回滚的提交；提交信息使用 `docs:`、`feat:`、`fix:`、`refactor:` 或 `chore:` 前缀。提交本身不会显著增加 token 消耗，真正昂贵的是全量编译、整本渲染和详细日志回传。

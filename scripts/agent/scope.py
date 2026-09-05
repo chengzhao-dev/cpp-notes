@@ -6,7 +6,7 @@
 当前任务的最小文件集，并把构建产物、渲染产物、其它章节一律列入 DENY。
 调用方只需读 UNIT+READ 所列文件，其余不碰——省掉「整包多读」与「反复枚举目录」。
 
-零新增元数据：READ 清单直接解析 docs/tasks/**/<chapter>.md 里的「必读」行，
+零新增元数据：READ 清单直接解析 handbook/tasks/**/<chapter>.md 里的「必读」行，
 不引入额外的清单文件；任务单本身就是路由表。
 
 用法：
@@ -71,7 +71,7 @@ def parse_required_read(task_file):
             continue
         for cand in TICK_RE.findall(line):
             cand = cand.strip().strip("()")
-            if cand.startswith(".cursor/") or cand.startswith("docs/") or cand.startswith("content/"):
+            if cand.startswith(".cursor/") or cand.startswith("handbook/") or cand.startswith("content/"):
                 paths.append(cand)
             elif cand.startswith("../../"):
                 # 任务单相对路径：归一到仓库根再取 POSIX 形式
@@ -96,7 +96,7 @@ def find_chapter(target, root):
         return None
     part, chapter = target.split("/", 1)
     qmd = root / "content" / part / f"{chapter}.qmd"
-    task = root / "docs" / "tasks" / "content" / part / f"{chapter}.md"
+    task = root / "handbook" / "tasks" / "content" / part / f"{chapter}.md"
     if not qmd.is_file():
         qmd = None
     return {"kind": "chapter", "part": part, "chapter": chapter,
@@ -129,7 +129,7 @@ DOMAIN_READ = {
     "theme": ["theme/css/", ".cursor/skills/quarto-theme/SKILL.md",
               ".cursor/skills/quarto-theme/references/design-tokens.md"],
     "dev": [".editorconfig", "scripts/cpp/"],
-    "repo": ["docs/structure.md", "AGENTS.md"],
+    "repo": ["handbook/repository-structure.md", "AGENTS.md"],
 }
 
 

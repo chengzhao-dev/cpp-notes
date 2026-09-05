@@ -2,17 +2,17 @@
 title: "写出第一个 C++ 程序"
 ---
 
-完成[搭建 WSL2 环境](setup-wsl2.qmd)后，本章先用 `g++` 编译并运行 Hello World，再用 CMake 管理同一个程序。你会看到直接编译与构建系统之间的关系，也会知道 VS Code 中的 clangd 如何读取构建信息。
+完成[搭建 WSL2 开发环境](setup-wsl2.qmd)后，本章从仓库中的 `main.cpp` 开始。你会先直接编译并运行它，再用 CMake 保存同一套构建规则。
 
 ## 本章目标
 
-完成本章后，你可以：
+本章结束时，你可以：
 
-- 写一个含 `main` 函数的 Hello World 程序，理解它是程序入口。
-- 使用 `g++` 按 C++20 标准编译程序，并在终端确认输出正确。
-- 编写最小的 `CMakeLists.txt`，用 CMake 完成相同的构建流程。
+- 查看一个最小 C++ 工程的文件关系。
+- 使用 C++20、`-Wall`、`-Wextra` 和 `-Werror` 编译并运行程序。
+- 编写本章使用的基础 `CMakeLists.txt`，重复同一构建流程。
 
-下面的流程图对比两种构建方式。它们都会生成同一个可执行文件，区别只在于构建规则由谁管理。
+直接编译适合确认单个源文件可以工作，CMake 适合保存目标、源文件和构建选项之间的关系。因此本章先使用 g++，再使用 CMake。
 
 ```{mermaid}
 flowchart TD
@@ -23,33 +23,45 @@ flowchart TD
   D --> E[运行并输出 Hello, World!]
 ```
 
-先使用 `g++` 理解编译过程，再用 CMake 把同一过程写成可复用的构建规则。
+## 查看项目结构
 
-## 第一个程序
+目录树把源码、构建规则和生成结果放在同一个模型中，后面的命令就不再是孤立的文件操作。下面只展示本章会使用的内容，顺序依据示例目录的真实结构。
 
-### 编写源文件
+```text
+first-program/
+├── build/
+│   └── bin/
+│       └── app              # 构建生成的可执行文件
+├── main.cpp                 # 程序源码
+├── CMakeLists.txt           # CMake 构建规则
+└── build-and-run.sh         # 一键构建脚本
+```
 
-每个 C++ 程序都必须有一个 `main` 函数，它是操作系统启动程序时调用的**入口**。程序从 `main` 的第一行开始执行，到 `main` 结束返回。下面这段就是最经典的 Hello World：
+配置和构建完成后，`build/bin/app` 才会出现。`build/` 中的缓存、日志、对象文件和其他 CMake 生成物不属于本章重点。接下来从 `main.cpp` 开始。
+
+## 编写并运行程序
+
+### 查看源码
+
+下面直接引用仓库中的完整 `main.cpp`。确认源码后，再执行编译命令：
 
 ```cpp
 {{< include /code/getting-started/first-program/main.cpp >}}
 ```
 
-上面就是 `main.cpp` 的完整内容。接下来编译并运行它。
-
 ### 编译并运行
 
-先创建统一的输出目录，再按 C++20 标准编译源码。警告选项会在程序尚未运行时提示可疑写法。
+在 Ubuntu 终端中创建输出目录，再用 g++ 按 C++20 标准编译。下面的命令会把可执行文件写入 `build/bin/`：
 
 ```bash
-# 创建可执行文件的输出目录。
+# 创建可执行文件的输出目录
 mkdir -p build/bin
 
-# 编译源码并将 app 写入 build/bin。
-g++ -std=c++20 -Wall -Wextra main.cpp -o build/bin/app
+# 编译源码并输出 app
+g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
 ```
 
-编译成功通常没有额外输出，`build/bin/` 中会出现名为 `app` 的可执行文件。进入该目录后运行它：
+编译成功后，进入输出目录运行程序。当前示例的预期结果是 `Hello, World!`：
 
 ```text
 $ cd build/bin
@@ -57,99 +69,79 @@ $ ./app
 Hello, World!
 ```
 
-看到 `Hello, World!` 就说明你的工具链和第一段代码都正常工作了。
+看到 `Hello, World!`，说明当前源文件已经完成编译、链接和运行。
 
 ::: {.callout-tip}
-编译时始终带上 `-Wall -Wextra`，开发期可再加 `-Wpedantic`，把警告当线索。编译通过不代表没有隐患，没开警告会漏掉未初始化、签名不匹配一类问题。
+编译通过只说明当前代码满足编译器要求。保留警告选项可以更早发现未初始化和类型不匹配等问题。
 :::
 
 ## 使用 CMake 构建
 
-### 为什么需要构建系统
+### 查看构建规则
 
-只有一个文件时，`g++` 直接编译最省事：一条命令就能产出可执行文件。文件一多，编译命令会越写越长，也越容易敲错。CMake 把构建目标和构建方法写进 `CMakeLists.txt`，因此构建规则可以进入版本库，其他人也能复现。接下来先写一份最小配置，再观察它如何生成构建文件。
-
-### 编写最小构建配置
-
-下面是与上面等价的最小 `CMakeLists.txt`：
+直接编译适合确认单个源文件可以工作。把相同的标准和警告选项写进 `CMakeLists.txt` 后，可以用同一套规则重复构建当前程序。
 
 ```cmake
 {{< include /code/getting-started/first-program/CMakeLists.txt >}}
 ```
 
-### 配置与构建
+### 配置并构建
 
-把 `CMakeLists.txt` 和 `main.cpp` 放在同一目录，先配置项目，再构建目标。配置阶段还会生成 `build/compile_commands.json`。这是 clangd 使用的编译数据库，记录头文件路径和编译参数；VS Code 通过 WSL 扩展打开项目后，clangd 就能据此提供更准确的补全、跳转和诊断。
+在示例目录中先配置，再构建 `app` 目标。两条命令应依次执行：
 
 ```bash
-# 配置项目并把构建文件放入 build/ 目录。
+# 生成 build/ 中的构建文件
 cmake -S . -B build
 
-# 构建 app 目标。
+# 构建 app 目标
 cmake --build build
 ```
 
-构建完成后，CMake 会把 `app` 写入 `build/bin/`。进入该目录后运行它：
-
-```text
-$ cd build/bin
-$ ./app
-Hello, World!
-```
-
-嫌手动敲两条命令麻烦？示例目录里附带了 `build-and-run.sh`，一条命令完成「配置 + 构建 + 运行」：
+构建完成后，`app` 会写入 `build/bin/`。示例还提供一键脚本，适合重复执行配置、构建和运行流程：
 
 ```bash
-# 在示例目录中运行一键构建脚本。
+# 在示例目录中运行完整流程
 bash build-and-run.sh
 ```
 
-脚本会依次配置、构建并进入 `build/bin/` 运行 `app`。文件开头的注释说明整份脚本的用途；`set -euo pipefail` 负责出错即停，需要保留：
+脚本会调用 CMake，随后运行 `build/bin/app`。如果任一步失败，脚本会停止并保留错误信息。
 
 ```bash
 {{< include /code/getting-started/first-program/build-and-run.sh >}}
 ```
 
-输出和直接用 `g++` 一致。区别在于，这次构建规则已经写进 `CMakeLists.txt`，可以提交到版本库，其他人拿到相同文件后也能复现。
-
-::: {.callout-warning}
-CMake 不「编译」代码，它生成构建文件（如 Makefile/Ninja），再由底层工具去编译。它解决的是「**怎么重复、可分享地构建**」，而不只是「怎么把这一个文件编过去」。
-:::
-
-::: {.callout-important}
-`CMAKE_CXX_STANDARD 20` 默认生成的是 `-std=gnu++20` 而非 `-std=c++20`。原因是 CMake 的 `CXX_EXTENSIONS` 默认为 `ON`，会把 GNU 扩展一起带上。需要严格贴合 ISO 标准时，加一行 `set(CMAKE_CXX_EXTENSIONS OFF)`。验证办法是 `cmake --build build -- VERBOSE=1`，看命令行里的 `-std=` 是 `c++20` 还是 `gnu++20`。
+::: {.callout-note}
+CMake 负责生成构建文件，实际编译仍由底层构建工具完成。它把目标、源文件和选项保存为可重复执行的规则。
 :::
 
 ## 常见问题
 
-### 找不到 g++ 命令
+### 编译器命令不可用
 
-1. 运行 `g++ --version` 确认是否真没装，或只是不在 `PATH`。
-2. 若提示找不到命令，回到[搭建 WSL2 环境](setup-wsl2.qmd)重装 `build-essential` 并验证。
-
-重装后运行 `g++ --version`，能看到版本号即成功。
-
-### build 目录能删吗
-
-可以。`build/` 只放配置缓存和编译产物，删掉不会丢源码；需要时重新配置并构建即可。仓库已用 `/code/**/build/` 把它排除在版本库之外。
-
-1. 关闭仍在运行的程序，避免文件被占用。
-2. 删除构建目录：`rm -rf build`。
-3. 重新配置并构建：`cmake -S . -B build && cmake --build build`。
-
-看到 `build/bin/app` 重新生成，说明清理没有破坏工程。
-
-### CMake 报错找不到编译器
-
-如果 CMake 报告找不到编译器，先运行 `g++ --version`。如果命令不存在，回到[搭建 WSL2 环境](setup-wsl2.qmd)安装 `build-essential` 并重新验证。若 `g++` 已经可用，问题可能来自 `build/` 中的旧配置缓存；删除该目录后重新配置项目：
+如果提示找不到 `g++`，先运行版本命令确认工具状态：
 
 ```bash
-rm -rf build
-cmake -S . -B build
+# 检查 g++ 是否可以调用
+g++ --version
 ```
 
-配置命令不再报告“找不到编译器”，就说明这次排查已经解决问题。
+如果命令仍然报错，再回到[搭建 WSL2 开发环境](setup-wsl2.qmd)重新安装 `build-essential`。
+
+### 构建目录需要重新生成
+
+如果 CMake 使用了旧编译器或旧选项，可以删除可重建的 `build/`，再重新配置：
+
+```bash
+# 删除可重建的 CMake 输出
+rm -rf build
+
+# 重新配置并构建项目
+cmake -S . -B build
+cmake --build build
+```
+
+> 删除 `build/` 不会影响 `main.cpp`、`CMakeLists.txt` 和 `build-and-run.sh`。
 
 ## 本章回顾
 
-你写出了第一个 C++ 程序：用 `main` 作为入口打印 Hello World，先以 `g++` 直接编译跑通，再用一份 `CMakeLists.txt` 让构建变得可重复、可分享。本章只把单个文件跑通；多文件工程、链接库与测试属于 CMake 进阶，后续章节展开。本章用到的构建约定（`build/`、`build/bin/app`、一键脚本）会在全书示例里沿用。
+你已经用 `main.cpp` 完成了“编译 → 运行”的最小闭环，又把同一流程写进 `CMakeLists.txt`。今后的多文件工程会沿用源码、构建目录和构建规则的分工；更复杂的目标、库和测试将在后续章节展开。

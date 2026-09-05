@@ -8,7 +8,7 @@
 
 子命令：
   check   一次跑完全部产物/源码校验（默认 terse：仅一行结论）
-  verify  编译校验 C++ 示例（Windows 自动经 WSL2；可 --style 追加 clang-format/tidy）
+  verify  编译校验 C++ 示例（Windows 自动经 WSL2；可 --changed 增量校验）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
   scope   解析任务作用域，输出 UNIT/READ/DENY 清单
   build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
@@ -121,6 +121,16 @@ def cmd_verify(args):
     argv = [PY, str(ROOT / ".cursor/skills/cpp-content/scripts/verify_examples.py")]
     if args.style:
         argv.append("--style")
+    if args.changed:
+        changed = changed_paths()
+        if changed is None:
+            print("INFO  verify --changed  检测到全局 C++ 配置或校验器改动，改为全量校验")
+        else:
+            paths = relevant_cpp_paths(changed)
+            if not paths:
+                print("SKIP  verify --changed  没有修改的 C++ 源文件或内嵌示例")
+                return 0
+            argv += ["--paths", *paths]
     rc, text = run(argv)
     if args.verbose:
         print(text.rstrip())
@@ -134,6 +144,49 @@ def cmd_verify(args):
     if rc == 0:
         print("PASS  verify 示例全部编译通过")
     return rc
+
+
+def changed_paths():
+    """返回相对 HEAD 的工作区路径；全局 C++ 改动时返回 None。"""
+    result = subprocess.run(
+        ["git", "status", "--porcelain=v1", "-z"], cwd=str(ROOT),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False,
+    )
+    raw = result.stdout.decode("utf-8", errors="replace")
+    paths = []
+    for item in raw.split("\0"):
+        if not item or len(item) < 4:
+            continue
+        path = item[3:].split(" -> ")[-1].strip('"')
+        path = path.replace("\\", "/")
+        if any(part in {"build", ".cache", ".tmp", ".quarto", "__pycache__"}
+               for part in path.split("/")):
+            continue
+        paths.append(path)
+
+    global_prefixes = (
+        ".config/cpp/",
+        "scripts/cpp/",
+        ".cursor/skills/cpp-content/scripts/",
+    )
+    global_files = {
+        "scripts/agent/run.py",
+        ".cursor/skills/cpp-content/scripts/verify_examples.py",
+    }
+    if any(path.startswith(global_prefixes) or path in global_files for path in paths):
+        return None
+    return paths
+
+
+def relevant_cpp_paths(paths):
+    """筛出可交给 verify_examples.py 的 C++ 文件和 QMD 文件。"""
+    selected = []
+    for path in paths:
+        if path.endswith(".cpp") and path.startswith("code/") and (ROOT / path).is_file():
+            selected.append(path)
+        elif path.endswith(".qmd") and (ROOT / path).is_file():
+            selected.append(path)
+    return selected
 
 
 def cmd_render(args):
@@ -190,7 +243,7 @@ def cmd_build(args):
 def cmd_status(args):
     """git 状态：区分「本次 agent 改动」与「用户既有未提交改动」。"""
     rc, text = run(["git", "status", "--porcelain"])
-    agent_prefixes = ("scripts/agent/", "docs/agent/", ".cursor/skills/",
+    agent_prefixes = ("scripts/agent/", "handbook/operations/", ".cursor/skills/",
                       ".config/", ".editorconfig",
                       "theme/", "_quarto.yml", "AGENTS.md")
     mine, theirs = [], []
@@ -229,6 +282,7 @@ def main():
     subs.add_parser("check", parents=[common], help="一次跑完全部校验")
     p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
+    p.add_argument("--changed", action="store_true", help="只校验相对 HEAD 修改的 C++ 内容")
     p = subs.add_parser("render", parents=[common], help="渲染并自动校验")
     p.add_argument("--no-ignore", action="store_true", help="传给 quarto --no-quartoignore")
     p.add_argument("--skip-check", action="store_true", help="渲染后不跑校验")

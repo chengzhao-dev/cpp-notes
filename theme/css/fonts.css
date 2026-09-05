@@ -1,4 +1,5 @@
-/* cpp-notes · 自托管 Web 字体（SIL OFL 1.1，见 theme/assets/fonts/OFL.txt） */
+/* cpp-notes · 自托管 Web 字体（均为 SIL OFL 1.1，见 theme/assets/fonts/OFL.txt） */
+/* Inter 负责拉丁字母，Noto Sans SC 负责中文，JetBrains Mono 负责代码。 */
 
 @font-face {
   font-family: "Inter";

@@ -6,7 +6,7 @@
 ## 基础设施（infra）
 
 TASK-INFRA-001 ~ 007 已全部完成，逐条任务单已归档到 [infra/DONE.md](infra/DONE.md)。
-新的基建任务直接在 `docs/tasks/infra/` 建文件并在此登记。
+新的基建任务直接在 `handbook/tasks/infra/` 建文件并在此登记。
 
 ## 主题（theme）
 

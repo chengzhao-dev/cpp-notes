@@ -50,6 +50,14 @@ git log --oneline -10
 - 只暂存目标文件，不提交密钥/生成产物（`_book/`、`.quarto/` 已在 `.gitignore`）。
 - commit message 简洁、对齐仓库现有风格。
 
+## 大更新的提交方式
+
+先查看 `git status --short`、`git diff --stat` 和 `git diff --name-only`，再按逻辑分组暂存，例如文档正文、校验工具、主题样式和仓库配置。每组使用显式路径执行 `git add`，随后检查 `git diff --cached --check` 与 `git diff --cached --stat`。
+
+提交前优先运行 `python scripts/agent/run.py verify --changed`、`python scripts/agent/run.py check` 和 `git diff --check`。只有改动主题或 Quarto 全局配置时才整本渲染；只有改动 C++ 全局配置或校验器时才需要全量 C++ 验证。不要让 `build/`、`.cache/`、`.tmp/` 和其他生成物触发校验。Python 解释器选择规则见 [`handbook/operations/agent-operations.md`](../../../../handbook/operations/agent-operations.md)。
+
+推荐提交信息前缀：`docs:` 用于文档与写作规范，`feat:` 用于新增功能或章节，`fix:` 用于行为修复，`refactor:` 用于不改变行为的结构调整，`chore:` 用于配置和维护。多个文件若属于同一个不可分割的行为变更，可放在同一提交；否则拆成可独立回滚的提交。未明确要求时不 commit、push 或创建 PR。
+
 ## 日常流程
 
 ```powershell
@@ -92,6 +100,6 @@ git reset --soft HEAD~1       # 撤销最近一次 commit（保留改动）
 
 ## 文档兼容性
 
-README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法，并为图片提供替代文字。Skill、`docs/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主；默认不放 Mermaid 或图片，复杂流程确有必要时需同时提供文字结论。修改 Markdown 后运行统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。
+README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法，并为图片提供替代文字。Skill、`handbook/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主；默认不放 Mermaid 或图片，复杂流程确有必要时需同时提供文字结论。修改 Markdown 后运行统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。
 
 代码、命令和终端输出统一左对齐。只有一两条且不需要上下文的短命令直接写在正文中；需要说明顺序或用途的命令才放入代码块，并把简短注释放在对应命令上方。代码块与 transcript 使用 GitHub 风格的明暗色板和统一字体，transcript 不使用语言高亮。

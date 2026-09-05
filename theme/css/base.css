@@ -112,6 +112,9 @@ h5 {
 body.index-page #quarto-document-content h2 {
   border-bottom: 0;
 }
+body.homepage #quarto-document-content h2 {
+  border-bottom: 0;
+}
 
 /* ---------- 垂直节奏（上边距节奏，参考 mdBook / React / Vue 的 prose 模式） ----------
    Quarto 把每个 h2 章节内容包在 <section class="level2"> 里，因此对主容器与各 section

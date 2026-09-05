@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""生成 docs/tasks 下的任务单文件。"""
+"""生成 handbook/tasks 下的任务单文件。"""
 
 from pathlib import Path
 
@@ -46,9 +46,9 @@ def write(path: Path, text: str):
 def infra():
     """已完成的基建任务不再重生成。
 
-    001-007 全部 done，历史记录折叠在 docs/tasks/infra/DONE.md。若继续按模板
+    001-007 全部 done，历史记录折叠在 handbook/tasks/infra/DONE.md。若继续按模板
     生成，会把已完成任务复活成 todo 并污染 INDEX.md，故此处只保留说明。
-    后续新的基建任务请直接在 docs/tasks/infra/ 下新建文件并登记 INDEX.md。
+    后续新的基建任务请直接在 handbook/tasks/infra/ 下新建文件并登记 INDEX.md。
     """
     return
 
@@ -149,6 +149,6 @@ if __name__ == "__main__":
     if SKIPPED:
         print()
         print("已存在的任务文件不会被覆盖：其状态与「读写边界」可能已由人工细化，")
-        print("请以 docs/tasks/ 下的实际文件为准；确需按脚本重生成时，先删除对应文件再运行。")
+        print("请以 handbook/tasks/ 下的实际文件为准；确需按脚本重生成时，先删除对应文件再运行。")
         for p in SKIPPED:
             print(f"  skip {p.relative_to(ROOT)}")

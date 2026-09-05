@@ -6,9 +6,9 @@ TASK-INFRA-001 ~ 007 全部完成，逐条任务单不再单独保留（内容�
 |---|---|---|
 | INFRA-001 | Skill 迁移 | 建立 `.cursor/skills/` 四域；cases 合并；`writing-style-core.md` |
 | INFRA-002 | 删除 opencode | 移除 `.opencode/` 与其引用 |
-| INFRA-003 | docs 框架 | `structure.md`、`tasks/INDEX.md`、`agent/` |
+| INFRA-003 | handbook 框架 | `repository-structure.md`、`tasks/INDEX.md`、`operations/` |
 | INFRA-004 | 脚本收尾 | `init_project.py` bare/simple；取消 cpp-project skill |
-| INFRA-004b | Python 规范 | Black + 中文注释约定（现并入 `docs/agent/ops.md`） |
+| INFRA-004b | Python 规范 | Black + 中文注释约定（现并入 `handbook/operations/agent-operations.md`） |
 | INFRA-005 | CI 校验 | `render-check.yml` 跑 `verify_examples.py` |
 | INFRA-006 | 精简合并 | 删 assets 与 full 模板；misc.css 并入 base.css |
 | INFRA-007 | 内容精简 | `writing-style-core`；setup-wsl2 ≤180 行 |
@@ -20,4 +20,4 @@ TASK-INFRA-001 ~ 007 全部完成，逐条任务单不再单独保留（内容�
 - 命令统一入口 `scripts/agent/run.py`：批处理校验、terse 输出、绕开 PowerShell 引号/GBK 重试。
 - 产物契约 `scripts/agent/check_dom_contracts.py`：复制按钮 hover、触屏兜底、打印不隐藏、favicon。
 - 开发环境落地：根 `.editorconfig`；Clang/VS Code 配置由 `scripts/cpp/init_project.py` 从模板生成。
-- `authoring.md`（239 行）拆为 `authoring.md` + `authoring-elements.md`；`render-ops.md` + `python-scripts.md` 合并为 `ops.md`；删除死模板 `chapter.qmd`、`api-doc.qmd`。
+- `authoring.md`（239 行）拆为 `authoring.md` + `authoring-elements.md`；渲染和脚本细则集中到 `agent-operations.md`；删除死模板 `chapter.qmd`、`api-doc.qmd`。
