@@ -16,7 +16,9 @@
 }
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* 桌面端固定两列；单卡也保留半行宽度，与双卡保持一致。
+     半行宽度沿用 calc((100% - 1.25rem) / 2) 的既有布局契约。 */
+  grid-template-columns: repeat(2, minmax(0, calc((100% - 1.25rem) / 2)));
   gap: 1.25rem;            /* 卡片间距对齐 gitcn（~20px） */
   margin: 0.6rem 0 1rem;   /* 顶部 0.9rem → 0.6rem，与描述下边距折叠后整体 0.6rem */
 }
@@ -33,12 +35,20 @@
   display: block;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;     /* gitcn 卡片观感（原 24px 过圆） */
-  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  padding: 1.35rem 1.5rem;
   transition: var(--transition);
+  min-height: 100%; /* 两卡并排时等高，避免短卡显得挤 */
+  box-sizing: border-box;
 }
 .landing-card:hover {
   border-color: var(--card-hover-border);
+  background-color: var(--surface-raised);
+}
+.landing-card:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 #quarto-document-content .landing-card h3 {
   margin-top: 0;
@@ -64,7 +74,14 @@
 }
 /* 未撰写章节：弱化 + "规划中" 角标 */
 .landing-card.coming-soon {
-  opacity: 0.8;
+  background-color: var(--surface-raised);
+  border-color: var(--card-border);
+}
+.landing-card.coming-soon h3,
+.landing-card.coming-soon h3 a,
+.landing-card.coming-soon p,
+.landing-card.coming-soon a.cta {
+  color: var(--text-secondary);
 }
 .landing-card.coming-soon::after {
   content: "规划中";
@@ -73,7 +90,7 @@
   font-size: 0.72rem;
   color: var(--text-secondary);
   border: 1px solid var(--card-border);
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 0.05rem 0.55rem;
 }
 
@@ -91,9 +108,15 @@
   text-decoration-color: var(--link-underline);
   text-underline-offset: 0.2em;
 }
-/* 落地页分组标题与卡片的间距节奏 */
-#quarto-document-content > h2 + .feature-grid {
+/* 落地页分组标题与卡片的间距节奏
+   Quarto 把 h2 包进 section.level2，不能用「主容器直属 h2」选择器 */
+#quarto-document-content > h2 + .feature-grid,
+#quarto-document-content section.level2 > h2 + .feature-grid {
   margin-top: 0.4rem;
+}
+/* 分组引导段（h2 下首段）与卡片网格：略收紧，避免两卡一行时上下空档过大 */
+#quarto-document-content section.level2 > p:first-of-type + .feature-grid {
+  margin-top: 0.85rem;
 }
 
 /* ========== 首页（根 index.qmd）专属：Hero 卡片 + 居中 + 统一配色 ==========
@@ -102,7 +125,7 @@ body.homepage #title-block-header.quarto-title-block.default,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 2.25rem 1.5rem;
   margin: 0 0 2rem;
   text-align: center;
@@ -129,6 +152,29 @@ body.homepage .feature-grid,
 body.homepage .landing-card,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) .landing-card {
   text-align: center;
+}
+
+@media (max-width: 767.98px) {
+  body.homepage #title-block-header.quarto-title-block.default,
+  #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+  body.homepage #title-block-header.quarto-title-block.default .quarto-title .title,
+  #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default .quarto-title .title {
+    font-size: 1.875rem;
+  }
+  body.homepage #title-block-header.quarto-title-block.default .description,
+  #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default .description {
+    font-size: 1rem;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .landing-card {
+    padding: 1.1rem 1.15rem;
+  }
 }
 body.homepage .landing-card h3 a,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) .landing-card h3 a {

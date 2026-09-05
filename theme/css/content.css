@@ -37,6 +37,21 @@
   border-bottom: 1px solid var(--table-border);
 }
 
+/* 短工具包表格按内容收窄并居中；宽表仍由通用 .table 规则负责滚动。 */
+.compact-table {
+  overflow-x: auto;
+}
+.compact-table .table {
+  display: table;
+  width: max-content;
+  min-width: min(100%, 34rem);
+  margin-inline: auto;
+}
+.compact-table .table th,
+.compact-table .table td {
+  text-align: center;
+}
+
 /* ---------- 引用块（> 标记，用于「注意」等提示；GitHub markdown-body 灰风：灰边 + 灰字，无彩色底） ---------- */
 blockquote,
 blockquote.blockquote {

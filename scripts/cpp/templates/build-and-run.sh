@@ -1,34 +1,27 @@
 #!/usr/bin/env bash
-# 一键构建并运行 CMake 示例（Ubuntu / WSL2）
-#
-# 固定约定（后续章节统一沿用）：
-#   - 构建目录       build/
-#   - 可执行文件位置 build/bin/
-#   - 可执行文件名   app（须与 CMakeLists.txt 的 add_executable(app ...) 一致）
-set -euo pipefail
-# e：任一条命令返回非 0 立即退出；u：用到未定义变量立即报错；o pipefail：管道中任一步失败都算失败
+# 一键配置、构建并运行当前 CMake 示例。
+# 用法：在项目根目录运行 bash build-and-run.sh。
+# 配置阶段会生成 compile_commands.json，供 clangd 还原真实编译参数。
 
-# 无论在哪里执行，都先切到脚本所在目录（即示例目录），保证相对路径稳定
+set -euo pipefail
+
+# 无论从哪里调用，都先切换到脚本所在的项目目录。
 cd "$(dirname "$0")"
 
-# —— 以下两项须与 CMakeLists.txt 保持一致 ——
+# 将生成物集中到 build/，避免污染源码目录。
 BUILD_DIR="build"
-BIN_DIR="$BUILD_DIR/bin"   # 可执行文件输出位置
-TARGET="app"               # 生成的可执行文件名
+BIN_DIR="$BUILD_DIR/bin"
+TARGET="app"
 
-# -DCMAKE_EXPORT_COMPILE_COMMANDS=ON 会生成 build/compile_commands.json，
-# 它是 clangd 的编译数据库：clangd 从源文件向上查找并自动进入 build/ 子目录读取，
-# 有了它，补全与跳转才能拿到真实的头文件路径和编译参数（比 .clangd 的兜底参数准确）。
-echo "==> 第 1 步：配置（生成构建系统到 $BUILD_DIR/）"
+# 导出编译数据库，让 clangd 的诊断与实际构建保持一致。
+printf '\n==> 配置\n\n'
 cmake -S . -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-echo "==> 第 2 步：构建（编译出 $BIN_DIR/$TARGET）"
+# 构建 CMakeLists.txt 声明的目标。
+printf '\n==> 构建\n\n'
 cmake --build "$BUILD_DIR"
 
-# 用分隔线把「构建」与「运行」的输出隔开，方便阅读
-echo
-echo "=================================================="
-echo " 运行 $BIN_DIR/$TARGET"
-echo "=================================================="
-echo
-"./$BIN_DIR/$TARGET"
+# 可执行文件统一放在 build/bin，和中间文件分开。
+printf '\n==> 运行\n\n'
+cd "$BIN_DIR"
+"./$TARGET"

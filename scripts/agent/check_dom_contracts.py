@@ -20,6 +20,12 @@
      （该层现在包裹代码本身，隐藏它 = 打印/PDF 时代码整块消失。）
   C4 站点图标：每个 HTML 的 <head> 必须含 rel="icon" 且指向 favicon.svg，
      且该图标文件确实被发布到产物目录。
+C5 Mermaid 图表：产物必须包含 Quarto Mermaid 运行时和 mermaid-js 图表占位符，
+      不得退化为普通 sourceCode 代码块。浏览器加载脚本后由占位符转换为 SVG。
+  C6 代码主题稳定性：源 CSS 必须使用统一代码字体，不得保留按 Bash/PowerShell
+      命令 token 强制改色的旧选择器；普通文本代码块不得带语言 token。
+  C7 代码块视觉契约：普通文本代码块与语言代码块必须共用 GitHub 代码背景、边框、
+      字体和布局令牌，避免两套代码块样式分叉。
 
 用法：python check_dom_contracts.py [--book-dir _book] [--verbose]
 退出码：0 = 全部契约通过；1 = 有契约失败；2 = 产物目录不存在（需先 quarto render）。
@@ -152,6 +158,27 @@ def check_contracts(book_dir, htmls, css_pairs):
     """跑完全部契约，返回 [(id, 名称, ok, 摘要, [细节行])]。"""
     results = []
 
+    # ---------- C0 GitHub 主题配置 ----------
+    quarto = (Path(__file__).resolve().parents[2] / "_quarto.yml")
+    try:
+        quarto_text = quarto.read_text(encoding="utf-8")
+    except OSError:
+        quarto_text = ""
+    c0 = (
+        "light: github-light" in quarto_text
+        and "dark: github-dark" in quarto_text
+        and "one-dark" not in quarto_text.lower()
+        and "custom.theme" not in quarto_text.lower()
+    )
+    results.append((
+        "C0", "仅使用 GitHub Light / GitHub Dark 高亮主题", c0,
+        "github-light=%s，github-dark=%s，未发现 One Dark/自定义主题=%s" % (
+            "light: github-light" in quarto_text,
+            "dark: github-dark" in quarto_text,
+            "one-dark" not in quarto_text.lower() and "custom.theme" not in quarto_text.lower()),
+        ["_quarto.yml 只保留 highlight-style.light=github-light 和 dark=github-dark"],
+    ))
+
     # ---------- C1 复制按钮可见性 ----------
     sibling_ok = False
     scaffold_pages = 0
@@ -229,6 +256,88 @@ def check_contracts(book_dir, htmls, css_pairs):
         "C4", "站点图标已注入并发布", c4, summary,
         ["每页 <head> 需 <link rel=\"icon\" … favicon.svg>；源文件见 theme/assets/favicon.svg，"
          "由 scripts/maint/gen_favicon.py 生成"],
+    ))
+
+    # ---------- C5 Mermaid ----------
+    mermaid_blocks = 0
+    mermaid_runtime_pages = 0
+    raw_mermaid = []
+    for path, _tree, _rels in htmls:
+        try:
+            html = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        mermaid_blocks += len(re.findall(r"<pre\b[^>]*class=\"[^\"]*\bmermaid-js\b", html))
+        if "quarto-diagram/mermaid.min.js" in html and "quarto-diagram/mermaid-init.js" in html:
+            mermaid_runtime_pages += 1
+        if re.search(r"<pre\b[^>]*class=\"[^\"]*\bsourceCode\b[^\"]*\"[^>]*>.*?flowchart\s+(?:TD|LR|TB|RL|BT)", html, re.S):
+            raw_mermaid.append(str(path.relative_to(book_dir)))
+    c5 = mermaid_blocks > 0 and mermaid_runtime_pages > 0 and not raw_mermaid
+    summary = "Mermaid 占位符=%d，运行时页面=%d，普通源码块=%d" % (
+        mermaid_blocks, mermaid_runtime_pages, len(raw_mermaid))
+    if raw_mermaid:
+        summary += "（" + ", ".join(raw_mermaid[:3]) + (" …" if len(raw_mermaid) > 3 else "") + "）"
+    results.append((
+        "C5", "Mermaid 使用 Quarto 图表运行时", c5, summary,
+        ["Mermaid 围栏必须使用 ```{mermaid}",
+         "渲染结果需包含 mermaid-js 占位符和 Quarto Mermaid 运行时",
+         "不得退化为带 sourceCode 类的普通 flowchart 代码块"],
+    ))
+
+    # ---------- C6 GitHub 代码主题与稳定 token ----------
+    css_text = "\n".join(css for _, css in css_pairs)
+    source_css = "\n".join(
+        path.read_text(encoding="utf-8", errors="ignore")
+        for path in sorted(book_dir.rglob("*.css"))
+    )
+    has_font = "var(--mono-font)" in source_css and "pre.sourceCode" in source_css
+    has_left_align = bool(re.search(r"text-align\s*:\s*left", source_css))
+    stale_selectors = re.findall(
+        r"(?:pre|div)\.sourceCode:is\(\.bash,\s*\.powershell\)[^{]*\{[^}]*color",
+        source_css,
+        flags=re.S,
+    )
+    legacy_output_pages = []
+    for path, tree, _rels in htmls:
+        for node in walk(tree):
+            if node.tag != "pre" or SRCODE in node.classes:
+                continue
+            if any(cls in node.classes for cls in ("bash", "powershell", "hljs")):
+                legacy_output_pages.append(str(path.relative_to(book_dir)))
+    c6 = has_font and has_left_align and not stale_selectors and not legacy_output_pages
+    summary = "统一字体=%s，左对齐=%s，旧命令着色选择器=%d，普通文本代码块语言类=%d" % (
+        has_font, has_left_align, len(stale_selectors), len(legacy_output_pages))
+    results.append((
+        "C6", "GitHub 代码主题与 token 样式稳定", c6, summary,
+        [
+            "亮色/暗色应由 _quarto.yml 的 github-light/github-dark 提供",
+            "代码 CSS 应统一使用 --mono-font，不按 Bash/PowerShell 命令 token 强制改色",
+            "普通文本代码块应保持左对齐并保留终端输出的空格",
+            "普通文本代码块不应带 sourceCode、bash、powershell 或 hljs 类",
+        ],
+    ))
+
+    # ---------- C7 普通文本代码块与语言代码块的视觉契约 ----------
+    source_css_text = "\n".join(
+        path.read_text(encoding="utf-8", errors="ignore")
+        for path in sorted(Path(__file__).resolve().parents[2].glob("theme/css/*.css"))
+    )
+    shared_selectors = (
+        "pre.sourceCode,\npre:not(.sourceCode)" in source_css_text
+        or "pre.sourceCode, pre:not(.sourceCode)" in source_css_text
+    )
+    shared_tokens = all(token in source_css_text for token in (
+        "--code-bg", "--code-border", "--code-fg", "--mono-font",
+        "--code-font-size", "--code-line-height", "--code-padding",
+    ))
+    c7 = shared_selectors and shared_tokens
+    results.append((
+        "C7", "普通文本代码块与 GitHub 代码块共享视觉令牌", c7,
+        "共享选择器=%s，代码令牌=%s" % (shared_selectors, shared_tokens),
+        [
+            "theme/css/code.css 应让 pre.sourceCode、pre:not(.sourceCode) 与 div.sourceCode 共用布局",
+            "背景、边框、字体、字号、行高和内边距应引用 theme/css/tokens.css 的代码令牌",
+        ],
     ))
 
     return results

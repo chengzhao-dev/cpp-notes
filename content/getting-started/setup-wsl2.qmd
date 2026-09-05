@@ -2,177 +2,151 @@
 title: "搭建 WSL2 环境"
 ---
 
-WSL2（Windows Subsystem for Linux，Windows 里的 Linux 子系统）让你在 Windows 里运行完整的 Ubuntu，而不必单独装一台 Linux 电脑或虚拟机。本章在 Windows 上搭好 Ubuntu 开发环境，并配齐编译、构建 C++ 程序所需的工具链。
+WSL2（Windows Subsystem for Linux，Windows 里的 Linux 子系统）让你在 Windows 中运行 Ubuntu。本章完成 WSL2 配置，并安装由 g++、CMake、clangd 和调试器组成的 C++ 工具链。Windows 负责桌面和 VS Code，Ubuntu 负责编译、运行与调试。
 
 ::: {.callout-note}
-本章命令在 Ubuntu 26.04 LTS 上验证，对应工具版本为 g++ 15.2.0 与 CMake 4.2.3。Ubuntu 24.04、22.04 等老版本大多同样可用，命令输出与包名可能略有差异。
+本章命令在 Ubuntu 26.04 LTS 上验证，对应工具版本为 g++ 15.2.0 与 CMake 4.2.3。Ubuntu 24.04、22.04 等版本通常同样适用，但命令输出可能略有差异。
 :::
 
 ## 本章目标
 
-学完本章，你就能：
+完成本章后，你可以：
 
-- 在 Windows 上装好并启用 WSL2，把 Ubuntu 当作日常开发环境。
-- 在 Ubuntu 终端里安装 C++ 工具链，并用 `--version` 确认各工具可用。
+- 在 Windows 上安装并启用 WSL2，将 Ubuntu 作为日常开发环境。
+- 在 Ubuntu 终端中安装 C++ 工具链，并用版本命令确认编译和构建工具可用。
+- 使用 VS Code 的 WSL 扩展连接 Ubuntu，让 clangd 提供补全、跳转和诊断。
+
+下图展示本章的安装顺序。每一步完成后再进入下一步，更容易定位配置问题。
 
 ```{mermaid}
 flowchart TD
   A[启用 WSL2] --> B[安装 Ubuntu]
   B --> C[安装 C++ 工具链]
-  C --> D[验证 g++ 与 cmake]
+  C --> D[验证 g++ 与 CMake]
 ```
+
+完成最后一步并看到工具版本后，开发环境就可以用于下一章的程序构建。
 
 ## 准备与安装
 
-以下步骤在 **Windows 的 PowerShell** 中完成（开始菜单搜索「PowerShell」，右键「以管理员身份运行」）。
+以下步骤在 Windows PowerShell 中完成。需要执行系统级操作时，请以管理员身份打开 PowerShell。
 
-### 先决条件
-
-1. **操作系统**：Windows 10 版本 2004 及以上，或 Windows 11。
-2. **CPU 虚拟化**：已在 BIOS/UEFI 中开启（任务管理器 → 性能 → CPU，「虚拟化」应显示「已启用」）。未开启时 `wsl --install` 可能失败。
+开始前请确认 Windows 10 版本 2004 及以上或 Windows 11，并在 BIOS/UEFI 中启用 CPU 虚拟化；可在“任务管理器 → 性能 → CPU”中查看。满足条件后，继续安装 WSL2。
 
 ### 安装 WSL2
 
-**第 1 步：运行安装命令**
-
-该命令会启用 WSL 相关 Windows 功能，并默认安装 Ubuntu：
+运行下面的命令。它会启用 WSL 相关 Windows 功能，并默认安装 Ubuntu：
 
 ```powershell
 wsl --install
 ```
 
-装完后**重启电脑**。重启后从开始菜单打开 **Ubuntu**，首次进入会提示创建 Linux **用户名**和**密码**，密码与 Windows 登录无关，输入时不显示字符，属正常现象。
+安装完成后重启电脑。首次打开 Ubuntu 时，按提示创建 Linux 用户名和密码；输入密码时不会显示字符，这是正常现象。
 
-**第 2 步：验证 WSL 版本**
+### 验证 WSL 版本
 
-仍在 PowerShell 中执行：
+在 PowerShell 中检查默认发行版和版本：
 
-```powershell
+```text
 $ wsl --status
 默认分发: Ubuntu
 默认版本: 2
 ```
 
-「默认版本: 2」表示 WSL2 已启用；「默认分发」是你输入 `wsl` 时进入的 Linux 发行版名称。
+“默认版本: 2”表示 WSL2 已启用；“默认分发”是输入 `wsl` 时进入的 Linux 发行版。
 
-::: {.callout-note}
-若提示未启用「虚拟机平台」，以管理员重新运行 `wsl --install`；仍不行则在「启用或关闭 Windows 功能」中勾选「虚拟机平台」与「适用于 Linux 的 Windows 子系统」，重启后再试。
+::: {.callout-warning}
+若提示未启用“虚拟机平台”，请以管理员身份重新运行 `wsl --install`；仍然失败时，在“启用或关闭 Windows 功能”中勾选“虚拟机平台”和“适用于 Linux 的 Windows 子系统”，然后重启。
 :::
 
-### 启动与关闭
+安装完成后，在开始菜单打开 Ubuntu，或在 PowerShell 中运行 `wsl`。若要直接进入 Linux 家目录，运行 `wsl ~`。
 
-- **启动 Ubuntu**
+### 查看运行状态
 
-  在 Windows 开始菜单打开 **Ubuntu** 应用（与在 PowerShell 输入 `wsl` 效果相同，都会进入默认 Linux 发行版）。若你已在 PowerShell，可用 `wsl ~` 直接进入 Linux 的**家目录**（`~`，类似 Windows 的「用户文件夹」）。
+在 PowerShell 中执行以下命令，确认发行版是否正在运行：
 
-- **关闭全部实例**
-
-  在 PowerShell 执行 `wsl --shutdown`，会停止所有正在后台运行的 Linux 环境。
-
-- **关闭指定发行版**
-
-  `wsl --terminate Ubuntu` 只停止名为 Ubuntu 的实例，其他发行版不受影响。
-
-- **查看是否在运行**
-
-  在 PowerShell 执行 `wsl --list --verbose`（可简写 `wsl -l -v`）。`STATE` 为 `Running` 表示该发行版正在运行；`Stopped` 表示已关闭。星号 `*` 所在行是默认分发：
-
-```powershell
+```text
 $ wsl -l -v
   NAME      STATE           VERSION
 * Ubuntu    Running         2
 ```
 
+`Running` 表示发行版正在运行，`Stopped` 表示当前已关闭。完成安装或排查问题后，先用这条命令确认实际状态，再决定是否关闭实例。
+
+### 关闭 WSL2
+
+不再使用 Linux 环境时，可以关闭全部发行版，也可以只关闭指定的 Ubuntu 实例。下面两条命令分别对应这两种操作：
+
+```powershell
+# 关闭全部正在运行的 WSL 发行版
+wsl --shutdown
+
+# 仅关闭 Ubuntu 实例
+wsl --terminate Ubuntu
+```
+
 ## 安装 C++ 构建工具链
 
-从本节起，请在 **Ubuntu 终端**（黑色或紫色窗口，提示符类似 `username@hostname:~$`）中操作，而不是 PowerShell。
+从本节开始，请在 Ubuntu 终端中操作，而不是 PowerShell。
 
-### 软件源
+### 软件源与工具包
 
-Ubuntu 通过**软件源**（远程软件仓库）安装包。默认使用官方源；若 `apt update` 或下载很慢，可按 [清华镜像帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 换源。网络正常则不必改。
+Ubuntu 通过软件源安装软件包。网络正常时使用默认官方源即可；下载缓慢时，可参考[清华大学开源软件镜像站的 Ubuntu 帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)。
 
-### 安装与验证
-
-**第 1 步：更新软件包索引**
-
-`apt update` 拉取最新包列表；`upgrade` 升级已安装包（可选但建议）：
+先更新软件包索引并升级已安装的软件，再安装本章需要的工具：
 
 ```bash
+# 更新软件包索引并升级已安装的软件
 sudo apt update && sudo apt upgrade -y
+
+# 安装 C++ 编译、构建、调试和代码检查工具
+sudo apt install -y build-essential gdb cmake ninja-build clang clangd clang-tidy clang-format
 ```
 
-`sudo` 会要求输入你在首次进入 Ubuntu 时设置的 Linux 密码。
+::: {.compact-table}
 
-**第 2 步：安装工具**
+| 包名 | 主要用途 |
+|:---:|:---:|
+| `build-essential` | 提供 g++、make 等基础编译工具 |
+| `gdb` | 使用 GNU 调试器进行单步调试和变量检查 |
+| `cmake` | 管理跨平台、多文件 C++ 项目 |
+| `ninja-build` | 提供快速构建后端 |
+| `clang`、`clangd`、`clang-tidy`、`clang-format` | 提供另一套编译器、语言服务、静态检查和格式化工具 |
 
-下表列出本章要装的包及其用途：
+:::
 
-| 包名 | 提供什么 | 你什么时候会用到 |
-|---|---|---|
-| build-essential | g++、make 等编译基础 | 编译 `.cpp` 源文件 |
-| gdb | GNU 调试器 | 单步调试、查看变量 |
-| cmake | 跨平台构建系统 | 管理多文件 C++ 项目 |
-| ninja-build | 快速构建后端 | CMake 生成构建文件时常用 |
-| clang / clang-tidy / clang-format | 另一套编译器与静态检查、格式化 | 代码风格检查、与 g++ 对照 |
+### 验证安装
 
-一条命令安装：
+下面展示三组具有代表性的版本输出。每条命令都应返回版本号，而不是 `command not found`；其余工具可以按相同方式验证。
 
-```bash
-sudo apt install -y build-essential gdb cmake ninja-build clang clang-tidy clang-format
-```
-
-**第 3 步：验证安装**
-
-逐条运行各工具的 `--version`，只看输出第一行：出现版本号且没有 `command not found`，该工具即就绪：
-
-```bash
-# g++：C++ 编译器（build-essential 提供）
+```text
 $ g++ --version
 g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
 
-# cmake：构建系统
 $ cmake --version
 cmake version 4.2.3
 
-# gdb：调试器
 $ gdb --version
 GNU gdb (Ubuntu 17.1-2ubuntu1) 17.1
-
-# clang：另一套编译器，可与 g++ 对照
-$ clang --version
-Ubuntu clang version 21.1.8 (6ubuntu1)
-
-# clang-format / clang-tidy：格式化与静态检查
-$ clang-format --version
-Ubuntu clang-format version 21.1.8 (6ubuntu1)
-
-$ clang-tidy --version
-Ubuntu LLVM version 21.1.8
 ```
-
-某一行报 `command not found`，说明对应的包没装上，重跑第 2 步的安装命令再验证。
 
 ## 常见问题
 
-### wsl 不是内部或外部命令
+### 找不到 WSL 命令
 
-表示 Windows 尚未安装或未识别 WSL 组件。按顺序排查：
+按以下顺序排查：
 
-1. 确认 Windows 版本满足先决条件（设置 → 系统 → 关于）。
-2. 以**管理员**身份在 PowerShell 运行 `wsl --install`，或在 Windows 功能中启用 WSL 相关项。
-3. **重启电脑**后再试。
+1. 确认 Windows 版本满足先决条件。
+2. 以管理员身份运行 `wsl --install`，或在 Windows 功能中启用 WSL 相关组件。
+3. 重启电脑后再次运行 `wsl --status`。
 
-成功后 `wsl --status` 应显示「默认版本: 2」。
+运行 `wsl --status` 且能看到默认版本信息，即说明命令已可用。
 
 ## 本章回顾
 
-你已在 Windows 上拥有可用的 WSL2 Ubuntu 环境，并装好了 C++ 编译与构建工具。日后可随时用 `wsl --status` 确认 WSL 状态，用各工具的 `--version` 确认工具链是否正常。
+现在你已经拥有可用的 WSL2 Ubuntu 环境，并安装了 C++ 编译、构建和调试工具。Windows 端安装 VS Code 和 WSL 扩展后，即可连接 Ubuntu 中的项目；clangd 会根据编译数据库提供补全、跳转和诊断。以后可以用 `wsl --status` 检查 WSL，用各工具的 `--version` 检查工具链。
 
-### 下一步
-
-下一章[写出第一个 C++ 程序](first-program.qmd)：用 `g++` 编译运行 Hello World，再用 CMake 把它管起来。
-
-### 相关资源
+下一章[写出第一个 C++ 程序](first-program.qmd)：使用 g++ 编译运行 Hello World，再用 CMake 管理它。
 
 - [WSL 官方文档](https://learn.microsoft.com/windows/wsl/)
 - [Ubuntu 换源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)

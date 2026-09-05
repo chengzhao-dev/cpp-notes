@@ -31,7 +31,9 @@ Quarto Book 写作方法论。体例参照 [learncpp.com](https://www.learncpp.c
 | 终端用 `PS>` | 演示块统一 `$` |
 | 普通章写 `description:` | 仅 index/part 封面 |
 | 在 `##`/`###` 前写 `---` 水平线 | H2 靠默认下边框分隔，小节前不写 `---` |
-| `::: {.callout-best-practice}` 等自定义类 | 内置 5 类 + 块内 `## 标题`；自定义类会被静默丢弃（`pitfalls.md` #12） |
+| `::: {.callout-best-practice}` 等自定义类 | 仅用内置 5 类与全局中文类型标题；自定义类会被静默丢弃（`pitfalls.md` #12） |
+| 卡片堆叠 API、命令和长句 | 只保留主题、范围和学习结果 |
+| 用反引号包住普通概念或卡片标题 | 只标记需要精确识别的技术对象 |
 
 ## 脚本
 
@@ -40,4 +42,4 @@ Quarto Book 写作方法论。体例参照 [learncpp.com](https://www.learncpp.c
 - `scripts/check_callouts.py` — 产物 callout 结构（需先渲染）
 - 章节骨架：`../cpp-content/templates/cpp-topic.qmd` + `../cpp-content/scripts/scaffold_chapter.py`
 
-批量校验统一走 `python scripts/agent/run.py check`，不要逐个脚本分别调用。
+批量校验统一走 `python scripts/agent/run.py check`，不要逐个脚本分别调用。中文 `.qmd`、Skill reference 和主题 CSS 必须使用 UTF-8 无 BOM、LF；显式指定 UTF-8，禁止系统代码页和 PowerShell 5.1 的 `-Encoding utf8` 写回。修改后先运行 `python scripts/agent/check_encoding.py`，再渲染；乱码应从 Git 可读版本恢复后重新应用补丁。

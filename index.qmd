@@ -1,6 +1,6 @@
 ---
 title: "C++ 笔记"
-description: "覆盖 Linux 环境、语言基础、STL 与内存管理；学完能编写并构建自己的 C++ 程序。"
+description: "从 WSL2 与 Ubuntu 开始，使用 VS Code 和 clangd 搭建 C++ 开发环境，逐步学习语言、标准库和对象管理。"
 number-sections: false
 body-classes: homepage
 ---
@@ -8,23 +8,23 @@ body-classes: homepage
 ::: {.feature-grid}
 ::: {.landing-card}
 ### [搭建开发环境](content/getting-started/index.qmd)
-在 WSL2 / Linux 上安装编译器与 CMake，写出并构建第一个 C++ 程序，搭好能编译、调试的工作环境。
+从 Linux 环境和工具链开始，完成第一个程序的编译与运行。
 
 [开始学习 →](content/getting-started/index.qmd){.cta}
 :::
 
 ::: {.landing-card .coming-soon}
 ### 语言基础
-变量、类型、控制流、函数与类——每章只讲一个概念，配可运行示例，按步积累语法。
+学习变量、类型、控制流、函数和类，逐步建立语言基础。
 :::
 
 ::: {.landing-card .coming-soon}
 ### 标准库（STL）
-vector、map、算法与迭代器——先学会日常写法，再理解底层实现思路。
+学习常用容器、算法和迭代器，掌握标准库的日常用法。
 :::
 
 ::: {.landing-card .coming-soon}
 ### 内存与对象
-RAII、智能指针、移动语义——写 C++ 时最常踩的坑，以及推荐的现代写法。
+学习 RAII、智能指针和移动语义，理解对象生命周期与资源管理。
 :::
 :::

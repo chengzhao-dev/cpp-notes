@@ -1,6 +1,5 @@
 ---
 # C++ 静态检查：modernize + cppcoreguidelines + bugprone 等。
-# 异常保持启用；命名 Google 规则见 code-style.md
 Checks: >
   bugprone-*,
   cppcoreguidelines-*,

@@ -27,7 +27,7 @@
 
 ## Callout（只用内置类型）
 
-`{.callout-tip}` + `## 最佳实践` · `{.callout-warning}` + `## 关键洞察` · `{.callout-important}` + `## 深入`（大师向，章末）。自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `quarto-docs` 的 `pitfalls.md` #12。
+使用内置 `note`、`tip`、`warning`、`important` 或 `caution`，并保留全局中文类型标题。不要在块内重复写“最佳实践”“关键洞察”或“深入”；自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `quarto-docs` 的 `pitfalls.md` #12。
 
 ## 核心主题索引
 

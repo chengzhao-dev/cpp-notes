@@ -128,7 +128,7 @@ def resolve_path(target, root):
 DOMAIN_READ = {
     "theme": ["theme/css/", ".cursor/skills/quarto-theme/SKILL.md",
               ".cursor/skills/quarto-theme/references/design-tokens.md"],
-    "dev": [".clangd", ".clang-format", ".editorconfig", ".vscode/"],
+    "dev": [".editorconfig", "scripts/cpp/"],
     "repo": ["docs/structure.md", "AGENTS.md"],
 }
 

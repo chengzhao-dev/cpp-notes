@@ -12,9 +12,9 @@
        · 章节页 标题→首段引言：由本规则的 line-height / margin-bottom 控制（见下方 #quarto-document-content > p:first-of-type）
        · 首页 标题→描述：由下方 #title-block-header .description 的 margin-top 控制 */
 #title-block-header.quarto-title-block.default .quarto-title .title {
-  font-size: 2.109375rem;   /* 33.75px，对齐 Cursor docs */
+  font-size: 2.109375rem;   /* 33.75px，保持 GitHub 文档式层级 */
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   line-height: 1.2;
   text-wrap: balance;
   text-align: left;        /* 覆盖默认 theme 居中，与左对齐正文/引言成组 */
@@ -80,24 +80,24 @@
   display: none;
 }
 
-/* ---------- 标题（Cursor docs 刻度：h2 20.625px / h3 18px；字重 400） ---------- */
+/* ---------- 标题：用字重与尺寸区分阅读层级 ---------- */
 h2 {
-  font-size: 1.2890625rem;
-  font-weight: 400;
+  font-size: 1.375rem;
+  font-weight: 600;
   line-height: 1.3;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 h3 {
   font-size: 1.125rem;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0;
   text-wrap: balance;
 }
 h4 {
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0;
 }
@@ -108,7 +108,10 @@ h5 {
   letter-spacing: 0;
 }
 
-/* h2 下边框由 Quarto/Bootstrap 主题默认提供，不在此覆盖 */
+/* h2 下边框由 Quarto/Bootstrap 主题默认提供；索引页关闭分隔线。 */
+body.index-page #quarto-document-content h2 {
+  border-bottom: 0;
+}
 
 /* ---------- 垂直节奏（上边距节奏，参考 mdBook / React / Vue 的 prose 模式） ----------
    Quarto 把每个 h2 章节内容包在 <section class="level2"> 里，因此对主容器与各 section
@@ -121,7 +124,7 @@ h5 {
   margin-top: 0;
   margin-bottom: 0;
 }
-/* 正文块间距 1.375rem；段落行高对齐 Cursor docs */
+/* 正文块间距 1.375rem，保持文档阅读节奏 */
 #quarto-document-content > * + *,
 #quarto-document-content section > * + * {
   margin-top: 1.375rem;
@@ -156,7 +159,14 @@ h5 {
 #quarto-document-content section > .code-caption + :is(.code-copy-outer-scaffold, pre) {
   margin-top: 0.5rem;
 }
-/* h2 间距：Cursor mt-12 mb-4 */
+#quarto-document-content :is(h2, h3, h4) + .callout {
+  margin-top: 0.75rem;
+}
+#quarto-document-content :is(.code-copy-outer-scaffold, pre) + .callout,
+#quarto-document-content .callout + :is(.code-copy-outer-scaffold, pre) {
+  margin-top: 1rem;
+}
+/* h2 间距：保持章节之间的清晰节奏 */
 #quarto-document-content > h2,
 #quarto-document-content section > h2 {
   margin-top: 3rem;

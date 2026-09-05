@@ -7,7 +7,7 @@
 ## 读写边界
 
 - **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/quarto/authoring-elements.md`；`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；`.cursor/skills/cpp-content/references/cpp/cpp.md`
-- **可写**: `content/getting-started/first-program.qmd`；示例 `code/getting-started/first-program/`（`first-program.cpp` + `CMakeLists.txt` + `build-and-run.sh`）；`_quarto.yml`（追加本章）
+- **可写**: `content/getting-started/first-program.qmd`；示例 `code/getting-started/first-program/`（`main.cpp` + `CMakeLists.txt` + `build-and-run.sh`）；`_quarto.yml`（追加本章）
 - **禁止**: `theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
 
 ## 范围说明

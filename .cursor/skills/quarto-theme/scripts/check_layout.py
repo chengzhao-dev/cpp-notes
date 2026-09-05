@@ -14,20 +14,21 @@ from pathlib import Path
 
 # 与 references/design-tokens.md / theme/css/tokens.css 保持同步
 CHECKS = [
-    ("light body token #171717", "--body-color: #171717"),
-    ("light accent orange #F54E00", "#F54E00"),
+    ("light body token #1F2328", "--body-color: #1F2328"),
+    ("light GitHub link #0969DA", "#0969DA"),
     ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
-    ("dark navbar page-bg token", "--navbar-bg: #0A0A0A"),
+    ("dark navbar page-bg token", "--navbar-bg: #0D1117"),
     ("body line-height 1.625", "line-height: 1.625"),
     ("accent dot token", "--dot-accent"),
-    ("dark page #0A0A0A", "#0A0A0A"),
-    ("dark body #EDEDED", "#EDEDED"),
-    ("dark link #FF6A1A", "#FF6A1A"),
+    ("dark page #0D1117", "#0D1117"),
+    ("dark body #E6EDF3", "#E6EDF3"),
+    ("dark link #4493F8", "#4493F8"),
     ("callout note border light", "--callout-note-border: #2563EB"),
     # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 pitfalls.md #12）
     ("callout tip (best-practice semantics)", "--callout-tip-border"),
     ("callout warning (key-insight semantics)", "--callout-warning-border"),
     ("callout important (deep-dive semantics)", "--callout-important-border"),
+    ("feature-grid max two columns", "calc((100% - 1.25rem) / 2)"),
 ]
 
 

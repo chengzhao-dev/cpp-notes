@@ -104,7 +104,7 @@ jobs:
           force_orphan: true   # 每次部署一个孤立提交，分支只含编译产物 + .nojekyll
 ```
 
-3. 首次启用可用 API 自动设置源（已配置时返回 409，容忍即可；失败兜底手动在 Settings → Pages 选 `gh-pages` 分支）：
+3. 首次启用可用 API 自动设置源（已配置时返回 409，可继续；失败时在 Settings → Pages 选择 `gh-pages` 分支）：
 
 ```bash
 curl -X POST -H "Authorization: Bearer $GITHUB_TOKEN" \

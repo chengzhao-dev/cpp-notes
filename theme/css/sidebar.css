@@ -59,6 +59,9 @@ body::-webkit-scrollbar-thumb {
   letter-spacing: normal;
   word-break: keep-all;
   color: var(--sidebar-fg);
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
 }
 #quarto-sidebar .sidebar-item-text.sidebar-link:hover {
   color: var(--body-color);
@@ -111,6 +114,9 @@ body::-webkit-scrollbar-thumb {
   font-weight: 400;
   line-height: 1.4;
   border-radius: 0;
+  min-height: 1.9rem;
+  display: flex;
+  align-items: center;
 }
 /* hover：正文色（!important 压过 Quarto 产物中的 color:#0969da !important） */
 .sidebar.margin-sidebar nav[role="doc-toc"] a.nav-link:hover {
@@ -167,10 +173,11 @@ nav.page-navigation {
   align-items: center;
   height: 100%;
   border: 1px solid var(--card-border);
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--body-color);
   font-size: 0.85rem;
   padding: 0.9rem 1.1rem;
+  min-height: 3.5rem;
 }
 .nav-page .pagination-link .bi {
   display: none; /* 隐藏 Bootstrap 图标，改用 < > */
@@ -192,6 +199,24 @@ nav.page-navigation {
 }
 .nav-page .pagination-link:hover .nav-page-text {
   color: var(--accent);
+}
+
+.nav-page .pagination-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+  nav.page-navigation {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+
+  .nav-page .pagination-link {
+    min-height: 3rem;
+    padding: 0.75rem 0.9rem;
+  }
 }
 
 

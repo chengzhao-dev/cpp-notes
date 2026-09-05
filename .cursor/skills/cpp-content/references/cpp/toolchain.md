@@ -4,9 +4,11 @@
 
 ## 为什么重要
 
-C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接决定你能否在开发期抓住 bug**。很多未定义行为（UB）、内存泄漏、数据竞争在 `-O2` 下才暴露，或只在某编译器下报错。现代 C++ 工程默认把警告当错误（`-Werror`）、用 sanitizer 在测试阶段兜底——这比上线后崩溃便宜得多。本备忘录以 Windows 上的 WSL2（GCC/Clang/CMake）为默认环境，MSVC 仅作对照。
+C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接决定你能否在开发期抓住 bug**。很多未定义行为（UB）、内存泄漏、数据竞争在 `-O2` 下才暴露，或只在某编译器下报错。现代 C++ 工程默认把警告当错误（`-Werror`）、用 sanitizer 在测试阶段兜底——这比上线后崩溃便宜得多。本备忘录以 Windows 上的 WSL2（GCC/Clang/CMake）为默认环境，MSVC 仅作对照。Windows 校验由 `wsl.exe` 按需启动默认 Ubuntu，不需要手动保持 WSL 会话。
 
 ## 核心规则
+
+展示工具链命令时，一两条简单命令直接写进正文；连续安装、配置或验证步骤才使用代码块。代码块中的关键命令在上一行使用简短的 Shell 注释，命令与输出演示使用 `text` 代码块，避免提示符、括号和版本号被错误拆成不同颜色。
 
 - **编译器**（默认 WSL2）：`g++`（GCC）、`clang++`（Clang）；对照 MSVC（`cl`）。跨编译器验证可揪出非标准写法。
 - **标准与选项统一**（C++20）：`-std=c++20`；MSVC 用 `/std:c++20`（`/std:c++latest` 追新特性）。
@@ -14,7 +16,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
 - **Sanitizer**（C++11 起普遍可用）：`-fsanitize=address,undefined`（ASan + UBSan）在开发/测试期检测泄漏、越界、UB；MSVC 用 `/fsanitize=address`。
 - **优化/调试分级**：调试 `-O0 -g`，发布 `-O2`（或 `-O3` 谨慎）；不要把 sanitizer 与高优化混用。
 - **格式化与静态检查**：排版与命名交给 clang-format / clang-tidy
-  （配置模板在 `scripts/cpp/templates/` 的 `clang-format` / `clang-tidy`，LLVM 排版 + Google 命名，见 `./code-style.md`）；
+  （配置源在 `.config/cpp/.clang-format` / `.config/cpp/.clang-tidy`，LLVM 排版 + Google 命名，见 `./code-style.md`）；
   校验用 `clang-format --dry-run -Werror`，
   clang-tidy 启用 `modernize-*` 与 `cppcoreguidelines-*` 子集。
 - **CMake 最小骨架**（C++20）：`cmake_minimum_required(VERSION 3.31)`、`set(CMAKE_CXX_STANDARD 20)` 且 `REQUIRED ON`。
@@ -50,6 +52,8 @@ cmake --build build
 ./build/main
 ```
 
+修改示例后的推荐校验方式是运行 `python scripts/agent/run.py verify`；只验证一个章节时运行 `python scripts/agent/run.py build <part>/<chapter>`。这两个入口默认压缩成功输出，只有排查失败时才使用 `--verbose`。
+
 ✗ 无警告、无标准约束，UB/泄漏悄然溜过编译：
 
 ```cmake
@@ -82,3 +86,8 @@ add_executable(main main.cpp)   # 没设 C++ 标准、没开 -Wall
 - CMake 官方文档：[cmake-buildsystem(7)](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html)
 - GCC/Clang Sanitizer 手册：`-fsanitize=address,undefined`
 - 本备忘录：`./engineering.md`（工程流程与审查）、`./pitfalls-ub.md`（UB 检测）、`./cpp.md`（写作约定与编译选项）
+## 终端命令与输出
+
+一两条无需区分用途的短命令直接写入正文。连续命令或需要说明用途的命令使用代码块，并把简短的 Bash 或 PowerShell 注释放在对应命令上方。命令输出使用 `text` 代码块，不让 `$`、括号和版本号参与语言高亮。
+
+代码块和 `text` 输出块都左对齐，并继承站点的 GitHub Light / GitHub Dark 代码字体、背景、边框和间距。代码块不使用 Markdown 粗体、斜体或长篇解释。

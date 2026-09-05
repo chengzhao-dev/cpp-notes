@@ -43,23 +43,29 @@ Quarto 升级最常破的就是这几条。破了就 FAIL 并给修复方向；`
 
 ## Python 工具脚本
 
-均为 Python ≥ 3.9，**运行时仅用标准库**。格式用 Black（见 `scripts/pyproject.toml`）。
+均为 Python ≥ 3.12，**运行时仅用标准库**。格式用 Black（见 `.config/python/pyproject.toml`）。Windows 优先使用 `.config/python/runtime.json` 指定的解释器，例如 `D:/ProgramData/miniforge3/python.exe`；若终端已配置仓库解释器，才使用简写 `python`。
 
 | 路径 | 用途 |
 |---|---|
-| `scripts/cpp/` | C++ 工程脚手架（`init_project.py` + `templates/`） |
+| `scripts/cpp/` | C++ 工程脚手架与基础工程模板（`init_project.py` + `templates/`） |
 | `scripts/build/` | 渲染后处理（`defer-mermaid.py`） |
 | `scripts/maint/` | 文档与站点资产维护（`gen_tasks.py`、`gen_favicon.py`） |
 | `scripts/agent/` | Agent 侧工具：`run.py`（统一入口）、`scope.py`（作用域）、`check_dom_contracts.py`、`check_skill_size.py` |
-| `scripts/config/` | 本机解释器（`python.json`，不入库） |
+| `.config/cpp/` | C++ 工程配置源（由 `init_project.py` 复制到新工程） |
+| `.config/python/` | Python 项目配置与本机解释器（`runtime.json` 不入库） |
+| `.config/python/` | Python 项目配置与运行时说明 |
 | `.cursor/skills/*/scripts/` | 领域校验：编译、脚手架、链接检查等 |
 
 **新建脚手架/校验 → 写 Python 脚本，不新建 skill。**
 
 ### 解释器
 
-`scripts/config/python.json` → 环境变量 `CPP_MEMO_PYTHON` → 自动搜索（≥3.9）。
+环境变量 `CPP_MEMO_PYTHON` → `.config/python/runtime.json` → 自动搜索（≥3.12）。`run.py` 会拒绝低于 Python 3.12 的解释器。
 本仓库工具脚本自身要打印中文，故 Windows 上建议设 `$env:PYTHONIOENCODING='utf-8'`，否则 PowerShell 的 GBK 控制台会把中文打成乱码。
+
+中文源文件必须以 UTF-8 无 BOM、LF 保存。禁止使用系统代码页或 GBK 读取后回写；PowerShell 5.1 写文件应改用 Python `encoding="utf-8"` 或显式 `UTF8Encoding($false)`。修改 `.qmd`、Skill 文档或主题 CSS 后先运行 `python scripts/agent/check_encoding.py`，检查失败时从 Git 可读版本恢复并重新应用补丁。
+
+代码块统一左对齐并保留源码缩进；表格负责字段对齐。正文中的冒号只作简短引出，短命令直接放入正文；代码块注释必须简短，并放在对应代码行上方。
 
 ### Black（可选本地工具，非 CI 门槛）
 
@@ -68,9 +74,17 @@ PowerShell 不会展开 `.cursor/skills/*/scripts/` 这类通配路径，需显�
 ```powershell
 $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
           ".cursor/skills/quarto-docs/scripts", ".cursor/skills/quarto-theme/scripts")
-& $py -m black --config scripts/pyproject.toml $dirs
-& $py -m black --check --config scripts/pyproject.toml $dirs
+& $py -m black --config .config/python/pyproject.toml $dirs
+& $py -m black --check --config .config/python/pyproject.toml $dirs
 ```
+
+文档中的一两条短命令直接写入正文；需要顺序或用途说明的连续命令才使用代码块，并把简短注释放在对应命令上方。代码、命令和 transcript 全部左对齐，transcript 与语言代码块共享字体和布局。
+
+代码块的背景、边框、字体和间距统一使用 GitHub Light / GitHub Dark 令牌。transcript 关闭语法高亮，只承担命令与输出展示；不要使用 CSS 按命令名、括号或 `$` 位置强制改色。
+
+### 临时文件治理
+
+`.tmp/`、`.cache/`、Python 测试缓存和覆盖率产物均为本地生成物，已由根 `.gitignore` 统一排除。发现新的工具缓存时，先确认它不属于源码或配置，再补充对应忽略规则；不要把个人机器路径写入仓库。
 
 ### 中文注释约定（与 C++ 示例同一套排版理念）
 
@@ -93,9 +107,11 @@ $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
 
 ## 开发环境配置
 
-仓库根的 `.editorconfig` / `.clang-format` / `.clangd` / `.vscode/` 是**工作区级**配置：
-打开仓库即格式化与补全可用，无需先建工程。`scripts/cpp/templates/` 下的同名模板保留，
-供 `init_project.py` 复制进**脱离本仓库使用**的独立工程。改排版规则时两处一起改，避免漂移。
+仓库根仅保留 `.editorconfig`；C++ 配置源使用工具约定的 `.config/cpp/.clang-format`、`.config/cpp/.clangd`、`.config/cpp/.clang-tidy`、`.config/cpp/.vscode/`。
+配置源统一位于 `.config/cpp/`，由 `init_project.py` 复制到新工程；
+`bare`、`simple` 与 `complete` 布局都会生成这些配置，`--no-clang` 可关闭生成；其中 `complete` 还会生成一键构建脚本。
 
 `build-and-run.sh` 里的 `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` 生成 `build/compile_commands.json`，
-clangd 会逐级向上查找并自动进入 `build/`；未构建过的文件由根 `.clangd` 的兜底参数接管。
+clangd 会逐级向上查找并自动进入 `build/`；未构建过的文件由项目 `.clangd` 的兜底参数接管。
+
+Windows 下 `run.py verify` 和 `run.py build` 会调用 `wsl.exe`，按需启动默认 WSL2 Ubuntu，在其中执行编译器和 CMake。默认只返回精简结论；仅在失败排查时使用 `--verbose`，避免将完整编译流水带入上下文。

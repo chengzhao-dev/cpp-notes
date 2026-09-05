@@ -4,7 +4,7 @@ project({{PROJECT_NAME}} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 固定可执行文件输出到 build/bin（与一键脚本约定一致）
+# 将可执行文件输出到 build/bin；运行时先进入该目录。
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(app main.cpp)

@@ -1,25 +1,34 @@
-_book/
-.quarto/
-node_modules/
-*.local
-.DS_Store
-
+# Quarto 生成物与缓存
+/_book/
 /.quarto/
 **/*.quarto_ipynb
+/content/**/*.html
 
-# 本机指定的 Python 解释器（机器相关，不入库；解析协议见 AGENTS.md）
-/scripts/config/python.json
-
-# 示例目录下的 CMake 构建产物（code/<part>/<chapter>/build/），不入库
-# 用 /code/**/ 锚定：避免无锚定的 build/ 误伤仓库工具脚本目录 scripts/build/
+# CMake 构建产物
 /code/**/build/
 
-# 章节示例里用 g++ 直接编译（-o app）产生的可执行文件/目标文件
-# （build/ 已由上面统一忽略；以下是源码目录下的临时产物）
-code/**/app
+# C++ 直接编译产物
 *.o
 *.obj
 a.out
 
-# 运行仓库 Python 脚本（含 py_compile）产生的字节码缓存
+# Python 缓存与本机运行时配置
 __pycache__/
+*.py[cod]
+/.config/python/runtime.json
+
+# 编辑器与操作系统临时文件
+/.vscode/
+.DS_Store
+*.local
+
+# 本地依赖与临时目录
+node_modules/
+.tmp/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+coverage.xml
+*.coverage

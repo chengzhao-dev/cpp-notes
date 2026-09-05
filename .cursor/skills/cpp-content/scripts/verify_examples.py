@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """编译校验仓库中的 C++ 示例，确保文档随附正确可运行的代码。
 
-编译环境：Windows 经 WSL2 调 g++/clang++；Linux（如 CI）直接在本地编译。
+编译环境：Windows 调用 wsl.exe，按需启动默认 WSL2 Ubuntu，再使用 g++/clang++；
+Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
 用法：
   python verify_examples.py
   python verify_examples.py --compiler clang++
   python verify_examples.py --style        # 追加 clang-format / clang-tidy
+
+Windows 下建议从仓库配置的 Python 3.12 运行：
+  D:/ProgramData/miniforge3/python.exe D:/Github/cpp-notes/scripts/agent/run.py verify
 退出码：0 = 全部通过；1 = 至少一处失败。
 
 编译阶段：
@@ -16,7 +20,7 @@
 风格阶段（仅 --style；规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
   S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
-  配置显式指向 scripts/cpp/templates/（clang-format、clang-tidy）；
+  配置显式指向 .config/cpp/（.clang-format、.clang-tidy）；
   clang 工具缺失/过旧时降级为警告；编译始终是硬门槛。
 """
 
@@ -37,7 +41,7 @@ SKIP_DIRS = {"build", ".git", "__pycache__", ".venv"}
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[4]
-CPP_PROJECT_TEMPLATES = REPO_ROOT / "scripts" / "cpp" / "templates"
+CPP_CONFIG_DIR = REPO_ROOT / ".config" / "cpp"
 
 
 ON_WINDOWS = platform.system() == "Windows"
@@ -59,7 +63,7 @@ def to_env_path(native_path):
 
 
 def sh(cmd, timeout=120):
-    """在编译环境执行命令：Windows 经 WSL，Linux 直接本地 bash。"""
+    """在编译环境执行命令；Windows 经 WSL 按需启动 Ubuntu。"""
     argv = ["wsl", "bash", "-c", cmd] if ON_WINDOWS else ["bash", "-c", cmd]
     return subprocess.run(
         argv,
@@ -232,8 +236,8 @@ def main():
         elif not style_targets:
             print("  no compilable .cpp under code/, nothing to check.")
         else:
-            fmt_cfg = to_env_path(str(CPP_PROJECT_TEMPLATES / "clang-format"))
-            tidy_cfg = to_env_path(str(CPP_PROJECT_TEMPLATES / "clang-tidy"))
+            fmt_cfg = to_env_path(str(CPP_CONFIG_DIR / ".clang-format"))
+            tidy_cfg = to_env_path(str(CPP_CONFIG_DIR / ".clang-tidy"))
             fmt_arg = (f"--style=file:'{fmt_cfg}'"
                        if tool_major_version("clang-format") >= 14 else "")
             tidy_arg = (f"--config-file='{tidy_cfg}'"

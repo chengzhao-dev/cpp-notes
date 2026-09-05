@@ -15,8 +15,20 @@ C++ 内容专家。默认 C++20、WSL2（g++/clang++）。全景索引见 `../_C
 | 代码风格 / 注释留白 | `references/cpp/code-style.md` |
 | 工具链 / 构建 | `references/cpp/toolchain.md` |
 
-**脚本**：`scripts/scaffold_chapter.py`、`scripts/verify_examples.py`（统一经 `run.py verify` 调用）。
-**工程脚手架**：`scripts/cpp/init_project.py`（bare/simple）。
+**脚本**：`scripts/scaffold_chapter.py`、`scripts/verify_examples.py`（统一经 `run.py verify` 调用）。Windows 下由 `wsl.exe` 按需启动默认 WSL2 Ubuntu；skill 不保持常驻 WSL 会话。
+**工程脚手架**：`scripts/cpp/init_project.py`（code/ 下默认 complete，也支持 bare/simple）。`simple` 只生成 CMake 最小工程；需要一键构建和运行时使用 `complete`。
+
+新建章节工程。Windows 使用仓库配置的 Python 3.12：
+
+```powershell
+D:/ProgramData/miniforge3/python.exe D:/Github/cpp-notes/scripts/cpp/init_project.py `
+  --name first-program `
+  --dir D:/Github/cpp-notes/code/getting-started
+```
+
+脚本会创建 `D:/Github/cpp-notes/code/getting-started/first-program`，生成 `main.cpp`、`CMakeLists.txt`、`build-and-run.sh`、clangd/clang-format 配置和 VS Code 配置。随后运行 `python scripts/agent/run.py build getting-started/first-program`，或在 WSL2 Ubuntu 中运行 `bash /mnt/d/Github/cpp-notes/code/getting-started/first-program/build-and-run.sh`。
+
+验证约定：修改 C++ 示例后运行一次 `python scripts/agent/run.py verify`；只验证单个章节时使用 `python scripts/agent/run.py build <part>/<chapter>`。默认输出为精简结论，只有失败排查时才追加 `--verbose`，避免把编译流水回传到上下文。
 
 ## 核心约定
 

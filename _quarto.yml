@@ -31,6 +31,7 @@ language:
 format:
   html:
     theme:
+      # 页面颜色由 theme tokens.css 提供 GitHub 风格，代码高亮使用下方内置主题。
       light: [cosmo, theme/scss/theme-light.scss]
       dark: [darkly, theme/scss/theme-dark.scss]
     pandoc-args:
@@ -61,6 +62,7 @@ format:
       - theme/css/landing.css
     number-sections: false
     highlight-style:
+      # 明暗模式都采用 GitHub 官方风格；不再叠加自定义 token 颜色。
       light: github-light
       dark: github-dark
     # mermaid 不配置 theme：quarto-diagram 的 init.js 走 --mermaid-* 变量驱动的

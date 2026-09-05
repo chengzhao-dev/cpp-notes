@@ -1,34 +1,39 @@
 ---
 title: "搭建开发环境"
-description: "先在 Windows 上把 C++ 开发环境搭起来，跑通工具链，写出并构建第一个程序，你就能编译、调试自己的代码了。"
+description: "在 Windows 上用 WSL2、Ubuntu、VS Code 和 clangd 搭建 C++ 开发环境，并完成第一个程序的构建。"
 number-sections: false
+body-classes: index-page
 ---
 
 ::: {.hero-eyebrow}
 准备环境
 :::
 
-本部分帮你在 Windows 上搭好 Linux 开发环境：先装 WSL2 与 Ubuntu，再装编译器和 CMake，写出并构建你的第一个 C++ 程序。
+本部分使用 Windows、WSL2、Ubuntu、VS Code 和 clangd 搭建 C++ 开发环境，再用 CMake 配置和构建第一个程序。完成后，你可以在 Linux 环境中编译、调试和维护示例。
 
 ## 环境搭建
 
+::: {.feature-grid}
 ::: {.landing-card}
 ### [在 WSL2 上配置 C++ 环境](setup-wsl2.qmd)
-在 Windows 里运行 Ubuntu，安装 g++、CMake 等工具，并用 `--version` 确认环境就绪。
+配置 Ubuntu、编译器和 CMake，并验证工具链是否可用。
 
 [开始学习 →](setup-wsl2.qmd){.cta}
 :::
 
 ::: {.landing-card}
 ### [写出第一个 C++ 程序](first-program.qmd)
-用 `g++` 编译运行 Hello World，再用 CMake 把它管起来，跑通第一段属于你的代码。
+编译并运行第一个 C++ 程序，再用 CMake 管理构建过程。
 
 [开始学习 →](first-program.qmd){.cta}
+:::
 :::
 
 ## 构建系统
 
+::: {.feature-grid}
 ::: {.landing-card .coming-soon}
 ### 用 CMake 构建 C++ 项目
-用现代 CMake 管理多文件工程：定义目标、链接库、跑测试，告别手写一长串 g++ 命令。
+学习用现代 CMake 管理多文件工程、库和测试。
+:::
 :::

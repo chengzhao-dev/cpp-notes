@@ -1,0 +1,19 @@
+---
+# C++ 排版基准：LLVM 风格 + 2 空格缩进。
+# 本文件是 C++ 工程脚手架的配置源；生成后会复制为工程根 .clang-format。
+Language: Cpp
+BasedOnStyle: LLVM
+Standard: Latest
+ColumnLimit: 80
+IndentWidth: 2
+AccessModifierOffset: -2
+
+# 不紧凑：单行函数/控制流一律展开，让注释有位置落在代码上一行
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# 留白：最多保留 1 个空行，块首不留空行
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false

@@ -8,10 +8,10 @@
 
 子命令：
   check   一次跑完全部产物/源码校验（默认 terse：仅一行结论）
-  verify  编译校验 C++ 示例（可 --style 追加 clang-format/tidy）
+  verify  编译校验 C++ 示例（Windows 自动经 WSL2；可 --style 追加 clang-format/tidy）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
   scope   解析任务作用域，输出 UNIT/READ/DENY 清单
-  build   在 WSL 中跑某章节示例的一键构建（供 clangd 生成编译数据库）
+  build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
   status  精简 git 状态：默认折叠用户既有改动，只看本次相关
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
@@ -25,15 +25,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 PY = sys.executable
+MIN_PYTHON = (3, 12)
 
 # 校验项：(名称, 脚本相对路径, 需要 _book 产物)
 CHECKS = [
+    ("encoding", "scripts/agent/check_encoding.py", False),
     ("layout", ".cursor/skills/quarto-theme/scripts/check_layout.py", True),
     ("callouts", ".cursor/skills/quarto-docs/scripts/check_callouts.py", True),
     ("dom", "scripts/agent/check_dom_contracts.py", True),
     ("size", "scripts/agent/check_skill_size.py", False),
     ("ascii", ".cursor/skills/quarto-docs/scripts/check_ascii_names.py", False),
     ("links", ".cursor/skills/quarto-docs/scripts/check_skill_links.py", False),
+    ("docs", "scripts/agent/check_docs.py", False),
 ]
 
 # 成功判据行：命中即认为该步通过，用于从大输出里挑出唯一有价值的一行
@@ -114,7 +117,7 @@ def cmd_check(args):
 
 
 def cmd_verify(args):
-    """编译校验示例（阶段多、输出长，故默认只回结论行）。"""
+    """编译校验示例；Windows 自动调用 WSL，默认只回结论行以控制输出量。"""
     argv = [PY, str(ROOT / ".cursor/skills/cpp-content/scripts/verify_examples.py")]
     if args.style:
         argv.append("--style")
@@ -125,7 +128,7 @@ def cmd_verify(args):
     # terse：保留失败行与最终结论，压掉逐个 compile 的流水
     keep = [ln for ln in text.splitlines()
             if ln.strip().startswith(("FAIL", "=== Phase", "All examples", "example(s) failed",
-                                      "skip", "MISS", "no "))]
+                                      "skip", "MISS", "no ", "未检测", "Windows："))]
     for ln in keep[-25:]:
         print(ln.rstrip())
     if rc == 0:
@@ -164,7 +167,7 @@ def cmd_scope(args):
 
 
 def cmd_build(args):
-    """在 WSL 里跑章节示例的一键构建，顺带生成 clangd 用的编译数据库。"""
+    """按需启动 WSL 运行章节构建，并生成 clangd 用的编译数据库。"""
     target = args.target.strip("/\\")
     script = ROOT / "code" / target / "build-and-run.sh"
     if not script.is_file():
@@ -188,7 +191,7 @@ def cmd_status(args):
     """git 状态：区分「本次 agent 改动」与「用户既有未提交改动」。"""
     rc, text = run(["git", "status", "--porcelain"])
     agent_prefixes = ("scripts/agent/", "docs/agent/", ".cursor/skills/",
-                      ".clangd", ".clang-format", ".editorconfig", ".vscode/",
+                      ".config/", ".editorconfig",
                       "theme/", "_quarto.yml", "AGENTS.md")
     mine, theirs = [], []
     for ln in text.splitlines():
@@ -210,6 +213,11 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
+
+    if sys.version_info < MIN_PYTHON:
+        required = ".".join(map(str, MIN_PYTHON))
+        print(f"FAIL  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")
+        return 1
 
     # 公共参数：用 parents 挂到每个子命令上，这样 --verbose 放前放后都能识别
     common = argparse.ArgumentParser(add_help=False)

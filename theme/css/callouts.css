@@ -57,11 +57,6 @@ div.callout.callout-style-default .callout-body > :first-child,
 #quarto-document-content .callout.callout-important .callout-body a { color: var(--callout-important-border); }
 #quarto-document-content .callout.callout-caution .callout-body a { color: var(--callout-caution-border); }
 
-.callout .callout-body code {
-  background-color: transparent;
-  font-size: 0.8125rem;
-}
-
 #quarto-document-content > .callout,
 #quarto-document-content section > .callout {
   margin-top: 1.8125rem;

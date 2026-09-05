@@ -19,5 +19,5 @@ TASK-INFRA-001 ~ 007 全部完成，逐条任务单不再单独保留（内容�
 - 任务作用域解析器 `scripts/agent/scope.py`：一次给出 UNIT/READ/DENY，`code/**/build/` 永不入上下文。
 - 命令统一入口 `scripts/agent/run.py`：批处理校验、terse 输出、绕开 PowerShell 引号/GBK 重试。
 - 产物契约 `scripts/agent/check_dom_contracts.py`：复制按钮 hover、触屏兜底、打印不隐藏、favicon。
-- 开发环境落地：根 `.editorconfig` / `.clang-format` / `.clangd` / `.vscode/`。
+- 开发环境落地：根 `.editorconfig`；Clang/VS Code 配置由 `scripts/cpp/init_project.py` 从模板生成。
 - `authoring.md`（239 行）拆为 `authoring.md` + `authoring-elements.md`；`render-ops.md` + `python-scripts.md` 合并为 `ops.md`；删除死模板 `chapter.qmd`、`api-doc.qmd`。

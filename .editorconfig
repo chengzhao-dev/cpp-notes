@@ -9,9 +9,12 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 indent_style = space
 
-# C / C++ / CMake：缩进取 4，与 .clang-format 的 IndentWidth 对齐
+# C / C++ / CMake：缩进取 2，与 .clang-format 的 IndentWidth 对齐
 [*.{c,cc,cpp,h,hh,hpp,cu}]
-indent_size = 4
+indent_size = 2
+
+[CMakeLists.txt]
+indent_size = 2
 
 # 构建脚本与配置：2 空格，与 theme/css 现有风格一致
 [*.{sh,yml,yaml,json,scss,css}]
