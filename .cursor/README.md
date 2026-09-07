@@ -4,7 +4,7 @@
 
 `.cursor/` 是本仓库面向 Agent 的配置目录，包含可按需读取的 skills 和一个项目级 MCP 服务。
 
-六项原则的完整文本位于根目录 `CODEX-PERSONAL-INSTRUCTIONS.md`，供粘贴进 Codex 个性化设置使用。它是宿主设置内容，不属于 skills 的阅读项：任务路由、`_CATALOG.md` 和任务单必读清单都不登记它。
+根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 是给用户手动粘贴进 Codex 个性化设置的宿主设置文本，不属于仓库任务的阅读项：任务路由、`_CATALOG.md`、`scope` 的 READ 和任务单必读清单都不登记它。
 
 Codex 项目指令链按 `project_doc_max_bytes` 截断；本项目采用 `65536` 字节护栏。OpenAI 未定义固定的 `AGENTS.md` 行数或 token 上限。
 

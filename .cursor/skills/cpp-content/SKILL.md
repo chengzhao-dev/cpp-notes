@@ -35,7 +35,7 @@ python handbook/scripts/cpp/init_project.py `
 - 使用 `-std=c++20 -Wall -Wextra`；完整示例带 `int main`。
 - 示例与章节对齐：单文件用 `code/<part>/<name>.cpp`，工程章用 `code/<part>/<chapter>/`；`build/` 不入库、不读、不校验。
 - 文件名使用 ASCII；注释放在代码上一行，逻辑块之间留空行。
-- 先运行 `run.py scope <part>/<chapter>`，再按“引言 → 概念 → 示例 → 验证 → 排错”写作，章首不单列目标小节。
+- 先运行 `run.py scope <part>/<chapter>`，再按“引言 → 概念 → 示例 → 验证 → 排错”写作。
 - 环境章不写长篇预检（逐项跑 `--version` 确认 WSL2 与编译器可用）。直接给出安装与构建命令，失败时进入 FAQ 诊断。
 - 修改示例运行 `verify --changed`；改主题、全局配置或页面结构时再渲染整本 Book。
 
