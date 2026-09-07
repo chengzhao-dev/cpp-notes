@@ -7,6 +7,7 @@
 | 语义 | CSS 变量 | 亮色 | 暗色 |
 |---|---|---|---|
 | 页面底色 | `--page-bg` | `#FFFFFF` | `#0D1117` |
+| 正文最大宽度 | `--content-width` | `800px` | `800px` |
 | 浮起面 | `--surface-raised` | `#F6F8FA` | `#161B22` |
 | 正文 | `--body-color` | `#1F2328` | `#E6EDF3` |
 | 次要文字 | `--text-secondary` | `#656D76` | `#8B949E` |
@@ -57,10 +58,10 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 
 | 元素 | 值 |
 |---|---|
-| 正文 | 15px / lh 1.625 |
-| H1（title） | 33.75px / w400 |
-| H2 | 20.625px / w400 / mt 3rem mb 1rem |
-| H3 | 18px / w400 |
+| 正文 | 16px / lh 1.75 |
+| H1（title） | 32px / w600 |
+| H2 | 24px / w600 / mt 3rem mb 1rem |
+| H3 | 20px / w600 |
 
 章节分隔：Quarto 默认 h2 下边框；qmd 不写 `---` 分节线。
 

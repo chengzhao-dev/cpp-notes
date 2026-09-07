@@ -1,7 +1,7 @@
 # Skills 目录索引
 
 给 `scope.py` 与 agent 用的全景表：一次看清「有什么、管什么、何时读」，避免因不知道存在而漏读（降质）或整包多读（费 token）。
-行数上限由 `scripts/agent/check_skill_size.py` 强制（L1 SKILL ≤45、L2 reference ≤160）。
+行数与字符上限由 `.cursor/tools/check_skill_size.py` 强制（L1 SKILL ≤45 行 / ≤3000 字符，L2 reference ≤160 行 / ≤6000 字符，全部 name+description ≤8000 字符）。
 
 | 文件 | 管什么 | 何时读我 |
 |---|---|---|
@@ -15,6 +15,7 @@
 | `quarto-docs/references/zh/sentence-flow.md` | 句子衔接、段落拆分、新手表达和多文件复核 | 长段落、语气跳跃或多文件联动润色 |
 | `quarto-docs/references/zh/avoid-words.md` | 润色禁词表 | 润色阶段 |
 | `quarto-docs/references/zh/cases-index.md` | 案例索引 | 需要范例时（再按需读单个 case） |
+| `quarto-docs/references/zh/chapter-outlines.md` | 具体章节的一二三级标题骨架 | 最低优先级，仅生成或重构指定章节时 |
 | `cpp-content/references/cpp/code-style.md` | C++ 命名、注释与留白、工具 | 写示例代码或跑 `--style` |
 | `cpp-content/references/cpp/cpp.md` | 语言基础要点 | core / getting-started 章 |
 | `cpp-content/references/cpp/stl.md` | 容器 / 迭代器 / 算法 | stl 与 cheatsheet 章 |
@@ -37,4 +38,4 @@
 | `github-ops/references/gh-cli.md`、`issues-releases.md` | gh CLI 与 PR/Issue | 按需 |
 | `skill-maintenance/SKILL.md` | skill 体量控制、规则合并与拆分 | 创建或修改 skill、reference、目录路由 |
 
-**禁止**：写章节正文时读 `theme/css/*`；查 build 产物；为「了解一下」而整包读 references。
+**禁止**：写章节正文时读 `theme/css/*`；查 build 产物；为「了解一下」而整包读 references；把根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 列为阅读项（它只服务 Codex 个性化设置，不参与任务路由）。

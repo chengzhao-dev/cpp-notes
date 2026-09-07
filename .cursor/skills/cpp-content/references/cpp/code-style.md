@@ -15,13 +15,16 @@
 ## 工具
 
 ```bash
-python .cursor/skills/cpp-content/scripts/verify_examples.py
-python .cursor/skills/cpp-content/scripts/verify_examples.py --style
+# 编译并运行完整 C++ 示例
+$ python .cursor/skills/cpp-content/scripts/verify_examples.py
+
+# 检查 C++ 格式
+$ python .cursor/skills/cpp-content/scripts/verify_examples.py --style
 ```
 
-clang 配置源位于 `.config/cpp/`，由 `scripts/cpp/init_project.py` 复制到独立工程根目录。
+clang 配置源位于 `.config/cpp/`，由 `handbook/scripts/cpp/init_project.py` 复制到独立工程根目录。
 
-Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `python scripts/agent/run.py verify`；单章节构建使用 `python scripts/agent/run.py build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
+Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `python .cursor/tools/run.py verify`；单章节构建使用 `python .cursor/tools/run.py build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
 
 ## 示例
 
@@ -43,7 +46,7 @@ Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一
 - 讲 `vector` 时只注释 `std::vector`、元素访问和迭代器等 vector 重点，不重复注释 `iostream` 或 `std::cout`。
 - CMake 命令和变量优先采用 CMake 官方中文文档术语；C++ 语言和标准库优先参考主流中文教材与 [cppreference 中文站](https://zh.cppreference.com/)。
 
-代码块只承担一个主要学习目标。多行原理说明移到正文，注释放在被说明代码的上一行，不使用行尾长注释；讲解同一概念的后续示例应减少重复注释。C++、CMake、Shell 和配置文件统一使用 2 空格缩进，逻辑块之间保留一个空行。CMake 和 Shell 的命令说明也遵循这一规则，先在正文说明目的，再给出干净、可复制的代码块。
+代码块只承担一个主要学习目标。多行原理说明移到正文，注释放在被说明代码的上一行，不使用行尾长注释；讲解同一概念的后续示例应减少重复注释。C++ 使用 `cpp` 围栏和 `//` 注释；Linux/WSL 命令和 Shell 脚本使用 `bash` 围栏、`#` 注释，命令前用 `$ `表示用户输入；CMake 使用 `cmake` 围栏、`#` 注释。命令输出使用紧邻的 `text` 块。各代码块内部的逻辑块之间留一个空行。
 
 代码和终端输出左对齐，保留必要缩进；字段名与说明的对齐交给表格。Shell、CMake 和 C++ 示例禁止把长解释写成行尾注释。中文说明使用完整句子，代码语法中的冒号不受正文标点规则影响。
 

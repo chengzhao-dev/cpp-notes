@@ -14,7 +14,7 @@ C++ 是"编译到机器码"的语言，**工具链的选择与编译参数直接
 
 ## 核心规则
 
-展示工具链命令时，一两条简单命令直接写进正文；连续安装、配置或验证步骤才使用代码块。版本检查直接使用 `g++ --version`、`cmake --version` 等完整命令，不为新手引入未解释的 `| head -n 1`。代码块中的关键命令在上一行使用简短的 Shell 注释，命令与输出演示使用 `text` 代码块，避免提示符、括号和版本号被错误拆成不同颜色。
+展示工具链命令时，一两条简单命令直接写进正文；连续安装、配置或验证步骤才使用代码块。Linux/WSL 的版本检查使用 `bash` 围栏，用户输入行以 `$ `开头，Shell 注释使用 `#`；输出使用紧邻的 `text` 块。CMake 配置文件仍使用 `cmake` 围栏，执行 CMake 的命令不放入 `cmake` 块。各代码块内部的逻辑段之间留一个空行。
 
 - **编译器**（默认 WSL2）：`g++`（GCC）、`clang++`（Clang）；对照 MSVC（`cl`）。跨编译器验证可揪出非标准写法。
 - **标准与选项统一**（C++20）：`-std=c++20`；MSVC 用 `/std:c++20`（`/std:c++latest` 追新特性）。
@@ -51,12 +51,15 @@ target_compile_options(main PRIVATE -Wall -Wextra -Werror)
 构建与运行（WSL2）：
 
 ```bash
-cmake -S . -B build
-cmake --build build
-./build/main
+# 配置：生成 Ninja 构建文件，指定 Debug 构建
+$ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
+
+# 构建并运行 main
+$ cmake --build build
+$ ./build/bin/main
 ```
 
-修改示例后的推荐校验方式是运行 `python scripts/agent/run.py verify`；只验证一个章节时运行 `python scripts/agent/run.py build <part>/<chapter>`。这两个入口默认压缩成功输出，只有排查失败时才使用 `--verbose`。
+修改示例后的推荐校验方式是运行 `python .cursor/tools/run.py verify`；只验证一个章节时运行 `python .cursor/tools/run.py build <part>/<chapter>`。这两个入口默认压缩成功输出，只有排查失败时才使用 `--verbose`。
 
 ✗ 无警告、无标准约束，UB/泄漏悄然溜过编译：
 
@@ -92,6 +95,6 @@ add_executable(main main.cpp)   # 没设 C++ 标准、没开 -Wall
 - 本备忘录：`./engineering.md`（工程流程与审查）、`./pitfalls-ub.md`（UB 检测）、`./cpp.md`（写作约定与编译选项）
 ## 终端命令与输出
 
-一两条无需区分用途的短命令直接写入正文。连续命令或需要说明用途的命令使用代码块，并把简短的 Bash 或 PowerShell 注释放在对应命令上方。命令输出使用 `text` 代码块，不让 `$`、括号和版本号参与语言高亮。
+一两条无需区分用途的短命令直接写入正文。连续命令或需要说明用途的命令使用代码块，并把简短的 Bash 或 PowerShell 注释放在对应命令上方。Linux/WSL 命令使用 `$ `提示符的 `bash` 块，输出使用紧邻的 `text` 块；PowerShell 不使用提示符。
 
 代码块和 `text` 输出块都左对齐，并继承站点的 GitHub Light / GitHub Dark 代码字体、背景、边框和间距。代码块不使用 Markdown 粗体、斜体或长篇解释。

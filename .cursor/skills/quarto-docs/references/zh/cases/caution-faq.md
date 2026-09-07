@@ -26,7 +26,7 @@
 
 ### build 目录能删吗
 
-可以。`build/` 只放配置缓存和编译产物，删掉不会丢源码；需要时用 `cmake -S . -B build` 再生成。仓库通常用 `.gitignore` 排除它。
+可以。`build/` 只放配置缓存和编译产物，删掉不会丢源码；需要时重新运行 `cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug` 再生成。仓库通常用 `.gitignore` 排除它。
 ```
 
 要点：

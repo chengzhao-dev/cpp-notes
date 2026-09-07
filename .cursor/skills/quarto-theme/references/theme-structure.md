@@ -1,5 +1,7 @@
 # 主题结构与组件规则（scss 变量 / css 组件）
 
+官方字段依据 Quarto [HTML format reference](https://quarto.org/docs/reference/formats/html.html)；以下 CSS/SCSS 选择器、令牌和装配顺序是本项目契约，不是 Quarto 内置 API。
+
 本文件规定 `theme/scss/`（主题变量）与 `theme/css/`（组件规则）下各文件的职责、组件规则要点、以及**新增配色/callout/组件的流程**。渲染/缓存命令以 `AGENTS.md` 为准；令牌表见 `design-tokens.md`。
 
 ## 文件职责

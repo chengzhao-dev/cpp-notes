@@ -5,7 +5,7 @@
 ## pages.yml
 
 - 触发：`push` 到 `main`，或 `workflow_dispatch`
-- 步骤：checkout → setup Quarto → setup Python → `quarto render` → `scripts/build/defer-mermaid.py` → `peaceiris/actions-gh-pages` 推 `_book/` 到 `gh-pages`（`force_orphan`）→ 可选校正 Pages source
+- 步骤：checkout → setup Quarto → setup Python → `quarto render` → `handbook/scripts/build/defer-mermaid.py` → `peaceiris/actions-gh-pages` 推 `_book/` 到 `gh-pages`（`force_orphan`）→ 可选校正 Pages source
 - 权限：`contents: write`（推分支）、`pages: write`（调 Pages API）
 - Pages 设置：Deploy from a branch → `gh-pages` / `(root)`（见 `github-pages.md` 方式四）
 

@@ -1,5 +1,7 @@
 # HTML 输出配置
 
+官方依据： [Quarto HTML options](https://quarto.org/docs/reference/formats/html.html) 与 [HTML basics](https://quarto.org/docs/output-formats/html-basics.html)。本文件只摘录本项目实际使用的字段；具体 CSS 仍以 `theme/` 为准。
+
 所有 HTML 外观选项都放在 YAML 的 `format: html:` 之下。**本仓库的真实样式实现（行号、提示符配色、文件名条、明暗主题变量）在 `AGENTS.md` 与 `theme/css/` 组件 css 中**，本文件只讲 Quarto 提供的选项与本项目约定，不重复承载样式片段。
 
 > 速查：`toc`/`theme`/`code-fold`/`embed-resources` 都嵌套在 `format: html:` 下 · 单文件用 `embed-resources` · 自包含数学加 `self-contained-math`
@@ -69,3 +71,4 @@ format:
 - 主题/TOC 不生效：浏览器硬刷新（Ctrl+Shift+R）排除缓存；确认选项嵌套在 `format: html:` 下而非顶层。
 - TOC 为空：确认正文使用真实的 `##` 级别 Markdown 标题（加粗文本或 `<h2>` 不会进入 TOC）。
 - 本仓库样式（行号/提示符/明暗）异常：检查 `theme/css/` 组件 css 与 `AGENTS.md`，而非本文件。
+- 可访问性：保持语义标题、可见键盘焦点、足够的明暗对比和可读的代码块；若配置 `axe: true`，将其视为渲染门禁，不把自定义 CSS 选择器当作 Quarto 官方 API。

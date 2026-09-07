@@ -23,7 +23,7 @@ description: Quarto Book HTML 主题与设计系统。涉及 theme/scss、theme/
 
 ## 已固化的产物契约
 
-`scripts/agent/check_dom_contracts.py` 断言：复制按钮 hover 作用域必须是 `.code-copy-outer-scaffold`
+`.cursor/tools/check_dom_contracts.py` 断言：复制按钮 hover 作用域必须是 `.code-copy-outer-scaffold`
 （Quarto 1.10 起按钮与 `div.sourceCode` 是兄弟）；`@media print` 不得隐藏 scaffold 本身；
 触屏 `@media (hover: none)` 兜底；favicon 注入与发布；Mermaid 必须输出 SVG 而不是源码块。改 DOM 相关样式前后都跑一次。
 

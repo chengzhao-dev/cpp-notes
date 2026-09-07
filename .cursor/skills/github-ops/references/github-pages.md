@@ -66,7 +66,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: quarto render
-      - run: python3 scripts/build/defer-mermaid.py
+      - run: python3 handbook/scripts/build/defer-mermaid.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

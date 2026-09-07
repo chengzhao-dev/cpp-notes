@@ -38,7 +38,7 @@
   需要无 BOM 时用 `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))`，
   或改用 Python 脚本（`encoding="utf-8"` 默认无 BOM）写入。
 - 不要让 PowerShell 的系统代码页参与中文文件的读取、转换或回写；这会把正常中文变成“锟/鐜/绔”等 UTF-8/GBK 乱码。
-- 修改 `.qmd` 或 Skill 文档后，先运行 `python scripts/agent/check_encoding.py`；它会检查 UTF-8、BOM、行尾和常见乱码特征。
+- 修改 `.qmd` 或 Skill 文档后，先运行 `python .cursor/tools/check_encoding.py`；它会检查 UTF-8、BOM、行尾和常见乱码特征。
 - 检查失败时从 Git 可读版本恢复，再重新应用修改；不要对已经乱码的文本盲目反向转码。
 
 ## 6. 渲染失败排查顺序

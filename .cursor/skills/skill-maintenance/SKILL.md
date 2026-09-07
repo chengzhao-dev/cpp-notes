@@ -10,11 +10,12 @@ description: 维护仓库内的 skills、references 和路由索引时使用，�
 ## 维护流程
 
 1. 先读 `_CATALOG.md`、目标 skill、相关 reference 和 `check_skill_size.py`。
-2. 运行 `python scripts/agent/check_skill_size.py --verbose`，确认当前 L1/L2 余量。
-3. 搜索相近规则，优先合并到职责最接近的现有文件，并删除重复表述。
-4. 新内容在预算内时直接补充；超出时先压缩措辞、合并相近主题和移除一次性案例。
-5. 精简后仍超出时，同一 skill 按独立主题新增 L2 reference；只有具备独立任务领域和触发条件时才新增 L1 skill。
-6. 新增或拆分后同步更新父级 `SKILL.md`、`_CATALOG.md` 和必要的路由说明。
+2. 运行 `python .cursor/tools/check_skill_size.py --verbose`，确认当前 L1/L2 字符余量（L1 ≤ 3000 字符、L2 ≤ 6000 字符，全部 `name + description` ≤ 8000 字符）。
+3. 先遵守六项原则：明确假设、保持简洁、精准修改、定义验收、默认中文并保护敏感信息。
+4. 搜索相近规则，优先合并到职责最接近的现有文件，并删除重复表述。
+5. 新内容在预算内时直接补充；超出时先压缩措辞、合并相近主题和移除一次性案例。
+6. 精简后仍超出时，同一 skill 按独立主题新增 L2 reference；只有具备独立任务领域和触发条件时才新增 L1 skill。
+7. 新增或拆分后同步更新父级 `SKILL.md`、`_CATALOG.md` 和必要的路由说明；默认使用作用域、范围读取和 terse 输出。
 
 ## 重构边界
 

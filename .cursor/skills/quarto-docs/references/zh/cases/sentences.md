@@ -36,13 +36,13 @@
 
 **状态命令**
 
-- ✗ 「状态：`wsl --list --verbose` 查看 STATE 列。」
+- ✗ 只给出状态列名称，却不说明查看命令和成功判据。
 - ✓ 说明过长时拆段，并解释 `STATE`：
 
 ```markdown
 - **查看是否在运行**
 
-  在 PowerShell 执行 `wsl -l -v`。`STATE` 为 `Running` 表示正在运行；
+  在 PowerShell 执行 `wsl --list --verbose`。`STATE` 为 `Running` 表示正在运行；
   `Stopped` 表示已关闭。
 ```
 

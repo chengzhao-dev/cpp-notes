@@ -4,7 +4,7 @@
 
 ## skills 上传策略
 
-- **必传**：`.cursor/skills/**`（Cursor 项目 skills：规则、案例、脚本、模板，clone 后即用）。
+- **必传**：`.cursor/skills/**`（项目级 skills：规则、案例、脚本、模板，clone 后可供 Agent 显式加载）。
 - **必不传**：`/.config/python/runtime.json`（本机解释器，clone 后按 AGENTS.md 解析协议重建）、
   `_book/`、`.quarto/`、`node_modules/`（根 `.gitignore` 覆盖）。
 - **忽略规则统一放仓库根 `.gitignore`**，不要在嵌套目录用「自忽略 `.gitignore`」。
@@ -22,7 +22,7 @@ git check-ignore -v .config/python/runtime.json _book .quarto node_modules
   clang-format 兼容），二进制扩展名（png/jpg/ico/woff…）显式 `binary`，`*.bat`/`*.cmd` 保持 CRLF。
 - 编码**一律 UTF-8 无 BOM**；PowerShell 5.1 的 `utf8` 参数会写 BOM，需要无 BOM 时用
   `[System.IO.File]::WriteAllText($path, $text, (New-Object System.Text.UTF8Encoding($false)))`。
-- 中文文件禁止经过系统代码页或 GBK 往返转换；修改后运行 `python scripts/agent/check_encoding.py`，检查 UTF-8、BOM、LF 和常见乱码特征。
+- 中文文件禁止经过系统代码页或 GBK 往返转换；修改后运行 `python .cursor/tools/check_encoding.py`，检查 UTF-8、BOM、LF 和常见乱码特征。
 - 首次提交用 `git add --renormalize .` 把行尾策略一次性落地；后续无需再管。
 
 ## 首次上传（init → 建仓 → push）
@@ -54,9 +54,11 @@ git log --oneline -10
 
 先查看 `git status --short`、`git diff --stat` 和 `git diff --name-only`，再按逻辑分组暂存，例如文档正文、校验工具、主题样式和仓库配置。每组使用显式路径执行 `git add`，随后检查 `git diff --cached --check` 与 `git diff --cached --stat`。
 
-提交前优先运行 `python scripts/agent/run.py verify --changed`、`python scripts/agent/run.py check` 和 `git diff --check`。只有改动主题或 Quarto 全局配置时才整本渲染；只有改动 C++ 全局配置或校验器时才需要全量 C++ 验证。不要让 `build/`、`.cache/`、`.tmp/` 和其他生成物触发校验。Python 解释器选择规则见 [`handbook/operations/agent-operations.md`](../../../../handbook/operations/agent-operations.md)。
+提交前优先运行 `python .cursor/tools/run.py verify --changed`、`python .cursor/tools/run.py check` 和 `git diff --check`。只有改动主题或 Quarto 全局配置时才整本渲染；只有改动 C++ 全局配置或校验器时才需要全量 C++ 验证。不要让 `build/`、`.cache/`、`.tmp/` 和其他生成物触发校验。Python 解释器选择规则见 [`handbook/operations/agent-operations.md`](../../../../handbook/operations/agent-operations.md)。
 
 推荐提交信息前缀：`docs:` 用于文档与写作规范，`feat:` 用于新增功能或章节，`fix:` 用于行为修复，`refactor:` 用于不改变行为的结构调整，`chore:` 用于配置和维护。多个文件若属于同一个不可分割的行为变更，可放在同一提交；否则拆成可独立回滚的提交。未明确要求时不 commit、push 或创建 PR。
+
+同一任务包含较多改动时，按性质相同且可以独立理解的内容分组提交。例如，正文与写作规范、脚本与校验、主题与配置可以分别成组。一次任务通常控制在 3 到 5 个提交以内，按实际边界决定，不为了拆分而拆分；每个提交都应能清楚说明一个主题，并尽量可以单独回滚。
 
 ## 日常流程
 

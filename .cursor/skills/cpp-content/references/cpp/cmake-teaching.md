@@ -12,6 +12,10 @@ CMake 章节先让目标运行，再逐步把命令行参数固化为目标属�
 
 每一步承接前一步的文件和生成结果。命令前说明它要完成什么，命令后说明成功时应看到什么；读者未使用的缓存和内部文件不放进目录树。
 
+## 默认构建参数
+
+示例工程与脚手架统一使用 `-G Ninja -DCMAKE_BUILD_TYPE=Debug`：Ninja 构建快、日志简洁，Debug 给构建加上 `-g` 且不启用优化，便于 gdb 打断点和查看变量。`CMAKE_EXPORT_COMPILE_COMMANDS` 保持开启，让 clangd 读到与实际构建一致的编译参数。发布构建在同一目录改用 `-DCMAKE_BUILD_TYPE=Release` 即可，入门章节不展开。
+
 ## 目标导向
 
 使用 `add_executable`、`add_library`、`target_sources`、`target_include_directories` 和 `target_compile_features` 表达目标关系。优先设置 target 属性，不用全局变量掩盖依赖关系。

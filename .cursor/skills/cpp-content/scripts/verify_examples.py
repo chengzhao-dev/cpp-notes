@@ -10,7 +10,7 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py --paths code/core/hello.cpp content/core/intro.qmd
 
 Windows 下使用仓库配置的 Python 3.12 运行：
-  python scripts/agent/run.py verify
+  python .cursor/tools/run.py verify
 退出码：0 = 全部通过；1 = 至少一处失败。
 
 编译阶段：

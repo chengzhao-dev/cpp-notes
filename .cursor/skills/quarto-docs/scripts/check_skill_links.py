@@ -19,6 +19,7 @@ import sys
 
 LINK_RE = re.compile(
     r"\.cursor/[A-Za-z0-9_./-]+"
+    r"|handbook/scripts/[A-Za-z0-9_./-]+"
     r"|(?:references|templates|scripts)/[A-Za-z0-9_./-]+"
     r"|\.{1,2}/[A-Za-z0-9_./-]+"
 )
@@ -84,9 +85,17 @@ def main():
             if not VALID_EXT_RE.search(link):
                 continue  # 跳过示例命令路径等非文档引用
             target = resolve_link(repo_root, skill_root, file_dir, link)
-            if not os.path.exists(target) and link.startswith("scripts/"):
-                # 仓库根 scripts/（AGENTS.md 定义的仓库级脚本目录）同样合法
-                target = os.path.normpath(os.path.join(repo_root, link))
+            if not os.path.exists(target):
+                if link.startswith(".cursor/tools/") or link.startswith("handbook/scripts/"):
+                    target = os.path.normpath(os.path.join(repo_root, link))
+                elif link.startswith("scripts/"):
+                    # 兼容 handbook/scripts 与 .cursor/tools
+                    cand1 = os.path.normpath(os.path.join(repo_root, "handbook", link))
+                    cand2 = os.path.normpath(os.path.join(repo_root, ".cursor", "tools", os.path.basename(link)))
+                    if os.path.exists(cand1):
+                        target = cand1
+                    elif os.path.exists(cand2):
+                        target = cand2
             if not os.path.exists(target):
                 bad.append((rel, link, os.path.relpath(target, repo_root)))
 
