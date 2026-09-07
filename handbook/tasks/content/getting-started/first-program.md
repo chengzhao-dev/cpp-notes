@@ -21,6 +21,6 @@
 - [x] quarto render 通过
 - [x] INDEX.md 更新为 done
 
-## Cursor 提示词
+## Agent 提示词
 
 > 执行 TASK-ENV-003。只读「读写边界」所列文件；完成验收清单。

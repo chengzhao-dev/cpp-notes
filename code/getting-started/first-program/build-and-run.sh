@@ -1,28 +1,39 @@
 #!/usr/bin/env bash
 # 一键配置、构建并运行当前 CMake 示例。
-# 用法：在项目根目录运行 bash build-and-run.sh。
-# 配置阶段会生成构建所需的辅助文件。
+# 用法：在项目目录中运行 bash build-and-run.sh。
+#
+# 本脚本包含 C++ 工程中最关键的三条指令，其余命令只是本地辅助：
+#   1. g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
+#      不调用构建工具，直接让编译器把单个源文件编译并链接成可执行文件。
+#      -std 选定语言标准，-Wall -Wextra 打开常用警告，-Werror 把警告升级为错误，
+#      -o 指定输出路径。适合确认一个源文件能跑通，见教程第二章。
+#   2. cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
+#      配置阶段：-G 选定底层构建工具 Ninja，-B 指定存放生成物的 build/ 目录，
+#      -D 写入缓存变量，CMAKE_BUILD_TYPE=Debug 给构建加上 -g 且不启用优化，
+#      便于 gdb 打断点和查看变量。
+#   3. cmake --build build
+#      构建阶段：进入 build/ 调用 Ninja 按依赖关系编译并链接目标。
+#      它会跳过没有变化的目标，只重建受影响的部分。
 
-# 命令失败、未定义变量或管道出错时停止脚本。
+# 命令失败、使用未定义变量或管道出错时停止脚本。
 set -euo pipefail
 
 # 无论从哪里调用，都先切换到脚本所在的项目目录。
-cd "$(dirname "$0")"
+project_dir="$(cd "$(dirname "$0")" && pwd)"
+cd "$project_dir"
 
-# 将生成物集中到 build/，避免污染源码目录。
-BUILD_DIR="build"
-BIN_DIR="$BUILD_DIR/bin"
-TARGET="app"
+# 构建目录与目标名与 CMakeLists.txt 保持一致。
+build_dir="build"
+target="app"
 
-# 保存完整构建参数，便于开发工具读取当前工程配置。
+# 配置：生成 Ninja 构建文件，同时导出 compile_commands.json 给 clangd。
 printf '\n==> 配置\n\n'
-cmake -S . -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake -G Ninja -B "$build_dir" -DCMAKE_BUILD_TYPE=Debug
 
-# 构建 CMakeLists.txt 声明的目标。
+# 构建：调用 Ninja 编译并链接 CMakeLists.txt 中声明的目标。
 printf '\n==> 构建\n\n'
-cmake --build "$BUILD_DIR"
+cmake --build "$build_dir"
 
-# 可执行文件统一放在 build/bin，和中间文件分开。
+# 运行：可执行文件统一放在 build/bin，和中间产物分开。
 printf '\n==> 运行\n\n'
-cd "$BIN_DIR"
-"./$TARGET"
+"$build_dir/bin/$target"

@@ -26,6 +26,6 @@
 - [ ] quarto render 通过
 - [ ] INDEX.md 更新为 done
 
-## Cursor 提示词
+## Agent 提示词
 
 > 本任务已并入 TASK-ENV-001，不单独执行。
