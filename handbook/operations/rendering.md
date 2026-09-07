@@ -8,7 +8,7 @@
 - 日常查看优先 `quarto render` 后直接打开 `_book/index.html`；只有需要热更新时才开 `quarto preview`。
 - **不要每次 preview 都清缓存**；下面「彻底清缓存」只在改完主题/`_quarto.yml` 后样式仍不生效时才用。
 - `_book/`、`.quarto/` 是生成产物，不要手动编辑。
-- **mermaid 懒加载**：`scripts/build/defer-mermaid.py` 在 CI 渲染后执行（见 `.github/workflows/pages.yml`），本地 render 不自动跑。
+- **mermaid 懒加载**：`handbook/scripts/build/defer-mermaid.py` 在 CI 渲染后执行（见 `.github/workflows/pages.yml`），本地 render 不自动跑。
 
 ## quarto preview 在 Windows 上卡死
 

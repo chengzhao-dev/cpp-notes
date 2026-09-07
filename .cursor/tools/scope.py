@@ -24,11 +24,15 @@ from pathlib import Path
 
 # 构建产物目录：任何情况下都不进上下文（内含 CMakeCXXCompilerId.cpp 等生成物，
 # 其中含 int main，误读会污染示例校验与写作判断）
-BUILD_DIRS = ("build",)
+BUILD_DIRS = ("build", ".cache", ".tmp", "__pycache__")
 ALWAYS_DENY = [
-    "_book/**（渲染产物：校验走 scripts/agent/check_dom_contracts.py，不直接读）",
+    "_book/**（渲染产物：校验走 .cursor/tools/check_dom_contracts.py，不直接读）",
     "code/**/build/**（CMake 产物：永不入上下文）",
     ".quarto/**（Quarto 缓存）",
+    "**/.cache/**（工具缓存）",
+    "**/.tmp/**（临时文件）",
+    # 根目录六项原则文件：只服务宿主个性化设置，永不作为任务阅读项
+    "CODEX-PERSONAL-INSTRUCTIONS.md（宿主设置用，不列入 UNIT/READ）",
 ]
 # 单个单元的代码文件上限：超出则只报计数，避免清单本身膨胀
 MAX_UNIT_FILES = 12
@@ -128,7 +132,7 @@ def resolve_path(target, root):
 DOMAIN_READ = {
     "theme": ["theme/css/", ".cursor/skills/quarto-theme/SKILL.md",
               ".cursor/skills/quarto-theme/references/design-tokens.md"],
-    "dev": [".editorconfig", "scripts/cpp/"],
+    "dev": [".editorconfig", "handbook/scripts/cpp/"],
     "repo": ["handbook/repository-structure.md", "AGENTS.md"],
 }
 

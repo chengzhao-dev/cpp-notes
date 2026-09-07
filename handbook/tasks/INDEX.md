@@ -1,6 +1,6 @@
 # 任务总表
 
-执行单任务：先 `python scripts/agent/run.py scope <part>/<chapter>` 取读写边界，再按任务单执行。
+执行单任务：先 `python .cursor/tools/run.py scope <part>/<chapter>` 取读写边界，再按任务单执行。
 进度只改本表「状态」列（任务单文件本身不回改）。
 
 ## 基础设施（infra）

@@ -16,11 +16,13 @@ CALLOUTS = {"note", "tip", "warning", "important", "caution"}
 CODE_EXTENSIONS = {".cpp", ".cc", ".cxx", ".h", ".hpp", ".cmake", ".sh", ".bash"}
 CODE_NAMES = {"CMakeLists.txt"}
 CODE_LANGUAGES = {"cpp", "c", "bash", "sh", "shell", "powershell", "ps1", "cmake", "text", "markdown", "yaml", "json", "toml", "mermaid"}
+SHELL_LANGUAGES = {"bash", "sh", "shell"}
+POWERSHELL_LANGUAGES = {"powershell", "ps1"}
 
 
 def documents():
     paths = [ROOT / "README.md", ROOT / "AGENTS.md", ROOT / "index.qmd"]
-    for folder in ("content", "docs", ".cursor/skills"):
+    for folder in ("content", "handbook", ".cursor/skills"):
         base = ROOT / folder
         if base.is_dir():
             paths.extend(base.rglob("*.qmd" if folder == "content" else "*.md"))
@@ -94,6 +96,11 @@ def check(path):
         if previous and level > previous + 1:
             errors.append(f"{rel}:{number}: DOC-E5 标题层级跳跃")
         previous = level
+    for (_previous_start, previous_end, _previous_info), (start, _end, _info) in zip(
+        blocks, blocks[1:]
+    ):
+        if start == previous_end + 1:
+            errors.append(f"{rel}:{start}: DOC-E11 相邻代码块之间应保留一个空行")
     for start, end, info in blocks:
         language = info.split()[0] if info else ""
         if language == "{mermaid}":
@@ -104,12 +111,39 @@ def check(path):
                 errors.append(f"{rel}:{start}: DOC-E6 Mermaid 必须使用 {{mermaid}} 围栏")
             if language and language not in CODE_LANGUAGES:
                 notices.append(f"{rel}:{start}: DOC-N5 未登记的代码块语言 {language}，请确认高亮器支持")
-            if language in {"bash", "powershell", "sh", "shell"} and ("$ " in body or "PS>" in body):
-                errors.append(f"{rel}:{start}: DOC-E7 带提示符的命令输出应改用 text 代码块")
+            block_lines = body.splitlines()
+            if language == "text" and any(
+                re.match(r"^\s*(?:\$ |PS>)", line) for line in block_lines
+            ):
+                errors.append(f"{rel}:{start}: DOC-E7 text 代码块不能包含命令提示符")
+            if language in SHELL_LANGUAGES:
+                commands, output = [], False
+                for line in block_lines:
+                    stripped = line.strip()
+                    if stripped.startswith("#"):
+                        output = any(marker in stripped for marker in ("预期输出", "实测输出"))
+                        continue
+                    if stripped.startswith("{{<") or not stripped or output:
+                        continue
+                    commands.append(line)
+                if any(not re.match(r"^\s*\$\s+\S", line) for line in commands):
+                    errors.append(
+                        f"{rel}:{start}: DOC-E7 Linux/WSL 命令应使用 bash 围栏并以 $ 提示符开头"
+                    )
+            if language in POWERSHELL_LANGUAGES and any(
+                re.match(r"^\s*(?:\$\s+|PS>)", line) for line in block_lines
+            ):
+                errors.append(
+                    f"{rel}:{start}: DOC-E7 PowerShell 命令不应使用 $ 或 PS> 提示符"
+                )
             if re.search(r"\*\*|(?<!\*)\*(?!\*)", body):
                 notices.append(f"{rel}:{start}: DOC-N1 代码块含强调符号，请人工确认")
-            if language in {"bash", "powershell", "sh", "shell"}:
-                commands = [line.strip() for line in body.splitlines() if line.strip() and not line.lstrip().startswith("#")]
+            if language in SHELL_LANGUAGES | POWERSHELL_LANGUAGES:
+                commands = [
+                    re.sub(r"^\s*\$\s+", "", line).strip()
+                    for line in block_lines
+                    if line.strip() and not line.lstrip().startswith("#")
+                ]
                 if len(commands) <= 2 and all(command in {"wsl", "wsl ~"} for command in commands):
                     notices.append(f"{rel}:{start}: DOC-N9 短命令可直接融入正文，无需单独代码块")
         elif kind in {"md", "agents"} and language == "mermaid":
@@ -164,7 +198,7 @@ def main():
         errors.extend(found_errors)
         notices.extend(found_notices)
     source_paths = sorted(
-        p for base in (ROOT / "code", ROOT / "scripts" / "cpp" / "templates")
+        p for base in (ROOT / "code", ROOT / "handbook" / "scripts" / "cpp" / "templates")
         if base.is_dir() for p in base.rglob("*")
         if p.is_file() and (p.suffix.lower() in CODE_EXTENSIONS or p.name in CODE_NAMES)
         and not any(part in SKIP for part in p.parts)

@@ -17,6 +17,6 @@
 - [ ] quarto render 通过
 - [ ] INDEX.md 更新为 done
 
-## Cursor 提示词
+## Agent 提示词
 
 > 执行 TASK-CS-001。只读「读写边界」所列文件；完成验收清单。

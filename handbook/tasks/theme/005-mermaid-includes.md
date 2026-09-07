@@ -15,6 +15,6 @@
 - [ ] 改后 quarto render
 - [ ] check_layout 通过
 
-## Cursor 提示词
+## Agent 提示词
 
 > 执行 TASK-THEME-005。只读「读写边界」所列文件；完成验收清单。

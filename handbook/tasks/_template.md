@@ -18,6 +18,6 @@
 - [ ] `quarto render` 无阻塞警告
 - [ ] `handbook/tasks/INDEX.md` 状态更新为 done
 
-## Cursor 提示词
+## Agent 提示词
 
 > 执行 TASK-<PART>-<NNN>。只读「读写边界」所列文件；完成验收清单。

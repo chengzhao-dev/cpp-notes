@@ -3,8 +3,8 @@
 
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-TASKS = ROOT / "docs" / "tasks"
+ROOT = Path(__file__).resolve().parents[3]
+TASKS = ROOT / "handbook" / "tasks"
 
 TEMPLATE = """# {task_id} · {title}
 
@@ -22,7 +22,7 @@ TEMPLATE = """# {task_id} · {title}
 
 {acceptance}
 
-## Cursor 提示词
+## Agent 提示词
 
 > 执行 {task_id}。只读「读写边界」所列文件；完成验收清单。
 """

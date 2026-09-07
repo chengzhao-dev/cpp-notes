@@ -8,7 +8,7 @@
   auto   目标在仓库 code/ 下 -> complete，否则 -> simple。
 
 标准用法（使用仓库配置的 Python 3.12）：
-  python scripts/cpp/init_project.py `
+  python handbook/scripts/cpp/init_project.py `
     --name first-program `
     --dir code/getting-started
 上例会自动创建 code/getting-started/first-program。
@@ -16,9 +16,9 @@
   bash build-and-run.sh
 
 仓库根目录已配置好 Python 时，也可以使用：
-  python scripts/cpp/init_project.py --name first-program --dir code/getting-started
+  python handbook/scripts/cpp/init_project.py --name first-program --dir code/getting-started
 
-用法：python scripts/cpp/init_project.py --name <name> [--dir code/<part>]
+用法：python handbook/scripts/cpp/init_project.py --name <name> [--dir code/<part>]
 退出码：0 成功；1 参数/路径错误。
 """
 
@@ -34,7 +34,7 @@ LAYOUTS = ("auto", "bare", "simple", "complete")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = SCRIPT_DIR / "templates"
-REPO_ROOT = SCRIPT_DIR.parent.parent
+REPO_ROOT = SCRIPT_DIR.parent.parent.parent
 CPP_CONFIG_DIR = REPO_ROOT / ".config" / "cpp"
 
 
@@ -75,7 +75,8 @@ def readme_text(name, layout):
             "单文件验证：",
             "",
             "```bash",
-            "python .cursor/skills/cpp-content/scripts/verify_examples.py",
+            "# 验证 C++ 示例",
+            "$ python .cursor/skills/cpp-content/scripts/verify_examples.py",
             "```",
         ]
     else:
@@ -85,10 +86,14 @@ def readme_text(name, layout):
             "构建与运行：",
             "",
             "```bash",
-            "cmake -S . -B build",
-            "cmake --build build",
-            "cd build/bin",
-            "./app",
+            "# 配置：生成 Ninja 构建文件，指定 Debug 构建",
+            "$ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug",
+            "",
+            "# 构建：调用 Ninja 编译并链接目标",
+            "$ cmake --build build",
+            "",
+            "# 运行构建结果",
+            "$ ./build/bin/app",
             "```",
             "",
             "配置阶段会生成 `build/compile_commands.json`，供 clangd 提供与实际构建一致的补全、跳转和诊断。",
@@ -155,7 +160,7 @@ def main():
     elif layout == "complete":
         print("\n下一步：编辑源码并运行 bash build-and-run.sh。")
     else:
-        print("\n下一步：编辑源码并运行 cmake -S . -B build。")
+        print("\n下一步：编辑源码并运行 cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug。")
     return 0
 
 

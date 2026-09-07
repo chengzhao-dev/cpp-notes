@@ -1,0 +1,13 @@
+{
+  "name": "cpp-notes-agent",
+  "version": "0.1.0",
+  "skillsRoot": ".cursor/skills",
+  "mcp": {
+    "name": "cpp-notes",
+    "transport": "stdio",
+    "command": "python",
+    "args": [".cursor/mcp/server.py"]
+  },
+  "autoload": false,
+  "autoloadNote": "宿主是否自动发现 .cursor 取决于宿主；不支持时请显式加载 skillsRoot。"
+}

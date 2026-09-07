@@ -19,24 +19,88 @@
 """
 
 import argparse
+import json
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PY = sys.executable
 MIN_PYTHON = (3, 12)
+RUNTIME_CONFIG = ROOT / ".config" / "python" / "runtime.json"
+
+
+class ToolNotFound(RuntimeError):
+    """外部工具未找到。"""
+
+
+def runtime_config():
+    """读取本机运行时配置；配置缺失或损坏时交给后续搜索。"""
+    try:
+        return json.loads(RUNTIME_CONFIG.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def python_version(candidate):
+    """返回解释器版本元组；无法执行时返回空值。"""
+    try:
+        result = subprocess.run(
+            [candidate, "-c", "import sys; print(sys.version_info[:2])"],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, check=False,
+        )
+        value = result.stdout.strip().strip("()")
+        major, minor = (int(part.strip()) for part in value.split(","))
+        return major, minor
+    except (OSError, ValueError):
+        return None
+
+
+def select_python():
+    """按固定路径优先、PATH 回退选择满足最低版本的 Python。"""
+    config = runtime_config()
+    candidates = [os.environ.get("CPP_MEMO_PYTHON"), config.get("python")]
+    candidates.extend(shutil.which(name) for name in ("python", "python3"))
+    candidates.append(sys.executable)
+    seen = set()
+    for candidate in candidates:
+        if not candidate:
+            continue
+        candidate = str(candidate)
+        if candidate in seen or not Path(candidate).is_file():
+            continue
+        seen.add(candidate)
+        version = python_version(candidate)
+        if version and version >= MIN_PYTHON:
+            return candidate
+    return None
+
+
+PY = select_python()
+
+
+def resolve_tool(name):
+    """按环境变量、运行时配置和 PATH 顺序解析外部工具。"""
+    env_name = "CPP_MEMO_" + Path(name).stem.upper()
+    config = runtime_config()
+    candidates = [os.environ.get(env_name), config.get(Path(name).stem), shutil.which(name)]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file():
+            return str(candidate)
+    raise ToolNotFound(f"找不到工具 {name}；请配置 {env_name} 或安装后加入 PATH")
 
 # 校验项：(名称, 脚本相对路径, 需要 _book 产物)
 CHECKS = [
-    ("encoding", "scripts/agent/check_encoding.py", False),
+    ("encoding", ".cursor/tools/check_encoding.py", False),
+    ("agent-controls", ".cursor/tools/test_agent_controls.py", False),
     ("layout", ".cursor/skills/quarto-theme/scripts/check_layout.py", True),
     ("callouts", ".cursor/skills/quarto-docs/scripts/check_callouts.py", True),
-    ("dom", "scripts/agent/check_dom_contracts.py", True),
-    ("size", "scripts/agent/check_skill_size.py", False),
+    ("dom", ".cursor/tools/check_dom_contracts.py", True),
+    ("size", ".cursor/tools/check_skill_size.py", False),
     ("ascii", ".cursor/skills/quarto-docs/scripts/check_ascii_names.py", False),
     ("links", ".cursor/skills/quarto-docs/scripts/check_skill_links.py", False),
-    ("docs", "scripts/agent/check_docs.py", False),
+    ("docs", ".cursor/tools/check_docs.py", False),
 ]
 
 # 成功判据行：命中即认为该步通过，用于从大输出里挑出唯一有价值的一行
@@ -52,7 +116,10 @@ def to_wsl_path(win_path):
 
 def run(argv, cwd=ROOT, env=None):
     """执行命令并捕获输出（bytes 手工解码，绕开 PowerShell 与 GBK 问题）。"""
-    proc = subprocess.run(argv, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
+    command = list(argv)
+    if command and not Path(command[0]).is_file():
+        command[0] = resolve_tool(command[0])
+    proc = subprocess.run(command, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
     text = proc.stdout.decode("utf-8", errors="replace")
     return proc.returncode, text
@@ -81,7 +148,7 @@ def interpret(rc, text, verbose, label):
 
 def cmd_check(args):
     """一次跑完全部校验；默认只回一行总结。"""
-    details, failed = [], []
+    details, failed, reported = [], [], []
     for name, script, need_book in CHECKS:
         path = ROOT / script
         if not path.is_file():
@@ -100,12 +167,15 @@ def cmd_check(args):
                 print(f"--- {name} ---")
                 print(text.rstrip())
         else:
+            if any(line.startswith("REPORT encoding") for line in text.splitlines()):
+                reported.append(name)
             last = next((ln for ln in reversed(text.splitlines())
                          if any(h in ln for h in PASS_HINTS)), "")
             details.append(f"{name}={last.strip() or 'ok'}")
 
     if not failed:
-        print(f"PASS  check {len(CHECKS)} 项全通过")
+        suffix = f"；软报告={','.join(reported)}" if reported else ""
+        print(f"PASS  check {len(CHECKS)} 项全通过{suffix}")
         if args.verbose:
             for d in details:
                 print(f"      {d}")
@@ -166,11 +236,11 @@ def changed_paths():
 
     global_prefixes = (
         ".config/cpp/",
-        "scripts/cpp/",
+        "handbook/scripts/cpp/",
         ".cursor/skills/cpp-content/scripts/",
     )
     global_files = {
-        "scripts/agent/run.py",
+        ".cursor/tools/run.py",
         ".cursor/skills/cpp-content/scripts/verify_examples.py",
     }
     if any(path.startswith(global_prefixes) or path in global_files for path in paths):
@@ -209,7 +279,7 @@ def cmd_render(args):
 
 
 def cmd_scope(args):
-    argv = [PY, str(ROOT / "scripts/agent/scope.py")]
+    argv = [PY, str(ROOT / ".cursor/tools/scope.py")]
     if args.list:
         argv.append("--list")
     if args.target:
@@ -227,7 +297,7 @@ def cmd_build(args):
         print(f"FAIL  build  找不到 {script.relative_to(ROOT)}")
         return 1
     env_path = to_wsl_path(script.parent)
-    rc, text = run(["wsl", "bash", "-lc", f"cd '{env_path}' && bash build-and-run.sh"])
+    rc, text = run(["wsl.exe", "bash", "-lc", f"cd '{env_path}' && bash build-and-run.sh"])
     if rc != 0:
         print(f"FAIL  build  {target} (exit={rc})")
         for ln in tail(text, 20):
@@ -243,7 +313,7 @@ def cmd_build(args):
 def cmd_status(args):
     """git 状态：区分「本次 agent 改动」与「用户既有未提交改动」。"""
     rc, text = run(["git", "status", "--porcelain"])
-    agent_prefixes = ("scripts/agent/", "handbook/operations/", ".cursor/skills/",
+    agent_prefixes = (".cursor/tools/", "handbook/operations/", ".cursor/skills/",
                       ".config/", ".editorconfig",
                       "theme/", "_quarto.yml", "AGENTS.md")
     mine, theirs = [], []
@@ -267,6 +337,11 @@ def main():
     except Exception:
         pass
 
+    if PY is None:
+        print("FAIL  找不到满足 Python >= 3.12 的解释器；请安装 Python 或设置 CPP_MEMO_PYTHON")
+        return 1
+    if Path(PY).resolve() != Path(sys.executable).resolve():
+        os.execv(PY, [PY, str(Path(__file__).resolve()), *sys.argv[1:]])
     if sys.version_info < MIN_PYTHON:
         required = ".".join(map(str, MIN_PYTHON))
         print(f"FAIL  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")
@@ -298,7 +373,11 @@ def main():
     args = parser.parse_args()
     handlers = {"check": cmd_check, "verify": cmd_verify, "render": cmd_render,
                 "scope": cmd_scope, "build": cmd_build, "status": cmd_status}
-    return handlers[args.cmd](args)
+    try:
+        return handlers[args.cmd](args)
+    except ToolNotFound as exc:
+        print(f"FAIL  {exc}")
+        return 1
 
 
 if __name__ == "__main__":

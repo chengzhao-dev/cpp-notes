@@ -255,7 +255,7 @@ def check_contracts(book_dir, htmls, css_pairs):
     results.append((
         "C4", "站点图标已注入并发布", c4, summary,
         ["每页 <head> 需 <link rel=\"icon\" … favicon.svg>；源文件见 theme/assets/favicon.svg，"
-         "由 scripts/maint/gen_favicon.py 生成"],
+         "由 handbook/scripts/maint/gen_favicon.py 生成"],
     ))
 
     # ---------- C5 Mermaid ----------

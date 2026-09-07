@@ -26,7 +26,7 @@ jobs:
       # 渲染整本 Book 到 _book/
       - run: quarto render
       # 把 mermaid 图改为懒加载，减小首屏体积（本地 render 不自动跑，故 CI 必须执行）
-      - run: python3 scripts/build/defer-mermaid.py
+      - run: python3 handbook/scripts/build/defer-mermaid.py
       - name: Publish _book to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
