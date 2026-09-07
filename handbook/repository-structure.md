@@ -13,16 +13,16 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | `.config/` | C++ 工程配置源与仓库工具配置 |
 | `scripts/` | 仓库级 Python（见下表） |
 | `handbook/` | 项目结构、任务清单和 Agent 运维细则 |
-| `.cursor/skills/` | Cursor 项目 skills |
+| `.cursor/skills/` | 项目级 Agent skills |
 
 ### scripts/ 子目录
 
 | 路径 | 用途 |
 |---|---|
-| `scripts/cpp/` | C++ 工程脚手架与基础工程模板（`init_project.py` + `templates/`）；`code/` 下默认生成完整工程 |
-| `scripts/build/` | 渲染后处理（`defer-mermaid.py`） |
-| `scripts/maint/` | 文档与站点资产维护（`gen_tasks.py`、`gen_favicon.py`） |
-| `scripts/agent/` | Agent 侧工具：`run.py` 统一入口、`scope.py` 作用域解析、`check_dom_contracts.py` 产物契约、`check_skill_size.py` 体积护栏 |
+| `handbook/scripts/cpp/` | C++ 工程脚手架与基础工程模板（`init_project.py` + `templates/`）；`code/` 下默认生成完整工程 |
+| `handbook/scripts/build/` | 渲染后处理（`defer-mermaid.py`） |
+| `handbook/scripts/maint/` | 文档与站点资产维护（`gen_tasks.py`、`gen_favicon.py`） |
+| `.cursor/tools/` | Agent 侧工具：`run.py` 统一入口、`scope.py` 作用域解析、`check_dom_contracts.py` 产物契约、`check_skill_size.py` 体量护栏 |
 
 ## Skill 与脚本分工
 
@@ -33,7 +33,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | 任务清单 | `handbook/tasks/` | `INDEX.md`、各章任务单文件（已完成任务归档在 `infra/DONE.md`） |
 | Python 格式 | `.config/python/pyproject.toml` + `handbook/operations/agent-operations.md` | Black 格式化 |
 
-**不做 skill 的重复**：C++ 工程脚手架只用 `scripts/cpp/init_project.py`，不建 `cpp-project` skill。
+**不做 skill 的重复**：C++ 工程脚手架只用 `handbook/scripts/cpp/init_project.py`，不建 `cpp-project` skill。
 
 ## 内容路线图
 
@@ -56,7 +56,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 
 | 类型 | 目标行数 | 结构上限 |
 |---|---|---|
-| 环境/安装章 | 120–180 | 引言 2 句 · 目标 ≤4 · mermaid 0–1 · 步骤 H3 ≤5 · FAQ ≤3 |
+| 环境/安装章 | 120–180 | 引言 2–3 句（交代分工、推进顺序和完成后可用工具） · mermaid 0–1 · 步骤 H3 ≤5 · FAQ ≤3 |
 | 语言概念章 | 100–150 | 动机 1 段 · 代码 1–2 块 · callout 0–1 · FAQ ≤2 |
 | 进阶/迁移 | 独立章 | 不进主线章（如 WSL 磁盘迁移） |
 
@@ -72,8 +72,11 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 
 ## 扩展文档
 
+- `AGENTS.md` 指令链按 `project_doc_max_bytes = 65536` 字节限制；OpenAI 未定义固定行数/token 上限。
+- skills 的体量按字符核算（厂商上限均为字符）：L1 ≤ 3000、L2 ≤ 6000、全部 name+description ≤ 8000；依据见 `handbook/operations/context-budget.md`。
+
 - 渲染与脚本运维：`handbook/operations/agent-operations.md`
 - 上下文预算与省 token 实测：`handbook/operations/context-budget.md`
-- 任务作用域怎么定：`python scripts/agent/run.py scope <part>/<chapter>`
+- 任务作用域怎么定：`python .cursor/tools/run.py scope <part>/<chapter>`
 - Python 脚本规范：`handbook/operations/agent-operations.md`
 - 任务总表：`handbook/tasks/INDEX.md`

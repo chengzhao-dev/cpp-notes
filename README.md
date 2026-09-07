@@ -3,63 +3,73 @@
 [![quarto build & deploy](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml/badge.svg)](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
 
-**C++ 笔记**是一份基于 [Quarto Book](https://quarto.org/docs/books/) 的中文 C++ 教程，面向希望边读边编译的初学者。[在线阅读](https://chengzhao-dev.github.io/cpp-notes/)。教学顺序参考 [LearnCpp.com](https://www.learncpp.com/)，标准语义以 [cppreference](https://en.cppreference.com/w/cpp/language) 等资料交叉核对。
+**C++ 笔记**是一份面向初学者的个人学习笔记，记录从可运行示例开始学习 C++ 语言、标准库和工程实践的过程。
+
+在线阅读：[chengzhao-dev.github.io/cpp-notes](https://chengzhao-dev.github.io/cpp-notes/)。从入门路线开始，边阅读边编译和运行示例。
 
 ## 从哪里开始
 
-按照下面的顺序阅读，先完成一次可运行的开发闭环，再扩展语言和工程知识：
+路线按 part 分组，每组内部从 1 开始编号，依次读完即可完成该组目标。
 
-1. [搭建开发环境](content/getting-started/index.qmd)：配置 WSL2 上的 Ubuntu、VS Code 和 CMake。
-2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成编译、运行和 CMake 构建。
-3. 进入语言基础，再学习标准库、对象管理、调试和性能。
+### getting-started：环境与第一个程序
 
-首页负责入口，入门索引负责章节顺序，正文负责一个完整学习任务。仓库结构和章节关系见 [`handbook/repository-structure.md`](handbook/repository-structure.md)。
+1. [搭建开发环境](content/getting-started/index.qmd)：启用 WSL2 上的 Ubuntu，换用国内镜像源，安装编译器与构建工具。
+2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成直接编译，再用 CMake 与 Ninja 自动构建。
 
-## 开发环境
+开发环境的分工很简单：Windows 提供图形界面，WSL2 上的 Ubuntu 提供编译和运行环境，VS Code 用于编辑，CMake 负责构建。
 
-Windows 提供图形界面，WSL2 提供 Ubuntu 开发环境；VS Code 用于编辑项目，CMake 负责配置和构建。仓库工具要求 Python 3.12，解释器选择规则见 [`handbook/operations/agent-operations.md`](handbook/operations/agent-operations.md)。示例源码位于 `code/`。
+### 后续 part
 
-完成环境配置后，在 WSL2 Ubuntu 中进入示例目录，运行 `bash build-and-run.sh` 即可构建并运行当前工程。Windows 下的仓库脚本会按需调用默认 WSL2，不需要手动保持 WSL 会话。
-
-## 本地阅读与校验
-
-```bash
-quarto preview
-```
-
-修改文档或示例后，优先使用增量 C++ 校验，再运行轻量检查：
-
-```powershell
-python scripts/agent/run.py verify --changed
-python scripts/agent/run.py check
-git diff --check
-```
-
-只有修改主题、Quarto 全局配置或需要确认页面布局时，才运行 `run.py render`。详细规则见 [`AGENTS.md`](AGENTS.md) 和 [`handbook/operations/agent-operations.md`](handbook/operations/agent-operations.md)。
-
-本地的 `code/**/build/`、`.cache/`、`.tmp/` 和 `.quarto/` 都是生成物或缓存，不属于教程源码，也不会提交到 Git。
+语言基础、标准库、对象管理、调试和性能等 part 尚未开始写作，路线和章节状态见
+[`handbook/repository-structure.md`](handbook/repository-structure.md)。新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
 
 ## 仓库结构
 
+下面的目录树展开项目中与阅读、示例和内容维护有关的部分。目录名和文件名均来自当前仓库；构建产物与缓存没有列出，正文也不再重复解释每个目录。
+
+```text
+cpp-notes/
+├── content/                        # Quarto 章节正文，按 part 分子目录
+│   └── getting-started/            # 入门 part：环境搭建与第一个程序
+├── code/                           # 与章节对应的 C++ 示例和工程
+│   └── getting-started/            # 入门 part 的示例工程，build/ 是产物
+├── theme/                          # 页面主题
+│   ├── assets/                     # 自托管字体与站点图标
+│   ├── css/                        # 按域拆分的样式表
+│   ├── includes/                   # 注入页面头部与尾部的 HTML 片段
+│   └── scss/                       # 明暗两套 SCSS 变量
+├── handbook/                       # 项目自身文档
+│   ├── repository-structure.md     # 目录关系、章节路线图与体量预算
+│   ├── operations/                 # Agent 运维、上下文预算与渲染细则
+│   ├── tasks/                      # 各章任务单（读写边界与验收）
+│   └── scripts/                    # 脚手架与维护脚本
+├── .cursor/                        # Agent 配置
+│   ├── mcp/                        # 项目级 MCP 服务
+│   ├── skills/                     # 写作、C++、主题与运维 skills
+│   └── tools/                      # 统一入口 run.py 与各项检查
+├── _quarto.yml                     # Quarto Book 配置与章节注册
+├── index.qmd                       # 站点首页
+├── AGENTS.md                       # 项目级 Agent 入口：结构、命令与读取边界
+├── CODEX-PERSONAL-INSTRUCTIONS.md  # 给 Codex 个性化设置使用的六项原则
+├── LICENSE                         # MIT 许可
+└── README.md                       # 仓库入口说明
 ```
-├── content/          # 章节
-├── code/             # 示例
-├── theme/            # HTML 主题
-├── scripts/          # Python 工具（cpp/ build/ maint/ agent/）
-├── handbook/         # 项目说明、任务清单与 Agent 运维规则
-├── .config/          # C++ 与仓库工具配置
-└── .cursor/skills/   # Agent 规范（见 AGENTS.md）
-```
 
-## 修改与提交
+章节、示例和任务清单按相同的 part 与 chapter 名称对应。例如，`content/getting-started/` 的示例位于 `code/getting-started/`，相关任务位于 `handbook/tasks/content/getting-started/`。
 
-大更新先按内容、工具和主题等逻辑分组，再分别暂存和提交。提交信息使用 `docs:`、`feat:`、`fix:`、`refactor:` 或 `chore:` 前缀；不要使用 `git add -A`，也不要提交构建产物、本机缓存和个人解释器路径。
+## Agent 六项原则
 
-提交前至少检查 `git status --short`、`git diff --cached --check`、`run.py verify --changed` 和 `run.py check`。只有明确需要发布时才推送到 `main`；GitHub Actions 会负责渲染并部署 Pages。
+`CODEX-PERSONAL-INSTRUCTIONS.md` 单独保存六项原则，用于 Codex 个性化设置中的「Codex 说明」一栏：把该文件正文粘贴进输入框并保存，此后每个会话都会带上它。原因是这类全局行为约束放在宿主个性化设置里才会在执行过程中真正生效，项目内的规则文件只会被按需读取。
 
-## 发布
+该文件只服务宿主设置。仓库内的 skills、任务单和检查脚本不把它列为阅读项，也不在任务中读取它；项目结构与命令约束仍见 [`AGENTS.md`](AGENTS.md)。
 
-推送到 `main` 后，GitHub Actions 渲染 Book，并把 `_book/` 推到 `gh-pages` 分支（Pages：Deploy from a branch → `gh-pages` / `(root)`）。
+## 内容范围
 
-目录职责与内容路线图的**单一真源**是 [`handbook/repository-structure.md`](handbook/repository-structure.md)；
-README 只保留入口和使用说明；具体维护规则、写作规范和脚手架细节分别见 [`AGENTS.md`](AGENTS.md)、[`handbook/operations/agent-operations.md`](handbook/operations/agent-operations.md) 和 `.cursor/skills/`。
+当前路线从入门环境和第一个程序开始，逐步覆盖：
+
+- C++ 语言基础，包括变量、类型、函数和控制流；
+- 标准库，包括容器、算法和迭代器；
+- 对象管理，包括生命周期、RAII、智能指针和移动语义；
+- 工程实践，包括 CMake、多文件项目、调试和性能。
+
+具体章节状态和目录关系见 [`handbook/repository-structure.md`](handbook/repository-structure.md)。

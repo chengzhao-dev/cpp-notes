@@ -26,7 +26,7 @@
 |---|---|---|---|
 | 写 `getting-started/first-program` 一章 | 52.1 KB / 12+ 个参考文件 | 27.4 KB / 9 个文件 | **-47%** |
 
-`scope.py` 白名单内容（可复现：`python scripts/agent/scope.py getting-started/first-program`）：
+`scope.py` 白名单内容（可复现：`python .cursor/tools/scope.py getting-started/first-program`）：
 本单元 qmd + 配对代码 3 文件 + 任务单 + 路由到的 4 个 reference。
 **`code/.../build/` 被排除并显式标注 HOLD**——该目录含 CMake 生成物（`CMakeCXXCompilerId.cpp`
 里有 `int main`），误读会污染示例校验。
@@ -58,15 +58,17 @@
 
 ### 4. 稳定前缀（每轮重读的基数）
 
+OpenAI 官方文档说明，Codex 以 `project_doc_max_bytes` 控制项目指令链，默认值为 32 KiB，示例可配置为 65536；没有固定行数或 token 上限。本仓库的 `AGENTS.md` 护栏采用 65536 字节，token 仅作不可精确换算的观察指标。
+
 | 文件 | 行数 | 字节 |
 |---|---|---|
-| `AGENTS.md`（L0） | 63 → **36** | 2600 → **2789** |
+| `AGENTS.md`（L0） | 63 → 49 | 2600 → 3184 字节 |
 | 4 × `SKILL.md`（L1） | 137 → **137** | **5946** |
 | `_CATALOG.md`（索引） | — | 2926 |
 
 **诚实记录（负面发现）**：AGENTS.md 行数降 43%，**字节却略升**。原因是中文一行可密可疏，
 只按「行数」定预算会被密集长行绕过；而真正决定成本的是字符量。
-已把护栏升级为**行 + 字节双维度**并自证有效（见下）。
+已把护栏升级为**行 + 字符双维度**并自证有效（见下），字节只保留在厂商按字节定义的 `AGENTS.md` 上。
 另：`_CATALOG.md` 是**新增开销**，其价值是让作用域解析与「该读哪份参考」一次确定，
 避免因不知道存在而漏读（降质）或整包多读（更费 token）——它属于「花小钱买路由准确」。
 
@@ -101,7 +103,8 @@
 |---|---|---|
 | 把选择器改回 `div.sourceCode:hover .code-copy-button` | C1 FAIL | **FAIL**，并指出 `stale-rule!` |
 | 在 `@media print` 内加 `.code-copy-outer-scaffold{display:none}` | C3 FAIL | **FAIL**，报出 `base.css` 违规规则 |
-| 给 AGENTS.md 追加超长内容 | size FAIL | **FAIL**，`7626 字节 > 3400` |
+| 给 AGENTS.md 追加超长内容 | size FAIL | **FAIL**，超过 `65536` 字节 |
+| 把某个 L2 reference 写成密集长行 | size FAIL | **FAIL**，报出「字符 > 6000」 |
 
 三处均已还原，还原后全 PASS。
 
@@ -112,7 +115,9 @@
 - **系统注入块**（含 4 个 skill 的 `description`）每轮固定，是降不掉的地板；
   仓库侧只能压 L0/L1 与按需读取，命中不会归零。
 - **子代理有启动/整合开销**，只在探索密集时净省；阈值判据不严格执行反而会 +轮次。
-- **中文文档的体积必须按字节管**，只按行数会被绕过（本轮已踩过并在护栏修正）。
+- **中文文档的体积只按行数会被绕过**（本轮已踩过）。修正方式是改用字符为主：厂商上限本身就是字符数，
+  按 UTF-8 字节会把中文多算约三倍，反而逼作者删掉必要内容。仅 `AGENTS.md` 跟随厂商的
+  `project_doc_max_bytes` 继续按字节核算（见第五节）。
 - 断言网覆盖的是**已知**契约；新类型问题仍需开逃生舱，跑完要把结论回写成新断言——
   「经验只沉淀一次」是这套机制不退化的前提。
 
@@ -123,3 +128,33 @@
 3. 侦察类「读很多、只要一句结论」→ 按阈值派子代理。
 4. 断言 FAIL 或新症状 → 一句声明开诊断模式 → 查完回写成断言。
 5. 会话中途尽量**不动靠前的 L0/L1 文件**（改动会使其后全部内容缓存失效）。
+
+## 五、字符预算依据（中文 skills）
+
+厂商给出的都是字符数，不是字节数，中文按字节核算会被多算约三倍：
+
+| 来源 | 约束 | 出处 |
+|---|---|---|
+| Agent Skills 规范 | `name` ≤ 64 characters，`description` ≤ 1024 characters，`license` ≤ 500 | agentskills.io/specification |
+| OpenAI Codex | 初始 skills 列表 ≤ 上下文 2%，上下文未知时 ≤ 8000 characters | developers.openai.com/codex/skills |
+| Claude | listing 中 description + when_to_use 在 1536 characters 截断；SKILL.md 正文建议 < 5000 tokens | code.claude.com/docs/en/skills |
+| OpenAI 项目指令链 | `project_doc_max_bytes`（默认 32 KiB，示例 65536），按字节 | AGENTS.md 配置 |
+
+结论：没有面向中文的专属上限，中文也没有厂商单列的 token 换算表。本项目按字符为主定预算，
+只有 `AGENTS.md` 跟随厂商定义继续按字节：L1 `SKILL.md` ≤ 3000 字符，L2 reference ≤ 6000 字符，
+全部 skill 的 `name + description` ≤ 8000 字符。当前实测 7 个 L1 合计 489 字符，余量充足。
+字符与 token 的换算不追求精确：一个汉字通常一个 token，标点与英文词更省，故字符上限是保守上界。
+护栏见 `.cursor/tools/check_skill_size.py`。
+
+## 六、增长时保持低消耗
+
+新增 skill、MCP、QMD 或 C++ 内容时，继续遵守以下顺序：
+
+1. 先运行 `run.py scope`，只读取当前 UNIT、READ 和必要的单个 reference。
+2. 优先复用现有脚本和权威规则；新文件必须有独立职责、触发条件和读取边界。
+3. 命令默认批量执行并只回结论；失败时才追加有限诊断，必要时使用 `--verbose`。
+4. MCP 先返回摘要、计数、行号和截断标记，需要细节再使用行范围读取。
+5. 用读取字节、文件数、命令轮次、输出字符和效果等价检查衡量优化，不能以删掉必要上下文换取数字下降。
+6. goal 模式下上下文明显吃紧（约 70%–80%）时先压缩再继续，压缩后重读作用域与必要产物；见 `agent-operations.md`「goal 模式下的上下文管理」。
+
+六项原则由根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 承载，只在 Codex 个性化设置中生效，不作为仓库任务的读取项。

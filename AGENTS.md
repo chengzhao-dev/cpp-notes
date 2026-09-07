@@ -1,37 +1,50 @@
 # AGENTS.md
 
-**C++ 笔记** Quarto Book：面向新手的 Linux C++ 渐进式中文教程。目录职责与内容路线图见 [`handbook/repository-structure.md`](handbook/repository-structure.md)。
+**C++ 笔记**是面向新手的 Linux C++ Quarto Book。
 
-## 上下文纪律（每次任务先照此办）
+## 六原则摘要
 
-1. 先跑一次 `python scripts/agent/run.py scope <part>/<chapter>`（或 `theme` / `dev` / `repo`），**只读**它列出的 UNIT + READ；DENY 内的文件不读、不检索、不索引。
-2. `_book/**`、`code/**/build/**`、`.quarto/**` 永不入上下文：`build/` 里的 CMake 生成物（`CMakeCXXCompilerId.cpp` 等）含 `int main`，误读会污染示例校验与写作判断。三层拦截：`.gitignore` + `.cursorignore`/`.cursorindexingignore`（访问与索引）+ `verify_examples.py` 的 `SKIP_DIRS` 剪枝。产物检查走 `run.py check`（脚本内部读大文件，只回一行结论）。
-3. 诊断逃生舱：只有当某项 check 报 FAIL 需定位、或出现断言未覆盖的新症状时，才允许真读产物，且先一句声明理由；查明后把结论回写成 `check_dom_contracts.py` 的一条断言（经验只沉淀一次）。
-4. 子代理阈值：预计要读 >8 个文件、或需全仓检索时，派 sub-agent 侦察并只回一段摘要；≤3 个文件本地直读更省。编辑类任务不派（改动须回主线程）。
-5. 一次任务只读路由指向的那一个 reference；跨章引用只写 `@sec-` 锚点，不去读对方正文。
-6. 改 `theme/**` 或 `_quarto.yml` 会触发整本重渲染：先声明代价，再 `run.py render`，之后只看校验结果、不回读 HTML。
+编码前思考；简洁优先；精准修改；目标驱动执行；默认使用简体中文；安全优先且绝不泄露密钥、凭据或敏感信息。
 
-## Skill 路由
+完整表述见根目录 `CODEX-PERSONAL-INSTRUCTIONS.md`，该文件用于粘贴进 Codex 个性化设置的「Codex 说明」，在那里它就是最高优先级。项目仓库只保留下面的结构、命令与读取边界。
 
-| 领域 | Skill |
-|---|---|
-| 写作 / qmd / 中文润色 | `quarto-docs` |
-| C++ 内容、示例、工具链 | `cpp-content` |
-| HTML 主题与设计令牌 | `quarto-theme` |
-| Git / Actions / Pages（未明确要求不 commit/push） | `github-ops` |
+## 项目结构
 
-全部 reference 的「管什么 · 何时读」：`.cursor/skills/_CATALOG.md`；改 skill 先读 `skill-maintenance`；按章任务与读写边界：`handbook/tasks/INDEX.md`。
+| 路径 | 职责 |
+| --- | --- |
+| `content/` | Quarto 章节正文，按 part 分目录 |
+| `code/` | 与章节对应的 C++ 示例和工程，`build/` 是产物 |
+| `theme/` | 页面主题、样式和字体资源 |
+| `handbook/` | 项目结构、任务、运维和 Agent 规范 |
+| `.cursor/` | skills、统一工具和项目 MCP 服务 |
 
-## 命令（统一经 run.py，避免 PowerShell 引号与 GBK 反复重试）
+章节目录对齐：`content/<part>/`、`code/<part>/`、`handbook/tasks/content/<part>/`。
+
+## 常用命令
 
 | 命令 | 用途 |
-|---|---|
-| `run.py check` | 一次跑完 layout / callouts / dom / ascii / links / size |
-| `run.py render` | 渲染 Book 并自动跑 check |
-| `run.py verify [--changed] [--style]` | 编译校验 C++ 示例；`--changed` 只校验改动内容，规则变更自动回退全量（Windows 按需启动 WSL） |
-| `run.py build <part>/<chapter>` | 在 WSL 中按需构建示例，顺带生成 clangd 编译数据库 |
-| `run.py scope <目标>` / `run.py status` | 作用域清单 / 精简 git 状态 |
+| --- | --- |
+| `python .cursor/tools/run.py scope <目标>` | 输出最小读取作用域 |
+| `python .cursor/tools/run.py check` | 批量运行编码、文档、主题和产物检查 |
+| `python .cursor/tools/run.py render` | 渲染 Book 并自动检查 |
+| `python .cursor/tools/run.py verify --changed` | 增量校验 C++ 示例 |
+| `python .cursor/tools/run.py build <part>/<chapter>` | 在 WSL 构建单章示例 |
+| `python .cursor/tools/run.py status` | 输出精简 Git 状态 |
 
-排错细则见 [`handbook/operations/agent-operations.md`](handbook/operations/agent-operations.md)。
-格式：Python ≥3.12 仅标准库，解释器见 runtime 配置；文本 LF、UTF-8 无 BOM；C++ 与 CMake 统一 2 空格。
-中文文件禁止使用系统代码页或 GBK 读写；修改 `.qmd`、Skill 或主题 CSS 后先运行 `check_encoding.py`，再运行 `run.py check` 或 `render`。代码块和终端 transcript 使用 GitHub 明暗色板、等宽字体并左对齐；短命令写正文，连续命令用代码块，注释放在命令上方。Windows 下 Python 使用配置的 3.12 解释器；C++ 校验由 `run.py` 经 WSL 执行，默认只输出结论，失败时再用 `--verbose`。
+## 工作约束
+
+1. 每次任务先运行 `run.py scope`，只读 UNIT、READ 和必要 reference；不要整包读取 references。
+2. 永不读取或索引 `_book/**`、`code/**/build/**`、`.quarto/**`、`.cache/**`、`.tmp/**`；产物检查交给脚本。
+3. 只有检查失败或出现新症状才进入诊断逃生舱；查明后把稳定经验沉淀为一次断言。
+4. 预计读取超过 8 个文件或需要全仓检索时才派侦察代理；编辑必须回主线程完成。
+5. 默认输出 terse 结论，失败才使用 `--verbose`；不回显密钥、凭据、`.env` 或无关个人信息。
+6. 中文文件使用 UTF-8 无 BOM、LF；修改 `.qmd`、skill 或主题 CSS 后先运行编码检查。
+7. 修改 `theme/**` 或 `_quarto.yml` 会触发整本渲染；先确认代价，再运行 `run.py render`。
+8. 稳定前缀按字符计预算：`AGENTS.md` 仅按 `project_doc_max_bytes = 65536` 做字节护栏，`.cursor/skills/` 的 L1/L2 由 `check_skill_size.py` 按字符为主、字节为次级护栏强制。
+9. 根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 只服务宿主个性化设置：禁止把它写入任务单必读、scope 的 READ、`_CATALOG.md` 路由或任何 skill 的阅读项。
+10. goal 模式长任务：上下文明显吃紧（约 70%–80%）时先压缩再继续，压缩后重读 `run.py scope` 输出确认边界；plan 与 build 模式不做此约束。细则见 `handbook/operations/agent-operations.md`。
+11. 工具调用遵循固定路径优先、PATH 回退、缺失即止：Python 使用 `CPP_MEMO_PYTHON` 与 `.config/python/runtime.json`，其他工具使用对应的 `CPP_MEMO_<TOOL>`；所有候选均不可用时立即中止当前命令，不伪造结果。
+
+## 初始化兼容
+
+Codex 初始化或其他工具重新生成规则时，必须合并本文件，不得覆盖项目结构、命令、安全约束和读取边界；`AGENTS.md` 是唯一项目级总入口，宿主专用文件只能引用它。
