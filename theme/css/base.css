@@ -12,8 +12,8 @@
        · 章节页 标题→首段引言：由本规则的 line-height / margin-bottom 控制（见下方 #quarto-document-content > p:first-of-type）
        · 首页 标题→描述：由下方 #title-block-header .description 的 margin-top 控制 */
 #title-block-header.quarto-title-block.default .quarto-title .title {
-  font-size: 2.109375rem;   /* 33.75px，保持 GitHub 文档式层级 */
-  font-weight: 400;
+  font-size: 2rem;   /* 32px，GitHub Markdown h1 */
+  font-weight: 600;
   letter-spacing: 0;
   line-height: 1.2;
   text-wrap: balance;
@@ -81,22 +81,26 @@
 }
 
 /* ---------- 标题：用字重与尺寸区分阅读层级 ---------- */
+h1,
 h2 {
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.25;
   letter-spacing: 0;
   text-wrap: balance;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--card-border);
 }
+h1 { font-size: 2rem; }
 h3 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0;
   text-wrap: balance;
 }
 h4 {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: 0;
@@ -113,6 +117,9 @@ body.index-page #quarto-document-content h2 {
   border-bottom: 0;
 }
 body.homepage #quarto-document-content h2 {
+  border-bottom: 0;
+}
+body.homepage #quarto-document-content h1 {
   border-bottom: 0;
 }
 
@@ -134,7 +141,7 @@ body.homepage #quarto-document-content h2 {
 }
 #quarto-document-content p,
 #quarto-document-content li {
-  line-height: 1.625;
+  line-height: 1.75;
 }
 /* 代码块↔代码块：额外 +0.4rem，命令序列更疏朗 */
 #quarto-document-content > :is(.code-copy-outer-scaffold, pre) + :is(.code-copy-outer-scaffold, pre),

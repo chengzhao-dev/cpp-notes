@@ -1,11 +1,9 @@
 ---
 title: "C++ 笔记"
-description: "从 WSL2 与 Ubuntu 开始，完成第一个 C++ 程序，再逐步学习语言、标准库和工程实践。"
+description: "这是一份面向初学者的中文 C++ 个人笔记，内容从 WSL2 与 Ubuntu、一个可运行的 C++ 程序开始，逐步连接语言基础、标准库和工程实践。"
 number-sections: false
 body-classes: homepage
 ---
-
-这是一份面向初学者的中文 C++ 教程。内容从可运行的小例子开始，逐步连接语言基础、标准库和工程实践。
 
 ## 从可运行的程序开始
 
