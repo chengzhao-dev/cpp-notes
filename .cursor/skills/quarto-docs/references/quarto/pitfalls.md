@@ -94,3 +94,9 @@
 - **根因**：Quarto（1.10 实测）只认 `note` / `tip` / `warning` / `important` / `caution` 五个内置 callout 类型。`callouts.lua` 依据 Attr 的 class 前缀识别类型，未知类型不产生 `Callout` 节点，整块按普通 `div` 走「带标题的章节」渲染路径；额外附加在内置类型上的 `.callout-*` 类同样被丢弃（不会保留到 `class` 属性）。主题里为这些名字准备的 CSS 选择器与令牌因此永不命中。
 - **规避**：只用内置 5 类，标题写在块内首行 `## …`。本仓库的「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring-elements.md`「Callout 提示框」。
 - **自检**：渲染后执行 `python .cursor/skills/quarto-docs/scripts/check_callouts.py`，它扫描 `_book/**/*.html`：出现 `<section class="levelN … callout-…">` 即判为退化，返回退出码 1。
+
+## 13. `{{< include >}}` 引用代码文件未加围栏 → 页面乱码式排版、目录被污染
+
+- **症状**：`{{< include /code/.../build-and-run.sh >}}` 直接放在正文里，渲染出的脚本失去高亮和等宽底色，`#!/usr/bin/env bash` 等 `#` 注释行变成大号标题，含 `*`、`_` 的行变成斜体或粗体，右侧目录里还多出几个假标题。
+- **根因**：`include` 只把文件内容原样插入 Markdown，不推断语言；不在围栏内时内容按普通 Markdown 解析，`#` 与强调符号都被当成语法。
+- **规避**：引用真实代码文件时，`{{< include >}}` 整体放进带语言名的围栏，按扩展名选 `cpp`、`bash`、`cmake`、`powershell`，没有一个例外。规则见 `authoring.md` 的「代码块」。
