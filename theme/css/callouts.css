@@ -1,9 +1,14 @@
-/* cpp-notes 共享主题 · 提示卡片 callout（左色条 + 浅底 + 小圆角） */
+/* cpp-notes 共享主题 · 提示卡片 callout（左色条 + 浅底 + 小圆角）
+ *
+ * 下面的 border: none 简写会把 border-left-color 重置为 currentColor，
+ * Bootstrap 的 div.callout-<type>.callout 又是 (0,2,1)，因此类型规则必须写成
+ * div.callout.callout-<type> 才能同特异、靠加载顺序胜出，让左条按类型着色。 */
 
 div.callout.callout-style-default,
 div.callout.callout-style-simple {
   border: none;
-  border-left: 3px solid var(--callout-note-border);
+  border-left-width: 3px;
+  border-left-style: solid;
   border-radius: var(--radius-sm);
   margin: 0;
   padding: 0.875rem 1rem;
@@ -77,23 +82,23 @@ div.callout.callout-style-default .callout-body > :first-child,
 .callout.callout-caution .callout-title-container,
 .callout.callout-caution .callout-icon { color: var(--callout-caution-border); }
 
-.callout.callout-note {
+div.callout.callout-note {
   border-left-color: var(--callout-note-border);
   background-color: var(--callout-note-bg);
 }
-.callout.callout-tip {
+div.callout.callout-tip {
   border-left-color: var(--callout-tip-border);
   background-color: var(--callout-tip-bg);
 }
-.callout.callout-warning {
+div.callout.callout-warning {
   border-left-color: var(--callout-warning-border);
   background-color: var(--callout-warning-bg);
 }
-.callout.callout-important {
+div.callout.callout-important {
   border-left-color: var(--callout-important-border);
   background-color: var(--callout-important-bg);
 }
-.callout.callout-caution {
+div.callout.callout-caution {
   border-left-color: var(--callout-caution-border);
   background-color: var(--callout-caution-bg);
 }
