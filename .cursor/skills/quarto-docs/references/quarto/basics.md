@@ -77,9 +77,9 @@ format:
       light: [cosmo, theme/scss/theme-light.scss]
       dark: [darkly, theme/scss/theme-dark.scss]
     grid:
-      sidebar-width: 300px
+      sidebar-width: 280px
       body-width: 800px
-      margin-width: 260px
+      margin-width: 240px
       gutter-width: 1.5em
     css:
       - theme/css/tokens.css

@@ -9,9 +9,8 @@ description: 采用 Defect-First 原则对 C++ 示例代码与 Quarto 文档进�
 
 ## 任务路由
 
-C++ 代码审查读 
-eferences/cpp-review.md；Quarto 文档与排版审查读 
-eferences/docs-review.md。改动涉及两者时按需加载，不读无关领域规则。
+C++ 代码审查读 `references/cpp-review.md`；Quarto 文档与排版审查读
+`references/docs-review.md`。改动涉及两者时按需加载，不读无关领域规则。
 
 ## 缺陷分级与输出格式
 

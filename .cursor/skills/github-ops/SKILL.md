@@ -11,8 +11,8 @@ Git 工作流、Pages 发布、CI。Book 产物目录 `_book/`。
 
 | 任务 | 参考 |
 |---|---|
-| git 日常 / 提交前 | `references/git-workflow.md` |
-| 发布 Pages、部署排错 | `references/github-pages.md` |
+| git 日常 / 提交前 | `references/git-workflow.md`（依据：`kb-search "仓库一致性"`） |
+| 发布 Pages、部署排错 | `references/github-pages.md`（依据：`kb-search "Pages 部署方式"`） |
 | Actions / CI | `references/actions.md` |
 | gh CLI | `references/gh-cli.md` |
 | PR / Issue | `references/issues-releases.md` |
@@ -22,4 +22,5 @@ Git 工作流、Pages 发布、CI。Book 产物目录 `_book/`。
 - **禁止**：未明确要求时不 commit / push / 建 PR；不 force-push main
 - 只 `git add` 显式路径：工作区常混有用户既有未提交改动，禁止 `git add -A` 裹挟
 - 远端仅 `main` + `gh-pages`；Actions 用 peaceiris 把 `_book/` 推到 `gh-pages`（`force_orphan`）
+- 行尾 LF、UTF-8 无 BOM、忽略规则集中根 `.gitignore`；归一化与分支保护的成因见 `knowledge/domains/tooling/04_repository_hygiene/`
 - 推 main → `.github/workflows/pages.yml` 自动部署；PR → `render-check.yml` 跑渲染与示例校验

@@ -5,7 +5,8 @@
   "mcp": {
     "name": "cpp-notes",
     "transport": "stdio",
-    "command": "python",
+    "command": "<python>",
+    "commandNote": "占位符，不是可直接执行的命令。按 AGENTS.md 工作约束 11 解析：优先环境变量 CPP_MEMO_PYTHON，其次 .config/python/runtime.json 的 python 字段。本机 PATH 中没有 python，直接写 python 会被 Microsoft Store 别名拦截，宿主登记时必须替换成解析到的绝对路径。",
     "args": [".cursor/mcp/server.py"]
   },
   "autoload": false,

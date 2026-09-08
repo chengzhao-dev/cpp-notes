@@ -1,74 +1,40 @@
 # HTML 输出配置
 
-官方依据： [Quarto HTML options](https://quarto.org/docs/reference/formats/html.html) 与 [HTML basics](https://quarto.org/docs/output-formats/html-basics.html)。本文件只摘录本项目实际使用的字段；具体 CSS 仍以 `theme/` 为准。
+> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、不折叠
 
-所有 HTML 外观选项都放在 YAML 的 `format: html:` 之下。**本仓库的真实样式实现（行号、提示符配色、文件名条、明暗主题变量）在 `AGENTS.md` 与 `theme/css/` 组件 css 中**，本文件只讲 Quarto 提供的选项与本项目约定，不重复承载样式片段。
+选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
-> 速查：`toc`/`theme`/`code-fold`/`embed-resources` 都嵌套在 `format: html:` 下 · 单文件用 `embed-resources` · 自包含数学加 `self-contained-math`
-
-## 常用选项
-
-| 选项 | 作用 |
-|---|---|
-| `toc: true` | 生成目录（TOC）；`toc-depth`、`toc-location`（left/right/body）、`toc-title` 可调 |
-| `theme` | 主题：25 个内置 Bootswatch 主题（`cosmo`、`flatly`、`darkly` 等）；明暗双主题 `theme: {light: cosmo, dark: darkly}`；可追加自定义 `.scss`。本书用 `light: [cosmo, theme/scss/theme-light.scss]` + `dark: [darkly, theme/scss/theme-dark.scss]` |
-| `grid` | 页面栅格：`sidebar-width` / `body-width` / `margin-width` / `gutter-width`（本书已设具体值，见 `basics.md`） |
-| `number-sections` | 章节自动编号（**本书设为 `false`**） |
-| `code-copy: true` | 代码块加"复制"按钮 |
-| `code-line-numbers: true` | 代码块显示行号；**本仓库不使用行号**（保持简洁），如需要再全局开启 |
-| `code-fold: true` | 代码块折叠为可展开的 "Code" 按钮 |
-| `code-tools: true` | 文档级 Code 菜单（显示/隐藏全部代码、查看 .qmd 源码） |
-| `embed-resources: true` | 生成**单一自包含 HTML**，所有图片/CSS/JS 内嵌（data URI），可单独分享 |
-| `self-contained-math: true` | 配合 `embed-resources` 将数学库（MathJax/KaTeX）也内嵌 |
-| `html-math-method` | 数学渲染方式：`mathjax`、`katex` 等 |
-
-## 代码块显示
-
-```yaml
-format:
-  html:
-    echo: false        # 隐藏代码只显示输出（可对单个 chunk 用 #| echo: false）
-    code-fold: true    # 折叠代码
-    code-overflow: wrap # 长行自动换行
+```powershell
+python .cursor/tools/run.py kb-search "html 输出选项" --domain tooling --subdomain html_output
+python .cursor/tools/run.py kb-search --toc "代码块显示"
 ```
 
-### 本仓库代码块/终端约定（引用实现）
+## 本仓库的现行取值
 
-- 本仓库**不使用行号**：代码块保持简洁；如日后需要，用 `code-line-numbers: true` 全局开启。
-- 终端命令块：指令块无提示符、演示块用 `$`（见 `authoring.md`）。
-- 上述样式的具体 CSS 实现见 **`theme/css/` 组件 css（按域拆分）**，约定说明见 **`AGENTS.md`**；修改样式应改这两处，而不是在文档里内联。
+全部写在根目录 `_quarto.yml` 的 `format: html:` 下，章节 front matter 不重复设置：
 
-## embed-resources（重点）
+| 选项 | 取值 | 备注 |
+|---|---|---|
+| `theme` | `light: [cosmo, theme/scss/theme-light.scss]` + `dark: [darkly, …]` | 内置主题与项目样式叠加，顺序决定覆盖关系 |
+| `highlight-style` | `light: github-light` + `dark: github-dark` | 明暗分别指定，语义颜色交给引擎 |
+| `toc` / `toc-depth` / `toc-location` | `true` / `4` / `right` | 右侧目录，窄屏会折叠，不作唯一定位手段 |
+| `number-sections` | `false` | 因此标题不手填序号，见 `basics.md` |
+| `code-copy` / `code-overflow` | `true` / `wrap` | 长行换行，不让读者横向拖动 |
+| `grid` | sidebar 280 / body 800 / margin 240 / gutter 1.5em | 页面栅格 |
+| `lang` | `zh` | 影响部分 HTML 行为与提示框默认词 |
 
-- **`self-contained: true` 已弃用**，请用 `embed-resources: true`（见 `pitfalls.md`）。
-- 默认渲染产生 `文档_files/` 依赖目录；`embed-resources: true` 把一切内嵌为单个 `.html`。
-- 适合：发邮件、归档、单文件分享。
-- 网站/多页面场景建议**不开启**，让各页共享外部资源以利用缓存。
-- 含数学时如需离线查看，再加 `self-contained-math: true`。
+本仓库**不开启**代码行号（`code-line-numbers`）与代码折叠（`code-fold`）：取舍依据见标识 `cpp-tooling-quarto-html-v1` 的知识文件（`run.py kb-search "为什么不开行号"`）。
 
-## 示例：完整文档配置
+## 改动约定
 
-```yaml
----
-title: "C++ 指南"
-lang: zh
-format:
-  html:
-    toc: true
-    toc-depth: 3
-    theme: cosmo
-    code-copy: true
-    code-fold: false
-    embed-resources: true
----
-```
+1. 改 `format: html:` 任何取值都属于主题级改动，会触发整本渲染，先确认代价再走 `run.py render`。
+2. 新增或删减 `theme/css/**` 组件样式表时，同步修改配置里的样式表清单，否则新样式不参与渲染。
+3. 页面视觉问题（提示符配色、文件名条、术语色）改 `theme/**` 与设计令牌，不在文档里内联样式，也不改高亮配置。
+4. 流程图使用图表专用围栏，配色由主题样式控制；配置里不指定图表主题名。
+5. 拿不准选项名、默认值或嵌套层级时查官方参考页，不凭记忆写 YAML（入口见 `pitfalls.md` #8）。
 
 ## 验证
 
-渲染后检查：
+渲染后确认：目录深度与位置符合预期、明暗两套高亮都可读、没有遗留依赖目录（目标是站点而非单文件分发）。
+主题或目录看起来没生效时先硬刷新排除缓存，再核对选项嵌套层级。
 
-- 单一文件场景：确认没有遗留 `文档_files/` 依赖目录。
-- 主题/TOC 不生效：浏览器硬刷新（Ctrl+Shift+R）排除缓存；确认选项嵌套在 `format: html:` 下而非顶层。
-- TOC 为空：确认正文使用真实的 `##` 级别 Markdown 标题（加粗文本或 `<h2>` 不会进入 TOC）。
-- 本仓库样式（行号/提示符/明暗）异常：检查 `theme/css/` 组件 css 与 `AGENTS.md`，而非本文件。
-- 可访问性：保持语义标题、可见键盘焦点、足够的明暗对比和可读的代码块；若配置 `axe: true`，将其视为渲染门禁，不把自定义 CSS 选择器当作 Quarto 官方 API。

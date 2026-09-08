@@ -33,7 +33,7 @@ quarto render --to html
 ### 校验 grid 布局是否生效
 
 不要对压缩 CSS 做宽模式全串扫描。跑 `python .cursor/tools/run.py check`（含 layout 项），
-或直接用 `check_layout.py`（单次字面匹配，不做全量正则）。
+或直接用 `.cursor/skills/quarto-theme/scripts/check_layout.py`（单次字面匹配，不做全量正则）。
 
 ## 产物契约（改 DOM/主题前后都要跑）
 
@@ -50,10 +50,10 @@ Quarto 升级最常破的就是这几条。破了就 FAIL 并给修复方向；`
 | `handbook/scripts/cpp/` | C++ 工程脚手架与基础工程模板（`init_project.py` + `templates/`） |
 | `handbook/scripts/build/` | 渲染后处理（`defer-mermaid.py`） |
 | `handbook/scripts/maint/` | 文档与站点资产维护（`gen_tasks.py`、`gen_favicon.py`） |
-| `.cursor/tools/` | Agent 侧工具：`run.py`（统一入口）、`scope.py`（作用域）、`check_dom_contracts.py`、`check_skill_size.py` |
+| `.cursor/tools/` | Agent 侧工具：`run.py`（统一入口）、`scope.py`（作用域）、`check_docs.py`、`check_encoding.py`、`check_dom_contracts.py`、`check_skill_size.py`、`test_agent_controls.py` |
 | `.config/cpp/` | C++ 工程配置源（由 `init_project.py` 复制到新工程） |
 | `.config/python/` | Python 项目配置与本机解释器（`runtime.json` 不入库） |
-| `.config/python/` | Python 项目配置与运行时说明 |
+| `scripts/`（仓库根） | 知识库管道：`kb_util.py`、`chunker.py`、`indexer.py`、`retriever.py`、`evaluate.py`、`eval_set.py`、`health_check.py`、`test_conflict_detection.py`，只经 `run.py kb-*` 与 `check` 调用 |
 | `.cursor/skills/*/scripts/` | 领域校验：编译、脚手架、链接检查等 |
 
 **新建脚手架/校验 → 写 Python 脚本，不新建 skill。**
@@ -116,19 +116,19 @@ $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
 
 ### 新脚本 Checklist
 
-- [ ] 放对目录（`scripts/<域>/` 或 skill `scripts/`）
+- [ ] 放对目录（`handbook/scripts/<域>/`、根 `scripts/`（知识库管道）或 skill `scripts/`）
 - [ ] 中文模块 docstring + 中文 argparse help
 - [ ] 仅标准库依赖；默认输出 ≤1 行结论
 - [ ] 在 `handbook/repository-structure.md` 或对应 skill 中登记用途
 
-## goal 模式下的上下文管理
+## 长任务跨轮交接
 
-仅适用于 goal 模式（自动跨轮推进同一个目标）。plan 与 build 模式由用户逐轮驱动，不需要主动压缩。
+上下文压缩由宿主完成，agent 侧没有调用入口：对话接近 `model_auto_compact_token_limit` 时自动总结历史，用户也可随时 `/compact`。压缩可行，只是不归 agent 触发，因此这里只固化压缩前后真正可执行的纪律。
 
-1. 目标跨轮持续，故每轮只推进一个可验证的子目标，收尾时把状态写进 `git status` 可见的文件，不靠对话记忆交接。
-2. 上下文明显吃紧（约 70%–80%）时先压缩上下文再继续，不要压到接近上限才处理，否则当轮就可能中断。
-3. 压缩会丢弃早期工具输出，因此压缩后立即重读 `run.py scope <目标>` 与必要产物，确认文件边界和已完成项，再继续编辑。
-4. 可复现的事实（版本号、目录结构、链接可达性）在需要时重新实测，不从摘要里的旧结论取值。
+1. 每轮只推进一个可验证的子目标，收尾时把状态写进 `git status` 可见的文件，不靠对话记忆交接。
+2. 可复现的事实（版本号、目录结构、链接可达性、索引条数）在需要时重新实测，不从摘要里的旧结论取值。
+3. 发现历史只剩摘要（或收到宿主的上下文告警）时，先重读 `run.py scope <目标>` 与 `git status` 确认边界和已完成项，再继续编辑，不重做已完成的工作。
+4. 压缩有损：交接依据只能是落盘文件与可复跑的命令输出，不能是对话里的结论。
 5. 每轮结束前用一次 `run.py check` 收口，避免把未验证的中间态留给下一轮。
 
 ## 开发环境配置

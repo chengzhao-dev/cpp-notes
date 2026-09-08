@@ -13,6 +13,10 @@
   scope   解析任务作用域，输出 UNIT/READ/DENY 清单
   build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
   status  精简 git 状态：默认折叠用户既有改动，只看本次相关
+  kb-index  增量或全量重建知识库索引（knowledge/ -> index_data/）
+  kb-search  知识库单次检索（透传 retriever 参数，如 --toc/--parent/--explain）
+  kb-check  知识库健康度与检索延迟测量
+  kb-eval   标注集召回率与 Token 预算验收
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
 退出码：透传被包装命令的退出码；0 = 成功。
@@ -101,6 +105,7 @@ CHECKS = [
     ("ascii", ".cursor/skills/quarto-docs/scripts/check_ascii_names.py", False),
     ("links", ".cursor/skills/quarto-docs/scripts/check_skill_links.py", False),
     ("docs", ".cursor/tools/check_docs.py", False),
+    ("conflict", "scripts/test_conflict_detection.py", False),
 ]
 
 # 成功判据行：命中即认为该步通过，用于从大输出里挑出唯一有价值的一行
@@ -331,6 +336,71 @@ def cmd_status(args):
     return rc
 
 
+KB_INDEX_DB = "index_data/kb_index.sqlite"
+
+
+def kb_script(name):
+    """拼出 scripts/ 下的知识库脚本绝对路径。"""
+    return str(ROOT / "scripts" / name)
+
+
+def ensure_kb_index():
+    """索引产物不入库（见 .gitignore），缺失时先全量重建，避免子命令空跑。"""
+    if (ROOT / KB_INDEX_DB).is_file():
+        return 0
+    print("INFO  知识库索引缺失，先执行一次全量重建")
+    rc, text = run([PY, kb_script("indexer.py"), "--rebuild"])
+    print(text.rstrip())
+    return rc
+
+
+def cmd_kb_index(args):
+    """重建或增量更新索引。"""
+    argv = [PY, kb_script("indexer.py")]
+    if args.rebuild:
+        argv.append("--rebuild")
+    rc, text = run(argv)
+    return interpret(rc, text, args.verbose, "kb-index")
+
+
+def cmd_kb_search(args):
+    """检索知识库：retriever 已按预算输出，故直接透传结果。"""
+    rc = ensure_kb_index()
+    if rc != 0:
+        return rc
+    rc, text = run([PY, kb_script("retriever.py"), *args.rest])
+    print(text.rstrip())
+    return rc
+
+
+def cmd_kb_check(args):
+    """知识库健康度检查（结构 + 延迟）。"""
+    rc = ensure_kb_index()
+    if rc != 0:
+        return rc
+    argv = [PY, kb_script("health_check.py")]
+    if args.gate:
+        argv.append("--gate")
+    if args.verbose:
+        argv.append("--verbose")
+    rc, text = run(argv)
+    return interpret(rc, text, args.verbose, "kb-check")
+
+
+def cmd_kb_eval(args):
+    """标注集验收：Top-K 召回率、注入令牌与延迟。"""
+    rc = ensure_kb_index()
+    if rc != 0:
+        return rc
+    argv = [PY, kb_script("evaluate.py"), "--topk", str(args.topk)]
+    if args.gate:
+        argv.append("--gate")
+    if args.verbose:
+        argv.append("--verbose")
+    rc, text = run(argv)
+    return interpret(rc, text, args.verbose, "kb-eval")
+
+
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -369,10 +439,29 @@ def main():
     p.add_argument("target")
     p = subs.add_parser("status", parents=[common], help="精简 git 状态")
     p.add_argument("--all", action="store_true", help="同时列出用户既有改动")
+    p = subs.add_parser("kb-index", parents=[common], help="重建或增量更新知识库索引")
+    p.add_argument("--rebuild", action="store_true", help="清空索引后全量重建")
+    p = subs.add_parser("kb-search", parents=[common], help="知识库检索（参数透传 retriever）")
+    p.add_argument("rest", nargs=argparse.REMAINDER, help="查询串与 retriever 参数（顺序任意）")
+    p = subs.add_parser("kb-check", parents=[common], help="知识库健康度与延迟")
+    p.add_argument("--gate", action="store_true", help="只把结构性问题视为失败")
+    p = subs.add_parser("kb-eval", parents=[common], help="标注集召回率与预算验收")
+    p.add_argument("--topk", type=int, default=5, help="召回评价的 K，默认 5")
+    p.add_argument("--gate", action="store_true", help="不卡延迟（延迟由 kb-check 负责）")
 
-    args = parser.parse_args()
+    args, extra = parser.parse_known_args()
+    if args.cmd == "kb-search":
+        # retriever 的参数表由 scripts/retriever.py 自己定义，本解析器只做统一入口，
+        # 故按原始 argv 顺序整体接管 kb-search 之后的参数，避免 --toc 这类 flag 被
+        # 本层吞掉后报 unrecognized arguments。--verbose 归本层使用，其余原样透传。
+        tail = sys.argv[sys.argv.index("kb-search") + 1:]
+        args.rest = [t for t in tail if t != "--verbose"]
+    elif extra:
+        parser.error("未识别的参数: " + " ".join(extra))
     handlers = {"check": cmd_check, "verify": cmd_verify, "render": cmd_render,
-                "scope": cmd_scope, "build": cmd_build, "status": cmd_status}
+                "scope": cmd_scope, "build": cmd_build, "status": cmd_status,
+                "kb-index": cmd_kb_index, "kb-search": cmd_kb_search,
+                "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval}
     try:
         return handlers[args.cmd](args)
     except ToolNotFound as exc:
