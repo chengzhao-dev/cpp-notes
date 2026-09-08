@@ -50,6 +50,8 @@ SCOPE_RE = re.compile(r"::|\(\)|\[\]")
 CONFLICT_MIN_SHARED = 1
 # 重合度降权上限：最多把旧版降到一半，避免词面相似就把知识压到看不见。
 CONFLICT_MAX_PENALTY = 0.5
+# FTS 布局标记：chunks_fts.rowid 与 chunks.rowid 对齐，删改走 rowid 而不是按值全表扫。
+FTS_LAYOUT = "rowid-v1"
 ASCII_RUN = re.compile(r"[A-Za-z0-9_]+")
 CJK_RUN = re.compile(r"[一-鿿]{1,}")
 # 停用词只放没有检索信号的英文虚词。C++ 关键字（this / int / const / std …）在
@@ -171,6 +173,24 @@ def cosine(a: bytes, b: bytes) -> float:
     return sum(x * y for x, y in zip(va, vb))
 
 
+def align_fts_rowids(con: sqlite3.Connection) -> int:
+    """把 chunks_fts 的 rowid 对齐到主表，返回重建的行数。
+
+    FTS5 里 chunk_id 是 UNINDEXED 列，按它删除会退化成全表扫描，增量索引因此
+    近似 O(N^2)。对齐后删改都按 rowid 定位，代价与索引规模无关；历史行的 rowid
+    与主表无对应关系，所以只在布局迁移时整体重建一次。
+    """
+    con.execute("DELETE FROM chunks_fts")
+    rows = con.execute("SELECT rowid, chunk_id, doc_id, content FROM chunks "
+                       "WHERE status='live' ORDER BY rowid").fetchall()
+    con.executemany(
+        "INSERT INTO chunks_fts(rowid, tokens, chunk_id, doc_id) VALUES (?,?,?,?)",
+        [(rowid, " ".join(tokens(content)), chunk_id, doc_id)
+         for rowid, chunk_id, doc_id, content in rows],
+    )
+    return len(rows)
+
+
 def graph_nodes(content: str, doc: dict) -> list[tuple[str, str]]:
     """从 Chunk 里抽图谱节点：C++ 标识符 + 文档标签。"""
     nodes = []
@@ -196,6 +216,12 @@ def connect(con: sqlite3.Connection) -> None:
     if "branch" not in cols:
         con.execute("ALTER TABLE chunks ADD COLUMN branch TEXT")
     con.execute("PRAGMA journal_mode=WAL")
+    # FTS rowid 布局：缺标记（旧库或新库）时对齐一次，之后增量都按 rowid 删改。
+    mark = con.execute("SELECT value FROM meta WHERE key='fts_layout'").fetchone()
+    if not mark or mark[0] != FTS_LAYOUT:
+        align_fts_rowids(con)
+        con.execute("INSERT INTO meta VALUES ('fts_layout', ?) "
+                    "ON CONFLICT(key) DO UPDATE SET value=excluded.value", (FTS_LAYOUT,))
 
 
 def upsert(con: sqlite3.Connection, chunk: dict, doc: dict, previous: dict) -> str:
@@ -224,10 +250,13 @@ def upsert(con: sqlite3.Connection, chunk: dict, doc: dict, previous: dict) -> s
         "vector=excluded.vector,branch=excluded.branch,status=excluded.status",
         payload,
     )
-    con.execute("DELETE FROM chunks_fts WHERE chunk_id=?", (chunk["chunk_id"],))
+    rowid = con.execute("SELECT rowid FROM chunks WHERE chunk_id=?",
+                        (chunk["chunk_id"],)).fetchone()[0]
+    con.execute("DELETE FROM chunks_fts WHERE rowid=?", (rowid,))
     con.execute(
-        "INSERT INTO chunks_fts(tokens, chunk_id, doc_id) VALUES (?,?,?)",
-        (" ".join(tokens(chunk["content"])), chunk["chunk_id"], chunk["doc_id"]),
+        "INSERT INTO chunks_fts(rowid, tokens, chunk_id, doc_id) VALUES (?,?,?,?)",
+        (rowid, " ".join(tokens(chunk["content"])),
+         chunk["chunk_id"], chunk["doc_id"]),
     )
     return action
 
@@ -426,11 +455,11 @@ def detect_conflicts(con: sqlite3.Connection, registry: dict) -> int:
     return rows
 def prune(con: sqlite3.Connection, alive: set) -> int:
     """把注册表里已经消失的 Chunk 标 deprecated（不物理删除，支持回溯）。"""
-    rows = [r for (r,) in con.execute("SELECT chunk_id FROM chunks")]
-    gone = [r for r in rows if r not in alive]
-    for chunk_id in gone:
+    rows = list(con.execute("SELECT chunk_id, rowid FROM chunks"))
+    gone = [r for r in rows if r[0] not in alive]
+    for chunk_id, rowid in gone:
         con.execute("UPDATE chunks SET status='deprecated' WHERE chunk_id=?", (chunk_id,))
-        con.execute("DELETE FROM chunks_fts WHERE chunk_id=?", (chunk_id,))
+        con.execute("DELETE FROM chunks_fts WHERE rowid=?", (rowid,))
     return len(gone)
 
 

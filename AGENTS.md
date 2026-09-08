@@ -35,6 +35,7 @@
 | `python .cursor/tools/run.py kb-search "<查询>" [参数]` | 按预算检索知识库，参数透传 retriever（`--toc` `--parent` `--explain` `--domain` `--branch`） |
 | `python .cursor/tools/run.py kb-check` | 知识库结构体检与检索延迟 |
 | `python .cursor/tools/run.py kb-eval` | 标注集召回率与注入 Token 验收 |
+| `python .cursor/tools/run.py kb-scale [--sizes 1000,10000]` | 三层索引规模基准，输出 P95 拐点 |
 
 ## 工作约束
 

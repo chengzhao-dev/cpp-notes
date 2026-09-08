@@ -12,7 +12,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | `theme/` | 明暗 SCSS + 按域 CSS + includes + 自托管字体 |
 | `.config/` | C++ 工程配置源与仓库工具配置 |
 | `knowledge/` | 领域知识库正文（`domains/` 为 main，`branches/` 为非 main；规范见 `knowledge/README.md`） |
-| `scripts/` | 仓库级 Python；知识库管道（`kb_util`/`chunker`/`indexer`/`retriever`/`evaluate`/`eval_set`/`health_check`/`test_conflict_detection`）与仓库脚本 |
+| `scripts/` | 仓库级 Python；知识库管道（`kb_util`/`chunker`/`indexer`/`retriever`/`evaluate`/`eval_set`/`health_check`/`scale_benchmark`/`test_conflict_detection`）与仓库脚本 |
 | `index_data/` | 知识库索引产物（SQLite + 注册表），已 gitignore，缺失时由 `run.py kb-index` 自动重建 |
 | `handbook/` | 项目结构、任务清单和 Agent 运维细则 |
 | `.cursor/skills/` | 项目级 Agent skills |
@@ -25,7 +25,7 @@ Quarto Book 中文 C++ 教程。阅读体例参考 [LearnCpp.com](https://www.le
 | `handbook/scripts/build/` | 渲染后处理（`defer-mermaid.py`） |
 | `handbook/scripts/maint/` | 文档与站点资产维护（`gen_tasks.py`、`gen_favicon.py`） |
 | `.cursor/tools/` | Agent 侧工具：`run.py` 统一入口、`scope.py` 作用域解析、`check_dom_contracts.py` 产物契约、`check_skill_size.py` 体量护栏 |
-| `scripts/`（根） | 知识库管道：分块 → 双层索引与图谱 → 五阶段检索 → 评测 → 体检，入口统一走 `run.py kb-*` |
+| `scripts/`（根） | 知识库管道：分块 → 双层索引与图谱 → 五阶段检索 → 评测 → 体检 → 规模基准，入口统一走 `run.py kb-*` |
 
 ## Skill 与脚本分工
 

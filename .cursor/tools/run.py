@@ -17,6 +17,7 @@
   kb-search  知识库单次检索（透传 retriever 参数，如 --toc/--parent/--explain）
   kb-check  知识库健康度与检索延迟测量
   kb-eval   标注集召回率与 Token 预算验收
+  kb-scale  三层索引的规模基准（P95 拐点，验证 100MB–1GB 目标）
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
 退出码：透传被包装命令的退出码；0 = 成功。
@@ -401,6 +402,16 @@ def cmd_kb_eval(args):
     return interpret(rc, text, args.verbose, "kb-eval")
 
 
+def cmd_kb_scale(args):
+    """规模基准：合成 Chunk 逐级测 P95，给出当前实现的可撑体量拐点。"""
+    argv = [PY, kb_script("scale_benchmark.py"), "--sizes", args.sizes,
+            "--repeats", str(args.repeats)]
+    if args.verbose:
+        argv.append("--verbose")
+    rc, text = run(argv)
+    return interpret(rc, text, args.verbose, "kb-scale")
+
+
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -448,6 +459,9 @@ def main():
     p = subs.add_parser("kb-eval", parents=[common], help="标注集召回率与预算验收")
     p.add_argument("--topk", type=int, default=5, help="召回评价的 K，默认 5")
     p.add_argument("--gate", action="store_true", help="不卡延迟（延迟由 kb-check 负责）")
+    p = subs.add_parser("kb-scale", parents=[common], help="三层索引规模基准与 P95 拐点")
+    p.add_argument("--sizes", default="1000,10000,50000,100000", help="逗号分隔的 Chunk 数")
+    p.add_argument("--repeats", type=int, default=3, help="每级重复次数")
 
     args, extra = parser.parse_known_args()
     if args.cmd == "kb-search":
@@ -461,7 +475,8 @@ def main():
     handlers = {"check": cmd_check, "verify": cmd_verify, "render": cmd_render,
                 "scope": cmd_scope, "build": cmd_build, "status": cmd_status,
                 "kb-index": cmd_kb_index, "kb-search": cmd_kb_search,
-                "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval}
+                "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval,
+                "kb-scale": cmd_kb_scale}
     try:
         return handlers[args.cmd](args)
     except ToolNotFound as exc:
