@@ -50,6 +50,12 @@ RRF_K = 60
 # 噪声向量挤到 20 名之外，也必须进精排，否则 `侵入式` 这种稀有精确词会被静默丢弃。
 RESCUE_RANK = 5
 CANDIDATE_POOL = 20
+# 融合分进精排时的权重，按量纲推导而不是试出来的：rerank_score 的取值区间是
+# 0~2（覆盖率 1 + 符号奖励 0.25*4），三路都排第一时的融合分最大，为
+# (1+3+0.6)/(60+1)≈0.075。0.075 * 8 ≈ 0.6，即融合项最多占精排区间的三分之一，
+# 「精排主导、RRF 次之」才是真的。原来写死的 30 会让融合项达到 2.3，
+# 直接把哈希向量的噪声前几名盖在词面命中的正文上面。
+RRF_SCORE_WEIGHT = 8.0
 QUOTE = chr(34)
 SYMBOL_PATTERN = r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_~]+)+"
 DOTTED_PATTERN = r"[A-Za-z_][A-Za-z0-9_]{3,}"
@@ -63,6 +69,11 @@ CONTRAST_RE = re.compile('|'.join(["区别", "不同", "对比", "比较", "哪�
 CODE_RE = re.compile('|'.join(["代码", "示例", "写法", "怎么实现", "implement"]))
 NAV_RE = re.compile('|'.join(["路线图", "章节", "目录", "大纲", "先学什么", "学习顺序", "roadmap"]))
 NOISE_RE = re.compile("^(请问|帮我|麻烦|能不能|可以|解释一下|讲讲|说下)+")
+# 精排专用的口语疑问二元组：只从查询侧覆盖率分母里剔除，索引侧 tokens()
+# 保持不变。中文二元组切不出词界，「什么」会连带产生「学什/么后/和什」这类碎片，
+# 而它本身在散文标题里高频出现（「工具链为什么是…」），留在分母里会把真正的
+# 领域词稀释掉，让无关段落靠一个虚词拿到非零覆盖率。
+RERANK_QUERY_NOISE = frozenset({"什么"})
 SPLIT_RE = re.compile('[，、；;]')
 SUPERSEDED_FACTOR = 0.35
 CACHE_TTL = 24 * 3600
@@ -291,7 +302,8 @@ def rank_parents(query: str, rows: list[dict], candidates: list[dict]) -> list[d
         if parent:
             bonus.setdefault(parent["chunk_id"], 1.0 / (RRF_K + rank))
     for row in rows:
-        row["score"] = round(rerank_score(query, row["text"]) + 30.0 * bonus.get(row["ref_id"], 0.0), 4)
+        row["score"] = round(rerank_score(query, row["text"])
+                              + RRF_SCORE_WEIGHT * bonus.get(row["ref_id"], 0.0), 4)
     rows.sort(key=lambda row: (-row["score"], row["ref_id"]))
     return rows
 
@@ -405,7 +417,8 @@ def rerank_score(query: str, content: str) -> float:
     这不是 Cross-Encoder。换成 bge-reranker 之类模型时只替换本函数，
     排序接口与预算裁剪都不用动。
     """
-    q_tokens = [t for t in dict.fromkeys(tokens(query)) if len(t) > 1]
+    q_tokens = [t for t in dict.fromkeys(tokens(query))
+                if len(t) > 1 and t not in RERANK_QUERY_NOISE]
     if not q_tokens:
         return 0.0
     c_tokens = set(tokens(content))
@@ -478,7 +491,7 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
         })
     # 精排主导、RRF 次之，再乘版本惩罚；同分时优先更短的 Parent 以省预算
     for row in candidates:
-        row["score"] = (row["rerank"] + 30 * row["rrf"]) * row["penalty"]
+        row["score"] = (row["rerank"] + RRF_SCORE_WEIGHT * row["rrf"]) * row["penalty"]
     candidates.sort(key=lambda c: (-c["score"],
                                    c["parent"]["token_count"] if c["parent"] else c["child"]["token_count"]))
 

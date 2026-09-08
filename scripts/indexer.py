@@ -229,7 +229,8 @@ def upsert(con: sqlite3.Connection, chunk: dict, doc: dict, previous: dict) -> s
     existing = previous.get(chunk["chunk_id"])
     branch = doc.get("branch", kb.DEFAULT_BRANCH)
     if (existing and existing["content_hash"] == chunk["content_hash"]
-            and existing.get("branch") == branch):
+            and existing.get("branch") == branch
+            and existing.get("status", "live") == "live"):
         return "unchanged"
     action = "update" if existing else "insert"
     payload = (
@@ -491,8 +492,10 @@ def main() -> int:
     connect(con)
     if not args.rebuild:
         previous = {
-            row[0]: {"content_hash": row[1], "branch": row[2]}
-            for row in con.execute("SELECT chunk_id, content_hash, branch FROM chunks")
+            row[0]: {"content_hash": row[1], "branch": row[2], "status": row[3]}
+            for row in con.execute(
+                "SELECT chunk_id, content_hash, branch, status FROM chunks"
+            )
         }
 
     counts = defaultdict(int)
