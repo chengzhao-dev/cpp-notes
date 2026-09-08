@@ -2,11 +2,11 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章准备好了 WSL2 上的 Ubuntu。本章从仓库里的 `code/getting-started/first-program/main.cpp` 出发，先看清工程包含哪些文件，再用 `g++` 把它编译运行，最后把同一套流程写进 `CMakeLists.txt`，交给 CMake 与 Ninja 自动执行。
+上一章准备好了 WSL2 上的 Ubuntu。本章从仓库里的 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先看清工程包含哪些文件，再用 `g++` 把它编译运行，最后把同一套流程写进 `CMakeLists.txt`，交给 CMake 与 Ninja 自动执行。
 
-## 一、项目结构与源码准备
+## 项目结构与源码准备
 
-### 1.1 梳理工程目录与文件依赖
+### 梳理工程目录与文件依赖
 
 示例目录包含本章用到的源码、构建文件和构建后产生的结果：
 
@@ -35,7 +35,7 @@ flowchart TD
 ```
 
 
-### 1.2 确认核心源码与预期输出
+### 确认核心源码与预期输出
 
 `main.cpp` 只包含一个 `main` 函数，向标准输出一行文本。源码如下：
 
@@ -45,9 +45,9 @@ flowchart TD
 
 程序正常运行后的输出是 `Hello, World!`，返回码为 0。后面两条构建路径都以这一行为结果作为判断依据，构建方式不同，预期输出一模一样。
 
-## 二、基于编译器的直接构建流程
+## 基于编译器的直接构建流程
 
-### 2.1 设定编译标准与严格警告选项
+### 设定编译标准与严格警告选项
 
 同一段源码在不同语言标准下含义不同，因此 `g++` 的第一件事情是声明标准。本章统一使用下列选项：
 
@@ -61,7 +61,7 @@ flowchart TD
 
 四个选项都会写进 `CMakeLists.txt`，直接编译和自动构建使用同一套判断标准。完整选项列表见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)。
 
-### 2.2 执行单文件编译与运行验证
+### 执行单文件编译与运行验证
 
 在 Ubuntu 终端的项目目录中执行：
 
@@ -84,9 +84,9 @@ Hello, World!
 保留 `-Wall -Wextra -Werror` 的价值在于把未初始化变量、类型不匹配等问题挡在构建阶段。编译通过只说明当前代码满足编译器要求，不代表程序逻辑正确。
 :::
 
-## 三、基于构建工具的自动化管理
+## 基于构建工具的自动化管理
 
-### 3.1 编写项目构建规则文件
+### 编写项目构建规则文件
 
 一个源文件用 `g++` 足够；文件变多之后，需要把标准、警告和输出位置保存成规则。本章的 `CMakeLists.txt` 只做这件事：
 
@@ -96,7 +96,7 @@ Hello, World!
 
 五段内容依次声明版本要求与项目名称、设定 C++20 标准、把可执行文件统一输出到 `build/bin`、导出编译数据库，最后从 `main.cpp` 构建 `app` 目标并附加警告选项。术语和完整语义见 [CMake 官方文档](https://cmake.org/documentation/)。
 
-### 3.2 执行自动化配置与一键运行
+### 执行自动化配置与一键运行
 
 CMake 负责生成构建文件，真正执行编译的是底层构建工具。本章使用 Ninja，两条关键命令依次执行：
 
@@ -122,7 +122,9 @@ Hello, World!
 $ bash build-and-run.sh
 ```
 
+```bash
 {{< include /code/getting-started/first-program/build-and-run.sh >}}
+```
 
 ::: {.callout-note}
 配置阶段会生成 `build/compile_commands.json`，clangd 据此还原每个源文件的真实编译参数，让编辑器的诊断和实际构建保持一致。它是构建产物，删除后重新配置即可生成。
@@ -132,7 +134,7 @@ $ bash build-and-run.sh
 
 ### 提示找不到 g++ 或 cmake
 
-先回到[搭建 WSL2 开发环境](setup-wsl2.qmd)的 2.1 重新安装软件包：
+先回到[搭建 WSL2 开发环境](setup-wsl2.qmd)，按[C++ 核心依赖安装与验证](setup-wsl2.qmd#c-核心依赖安装与验证)一节重装软件包：
 
 ```bash
 # 安装编译器、构建工具和调试器
