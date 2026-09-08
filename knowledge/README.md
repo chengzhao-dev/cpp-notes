@@ -15,7 +15,8 @@ knowledge/
 │       ├── 02_quarto_rendering/
 │       ├── 03_publishing/
 │       ├── 04_repository_hygiene/
-│       └── 05_html_output/
+│       ├── 05_html_output/
+│       └── 06_agent_runtime/
 └── branches/                     # 非 main 分支的知识
     ├── cpp26-preview/
     └── legacy-cpp98/

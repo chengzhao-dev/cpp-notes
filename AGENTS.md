@@ -48,7 +48,7 @@
 7. 修改 `theme/**` 或 `_quarto.yml` 会触发整本渲染；先确认代价，再运行 `run.py render`。
 8. 稳定前缀按字符计预算：`AGENTS.md` 仅按 `project_doc_max_bytes = 65536` 做字节护栏，`.cursor/skills/` 的 L1/L2 由 `check_skill_size.py` 按字符为主、字节为次级护栏强制。
 9. 根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 只服务宿主个性化设置：禁止把它写入任务单必读、scope 的 READ、`_CATALOG.md` 路由或任何 skill 的阅读项。
-10. goal 模式长任务：上下文压缩由宿主完成（接近上限自动触发，用户可用 `/compact`），agent 不自行调用；故每轮只推进一个可验证子目标并把进度落盘到 `git status` 可见的文件，不依赖对话记忆交接；版本号、目录结构、链接可达性等可复现事实需要时重新实测；压缩后或收到上下文告警时先重读 `run.py scope` 与 `git status` 确认边界；每轮结束前用一次 `run.py check` 收口。
+10. goal 模式长任务：上下文压缩由宿主完成（接近阈值自动触发，用户可手动压缩），agent 侧没有调用入口，阈值与摘要写法是宿主侧可选配置项（见 `knowledge/domains/tooling/06_agent_runtime/codex-context-compaction.md`）；故每轮只推进一个可验证子目标并把进度落盘到 `git status` 可见的文件，不依赖对话记忆交接；版本号、目录结构、链接可达性等可复现事实需要时重新实测；压缩后或收到上下文告警时先重读 `run.py scope` 与 `git status` 确认边界；每轮结束前用一次 `run.py check` 收口。
 11. 工具调用遵循固定路径优先、PATH 回退、缺失即止：Python 使用 `CPP_MEMO_PYTHON` 与 `.config/python/runtime.json`，其他工具使用对应的 `CPP_MEMO_<TOOL>`；所有候选均不可用时立即中止当前命令，不伪造结果。
 
 ## 初始化兼容

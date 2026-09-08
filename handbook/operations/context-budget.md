@@ -155,6 +155,6 @@ OpenAI 官方文档说明，Codex 以 `project_doc_max_bytes` 控制项目指令
 3. 命令默认批量执行并只回结论；失败时才追加有限诊断，必要时使用 `--verbose`。
 4. MCP 先返回摘要、计数、行号和截断标记，需要细节再使用行范围读取。
 5. 用读取字节、文件数、命令轮次、输出字符和效果等价检查衡量优化，不能以删掉必要上下文换取数字下降。
-6. 上下文压缩由宿主完成（接近上限自动触发或用户 `/compact`），agent 侧不调用；长任务每轮只推进一个可验证子目标并把进度落盘，可复现事实重新实测；见 `agent-operations.md`「长任务跨轮交接」。
+6. 上下文压缩由宿主完成（接近阈值自动触发或用户手动压缩），agent 侧没有调用入口；阈值与摘要写法是宿主侧可选配置项，机制见 `knowledge/domains/tooling/06_agent_runtime/codex-context-compaction.md`。长任务每轮只推进一个可验证子目标并把进度落盘，可复现事实重新实测；见 `agent-operations.md`「长任务跨轮交接」。
 
 六项原则由根目录 `CODEX-PERSONAL-INSTRUCTIONS.md` 承载，只在 Codex 个性化设置中生效，不作为仓库任务的读取项。

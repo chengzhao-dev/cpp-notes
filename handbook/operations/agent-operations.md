@@ -123,7 +123,9 @@ $dirs = @("scripts", ".cursor/skills/cpp-content/scripts",
 
 ## 长任务跨轮交接
 
-上下文压缩由宿主完成，agent 侧没有调用入口：对话接近 `model_auto_compact_token_limit` 时自动总结历史，用户也可随时 `/compact`。压缩可行，只是不归 agent 触发，因此这里只固化压缩前后真正可执行的纪律。
+压缩触发权在宿主：对话接近阈值时自动总结历史，用户也可手动压缩；agent 侧没有调用入口，所以旧版「上下文吃紧时先压缩再继续」是无效条款，已删除。
+阈值、统计口径、摘要提示词与压缩前后钩子都是宿主侧真实存在的可选配置项，属于本机调优，机制与取值依据见
+`knowledge/domains/tooling/06_agent_runtime/codex-context-compaction.md`。这里只固化 agent 在压缩前后可执行的纪律。
 
 1. 每轮只推进一个可验证的子目标，收尾时把状态写进 `git status` 可见的文件，不靠对话记忆交接。
 2. 可复现的事实（版本号、目录结构、链接可达性、索引条数）在需要时重新实测，不从摘要里的旧结论取值。
