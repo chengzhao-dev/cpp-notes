@@ -1,6 +1,6 @@
 # Quarto 基础（Book 项目）
 
-本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、pitfalls.md）提到这些约定时一律引用本文件，不重复陈述。
+本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、pitfalls.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的取值只在 `html-output.md` 列一份，本文件不复制，避免两处随修订漂移。
 
 > 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节
 
@@ -76,22 +76,8 @@ format:
     theme:
       light: [cosmo, theme/scss/theme-light.scss]
       dark: [darkly, theme/scss/theme-dark.scss]
-    grid:
-      sidebar-width: 280px
-      body-width: 800px
-      margin-width: 240px
-      gutter-width: 1.5em
-    css:
-      - theme/css/tokens.css
-      - theme/css/base.css
-      # ……组件 css 按域拆分，完整清单见仓库 _quarto.yml
-    toc: true
-    toc-depth: 4
-    toc-location: right
-    code-copy: true
-    code-overflow: wrap
-    number-sections: false
-    lang: zh
+    # format: html 的其余取值（grid/css/toc/code-*/lang）以 _quarto.yml 与
+    # references/quarto/html-output.md 的现行取值表为准，本文件不复制
 ```
 
 - `book:` 下的 `title`、`author`、`date` 为书目信息；`chapters` 定义章节顺序。
