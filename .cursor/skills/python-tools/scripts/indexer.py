@@ -504,7 +504,7 @@ def main() -> int:
                 (str(VECTOR_DIM),))
     seq = con.execute("SELECT value FROM meta WHERE key=?",
                    (BUILD_SEQ_KEY,)).fetchone()
-    seq = int(seq[0]) + 1 if seq and seq[0].icdigit() else 1
+    seq = int(seq[0]) + 1 if seq and seq[0].isdigit() else 1
     con.execute("INSERT INTO meta VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
                 (BUILD_SEQ_KEY, str(seq)))
     con.commit()
