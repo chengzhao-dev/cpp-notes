@@ -33,3 +33,19 @@
 ## 校验
 
 用 `scripts/check_layout.py` 或单次字面匹配（勿宽扫 minified Bootstrap CSS）。清 SASS 缓存见 `AGENTS.md`。
+
+## 代码高亮契约
+
+- 亮色 `github-light`、暗色 `github-dark`，配置唯一来源是 `_quarto.yml`。
+- 语义颜色由 Pandoc/Quarto 的 token 提供，CSS 只负责背景、布局、字体和稳定的基础色。
+- 括号、标点、`$`、版本号和普通输出必须保持连续的基础色，不按命令名或字符内容覆盖。
+- `text` 代码块用于命令输出和纯文本演示，不启用语言高亮，但与 `cpp`、`cmake`、`bash`、`powershell` 共用字体、字号、行高和字重。
+- 三类代码块（`text`、语言代码块、`include` 代码）共用内边距、边框和 `--code-*` 令牌；页面明暗使用 GitHub 中性灰、蓝色链接和绿色状态色。
+
+## 产物契约断言
+
+`.cursor/skills/agent-ops/scripts/check_dom_contracts.py` 断言以下项，改 DOM 相关样式前后各跑一次：
+
+- 复制按钮 hover 作用域限定在 `.code-copy-outer-scaffold`（Quarto 1.10 起按钮与 `div.sourceCode` 是兄弟）。
+- `@media print` 不得隐藏 scaffold 本身；`@media (hover: none)` 提供触屏兜底。
+- favicon 注入与发布；Mermaid 输出 SVG 而不是源码块。

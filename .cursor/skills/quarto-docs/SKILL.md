@@ -1,39 +1,45 @@
 ---
 name: quarto-docs
 description: 编写结构清晰、可验证、适合 HTML 阅读的 Quarto 中文技术文档。涉及 QMD、README、章节润色和渲染时使用。
+metadata:
+  short-description: 编写可验证的中文 Quarto 文档
 ---
 
 # Skill: quarto-docs
 
-负责页面结构、中文表达和多文件协作；C++ 语义交给 `cpp-content`，主题细节交给 `quarto-theme`。按目录索引只读所需 reference。
+负责页面结构、中文表达与多文件协作；C++ 语义交给 `cpp-content`，主题样式交给 `quarto-theme`。按路由只读所需 reference，不整包加载。
 
-## 总原则
+## 适用场景
 
-中文技术文档任务先遵循 `references/zh/writing-principles.md`；受众导向与可验证性是冲突时的最终裁决标准。章节组织读 `writing-style-core.md`，C++ 章节读 `cpp-chapter-writing.md`。句式、措辞、环境和项目案例通过知识库检索获取。
+- 新写或润色 `.qmd` 正文、标题、代码块、终端命令、图表与 Callout，以及 `README.md`、`AGENTS.md` 体例。
+- **不适用**：渲染参数取值与设计令牌（转 `quarto-theme`）、C++ 语义正确性（转 `cpp-content`）。
 
 ## 任务路由
-正文读 `authoring.md`、`writing-style-core.md`；中文总原则和专项规则按上节路由读取；图表、表格和提示框读 `authoring-elements.md`；终端命令读 `terminal-validation.md`；结构、输出和排错读 `basics.md`、`html-output.md`、`pitfalls.md`。需要项目细则时用 `kb-search --domain quarto-docs`。不读主题 CSS，不整包加载 references。
 
-## 常见错误（Do / Don’t）
+| 要做的事 | 读取 |
+| --- | --- |
+| 所有中文文档任务（最高优先） | `references/zh/writing-principles.md` |
+| 正文结构、代码块、终端命令块 | `references/quarto/authoring.md`、`terminal-validation.md` |
+| 章节组织 / C++ 章节专项 | `references/zh/writing-style-core.md`、`cpp-chapter-writing.md` |
+| 图表、表格、Callout、FAQ、交叉引用 | `references/quarto/authoring-elements.md` |
+| Book 结构、front matter、标题层级、HTML 取值、渲染排错 | `references/quarto/basics.md`、`html-output.md`、`pitfalls.md`（编号索引，按症状定位） |
+| 句式、措辞与项目案例依据 | `run.py kb-search "<查询>" --domain quarto-docs` |
 
-| ✗ | ✓ |
-|---|---|
-| YAML `title:` + 同文本 `# H1` | 只用 `title:`，小节从 `##` |
-| 代码块 `{.cpp}` | 普通围栏 `cpp` |
-| 终端用 `PS>` | 演示块统一 `$` |
-| 普通章写 `description:` | 仅 index/part 封面 |
-| 在 `##`/`###` 前写 `---` 水平线 | H2 靠默认下边框分隔，小节前不写 `---` |
-| 裸写 `{{< include /code/.../file >}}` | 整体包进带语言名的围栏（`cpp`/`bash`/`cmake`），否则 `#` 注释变标题（`pitfalls.md` #13） |
-| `##`/`###` 手动加 `一、`、`1.1` 序号 | 标题只写任务名，`number-sections: false` 下序号会与目录和引用错位 |
-| 用反引号包住仓库文件路径 | 写成可跳转链接：GitHub blob 或 `page.qmd#锚点` |
-| `::: {.callout-best-practice}` 等自定义类 | 仅用内置 5 类与全局中文类型标题；自定义类会被静默丢弃（`pitfalls.md` #12） |
-| 卡片堆叠 API、命令和长句 | 只保留主题、范围和学习结果 |
-| 用反引号包住普通概念或卡片标题 | 只标记需要精确识别的技术对象 |
+## P0 硬约束
 
-## 脚本与校验
+1. 标题只由 YAML `title:` 提供，页面内不再写同文本 `# H1`；小节从 `##` 开始，不手填序号，`##`/`###` 前不写 `---` 水平线。
+2. 代码块用普通语言围栏 `cpp`/`bash`/`powershell`/`cmake`；Mermaid 必须用 `{mermaid}` 围栏；`{{< include >}}` 整体放进带语言名的围栏。
+3. Callout 只用内置 5 类，自定义类会被静默丢弃。
+4. 正文只承诺实际提供且能验证的内容，标题后第一句直接兑现承诺。
+5. 中文 `.qmd`、Skill 与主题 CSS 使用 UTF-8 无 BOM、LF，改后先跑编码检查。
 
-章节骨架使用 `../cpp-content/templates/cpp-topic.qmd`；批量校验走 `run.py check`。中文 `.qmd`、Skill 和主题 CSS 使用 UTF-8 无 BOM、LF；修改后先运行 `check_encoding.py`。
+## 工作流程
 
-## 协作原则
+1. 多文件修改先定页面角色：入口只回答「这是什么、从哪开始」，索引只安排顺序，正文负责一个可完成任务。
+2. 跑 `run.py scope <part>/<chapter>`，按路由读取该主题需要的 reference；章节骨架用 `../cpp-content/templates/cpp-topic.qmd`。
+3. 逐节核对围栏、标题层级、链接与输出一致性；影响渲染时跑 `run.py render`，日常收口只跑 `run.py check`。
 
-多文件修改先确定页面角色，再统一标题、术语、命令、链接和详略。正文只承诺实际提供且能验证的内容；具体环境、工程和命令案例留在知识库。
+## 完成判据
+
+- [ ] `run.py check` 全通过（含 `docs`、`callouts`、`links`、`encoding`）。
+- [ ] 交叉引用锚点可达、本地文件引用存在；术语、命令与详略在多文件间一致。

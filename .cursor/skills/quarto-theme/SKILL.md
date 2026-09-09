@@ -1,44 +1,45 @@
 ---
 name: quarto-theme
 description: Quarto Book HTML 主题与设计系统。涉及 .cursor/skills/quarto-theme/assets/theme/scss、.cursor/skills/quarto-theme/assets/theme/css、includes、设计令牌、布局校验时使用。默认中文。
+metadata:
+  short-description: Quarto Book HTML 主题与设计令牌
 ---
 
 # Skill: quarto-theme
 
-明暗双主题采用 GitHub Light / GitHub Dark 色板，保留适合教程阅读的三栏布局。
+明暗双主题采用 GitHub Light / GitHub Dark 色板，保留适合教程阅读的三栏布局。只负责样式与令牌，页面结构交给 `quarto-docs`。
+
+## 适用场景
+
+- 改 `scss/` 变量、`css/` 组件规则、`tokens.css` 令牌、`includes/` 与字体图标资源。
+- 校验布局契约、新增配色或 callout、调整代码块外观。
+- **不适用**：正文写法与 `.qmd` 结构（转 `quarto-docs`）；改任一主题文件会触发整本重渲染。
 
 ## 任务路由
 
-| 任务 ID | 可写 |
-|---|---|
-| TASK-THEME-001 | `tokens.css`、`.cursor/skills/quarto-theme/assets/theme/scss/*` |
-| TASK-THEME-002 | `nav.css`、`sidebar.css` |
-| TASK-THEME-003 | `content.css`、`code.css` |
-| TASK-THEME-004 | `callouts.css`、`landing.css` |
-| TASK-THEME-005 | `mermaid.css`、`includes/` |
-| TASK-THEME-006 | 跑 `run.py check` |
+| 任务 | 读取 |
+| --- | --- |
+| 改任何主题文件 | `references/design-tokens.md` + **目标那一个** css 文件 |
+| 文件职责、组件规则、新增流程 | `references/theme-structure.md` |
+| 改样式的代价与运行边界 | `.cursor/skills/agent-ops/references/agent-operations.md` |
 
-必读：`references/design-tokens.md` + **目标那一个** css 文件（不要通读整个 `.cursor/skills/quarto-theme/assets/theme/css/`）。
-改样式的代价与流程见 `.cursor/skills/agent-ops/references/agent-operations.md`（会触发整本重渲染）。
+禁止通读整个 `.cursor/skills/quarto-theme/assets/theme/css/`，禁止为「看一下」加载无关 css。
 
-## 已固化的产物契约
+## P0 硬约束
 
-`.cursor/skills/agent-ops/scripts/check_dom_contracts.py` 断言：复制按钮 hover 作用域必须是 `.code-copy-outer-scaffold`
-（Quarto 1.10 起按钮与 `div.sourceCode` 是兄弟）；`@media print` 不得隐藏 scaffold 本身；
-触屏 `@media (hover: none)` 兜底；favicon 注入与发布；Mermaid 必须输出 SVG 而不是源码块。改 DOM 相关样式前后都跑一次。
+1. 颜色、字号、间距的唯一出处是 `tokens.css`；组件 css 不写字面色值。
+2. 改 `.cursor/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 前确认整本重渲染代价，改后跑 `run.py render`。
+3. 令牌语义、复制按钮作用域、`@media print`、触屏兜底、Mermaid 输出 SVG 由 `check_dom_contracts.py` 断言，改前后各跑一次。
+4. 不按字符内容、DOM 位置或命令名覆盖高亮颜色，语义色交给 Pandoc/Quarto token。
 
-## 代码高亮约定
+## 工作流程
 
-- 亮色使用 `github-light`，暗色使用 `github-dark`，配置唯一来源是 `_quarto.yml`。
-- 语义颜色由 Pandoc/Quarto 的 token 提供，CSS 只负责背景、布局、字体和稳定的基础色。
-- 不按字符内容、DOM 位置或 Bash/PowerShell 命令名覆盖颜色；括号、标点、`$`、版本号和普通输出必须保持连续的基础色。
-- `text` 代码块用于命令输出和纯文本演示，不启用语言高亮，但必须与 `cpp`、`cmake`、`bash` 和 `powershell` 使用相同的代码字体、字号、行高和字重。
-- 所有代码块左对齐；代码字体为统一的等宽字体并保留缩进，字段对齐交给表格，不用 CSS 或空格制造伪表格。
-- `text`、语言代码块和 `include` 代码共用字体、字号、行高、内边距、边框和 `--code-*` 令牌；页面明暗颜色使用 GitHub 中性灰、蓝色链接和绿色状态色。
-## 结构
+1. 先定位承载该样式的 css 文件，再读它和 `design-tokens.md`，不扩散到其他 css；令牌改在 `tokens.css`，组件规则只引用令牌。
+2. 新增配色或 callout 按 `references/theme-structure.md`「新增流程」四步走完并同步令牌表。
+3. 运行 `python .cursor/skills/agent-ops/scripts/run.py render`，用产物确认明暗两态。
 
-| 路径 | 职责 |
-|---|---|
-| `.cursor/skills/quarto-theme/assets/theme/scss/theme-*.scss` | Bootstrap 变量 |
-| `.cursor/skills/quarto-theme/assets/theme/css/*.css` | 组件规则（颜色走 `tokens.css`） |
-| `.cursor/skills/quarto-theme/assets/theme/assets/` | 自托管字体 + 站点图标（整目录发布） |
+## 完成判据
+
+- [ ] `run.py check` 全通过，含 `layout`、`dom`、`callouts`。
+- [ ] 明暗两态与触屏兜底均在渲染产物中确认，无新增色值硬编码。
+- [ ] 新增令牌已写回 `references/design-tokens.md`。
