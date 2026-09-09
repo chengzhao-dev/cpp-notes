@@ -90,7 +90,7 @@ def main():
                     target = os.path.normpath(os.path.join(repo_root, link))
                 elif link.startswith("scripts/"):
                     # 兼容 .cursor/skills/python-tools/scripts 与 .cursor/skills/agent-ops/scripts
-                    cand1 = os.path.normpath(os.path.join(repo_root, "handbook", link))
+                    cand1 = os.path.normpath(os.path.join(repo_root, ".cursor", "skills", link))
                     cand2 = os.path.normpath(os.path.join(repo_root, ".cursor", "tools", os.path.basename(link)))
                     if os.path.exists(cand1):
                         target = cand1

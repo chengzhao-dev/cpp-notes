@@ -11,7 +11,7 @@ knowledge/
 ├── quarto-docs/                  # 按 writing、rendering、output 等性质归档
 ├── github-ops/                   # Git、CI、Pages 与发布
 └── agent-ops/                    # Agent 运行、重构与维护
-kkk
+```
 
 按性质创建子目录，不创建空目录；文件名与目录名一律纯 ASCII。
 
@@ -59,14 +59,14 @@ python .cursor/skills/agent-ops/scripts/run.py kb-eval             # Top-5 召�
 python .cursor/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain quarto-docs --explain
 ```
 
-产物写在 ktemp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 k.cursor/skills/python-tools/scripts/`：
-`kb_util.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
-`retriever.py` 五阶段检索、`evaluate.py` 与 `eval_set.py` 评测、`health_check.py` 体检、
+产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.cursor/skills/python-tools/scripts/`：
+`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
+`retriever.py` 五阶段检索、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `run.py check`）。
 
 ## 新增知识的最小闭环
 
 1. 建文件 → `kb-index` → `kb-check`（重复必须为 0）。
-2. 在 `scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
+2. 在 `.cursor/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做加一行 `kb-search` 入口。
 4. 更新 `.cursor/skills/catalog.md` 路由，最后跑 `run.py check`。

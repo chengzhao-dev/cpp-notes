@@ -5,7 +5,7 @@
 为什么这样归一化行尾、为什么远端只留两个分支、提交按什么边界切分，都在知识库，一条命令取用：
 
 ```powershell
-python .cursor/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分支保护依据" --domain tooling
+python .cursor/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分支保护依据" --domain github-ops
 ```
 
 ## 硬约束
@@ -77,4 +77,4 @@ git reset --soft HEAD~1       # 撤销最近一次 commit（保留改动）
 
 ## 文档兼容性
 
-README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字；Skill、`` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。
+README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字；Skill、`knowledge/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。

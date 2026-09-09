@@ -4,8 +4,7 @@
 
 ## 结论
 
-工具链安装已作为「安装 C++ 构建工具链」一节写进
-content/getting-started/setup-wsl2.qmd，
+工具链安装已作为「安装 C++ 构建工具链」一节写进 `content/getting-started/setup-wsl2.qmd`，
 不单列成章：装 WSL2 与装编译器本就是同一次动手过程，拆两章会让新手在两页之间来回跳。
 
 **不要再为本章新建** `content/getting-started/install-toolchain.qmd`。后续若工具链内容膨胀

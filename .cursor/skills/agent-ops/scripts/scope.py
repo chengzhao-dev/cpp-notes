@@ -32,7 +32,7 @@ ALWAYS_DENY = [
     "**/.cache/**（工具缓存）",
     "**/.tmp/**（临时文件）",
     # 宿主六项原则文件：只服务个性化设置，永不作为任务阅读项
-    "CODEX-PERSONAL-INSTRUCTIONS.md（宿主设置用，不列入 UNIT/READ）",
+    "宿主个性化说明（六项原则，来自用户全局配置）：不列入 UNIT/READ",
 ]
 # 单个单元的代码文件上限：超出则只报计数，避免清单本身膨胀
 MAX_UNIT_FILES = 12
@@ -223,7 +223,7 @@ def main():
 
     if not unit:
         print(f"无法解析目标：{target}")
-        print("支持形式：<part>/<chapter>、仓库内路径、或 .cursor/skills/quarto-theme/assets/theme/dev/repo。")
+        print("支持形式：<part>/<chapter>、仓库内路径、或 theme/dev/repo。")
         print("章节需与目录命名约定对齐（content/<part>/<chapter>.qmd ↔ code/<part>/<chapter>）；")
         print("不匹配时请按约定重命名，本脚本不做猜测。可用 --list 查看现有单元。")
         return 1

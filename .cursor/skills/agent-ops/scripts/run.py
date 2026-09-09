@@ -270,8 +270,6 @@ def relevant_cpp_paths(paths):
 
 def cmd_render(args):
     """渲染 Book（改 .cursor/skills/quarto-theme/assets/theme/ 或 _quarto.yml 会整本重渲染，故单独提示），成功后跑 check。"""
-    if not args.quiet_warn and (ROOT / "handbook").is_dir():
-        pass  # 渲染代价由调用方自行声明；此处只做，不劝说
     rc, text = run(["quarto", "render"] + (["--no-quartoignore"] if args.no_ignore else []))
     if rc != 0:
         print(f"FAIL  quarto render (exit={rc})")

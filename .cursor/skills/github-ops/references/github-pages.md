@@ -3,7 +3,7 @@
 本文件只放「怎么做」。为什么这样选、失效模式与取舍依据在知识库，一条命令取用：
 
 ```powershell
-python .cursor/skills/agent-ops/scripts/run.py kb-search "GitHub Pages 部署方式与产物分支" --domain tooling
+python .cursor/skills/agent-ops/scripts/run.py kb-search "GitHub Pages 部署方式与产物分支" --domain github-ops
 ```
 
 > Book 输出目录是 `_book/`（website 为 `_site/`），上传 `path` 与 `publish_dir` 都跟着用 `_book`。

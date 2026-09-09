@@ -9,11 +9,10 @@
 | `content/` | Quarto 章节正文，按 part 分目录 |
 | `code/` | 与章节对应的 C++ 示例和工程，`build/` 是产物 |
 | `.cursor/skills/quarto-theme/assets/theme/` | 页面主题、样式和字体资源 |
-| `` | 项目结构、任务、运维和 Agent 规范 |
 | `.cursor/` | skills、统一工具和项目 MCP 服务 |
 | `knowledge/` | 精简领域知识库（回答「为什么」）；`temp/knowledge-index/` 是其索引产物，不入库 |
 
-章节目录对齐：`content/<part>/`、`code/<part>/`、`tasks/content/<part>/`。
+章节目录对齐：`content/<part>/`、`code/<part>/`、任务单 `.cursor/skills/cpp-content/references/tasks/<part>/`。
 
 ## 常用命令
 

@@ -52,4 +52,4 @@
 
 新增或迁移 `knowledge/` 文件后必须跑 `run.py kb-index`（增量）与 `run.py kb-check`；`kb-eval` 负责召回率与 Token 预算验收。索引产物在 `temp/knowledge-index/`（已 gitignore），缺失时子命令会自动重建。
 
-**禁止**：写章节正文时读 `.cursor/skills/quarto-theme/assets/theme/css/*`；查 build 产物；为「了解一下」而整包读 references；把 `` 列为阅读项（它只服务 Codex 个性化设置，不参与任务路由）。
+**禁止**：写章节正文时读 `.cursor/skills/quarto-theme/assets/theme/css/*`；查 build 产物；为「了解一下」而整包读 references；把宿主个性化说明（用户全局配置里的六项原则，仓库内不存在该文件）列为阅读项。

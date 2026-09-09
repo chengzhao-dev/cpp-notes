@@ -5,7 +5,7 @@
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
 ```powershell
-python .cursor/skills/agent-ops/scripts/run.py kb-search "html 输出选项" --domain tooling --subdomain html_output
+python .cursor/skills/agent-ops/scripts/run.py kb-search "html 输出选项" --domain quarto-docs --subdomain html_output
 python .cursor/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 ```
 

@@ -22,7 +22,7 @@ POWERSHELL_LANGUAGES = {"powershell", "ps1"}
 
 def documents():
     paths = [ROOT / "README.md", ROOT / "AGENTS.md", ROOT / "index.qmd"]
-    for folder in ("content", "handbook", ".cursor/skills"):
+    for folder in ("content", ".cursor/skills", "knowledge"):
         base = ROOT / folder
         if base.is_dir():
             paths.extend(base.rglob("*.qmd" if folder == "content" else "*.md"))

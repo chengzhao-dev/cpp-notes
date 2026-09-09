@@ -4,7 +4,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-TASKS = ROOT / "handbook" / "tasks"
+TASKS = ROOT / ".cursor" / "skills" / "cpp-content" / "references" / "tasks"
 
 TEMPLATE = """# {task_id} · {title}
 
