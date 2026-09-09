@@ -19,10 +19,10 @@ metadata:
 | 要做的事 | 读取 |
 | --- | --- |
 | 所有中文文档任务（最高优先） | `references/zh/writing-principles.md` |
-| 正文结构、代码块、终端命令块 | `references/quarto/authoring.md`、`terminal-validation.md` |
-| 章节组织 / C++ 章节专项 | `references/zh/writing-style-core.md`、`cpp-chapter-writing.md` |
-| 图表、表格、Callout、FAQ、交叉引用 | `references/quarto/authoring-elements.md` |
-| Book 结构、front matter、标题层级、HTML 取值、渲染排错 | `references/quarto/basics.md`、`html-output.md`、`pitfalls.md`（编号索引，按症状定位） |
+| 正文结构、文档元素与终端命令块 | `references/quarto/authoring.md`、`references/quarto/terminal-validation.md` |
+| 章节组织 / C++ 章节专项 | `references/zh/writing-style-core.md`、`references/zh/cpp-chapter-writing.md` |
+| Book 结构、front matter、标题层级 | `references/quarto/basics.md` |
+| HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
 | 句式、措辞与项目案例依据 | `run.py kb-search "<查询>" --domain quarto-docs` |
 
 ## P0 硬约束

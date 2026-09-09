@@ -107,6 +107,7 @@ CHECKS = [
     ("ascii", ".cursor/skills/quarto-docs/scripts/check_ascii_names.py", False),
     ("links", ".cursor/skills/quarto-docs/scripts/check_skill_links.py", False),
     ("docs", ".cursor/skills/agent-ops/scripts/check_docs.py", False),
+    ("tasks", ".cursor/skills/agent-ops/scripts/check_task_matrix.py", False),
     ("conflict", ".cursor/skills/python-tools/scripts/test_conflict_detection.py", False),
     ("vector-eq", ".cursor/skills/python-tools/scripts/test_vector_index_equivalence.py", False),
     ("vector-shard", ".cursor/skills/python-tools/scripts/test_vector_sharding.py", False),

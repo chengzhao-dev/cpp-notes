@@ -7,21 +7,20 @@ metadata:
 
 # Skill: agent-ops
 
-统一承载 Agent 运行入口、Skills 分层、MCP 与仓库级验收。只回答「怎么组织与维护」，领域结论交给 `knowledge/`。
+统一承载 Agent 运行入口、Skills 分层、MCP 与仓库级验收；只回答「怎么组织与维护」，领域结论交给 `knowledge/`。
 
 ## 适用场景
 
 - 新建、合并、重构、改名或删除 skill、reference、MCP 工具与脚本入口。
-- 用 `scope` 确定读取边界，用 `check` 做任务收口验收。
+- 用 `scope` 确定读取边界，用 `check`（含 `tasks` 矩阵一致性）收口验收。
 - **不适用**：写章节正文（转 `cpp-content` 或 `quarto-docs`）、改样式（转 `quarto-theme`）。
 
 ## 任务路由
 
 | 任务 | 读取 |
 | --- | --- |
-| 改 skill 结构与体量 | `references/refactor-guidelines.md` |
-| 运行边界与诊断逃生舱 | `references/agent-operations.md` |
-| 目录关系与章节路线图 | `references/repository-structure.md` |
+| 改 skill 结构、体量、任务矩阵格式与 ID 规则 | `references/refactor-guidelines.md` |
+| 目录关系、章节路线图、运行边界与诊断逃生舱 | `references/repository-structure.md` |
 | skill 全景与分工权威 | `../catalog.md` |
 
 ## P0 硬约束
@@ -30,6 +29,7 @@ metadata:
 2. L1 只保留路由与硬约束，L2 只承载单一主题的按需知识；越界先瘦身再合并，不得放宽 `check_skill_size.py` 的预算常量。
 3. 目录、文件名、命令、版本和路径以磁盘实测为准；确认不了就不写、不伪造。
 4. 重构默认在原文件上局部进行，不因「重构」删除后重写，除非用户明确要求或原结构已无法安全修复。
+5. 任务矩阵、`scope.py` 与 `generate_tasks.py` 三者同格式；改任一处必须跑 `run.py check`（含 `tasks` 一致性检查）。
 
 ## 工作流程
 

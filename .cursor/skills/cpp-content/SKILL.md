@@ -20,9 +20,9 @@ metadata:
 | --- | --- |
 | 开工前定位作用域 | `python .cursor/skills/agent-ops/scripts/run.py scope <part>/<chapter>` |
 | 章节设计与示例递进 | `references/cpp/teaching-method.md` |
-| 语言 / 标准库 / 内存 / 模板要点 | `cpp.md`、`stl.md`、`modern-cpp.md`、`templates.md`（按主题只读一个） |
-| 术语核对、规则型内容、示例练习、代码风格 | `standard-chinese.md`、`effective-rules.md`、`examples-practice.md`、`code-style.md` |
-| 工程、CMake、工具链章与排错依据 | `engineering.md`、`cmake-teaching.md`、`toolchain.md`；`run.py kb-search "<查询>" --domain cpp-content` |
+| 语言 / 标准库 / 内存与模板要点 | `references/cpp/cpp.md`、`references/cpp/stl.md`、`references/cpp/modern-cpp.md`（按主题只读一个） |
+| 术语核对、规则型内容、示例练习、代码风格 | `references/cpp/cpp.md`、`references/cpp/effective-rules.md`、`references/cpp/examples-practice.md`、`references/cpp/code-style.md` |
+| 工程、CMake、工具链章写作与依据 | `references/cpp/engineering.md`、`references/cpp/cmake-teaching.md`；决策依据用 `run.py kb-search "<查询>" --domain cpp-content` |
 
 ## P0 硬约束
 
@@ -30,7 +30,7 @@ metadata:
 2. 示例必须可编译可运行：`-std=c++20 -Wall -Wextra`，完整示例带 `int main`，片段首行标 `// 片段`。
 3. 正文里的输出必须来自实测；拿不到结果就不写、不伪造。
 4. 示例路径与章节对齐：单文件 `code/<part>/<name>.cpp`，工程章 `code/<part>/<chapter>/`；`build/` 不入库、不读、不校验。
-5. 涉及标准语义时标注 C++ 版本，并用 `standard-chinese.md` 核对译名。
+5. 涉及标准语义时标注 C++ 版本，并用 `cpp.md` 核对译名。
 
 ## 工作流程
 
@@ -42,4 +42,4 @@ metadata:
 ## 完成判据
 
 - [ ] `verify --changed` 通过，正文承诺的输出与实测一致。
-- [ ] 术语与版本标注对 `standard-chinese.md` 无冲突；入门章节只讲当前任务用到的工具与命令。
+- [ ] 术语与版本标注对 `cpp.md` 无冲突；入门章节只讲当前任务用到的工具与命令。

@@ -2,7 +2,7 @@
 """校验关键设计令牌与组件选择器是否进入渲染产物（_book）。
 
 用单次字面匹配（子串查找）+ 计数，不对压缩后大 CSS 做宽模式扫描。
-规范出处：.cursor/skills/quarto-theme/references/design-tokens.md。
+规范出处：.cursor/skills/quarto-theme/references/theme-system.md。
 
 用法：python check_layout.py [--book-dir _book]
 退出码：0 = 关键令牌全部存在；1 = 有缺失。
@@ -12,7 +12,7 @@ import argparse
 import sys
 from pathlib import Path
 
-# 与 references/design-tokens.md / .cursor/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
+# 与 references/theme-system.md / .cursor/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
 CHECKS = [
     ("light body token #1F2328", "--body-color: #1F2328"),
     ("light GitHub link #0969DA", "#0969DA"),
@@ -26,7 +26,7 @@ CHECKS = [
     ("dark body #E6EDF3", "#E6EDF3"),
     ("dark link #4493F8", "#4493F8"),
     ("callout note border light", "--callout-note-border: #2563EB"),
-    # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 pitfalls.md #12）
+    # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 rendering-and-output.md #12）
     ("callout tip (best-practice semantics)", "--callout-tip-border"),
     ("callout warning (key-insight semantics)", "--callout-warning-border"),
     ("callout important (deep-dive semantics)", "--callout-important-border"),

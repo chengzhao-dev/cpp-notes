@@ -18,8 +18,7 @@ metadata:
 
 | 审查对象 | 读取 |
 |---|---|
-| C++ 示例与工程 | `references/cpp-review.md` |
-| `.qmd` 正文与排版 | `references/docs-review.md`（两者都涉及时按需加载，不读无关规则） |
+| C++ 示例与工程 / `.qmd` 正文与排版 | `references/review-checklists.md`（两类都涉及时按需加载，不读无关规则） |
 
 ## P0 硬约束
 

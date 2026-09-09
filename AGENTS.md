@@ -12,7 +12,7 @@
 | `.cursor/` | skills、统一工具和项目 MCP 服务 |
 | `knowledge/` | 精简领域知识库（回答「为什么」）；`temp/knowledge-index/` 是其索引产物，不入库 |
 
-章节目录对齐：`content/<part>/`、`code/<part>/`、任务单 `.cursor/skills/cpp-content/references/tasks/<part>/`。
+章节目录对齐：`content/<part>/`、`code/<part>/`、任务矩阵 `.cursor/skills/cpp-content/references/tasks/<part>.md`（一行一章，状态与读写边界的唯一出处）。
 
 ## 常用命令
 

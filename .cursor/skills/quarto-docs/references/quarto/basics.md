@@ -1,6 +1,6 @@
 # Quarto 基础（Book 项目）
 
-本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、pitfalls.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的取值只在 `html-output.md` 列一份，本文件不复制，避免两处随修订漂移。
+本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的取值只在 `knowledge/quarto-docs/output/html-output.md` 列一份，本文件不复制，避免两处随修订漂移。
 
 > 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节
 
@@ -43,7 +43,7 @@ format: html
 | `format` | 输出格式（`html`/`pdf`/`revealjs`），可写对象形式配置子选项 |
 | `lang` | 语言，如 `zh`（影响部分 HTML 行为与 PDF） |
 | `bibliography` / `csl` | 参考文献库 / 引用样式 |
-| `toc` | 目录（常放在 `format: html` 下，见 `html-output.md`） |
+| `toc` | 目录（常放在 `format: html` 下，见 `rendering-and-output.md`） |
 
 ## 常用命令
 
@@ -77,7 +77,7 @@ format:
       light: [cosmo, .cursor/skills/quarto-theme/assets/theme/scss/theme-light.scss]
       dark: [darkly, .cursor/skills/quarto-theme/assets/theme/scss/theme-dark.scss]
     # format: html 的其余取值（grid/css/toc/code-*/lang）以 _quarto.yml 与
-    # references/quarto/html-output.md 的现行取值表为准，本文件不复制
+    # references/quarto/rendering-and-output.md 的现行取值表为准，本文件不复制
 ```
 
 - `book:` 下的 `title`、`author`、`date` 为书目信息；`chapters` 定义章节顺序。
@@ -124,12 +124,12 @@ report.html          # 输出 HTML
 report_files/        # 依赖资源（图片、CSS、JS）
 ```
 
-如希望单一自包含 HTML（无外部依赖），用 `embed-resources: true`，见 `html-output.md`。
+如希望单一自包含 HTML（无外部依赖），用 `embed-resources: true`，见 `rendering-and-output.md`。
 
 ## 延伸
 
-- 正文结构与代码块/终端约定：`authoring.md`；图表/表格/callout/交叉引用：`authoring-elements.md`
-- 外观配置（toc/theme/grid/code-fold）：`html-output.md`
+- 正文结构、代码块/终端约定与文档元素：`authoring.md`
+- 外观配置（toc/theme/grid/code-fold）：`rendering-and-output.md`
 - 发布 GitHub Pages：见 `github-ops` skill
-- 渲染/路径/编码坑：本目录 `pitfalls.md`
+- 渲染/路径/编码坑：本目录 `rendering-and-output.md`（编号索引）
 - 本仓库渲染/预览/缓存等操作细节：**以 `AGENTS.md` 与 `.cursor/skills/quarto-theme/assets/theme/css/` 组件 css 为准**（见 SKILL.md 分工说明），本文件不重复承载。

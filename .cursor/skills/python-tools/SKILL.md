@@ -19,16 +19,18 @@ metadata:
 | 要做的事 | 读取 |
 | --- | --- |
 | 知识库管道（分块 / 索引 / 检索 / 评测 / 体检） | `scripts/`，规范见 `../../../knowledge/README.md` |
-| 忽略规则与索引边界 | `references/ignore-rules.md` |
+
 | Python 版本与格式化配置 | `assets/config/pyproject.toml` |
 | 新建章节工程脚手架 | `scripts/scaffold/init_project.py` |
+| 重建或校验章节任务矩阵 | `scripts/maintenance/generate_tasks.py --check`（漂移时 `--write`） |
 
 ## P0 硬约束
 
 1. 仓库检查一律走 `.cursor/skills/agent-ops/scripts/run.py`，不绕过它直接串脚本。
 2. 运行时按固定顺序：`CPP_MEMO_PYTHON` → `assets/config/runtime.json`（可选的本机文件，已被 `.gitignore` 忽略）→ PATH；候选全部不可用时立即中止，不伪造结果。
 3. 知识库正文只在根 `knowledge/`，索引产物只在 `temp/knowledge-index/`（不入库）。
-4. 脚本改动后同步更新 `AGENTS.md` 命令表与 `run.py` 子命令说明。
+4. 作用域、检索和索引统一跳过构建产物、Quarto 缓存、依赖目录、Python 缓存与密钥文件；规则来源是根目录 `.gitignore`，不再依赖 `.cursor/ignore` 或 `.cursor/indexingignore`。
+5. 脚本改动后同步更新 `AGENTS.md` 命令表与 `run.py` 子命令说明。
 
 ## 工作流程
 

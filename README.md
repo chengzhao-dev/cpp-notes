@@ -25,35 +25,38 @@
 
 ## 仓库结构
 
-下面的目录树展开项目中与阅读、示例和内容维护有关的部分。目录名和文件名均来自当前仓库；构建产物与缓存没有列出，正文也不再重复解释每个目录。
-
 ```text
 cpp-notes/
-├── content/                        # Quarto 章节正文，按 part 分子目录
-│   └── getting-started/            # 入门 part：环境搭建与第一个程序
-├── code/                           # 与章节对应的 C++ 示例和工程
-│   └── getting-started/            # 入门 part 的示例工程，build/ 是产物
-├──                        # 项目自身文档
-│   ├── repository-structure.md     # 目录关系、章节路线图与体量预算
-│   ├── .cursor/skills/agent-ops/references/                 # Agent、代码与中文写作原则
-│   ├── operations/                 # Agent 运维、上下文预算与渲染细则
-│   ├── tasks/                      # 各章任务单（读写边界与验收）
-│   ├── scripts/                    # 脚手架、维护脚本与知识库管道
-│   ├── knowledge/                  # 精简领域知识库
-│   ├── theme/                      # 页面主题、字体与样式
-│   └── index_data/                 # 知识库索引产物
-├── .cursor/                        # Agent 配置
-│   ├── mcp/                        # 项目级 MCP 服务
-│   ├── skills/                     # 写作、C++、主题与运维 skills
-│   └── tools/                      # 统一入口 run.py 与各项检查
-├── _quarto.yml                     # Quarto Book 配置与章节注册
-├── index.qmd                       # 站点首页
-├── AGENTS.md                       # 项目级 Agent 入口：结构、命令与读取边界
-├── LICENSE                         # MIT 许可
-└── README.md                       # 仓库入口说明
+├── content/                          # Quarto 章节正文，按 part 分子目录
+│   └── getting-started/              # 入门 part：index/setup-wsl2/first-program.qmd
+├── code/                             # 与章节对应的 C++ 示例，build/ 与 .cache/ 是产物
+│   └── getting-started/first-program/
+├── knowledge/                        # 精简领域知识库（回答「为什么」）
+│   ├── README.md                     # 知识库规范与新增知识闭环
+│   ├── agent-ops/  cpp-content/  github-ops/  quarto-docs/
+├── .cursor/
+│   ├── manifest.json                 # 项目能力清单
+│   ├── mcp/                          # 项目级 MCP 服务（server.py）
+│   └── skills/
+│       ├── catalog.md                # skill/reference/knowledge 全景路由表（先读这里）
+│       ├── agent-ops/                # 统一入口 run.py、scope 与各项检查脚本
+│       ├── code-review/              # 只读缺陷审查
+│       ├── cpp-content/              # C++ 内容：references/cpp/、references/tasks/、模板与校验
+│       ├── github-ops/               # git、gh CLI、Pages、CI 操作清单
+│       ├── python-tools/             # 知识库管道、脚手架与维护脚本
+│       ├── quarto-docs/              # .qmd 写法与中文技术文档格式
+│       └── quarto-theme/             # 主题 css/scss、设计令牌与布局校验
+├── .github/workflows/                # pages.yml（发布）与 render-check.yml（PR 校验）
+├── _quarto.yml                       # Book 配置与章节注册
+├── index.qmd                         # 站点首页
+├── AGENTS.md                         # 项目级 Agent 入口：结构、命令与读取边界
+└── LICENSE                           # MIT 许可
 ```
 
-章节、示例和任务清单按相同的 part 与 chapter 名称对应。例如，`content/getting-started/` 的示例位于 `code/getting-started/`，相关任务位于 `tasks/content/getting-started/`。
+章节、示例和任务矩阵按相同的 part 与 chapter 名称对齐：`content/<part>/<chapter>.qmd`、
+`code/<part>/<chapter>`（单文件 `.cpp` 或同名工程目录）、
+`.cursor/skills/cpp-content/references/tasks/<part>.md` 里的一行。索引产物在 `temp/knowledge-index/`，
+重构报告在 `temp/refactor/`，两者都不入库。
 
 ## 内容范围
 

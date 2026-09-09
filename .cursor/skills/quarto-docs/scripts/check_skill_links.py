@@ -7,7 +7,12 @@
   - scripts/...（skill 根相对路径；未命中时回退按仓库根 scripts/ 解析，两处任一存在即通过）
   - ./、../ 相对路径（含跨 skill 的 ../..）
   - .cursor/... 全仓库路径
-仅校验以 .md / .qmd / .py 结尾的引用，跳过示例命令路径（如 ./build/main）。
+校验两类引用：
+  - 带扩展名的 .md / .qmd / .py：目标必须存在；
+  - 指向 references/ 的无扩展名引用：判为「漏写扩展名」直接 FAIL——该目录下的知识文件一律带
+    .md，历史上曾有残留文件因无扩展名躲过全部检查。
+模板路径（紧跟 <占位符> 的目录，如 references/tasks/<part>.md）只校验目录存在。
+其余无扩展名路径（示例命令路径如 ./build/main）跳过。
 
 用法：python check_skill_links.py
 退出码：0 = 全部链接可达；1 = 存在断链。
@@ -82,16 +87,25 @@ def main():
             text = fh.read()
         for m in LINK_RE.finditer(text):
             link = m.group(0)
-            if not VALID_EXT_RE.search(link):
-                continue  # 跳过示例命令路径等非文档引用
             target = resolve_link(repo_root, skill_root, file_dir, link)
+            if not VALID_EXT_RE.search(link):
+                if text[m.end():m.end() + 1] == "<":
+                    # 模板路径：截断处应为已存在的目录
+                    if not os.path.isdir(target):
+                        bad.append((rel, link, "模板路径的目录不存在"))
+                    continue
+                if "references/" in link and not os.path.isdir(target):
+                    bad.append((rel, link, "无扩展名的 reference 引用（应带 .md）"))
+                continue
             if not os.path.exists(target):
-                if link.startswith(".cursor/skills/agent-ops/scripts/") or link.startswith(".cursor/skills/python-tools/scripts/"):
+                if link.startswith((".cursor/skills/agent-ops/scripts/",
+                                     ".cursor/skills/python-tools/scripts/")):
                     target = os.path.normpath(os.path.join(repo_root, link))
                 elif link.startswith("scripts/"):
                     # 兼容 .cursor/skills/python-tools/scripts 与 .cursor/skills/agent-ops/scripts
                     cand1 = os.path.normpath(os.path.join(repo_root, ".cursor", "skills", link))
-                    cand2 = os.path.normpath(os.path.join(repo_root, ".cursor", "tools", os.path.basename(link)))
+                    cand2 = os.path.normpath(os.path.join(repo_root, ".cursor", "tools",
+                                                          os.path.basename(link)))
                     if os.path.exists(cand1):
                         target = cand1
                     elif os.path.exists(cand2):
@@ -104,8 +118,8 @@ def main():
         return 0
 
     print(f"Found {len(bad)} broken link(s):")
-    for rel, link, target in bad:
-        print(f"  {rel} -> {link} (resolved: {target})")
+    for rel, link, reason in bad:
+        print(f"  {rel} -> {link} ({reason})")
     return 1
 
 

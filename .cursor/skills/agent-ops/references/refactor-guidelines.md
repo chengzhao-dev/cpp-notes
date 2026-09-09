@@ -31,6 +31,19 @@
 
 P1 强制细则、P2 建议和反模式一律下沉 L2 或 `knowledge/`。
 
+## 任务矩阵契约（L2 的特殊形态）
+
+`.cursor/skills/cpp-content/references/tasks/<part>.md` 一行一章，是章节路由与状态的唯一权威记录，格式由
+`.cursor/skills/agent-ops/scripts/scope.py` 解析、由 `generate_tasks.py` 生成、由
+`check_task_matrix.py` 断言，三者必须同步：
+
+1. 列顺序固定为 `ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注`，行以 `| \`TASK-` 开头且 8 格。
+2. `—` 表示空；无内容占位写作 `—（不新建）`、`—（本章无示例）`，不留裸空白。
+3. ID 前缀按 part 固定（ENV/CORE/STL/MEM/PERF/DBG/TOOL/CS），三位数字在 part 内连续。
+4. 文件级读写边界只写一次（`## 公共读写边界` 的 `- **必读**` 行），行间只写差异；
+   交集变化时先改生成表的章节数据，再 `generate_tasks.py --write`。
+5. 状态只允许 `todo` / `done` / `merged`；merged 章不得留下同名正文。
+
 ## 重构执行纪律
 
 - 修改前先检索入口、引用和测试，理解文件职责后再迁移或删除。

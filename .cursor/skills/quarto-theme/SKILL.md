@@ -19,9 +19,8 @@ metadata:
 
 | 任务 | 读取 |
 | --- | --- |
-| 改任何主题文件 | `references/design-tokens.md` + **目标那一个** css 文件 |
-| 文件职责、组件规则、新增流程 | `references/theme-structure.md` |
-| 改样式的代价与运行边界 | `.cursor/skills/agent-ops/references/agent-operations.md` |
+| 改任何主题文件（含文件职责、组件规则、新增流程） | `references/theme-system.md` + **目标那一个** css 文件 |
+| 改样式的代价与运行边界 | `.cursor/skills/agent-ops/references/repository-structure.md` |
 
 禁止通读整个 `.cursor/skills/quarto-theme/assets/theme/css/`，禁止为「看一下」加载无关 css。
 
@@ -34,12 +33,12 @@ metadata:
 
 ## 工作流程
 
-1. 先定位承载该样式的 css 文件，再读它和 `design-tokens.md`，不扩散到其他 css；令牌改在 `tokens.css`，组件规则只引用令牌。
-2. 新增配色或 callout 按 `references/theme-structure.md`「新增流程」四步走完并同步令牌表。
+1. 先定位承载该样式的 css 文件，再读它和 `theme-system.md`，不扩散到其他 css；令牌改在 `tokens.css`，组件规则只引用令牌。
+2. 新增配色或 callout 按 `references/theme-system.md`「新增流程」四步走完并同步令牌表。
 3. 运行 `python .cursor/skills/agent-ops/scripts/run.py render`，用产物确认明暗两态。
 
 ## 完成判据
 
 - [ ] `run.py check` 全通过，含 `layout`、`dom`、`callouts`。
 - [ ] 明暗两态与触屏兜底均在渲染产物中确认，无新增色值硬编码。
-- [ ] 新增令牌已写回 `references/design-tokens.md`。
+- [ ] 新增令牌已写回 `references/theme-system.md`。

@@ -20,8 +20,8 @@ metadata:
 | --- | --- |
 | git 日常 / 提交前 | `references/git-workflow.md`（依据：`kb-search "仓库一致性"`） |
 | Pages 发布与部署排错 | `references/github-pages.md`（依据：`kb-search "Pages 部署方式"`） |
-| Actions / CI | `references/actions.md`、`ci-check.md` |
-| gh CLI / PR / Issue | `references/gh-cli.md`、`issues-releases.md` |
+| Actions / CI | `references/ci.md` |
+| gh CLI / PR / Issue | `references/pr-and-cli.md` |
 
 ## P0 硬约束
 

@@ -1,154 +1,178 @@
 #!/usr/bin/env python3
-"""生成 tasks 下的任务单文件。"""
+"""由单一章节表生成 8 个 part 任务矩阵（`cpp-content/references/tasks/<part>.md`）。
 
-from pathlib import Path
+为什么需要它：矩阵是 `scope.py` 的唯一路由表，也是章节状态的权威记录。手工维护 8 个文件
+容易写歪表头、漏掉「公共必读」交集、或让 scope 解析不到刚登记的章节；本脚本把这些规则
+固化成一次生成，并用 --check 与磁盘比对，防止脚本与内容再次脱节。
 
-ROOT = Path(__file__).resolve().parents[3]
-TASKS = ROOT / ".cursor" / "skills" / "cpp-content" / "references" / "tasks"
+数据契约（与 scope.py 的解析规则一一对应，改格式必须两处同改）：
+  - 每行一章，列顺序固定：ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注
+  - 行以 "| `TASK-" 开头，且至少 8 格；`—` 表示空；正文/示例只写第一个反引号路径
+  - 「公共必读」行由本 part 全部章节的必读交集推导（scope.py 把该行作为通用 READ）
 
-TEMPLATE = """# {task_id} · {title}
-
-- **状态**: {status}
-- **Skill**: {skill}
-- **依赖**: {deps}
-
-## 读写边界
-
-- **必读**: [`AGENTS.md`](../../AGENTS.md)；本文件{extra_read}
-- **可写**: {writable}
-- **禁止**: {forbidden}
-
-## 验收
-
-{acceptance}
-
-## Agent 提示词
-
-> 执行 {task_id}。只读「读写边界」所列文件；完成验收清单。
+用法：
+  python generate_tasks.py --check   # 只比对，报告漂移；退出码 1 = 磁盘与表不一致（默认）
+  python generate_tasks.py --write   # 用表覆盖重写 8 个矩阵
+退出码：0 = 一致 / 写入成功；1 = 存在漂移（check 模式）。
 """
 
+import argparse
+import io
+import sys
+from pathlib import Path
 
-SKIPPED = []
-WRITTEN = []
+ROOT = Path(__file__).resolve().parents[5]
+TASKS = ROOT / ".cursor" / "skills" / "cpp-content" / "references" / "tasks"
+SKILL_REFS = ".cursor/skills/"
 
-
-def write(path: Path, text: str):
-    """写任务文件；已存在且内容不同则判定为手工编辑过，跳过不覆盖。"""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        if path.read_text(encoding="utf-8") != text:
-            SKIPPED.append(path)
-        return
-    path.write_text(text, encoding="utf-8", newline="\n")
-    WRITTEN.append(path)
-
-
-def infra():
-    """已完成的基建任务不再重生成。
-
-    001-007 全部 done，历史记录折叠在 tasks/infra/DONE.md。若继续按模板
-    生成，会把已完成任务复活成 todo 并污染 INDEX.md，故此处只保留说明。
-    后续新的基建任务请直接在 tasks/infra/ 下新建文件并登记 INDEX.md。
-    """
-    return
+# 所有 part 共用的写作规范必读（专项 ref 之外的最小公共集）
+COMMON_BASE = [
+    SKILL_REFS + "quarto-docs/references/quarto/authoring.md",
+    SKILL_REFS + "quarto-docs/references/zh/writing-style-core.md",
+]
+PREFIX = {
+    "getting-started": "ENV", "core": "CORE", "stl": "STL", "memory": "MEM",
+    "performance": "PERF", "debugging": "DBG", "toolchain": "TOOL", "cheatsheet": "CS",
+}
+ORDER = ["getting-started", "core", "stl", "memory", "performance", "debugging", "toolchain", "cheatsheet"]
 
 
-def theme():
-    items = [
-        ("001-tokens", "TASK-THEME-001", "tokens + SCSS", "todo",
-         "`.cursor/skills/quarto-theme/assets/theme/css/tokens.css`、`.cursor/skills/quarto-theme/assets/theme/scss/*`", "`content/`"),
-        ("002-nav-sidebar", "TASK-THEME-002", "导航与侧栏", "todo",
-         "`.cursor/skills/quarto-theme/assets/theme/css/nav.css`、`sidebar.css`", "`content/`"),
-        ("003-content-code", "TASK-THEME-003", "正文与代码块", "todo",
-         "`.cursor/skills/quarto-theme/assets/theme/css/content.css`、`code.css`", "`content/`"),
-        ("004-callouts-landing", "TASK-THEME-004", "Callout 与首页", "todo",
-         "`.cursor/skills/quarto-theme/assets/theme/css/callouts.css`、`landing.css`", "`content/`"),
-        ("005-mermaid-includes", "TASK-THEME-005", "Mermaid 与 includes", "todo",
-         "`.cursor/skills/quarto-theme/assets/theme/css/mermaid.css`、`.cursor/skills/quarto-theme/assets/theme/includes/`", "`content/`"),
-        ("006-layout-check", "TASK-THEME-006", "布局验收", "todo",
-         "跑 check_layout.py", "`content/`"),
+def cpp(name):
+    """cpp-content 的专项 reference 路径。"""
+    return SKILL_REFS + f"cpp-content/references/cpp/{name}"
+
+
+# 一行一章：(part, chapter, status, dep, spec, code, note)
+#   status: todo | done | merged
+#   dep:    前置任务完整 ID，无前置写 None
+#   spec:   专项必读（reference 文件名），无差异写 None —— 与公共集相同即无专项
+#   code:   示例路径覆盖；None 表示按默认单文件 code/<part>/<chapter>.cpp
+CHAPTERS = [
+    ("getting-started", "setup-wsl2", "done", None, "engineering.md", "—（本章无示例）", "—"),
+    ("getting-started", "install-toolchain", "merged", "TASK-ENV-001", None, None,
+     "已并入 ENV-001 的「安装 C++ 构建工具链」一节，勿再新建同名 qmd"),
+    ("getting-started", "first-program", "done", "TASK-ENV-001", "cpp.md",
+     "code/getting-started/first-program/", "先 g++ 直编，再最小 CMakeLists；多文件与目标留给 cmake-intro"),
+    ("getting-started", "cmake-intro", "todo", "TASK-ENV-003", "engineering.md", None, "—"),
+    ("core", "intro", "todo", "TASK-ENV-003", "cpp.md", None, "—"),
+    ("core", "variables", "todo", "TASK-CORE-001", "cpp.md", None, "—"),
+    ("core", "operators", "todo", "TASK-CORE-002", "cpp.md", None, "—"),
+    ("core", "control-flow", "todo", "TASK-CORE-003", "cpp.md", None, "—"),
+    ("core", "functions", "todo", "TASK-CORE-004", "cpp.md", None, "—"),
+    ("core", "arrays-strings", "todo", "TASK-CORE-005", "cpp.md", None, "—"),
+    ("core", "structs-classes", "todo", "TASK-CORE-006", "cpp.md", None, "—"),
+    ("core", "references", "todo", "TASK-CORE-007", "cpp.md", None, "—"),
+    ("stl", "intro-stl", "todo", "TASK-CORE-005", "stl.md", None, "—"),
+    ("stl", "vector", "todo", "TASK-STL-001", "stl.md", None, "—"),
+    ("stl", "map-set", "todo", "TASK-STL-002", "stl.md", None, "—"),
+    ("stl", "iterators", "todo", "TASK-STL-002", "stl.md", None, "—"),
+    ("stl", "algorithms", "todo", "TASK-STL-004", "stl.md", None, "—"),
+    ("memory", "stack-heap", "todo", "TASK-CORE-007", "modern-cpp.md", None, "—"),
+    ("memory", "raii", "todo", "TASK-MEM-001", "modern-cpp.md", None, "—"),
+    ("memory", "smart-pointers", "todo", "TASK-MEM-002", "modern-cpp.md", None, "—"),
+    ("memory", "move-semantics", "todo", "TASK-MEM-003", "modern-cpp.md", None, "—"),
+    ("performance", "profiling", "todo", "TASK-MEM-002", "performance-and-pitfalls.md", None, "—"),
+    ("performance", "cache-locality", "todo", "TASK-PERF-001", "performance-and-pitfalls.md", None, "—"),
+    ("performance", "rvo-nrvo", "todo", "TASK-MEM-004", "performance-and-pitfalls.md", None, "—"),
+    ("debugging", "gdb-basics", "todo", "TASK-ENV-003", "performance-and-pitfalls.md", None, "—"),
+    ("debugging", "sanitizers", "todo", "TASK-DBG-001", "performance-and-pitfalls.md", None, "—"),
+    ("debugging", "common-bugs", "todo", "TASK-DBG-001", "performance-and-pitfalls.md", None, "—"),
+    ("toolchain", "cmake-targets", "todo", "TASK-ENV-004", "engineering.md", None, "—"),
+    ("toolchain", "clang-tools", "todo", "TASK-TOOL-001", "code-style.md", None, "—"),
+    ("toolchain", "project-layout", "todo", "TASK-TOOL-001", "engineering.md", None, "—"),
+    ("cheatsheet", "syntax-ref", "todo", "TASK-CORE-008", "cpp.md", None, "—"),
+    ("cheatsheet", "stl-ref", "todo", "TASK-STL-005", "stl.md", None, "—"),
+]
+
+
+def task_id(part, chapter):
+    """按 part 前缀与章节在表中的序号生成任务 ID（顺序即矩阵里的编号）。"""
+    rows = [c for c in CHAPTERS if c[0] == part]
+    index = [c[1] for c in rows].index(chapter) + 1
+    return f"TASK-{PREFIX[part]}-{index:03d}"
+
+
+def render(part, rows):
+    """渲染一个 part 的矩阵文本。rows 已按 ID 升序。"""
+    reqs = [COMMON_BASE + ([cpp(spec)] if spec and not _is_merged(status) else [])
+            for part_, chapter, status, dep, spec, code, note in rows]
+    commons = sorted(set.intersection(*[set(r) for r in reqs]))
+    lines = [
+        f"# {part} 章节任务矩阵", "",
+        f"本文件是 {part} 全部章节任务的唯一权威记录：一行一章，读写边界与验收在文件级统一，"
+        "只有差异写进行内。改状态只改本表「状态」列，仓库内不存在其它 INDEX 文件。", "",
+        "## 公共读写边界", "",
+        "- **必读**: `AGENTS.md`；本文件；" + "；".join(f"`{p}`" for p in commons),
+        "- **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）",
+        "- **禁止**: `.cursor/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、"
+        "示例目录下的 `build/`（CMake 产物）", "",
+        "示例默认单文件 `code/<part>/<chapter>.cpp`；需要构建工程时改用同名子目录，产物落其 `build/`。", "",
+        "## 统一验收（每章完成时逐项确认）", "",
+        "- [ ] 正文符合体量预算，`run.py check` 与 `run.py render` 通过",
+        "- [ ] 示例经 `run.py verify --changed` 编译通过，正文承诺的输出与实测一致",
+        "- [ ] 本文件「状态」列已更新为 `done`", "",
+        "## 任务矩阵", "",
+        "| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
-    for fname, tid, title, status, writable, forbidden in items:
-        write(TASKS / "theme" / f"{fname}.md", TEMPLATE.format(
-            task_id=tid, title=title, status=status, skill="quarto-theme",
-            deps="TASK-INFRA-006", extra_read="；`design-tokens.md`",
-            writable=writable, forbidden=forbidden,
-            acceptance="- [ ] 改后 quarto render\n- [ ] check_layout 通过"))
+    for (part_, chapter, status, dep, spec, code, note), required in zip(rows, reqs):
+        tid = task_id(part_, chapter)
+        extra = sorted(set(required) - set(commons))
+        if _is_merged(status):
+            body, example, spec_cell = "—（不新建）", "—", "—"
+        else:
+            body = f"`content/{part_}/{chapter}.qmd`"
+            example = (f"`code/{part_}/{chapter}.cpp`" if code is None
+                       else code if code.startswith("—") else f"`{code}`")
+            spec_cell = "；".join(f"`{p}`" for p in extra) or "—"
+        lines.append("| `{}` | {} | {} | {} | {} | {} | {} | {} |".format(
+            tid, chapter, status, f"`{dep}`" if dep else "—", body, example, spec_cell, note))
+    return "\n".join(lines) + "\n"
 
 
-def content():
-    chapters = [
-        ("getting-started", "setup-wsl2", "TASK-ENV-001", "搭建 WSL2 环境", "done", "007", "toolchain.md"),
-        ("getting-started", "install-toolchain", "TASK-ENV-002", "安装工具链（已并入 ENV-001）", "merged", "001", "toolchain.md"),
-        ("getting-started", "first-program", "TASK-ENV-003", "第一个程序", "done", "001", "cpp.md"),
-        ("getting-started", "cmake-intro", "TASK-ENV-004", "CMake 入门", "todo", "003", "toolchain.md"),
-        ("core", "intro", "TASK-CORE-001", "C++ 简介", "todo", "ENV-003", "cpp.md"),
-        ("core", "variables", "TASK-CORE-002", "变量与类型", "todo", "001", "cpp.md"),
-        ("core", "operators", "TASK-CORE-003", "运算符", "todo", "002", "cpp.md"),
-        ("core", "control-flow", "TASK-CORE-004", "控制流", "todo", "003", "cpp.md"),
-        ("core", "functions", "TASK-CORE-005", "函数", "todo", "004", "cpp.md"),
-        ("core", "arrays-strings", "TASK-CORE-006", "数组与字符串", "todo", "005", "cpp.md"),
-        ("core", "structs-classes", "TASK-CORE-007", "结构体与类", "todo", "006", "cpp.md"),
-        ("core", "references", "TASK-CORE-008", "引用", "todo", "007", "cpp.md"),
-        ("stl", "intro-stl", "TASK-STL-001", "STL 简介", "todo", "CORE-005", "stl.md"),
-        ("stl", "vector", "TASK-STL-002", "vector", "todo", "001", "stl.md"),
-        ("stl", "map-set", "TASK-STL-003", "map 与 set", "todo", "002", "stl.md"),
-        ("stl", "iterators", "TASK-STL-004", "迭代器", "todo", "002", "stl.md"),
-        ("stl", "algorithms", "TASK-STL-005", "算法", "todo", "004", "stl.md"),
-        ("memory", "stack-heap", "TASK-MEM-001", "栈与堆", "todo", "CORE-007", "modern-cpp.md"),
-        ("memory", "raii", "TASK-MEM-002", "RAII", "todo", "001", "modern-cpp.md"),
-        ("memory", "smart-pointers", "TASK-MEM-003", "智能指针", "todo", "002", "modern-cpp.md"),
-        ("memory", "move-semantics", "TASK-MEM-004", "移动语义", "todo", "003", "modern-cpp.md"),
-        ("performance", "profiling", "TASK-PERF-001", "性能分析", "todo", "MEM-002", "performance.md"),
-        ("performance", "cache-locality", "TASK-PERF-002", "缓存局部性", "todo", "001", "performance.md"),
-        ("performance", "rvo-nrvo", "TASK-PERF-003", "RVO/NRVO", "todo", "MEM-004", "performance.md"),
-        ("debugging", "gdb-basics", "TASK-DBG-001", "GDB 基础", "todo", "ENV-003", "pitfalls-ub.md"),
-        ("debugging", "sanitizers", "TASK-DBG-002", "Sanitizer", "todo", "001", "pitfalls-ub.md"),
-        ("debugging", "common-bugs", "TASK-DBG-003", "常见 bug", "todo", "001", "pitfalls-ub.md"),
-        ("toolchain", "cmake-targets", "TASK-TOOL-001", "CMake 目标", "todo", "ENV-004", "engineering.md"),
-        ("toolchain", "clang-tools", "TASK-TOOL-002", "Clang 工具", "todo", "001", "code-style.md"),
-        ("toolchain", "project-layout", "TASK-TOOL-003", "项目布局", "todo", "001", "engineering.md"),
-        ("cheatsheet", "syntax-ref", "TASK-CS-001", "语法速查", "todo", "CORE-008", "cpp.md"),
-        ("cheatsheet", "stl-ref", "TASK-CS-002", "STL 速查", "todo", "STL-005", "stl.md"),
-    ]
-    for part, chapter, tid, title, status, dep, ref in chapters:
-        extra = (
-            f"；`.cursor/skills/quarto-docs/references/quarto/authoring.md`；`.cursor/skills/quarto-docs/references/quarto/authoring-elements.md`；"
-            f"`.cursor/skills/quarto-docs/references/zh/writing-style-core.md`；"
-            f"`.cursor/skills/cpp-content/references/cpp/{ref}`"
-        )
-        writable = (
-            f"`content/{part}/{chapter}.qmd`；示例 `code/{part}/{chapter}.cpp`"
-            f"（需构建工程则用 `code/{part}/{chapter}/`，产物落其 build/）；"
-            f"`_quarto.yml`（追加本章）"
-        )
-        acc = (
-            "- [ ] qmd 符合体量预算\n"
-            "- [ ] verify_examples.py 通过\n"
-            "- [ ] quarto render 通过\n"
-            "- [ ] INDEX.md 更新为 done"
-        )
-        if status == "done":
-            acc = acc.replace("- [ ]", "- [x]", 1).replace("- [ ]", "- [x]", 1)
-        write(TASKS / "content" / part / f"{chapter}.md", TEMPLATE.format(
-            task_id=tid, title=title, status=status,
-            skill="cpp-content + quarto-docs", deps=f"TASK-{dep}" if not dep.startswith("TASK") else dep,
-            extra_read=extra,
-            writable=writable,
-            forbidden=(
-                f"`.cursor/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）"
-            ),
-            acceptance=acc))
+def _is_merged(status):
+    return status.startswith("merged")
+
+
+def build():
+    """返回 {part: 矩阵文本}。"""
+    out = {}
+    for part in ORDER:
+        rows = sorted((c for c in CHAPTERS if c[0] == part), key=lambda c: task_id(c[0], c[1]))
+        out[part] = render(part, rows)
+    return out
+
+
+def main():
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+    ap = argparse.ArgumentParser(description="生成任务矩阵")
+    ap.add_argument("--write", action="store_true", help="覆盖写入矩阵（默认只比对）")
+    ap.add_argument("--check", action="store_true", help="只比对磁盘，报告漂移")
+    args = ap.parse_args()
+
+    drift = []
+    for part, text in build().items():
+        path = TASKS / f"{part}.md"
+        current = path.read_text(encoding="utf-8") if path.is_file() else None
+        if current == text:
+            continue
+        drift.append(part)
+        if args.write:
+            io.open(path, "w", encoding="utf-8", newline="\n").write(text)
+
+    if args.write:
+        print(f"已写入 {len(ORDER)} 个矩阵，其中 {len(drift)} 个发生变化。")
+        return 0
+    if drift:
+        print(f"DRIFT: {len(drift)} 个矩阵与章节表不一致：{', '.join(drift)}")
+        print("确认以脚本为准时运行 generate_tasks.py --write；否则先修 CHAPTERS。")
+        return 1
+    print(f"OK: {len(ORDER)} 个矩阵与章节表一致，共 {len(CHAPTERS)} 章。")
+    return 0
 
 
 if __name__ == "__main__":
-    infra()
-    theme()
-    content()
-    print(f"新建 {len(WRITTEN)} 个，跳过（已存在）{len(SKIPPED)} 个。")
-    if SKIPPED:
-        print()
-        print("已存在的任务文件不会被覆盖：其状态与「读写边界」可能已由人工细化，")
-        print("请以 tasks/ 下的实际文件为准；确需按脚本重生成时，先删除对应文件再运行。")
-        for p in SKIPPED:
-            print(f"  skip {p.relative_to(ROOT)}")
+    sys.exit(main())

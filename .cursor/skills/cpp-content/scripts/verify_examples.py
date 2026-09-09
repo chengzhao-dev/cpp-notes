@@ -14,7 +14,7 @@ Windows 下使用仓库配置的 Python 3.12 运行：
 退出码：0 = 全部通过；1 = 至少一处失败。
 
 编译阶段：
-  1. code/ 下书籍示例（规范见 references/cpp/toolchain.md，-std=c++20 -Wall -Wextra）；
+  1. code/ 下书籍示例（规范见 references/cpp/engineering.md，-std=c++20 -Wall -Wextra）；
      跳过 build/ 等构建目录，不校验 CMake 生成物
   2. 本 skill references/cpp/*.md 内嵌完整示例（含 int main 的 ```cpp 块）
   3. content/**/*.qmd 内嵌完整示例
