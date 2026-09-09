@@ -1,7 +1,7 @@
 # 渲染与发布排查索引
 
 按症状查此表：每条只给可执行处置。**行为成因与取舍**的唯一出处是知识库，用
-`python .cursor/tools/run.py kb-search "<症状关键词>"` 取用
+`python .cursor/skills/agent-ops/scripts/run.py kb-search "<症状关键词>"` 取用
 （可加 `--domain tooling --subdomain quarto_rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
 
 > 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · `{{< include >}}` 必须包在带语言名的围栏里
@@ -29,9 +29,9 @@
 ## 5. 中文乱码/编码
 
 - **症状**：中文变成「锟/鐜/绔」类字串，或文件带 BOM、行尾变 CRLF。
-- **处置**：改 `.qmd` 或 Skill 文档后先跑 `python .cursor/tools/check_encoding.py`；失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）；front matter 可设 `lang: zh`。
+- **处置**：改 `.qmd` 或 Skill 文档后先跑 `python .cursor/skills/agent-ops/scripts/check_encoding.py`；失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）；front matter 可设 `lang: zh`。
 - **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入；不要让系统代码页参与中文读写。
-- **自检**：`python .cursor/tools/run.py check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
+- **自检**：`python .cursor/skills/agent-ops/scripts/run.py check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
 
 ## 6. 渲染失败排查顺序
 

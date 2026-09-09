@@ -21,7 +21,7 @@
 ### 后续 part
 
 语言基础、标准库、对象管理、调试和性能等 part 尚未开始写作，路线和章节状态见
-[`handbook/repository-structure.md`](handbook/repository-structure.md)。新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
+`.cursor/skills/agent-ops/references/repository-structure.md`。新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
 
 ## 仓库结构
 
@@ -33,16 +33,15 @@ cpp-notes/
 │   └── getting-started/            # 入门 part：环境搭建与第一个程序
 ├── code/                           # 与章节对应的 C++ 示例和工程
 │   └── getting-started/            # 入门 part 的示例工程，build/ 是产物
-├── theme/                          # 页面主题
-│   ├── assets/                     # 自托管字体与站点图标
-│   ├── css/                        # 按域拆分的样式表
-│   ├── includes/                   # 注入页面头部与尾部的 HTML 片段
-│   └── scss/                       # 明暗两套 SCSS 变量
-├── handbook/                       # 项目自身文档
+├──                        # 项目自身文档
 │   ├── repository-structure.md     # 目录关系、章节路线图与体量预算
+│   ├── .cursor/skills/agent-ops/references/                 # Agent、代码与中文写作原则
 │   ├── operations/                 # Agent 运维、上下文预算与渲染细则
 │   ├── tasks/                      # 各章任务单（读写边界与验收）
-│   └── scripts/                    # 脚手架与维护脚本
+│   ├── scripts/                    # 脚手架、维护脚本与知识库管道
+│   ├── knowledge/                  # 精简领域知识库
+│   ├── theme/                      # 页面主题、字体与样式
+│   └── index_data/                 # 知识库索引产物
 ├── .cursor/                        # Agent 配置
 │   ├── mcp/                        # 项目级 MCP 服务
 │   ├── skills/                     # 写作、C++、主题与运维 skills
@@ -50,18 +49,11 @@ cpp-notes/
 ├── _quarto.yml                     # Quarto Book 配置与章节注册
 ├── index.qmd                       # 站点首页
 ├── AGENTS.md                       # 项目级 Agent 入口：结构、命令与读取边界
-├── CODEX-PERSONAL-INSTRUCTIONS.md  # 给 Codex 个性化设置使用的六项原则
 ├── LICENSE                         # MIT 许可
 └── README.md                       # 仓库入口说明
 ```
 
-章节、示例和任务清单按相同的 part 与 chapter 名称对应。例如，`content/getting-started/` 的示例位于 `code/getting-started/`，相关任务位于 `handbook/tasks/content/getting-started/`。
-
-## Agent 六项原则
-
-`CODEX-PERSONAL-INSTRUCTIONS.md` 单独保存六项原则，用于 Codex 个性化设置中的「Codex 说明」一栏：把该文件正文粘贴进输入框并保存，此后每个会话都会带上它。原因是这类全局行为约束放在宿主个性化设置里才会在执行过程中真正生效，项目内的规则文件只会被按需读取。
-
-该文件只服务宿主设置。仓库内的 skills、任务单和检查脚本不把它列为阅读项，也不在任务中读取它；项目结构与命令约束仍见 [`AGENTS.md`](AGENTS.md)。
+章节、示例和任务清单按相同的 part 与 chapter 名称对应。例如，`content/getting-started/` 的示例位于 `code/getting-started/`，相关任务位于 `tasks/content/getting-started/`。
 
 ## 内容范围
 
@@ -72,4 +64,4 @@ cpp-notes/
 - 对象管理，包括生命周期、RAII、智能指针和移动语义；
 - 工程实践，包括 CMake、多文件项目、调试和性能。
 
-具体章节状态和目录关系见 [`handbook/repository-structure.md`](handbook/repository-structure.md)。
+具体章节状态和目录关系见 `.cursor/skills/agent-ops/references/repository-structure.md`。

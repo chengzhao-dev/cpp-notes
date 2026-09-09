@@ -1,28 +1,19 @@
 # knowledge/ 知识库
 
-本目录是**领域知识的唯一出处**：回答「为什么这样配、为什么这样设计、失效的成因是什么」。
-skill 侧 `.cursor/skills/*/references/` 只承载写作流程、格式约定和硬约束，需要依据时写一行检索入口，不复制本目录正文。
+本目录是领域知识的唯一出处：回答当前项目为何这样配置、设计和排错。目录名与对应 Skill 一致。
+Skill 侧只承载跨项目可复用的流程、格式约定和硬约束；平台、版本、路径、命令、案例和取舍依据放在本目录，通过检索获取。
 
 ## 目录结构
 
 ```text
 knowledge/
-├── domains/                      # main 分支的稳定知识
-│   ├── cpp_core/                 # 核心语言
-│   │   └── 01_memory_pointers/
-│   └── tooling/                  # 工具链与工程
-│       ├── 01_build_toolchain/
-│       ├── 02_quarto_rendering/
-│       ├── 03_publishing/
-│       ├── 04_repository_hygiene/
-│       ├── 05_html_output/
-│       └── 06_agent_runtime/
-└── branches/                     # 非 main 分支的知识
-    ├── cpp26-preview/
-    └── legacy-cpp98/
-```
+├── cpp-content/                  # 按 language、memory、toolchain 等性质归档
+├── quarto-docs/                  # 按 writing、rendering、output 等性质归档
+├── github-ops/                   # Git、CI、Pages 与发布
+└── agent-ops/                    # Agent 运行、重构与维护
+kkk
 
-子目录前缀数字只用于稳定排序，不参与检索打分。文件名与目录名一律纯 ASCII。
+按性质创建子目录，不创建空目录；文件名与目录名一律纯 ASCII。
 
 ## 文件规范（强制）
 
@@ -32,8 +23,8 @@ frontmatter 字段：
 |---|---|---|
 | `kb_id` | 是 | 全局唯一，格式 `<domain>-<subdomain>-<主题>-v<N>`；改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
-| `domain` | 是 | 检索预过滤维度，取值与 `domains/` 下一层目录名一致 |
-| `subdomain` | 建议 | 与 `domains/<domain>/` 下的子目录名对应 |
+| `domain` | 是 | 检索预过滤维度，取值与 Skill 目录名一致 |
+| `subdomain` | 建议 | 同一 Skill 内的主题筛选 |
 | `tags` | 建议 | 行内列表，参与概念图谱连线，也是冲突检测的概念来源之一 |
 | `level_range` | 建议 | 面向读者的难度区间 |
 | `dependencies` | 建议 | 前置知识的 `kb_id` 列表，图谱按它建边 |
@@ -56,19 +47,19 @@ frontmatter 字段：
 2. 每个 Child 都带 `[标题路径] ` 前缀，保证独立可判读。
 3. 检索器交给 LLM 的是 Stage 5 回溯后的 Parent，评测口径必须与之一致。
 4. 中文分词取二元组，ASCII 标识符整体保留并拆下划线，**语言关键字永不作为停用词**。
-5. 冲突候选只在**同一分支**内按文档级概念集合（`tags` ∪ 反引号内的严格标识符）的 Jaccard 判定，并跳过已被 `supersedes` 关联的一对；跨分支的差异是分支分歧，不是冲突。
+5. 冲突候选按全库文档级概念集合（`tags` ∪ 反引号内的严格标识符）的 Jaccard 判定，并跳过已被 `supersedes` 关联的一对。
 
 ## 索引与验证
 
 ```powershell
-python .cursor/tools/run.py kb-index            # 增量（按 content_hash 跳过未变文件）
-python .cursor/tools/run.py kb-index --rebuild  # 改分词或结构后全量重建
-python .cursor/tools/run.py kb-check            # 格式违规、重复、孤立、断链、P95 延迟
-python .cursor/tools/run.py kb-eval             # Top-5 召回率、延迟与注入 Token 预算
-python .cursor/tools/run.py kb-search "<查询>" --domain tooling --explain
+python .cursor/skills/agent-ops/scripts/run.py kb-index            # 增量（按 content_hash 跳过未变文件）
+python .cursor/skills/agent-ops/scripts/run.py kb-index --rebuild  # 改分词或结构后全量重建
+python .cursor/skills/agent-ops/scripts/run.py kb-check            # 格式违规、重复、孤立、断链、P95 延迟
+python .cursor/skills/agent-ops/scripts/run.py kb-eval             # Top-5 召回率、延迟与注入 Token 预算
+python .cursor/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain quarto-docs --explain
 ```
 
-产物写在 `index_data/`（已 gitignore，缺失时自动重建）。管道代码在 `scripts/`：
+产物写在 ktemp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 k.cursor/skills/python-tools/scripts/`：
 `kb_util.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
 `retriever.py` 五阶段检索、`evaluate.py` 与 `eval_set.py` 评测、`health_check.py` 体检、
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `run.py check`）。
@@ -78,4 +69,4 @@ python .cursor/tools/run.py kb-search "<查询>" --domain tooling --explain
 1. 建文件 → `kb-index` → `kb-check`（重复必须为 0）。
 2. 在 `scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做加一行 `kb-search` 入口。
-4. 更新 `.cursor/skills/_CATALOG.md` 路由，最后跑 `run.py check`。
+4. 更新 `.cursor/skills/catalog.md` 路由，最后跑 `run.py check`。

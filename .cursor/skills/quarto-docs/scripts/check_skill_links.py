@@ -19,7 +19,7 @@ import sys
 
 LINK_RE = re.compile(
     r"\.cursor/[A-Za-z0-9_./-]+"
-    r"|handbook/scripts/[A-Za-z0-9_./-]+"
+    r"|.cursor/skills/python-tools/scripts/[A-Za-z0-9_./-]+"
     r"|(?:references|templates|scripts)/[A-Za-z0-9_./-]+"
     r"|\.{1,2}/[A-Za-z0-9_./-]+"
 )
@@ -86,10 +86,10 @@ def main():
                 continue  # 跳过示例命令路径等非文档引用
             target = resolve_link(repo_root, skill_root, file_dir, link)
             if not os.path.exists(target):
-                if link.startswith(".cursor/tools/") or link.startswith("handbook/scripts/"):
+                if link.startswith(".cursor/skills/agent-ops/scripts/") or link.startswith(".cursor/skills/python-tools/scripts/"):
                     target = os.path.normpath(os.path.join(repo_root, link))
                 elif link.startswith("scripts/"):
-                    # 兼容 handbook/scripts 与 .cursor/tools
+                    # 兼容 .cursor/skills/python-tools/scripts 与 .cursor/skills/agent-ops/scripts
                     cand1 = os.path.normpath(os.path.join(repo_root, "handbook", link))
                     cand2 = os.path.normpath(os.path.join(repo_root, ".cursor", "tools", os.path.basename(link)))
                     if os.path.exists(cand1):

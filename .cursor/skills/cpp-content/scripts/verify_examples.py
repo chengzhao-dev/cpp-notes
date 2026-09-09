@@ -10,7 +10,7 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py --paths code/core/hello.cpp content/core/intro.qmd
 
 Windows 下使用仓库配置的 Python 3.12 运行：
-  python .cursor/tools/run.py verify
+  python .cursor/skills/agent-ops/scripts/run.py verify
 退出码：0 = 全部通过；1 = 至少一处失败。
 
 编译阶段：
@@ -21,7 +21,7 @@ Windows 下使用仓库配置的 Python 3.12 运行：
 风格阶段（仅 --style；规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
   S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
-  配置显式指向 .config/cpp/（.clang-format、.clang-tidy）；
+  配置显式指向 .cursor/skills/cpp-content/assets/config/（.clang-format、.clang-tidy）；
   clang 工具缺失/过旧时降级为警告；编译始终是硬门槛。
 """
 

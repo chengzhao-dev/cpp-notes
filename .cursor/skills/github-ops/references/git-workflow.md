@@ -5,7 +5,7 @@
 为什么这样归一化行尾、为什么远端只留两个分支、提交按什么边界切分，都在知识库，一条命令取用：
 
 ```powershell
-python .cursor/tools/run.py kb-search "仓库一致性与分支保护依据" --domain tooling
+python .cursor/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分支保护依据" --domain tooling
 ```
 
 ## 硬约束
@@ -47,9 +47,8 @@ git diff
 git log --oneline -10
 ```
 
-再按改动范围跑检查：`python .cursor/tools/run.py verify --changed`、`python .cursor/tools/run.py check`、`git diff --check`。
+再按改动范围跑检查：`python .cursor/skills/agent-ops/scripts/run.py verify --changed`、`python .cursor/skills/agent-ops/scripts/run.py check`、`git diff --check`。
 只有改主题或 Quarto 全局配置才整本渲染；只有改 C++ 全局配置或校验器才全量验证；不要让 `build/`、`.cache/`、`.tmp/` 触发校验。
-解释器选择规则见 [`handbook/operations/agent-operations.md`](../../../../handbook/operations/agent-operations.md)。
 
 ## 大更新怎么分组
 
@@ -78,4 +77,4 @@ git reset --soft HEAD~1       # 撤销最近一次 commit（保留改动）
 
 ## 文档兼容性
 
-README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字；Skill、`handbook/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。
+README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字；Skill、`` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。

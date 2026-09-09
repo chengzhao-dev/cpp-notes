@@ -1,6 +1,6 @@
 # C++ 代码风格
 
-> LLVM 排版 · Google 命名 · C++20 · 2 空格缩进 · 配置源见 `.config/cpp/`
+> LLVM 排版 · Google 命名 · C++20 · 2 空格缩进 · 配置源见 `.cursor/skills/cpp-content/assets/config/`
 
 ## 命名
 
@@ -22,9 +22,9 @@ $ python .cursor/skills/cpp-content/scripts/verify_examples.py
 $ python .cursor/skills/cpp-content/scripts/verify_examples.py --style
 ```
 
-clang 配置源位于 `.config/cpp/`，由 `handbook/scripts/cpp/init_project.py` 复制到独立工程根目录。
+clang 配置源位于 `.cursor/skills/cpp-content/assets/config/`，由 `.cursor/skills/python-tools/scripts/scaffold/init_project.py` 复制到独立工程根目录。
 
-Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `python .cursor/tools/run.py verify`；单章节构建使用 `python .cursor/tools/run.py build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
+Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `python .cursor/skills/agent-ops/scripts/run.py verify`；单章节构建使用 `python .cursor/skills/agent-ops/scripts/run.py build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
 
 ## 示例
 

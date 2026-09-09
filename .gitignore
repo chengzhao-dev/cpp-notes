@@ -33,5 +33,5 @@ htmlcov/
 coverage.xml
 *.coverage
 
-# RAG 索引产物（由 knowledge/ 生成，不入库）
-/index_data/
+# 临时分析、重构报告与知识库索引（不入库）
+/temp/

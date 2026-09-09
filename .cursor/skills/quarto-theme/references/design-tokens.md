@@ -1,6 +1,6 @@
 # 设计令牌（GitHub 风格）
 
-本文件是本仓库明暗双主题的**令牌规范来源**。页面颜色参考 GitHub Light / GitHub Dark，代码高亮由 Quarto 的同名主题提供；实际生效位置在 `theme/css/tokens.css`，二者保持同步。
+本文件是本仓库明暗双主题的**令牌规范来源**。页面颜色参考 GitHub Light / GitHub Dark，代码高亮由 Quarto 的同名主题提供；实际生效位置在 `.cursor/skills/quarto-theme/assets/theme/css/tokens.css`，二者保持同步。
 
 ## 令牌对照表
 
@@ -44,12 +44,12 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 - **侧栏 active**：浅底高亮 + GitHub 蓝色左轨（`--accent`）。
 - **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影；网格一行最多两列。
 - **首页与组件**：采用 GitHub 文档式细边框、冷灰分隔线和轻背景；卡片 hover 只改变边框或背景，不改变尺寸。
-- **顶栏品牌标**：与 `theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
+- **顶栏品牌标**：与 `.cursor/skills/quarto-theme/assets/theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
 - **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角；`text` 内容不启用语言 token。
 
 ## 字体栈（三处同步）
 
-自托管 OFL 字体（`theme/assets/fonts/` + `theme/css/fonts.css`），无第三方 CDN：
+自托管 OFL 字体（`.cursor/skills/quarto-theme/assets/theme/assets/fonts/` + `.cursor/skills/quarto-theme/assets/theme/css/fonts.css`），无第三方 CDN：
 
 - Sans：`Inter` → `Noto Sans SC` → 系统/CJK 回退（`theme-*.scss`、`tokens.css --ui-font`）
 - Mono：`JetBrains Mono` → `Noto Sans Mono CJK SC` / `Noto Sans SC` → ui-monospace 回退；代码主题使用 GitHub Light / GitHub Dark。代码块统一左对齐，终端输出保留原始空格。
@@ -69,4 +69,4 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 
 - **布局**：Quarto Book 三栏（左导航 + 正文 + 右 TOC），页面色彩参考 GitHub 文档界面
 - **阅读体例**：渐进式中文、小步展开，参考 [learncpp.com](https://www.learncpp.com/)
-- **实现**：Bootstrap cosmo/darkly 基底 + `theme/css/` 域拆分覆盖
+- **实现**：Bootstrap cosmo/darkly 基底 + `.cursor/skills/quarto-theme/assets/theme/css/` 域拆分覆盖

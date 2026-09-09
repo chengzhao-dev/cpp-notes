@@ -7,9 +7,12 @@ description: 编写结构清晰、可验证、适合 HTML 阅读的 Quarto 中�
 
 负责页面结构、中文表达和多文件协作；C++ 语义交给 `cpp-content`，主题细节交给 `quarto-theme`。按目录索引只读所需 reference。
 
-## 任务路由
+## 总原则
 
-正文读 `authoring.md`、`writing-style-core.md`；句子衔接读 `sentence-flow.md`，润色按需读 `avoid-words.md`；图表、表格、Callout 读 `authoring-elements.md`；终端命令读 `terminal-validation.md`；结构、输出和排错读 `basics.md`、`html-output.md`、`pitfalls.md`。多文件任务先建立页面角色，再统一路线、术语和链接。不读主题 CSS，不整包加载 references。
+中文技术文档任务先遵循 `references/zh/writing-principles.md`；受众导向与可验证性是冲突时的最终裁决标准。章节组织读 `writing-style-core.md`，C++ 章节读 `cpp-chapter-writing.md`。句式、措辞、环境和项目案例通过知识库检索获取。
+
+## 任务路由
+正文读 `authoring.md`、`writing-style-core.md`；中文总原则和专项规则按上节路由读取；图表、表格和提示框读 `authoring-elements.md`；终端命令读 `terminal-validation.md`；结构、输出和排错读 `basics.md`、`html-output.md`、`pitfalls.md`。需要项目细则时用 `kb-search --domain quarto-docs`。不读主题 CSS，不整包加载 references。
 
 ## 常见错误（Do / Don’t）
 
@@ -31,12 +34,6 @@ description: 编写结构清晰、可验证、适合 HTML 阅读的 Quarto 中�
 
 章节骨架使用 `../cpp-content/templates/cpp-topic.qmd`；批量校验走 `run.py check`。中文 `.qmd`、Skill 和主题 CSS 使用 UTF-8 无 BOM、LF；修改后先运行 `check_encoding.py`。
 
-## 章节主线
+## 协作原则
 
-正文按“引言 → 前置条件 → 问题场景 → 心智模型 → 最小示例 → 实际操作 → 验证 → 常见错误 → 回顾”推进。章首用引言段交代动机与读者收益。前置条件与命令分开写，并列条件用无序列表，有先后关系的动作用有序列表。标题必须代表独立任务、概念、示例、验证或排错流程；短内容不单独创建 `###`。标题后的第一句直接兑现承诺，每段只引入一个新对象。
-
-多文件修改先建立角色关系，再统一标题、术语、命令、链接和详略。环境、工具、命令和高级配置混杂，或命令没有目的和成功判据，都是反面案例。Callout 放在所属小节的语义末尾，其后不再紧跟正文段落。
-
-某一章的一二三级标题骨架见 `references/zh/chapter-outlines.md`，优先级最低，只在生成或重构指定章节时读取。
-
-真实工程章节在第一次展示源码前展示目录树。先用命令获取真实目录，再从根目录按实际层级生成 `text` 代码块；只展示当前任务需要的源码、构建文件和关键产物，不凭想象补文件，不展示缓存和 CMake 杂项。代码块前说明目的，代码块后说明结果和下一步。面向新手直接使用 Windows、WSL2 上的 Ubuntu 等具体名称；插件和编辑器内部机制不写入入门主线，必要时只链接官方文档。正文只承诺实际提供的查看、编译、运行和验证内容。
+多文件修改先确定页面角色，再统一标题、术语、命令、链接和详略。正文只承诺实际提供且能验证的内容；具体环境、工程和命令案例留在知识库。

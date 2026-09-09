@@ -74,8 +74,8 @@ book:
 format:
   html:
     theme:
-      light: [cosmo, theme/scss/theme-light.scss]
-      dark: [darkly, theme/scss/theme-dark.scss]
+      light: [cosmo, .cursor/skills/quarto-theme/assets/theme/scss/theme-light.scss]
+      dark: [darkly, .cursor/skills/quarto-theme/assets/theme/scss/theme-dark.scss]
     # format: html 的其余取值（grid/css/toc/code-*/lang）以 _quarto.yml 与
     # references/quarto/html-output.md 的现行取值表为准，本文件不复制
 ```
@@ -132,4 +132,4 @@ report_files/        # 依赖资源（图片、CSS、JS）
 - 外观配置（toc/theme/grid/code-fold）：`html-output.md`
 - 发布 GitHub Pages：见 `github-ops` skill
 - 渲染/路径/编码坑：本目录 `pitfalls.md`
-- 本仓库渲染/预览/缓存等操作细节：**以 `AGENTS.md` 与 `theme/css/` 组件 css 为准**（见 SKILL.md 分工说明），本文件不重复承载。
+- 本仓库渲染/预览/缓存等操作细节：**以 `AGENTS.md` 与 `.cursor/skills/quarto-theme/assets/theme/css/` 组件 css 为准**（见 SKILL.md 分工说明），本文件不重复承载。

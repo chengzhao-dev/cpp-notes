@@ -47,7 +47,7 @@
 ## 示例约定
 
 - 源码：`code/<part>/<name>.cpp`，与 `content/<part>/` 对齐。
- - 新建工程：`python handbook/scripts/cpp/init_project.py --name <name> --dir code/<part>`。
+ - 新建工程：`python .cursor/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。
 - 校验：`python .cursor/skills/cpp-content/scripts/verify_examples.py`。
 
 ## 命名

@@ -12,7 +12,7 @@ import argparse
 import sys
 from pathlib import Path
 
-# 与 references/design-tokens.md / theme/css/tokens.css 保持同步
+# 与 references/design-tokens.md / .cursor/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
 CHECKS = [
     ("light body token #1F2328", "--body-color: #1F2328"),
     ("light GitHub link #0969DA", "#0969DA"),
@@ -67,7 +67,7 @@ def main():
     if fail == 0:
         print("All key tokens/selectors present.")
         return 0
-    print(f"{fail} token(s) missing; check theme/css/*.css and the SASS cache.")
+    print(f"{fail} token(s) missing; check .cursor/skills/quarto-theme/assets/theme/css/*.css and the SASS cache.")
     return 1
 
 

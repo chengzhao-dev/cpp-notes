@@ -44,8 +44,8 @@ python .cursor/mcp/server.py
 ## 资源
 
 - `project://structure`：当前允许访问的项目结构。
-- `project://skills`：`.cursor/skills/_CATALOG.md`。
-- `project://agent`：`.cursor/README.md` 和能力边界。
+- `project://skills`：`.cursor/skills/catalog.md`。
+- `project://agent`：`.cursor/mcp/README.md` 和能力边界。
 
 ## 安全边界
 

@@ -146,7 +146,7 @@ def run_command(args: list[str], timeout: int = 120) -> dict[str, Any]:
 
 
 def run_agent(*args: str, timeout: int = 120) -> dict[str, Any]:
-    return run_command([PYTHON, str(ROOT / ".cursor/tools/run.py"), *args], timeout)
+    return run_command([PYTHON, str(ROOT / ".cursor/skills/agent-ops/scripts/run.py"), *args], timeout)
 
 
 def tool_result(value: Any, is_error: bool = False) -> dict[str, Any]:
@@ -183,7 +183,7 @@ TOOLS = [
     },
     {
         "name": "project_scope",
-        "description": "Resolve the repository's minimal task scope using .cursor/tools/run.py.",
+        "description": "Resolve the repository's minimal task scope using .cursor/skills/agent-ops/scripts/run.py.",
         "inputSchema": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
     },
     {
@@ -332,9 +332,9 @@ def resource_text(uri: str) -> str:
             paths.append(path.name + ("/" if path.is_dir() else ""))
         return "\n".join(paths) + "\n"
     if uri == "project://skills":
-        return read_text(".cursor/skills/_CATALOG.md")
+        return read_text(".cursor/skills/catalog.md")
     if uri == "project://agent":
-        return read_text(".cursor/README.md")
+        return read_text(".cursor/mcp/README.md")
     raise MCPError(f"unknown resource: {uri}")
 
 
