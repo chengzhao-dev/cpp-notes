@@ -23,7 +23,7 @@ metadata:
 | 章节组织 / C++ 章节专项 | `references/zh/writing-style-core.md`、`references/zh/cpp-chapter-writing.md` |
 | Book 结构、front matter、标题层级 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
-| 句式、措辞与项目案例依据 | `run.py kb-search "<查询>" --domain quarto-docs` |
+| 措辞、案例与页面组织依据（为什么这么排） | `run.py kb-search "块序列"`、`"卡片"`、`"措辞"`，均加 `--domain quarto-docs` |
 
 ## P0 硬约束
 

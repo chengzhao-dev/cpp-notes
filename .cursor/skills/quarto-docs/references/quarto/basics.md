@@ -38,7 +38,7 @@ format: html
 | 字段 | 作用 |
 |---|---|
 | `title` / `subtitle` | 标题 / 副标题 |
-| `description` | **仅在 Book 的 `index.qmd`（封面页）渲染为可见引导段落**；普通章节（位于 `content/` 下）**不要写该字段**，只保留 `title:`，开篇可见文字写正文段落/引用块 |
+| `description` | **只有根 `index.qmd` 会渲染成页面可见副标题**（产物里的 `<div class="description">`）。part 封面写该字段只产出 `<meta name="description">` 供搜索引擎使用，页面上不显示，因此分组引导句必须写成 `##` 下的正文段落；普通章节不写该字段 |
 | `author` / `date` | 作者 / 日期（`today` 自动取当天） |
 | `format` | 输出格式（`html`/`pdf`/`revealjs`），可写对象形式配置子选项 |
 | `lang` | 语言，如 `zh`（影响部分 HTML 行为与 PDF） |
@@ -83,7 +83,7 @@ format:
 - `book:` 下的 `title`、`author`、`date` 为书目信息；`chapters` 定义章节顺序。
 - **`index.qmd` 必须存在**，作为 Book 首页/入口。
 - 章节可放子目录（如 `content/getting-started/setup-wsl2.qmd`），在 `chapters` 写相对路径。
-- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本书在用；索引页含 `.hero-eyebrow`，不写 `---`），产生分卷/分部标题。
+- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本书在用），产生分卷/分部标题。索引页的 `.hero-eyebrow` 是可选视觉组件，只在正文真的写了该 div 时生效，与 `part:` 的写法无关，不构成索引页的硬性要求。
 - 章节间交叉引用用 `@sec-...`、`@tbl-...`、`@fig-...`。
 - 渲染：`quarto render`，Book **默认输出到 `_book/`**（区别于 website 的 `_site/`）。
 

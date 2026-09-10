@@ -70,6 +70,8 @@ L2 `references/**/*.md` ≤160 行 / ≤6000 字符，全部 `name + description
 | `knowledge/quarto-docs/rendering/rendering-constraints.md` | `quarto-docs` | Quarto 渲染行为与失效模式依据 |
 | `knowledge/quarto-docs/writing/chinese-style-cases.md` | `quarto-docs` | 中文段落、句式与措辞案例 |
 | `knowledge/quarto-docs/writing/chapter-and-environment-cases.md` | `quarto-docs` | 章节、环境与命令展示案例 |
+| `knowledge/quarto-docs/writing/chapter-page-pattern.md` | `quarto-docs` | 教学正文的块序列与职责边界 |
+| `knowledge/quarto-docs/writing/landing-page-pattern.md` | `quarto-docs` | 入口与卡片页的三层结构与卡片职责 |
 
 **禁止**：写正文时读 `quarto-theme/assets/theme/css/*`；查 `build/` 产物；为「了解一下」整包读
 `references/`；把宿主个性化说明（用户全局配置里的六项原则，仓库内不存在该文件）列为阅读项。

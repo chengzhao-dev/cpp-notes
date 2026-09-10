@@ -8,6 +8,10 @@ TOOLING = [
     ("Quarto HTML 主题在哪里配置", "作用域", "navigation"),
     ("上下文压缩由谁触发", "压缩由宿主触发而不是 agent", "concept"),
     ("中文技术文档如何让命令前后形成闭环", "段落与代码块闭环", "procedure"),
+    ("章节正文为什么要按块序列排", "块序列固定为五段的原因", "concept"),
+    ("引言应该写哪些内容", "引言的职责边界", "concept"),
+    ("入口页的卡片可以放命令吗", "卡片只承担定位", "concept"),
+    ("README 和站点首页怎么分工", "README 与站点入口页的分工", "procedure"),
 ]
 
 ROWS = TOOLING
