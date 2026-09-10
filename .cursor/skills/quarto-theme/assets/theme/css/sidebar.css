@@ -114,7 +114,9 @@ body::-webkit-scrollbar-thumb {
   font-weight: 400;
   line-height: 1.4;
   border-radius: 0;
-  min-height: 1.9rem;
+  /* 单行条目高度：1.5rem 恰好容纳一行 0.8125rem/1.4 文字，条目折到两行时
+     高度会明显超过此值，check_typography.py 据此判定「目录锯齿」。 */
+  min-height: 1.5rem;
   display: flex;
   align-items: center;
 }
@@ -144,16 +146,17 @@ body::-webkit-scrollbar-thumb {
 #quarto-sidebar a.sidebar-link:focus-visible {
   outline-color: var(--sidebar-fg);
 }
-/* 二级嵌套：竖线占位 0.75rem + 每级缩进 0.75rem，字号与色同顶层 */
+/* 二级嵌套：竖线占位 0.75rem + 半级缩进。缩进表达层级即可，
+   每级整整 0.75rem 会在窄侧栏里把三级条目的文字宽度压到折行。 */
 .sidebar.margin-sidebar nav[role="doc-toc"] ul ul > li > a.nav-link {
-  padding-left: calc(0.75rem + var(--toc-indent));
+  padding-left: calc(0.75rem + var(--toc-indent) * 0.5);
   font-size: 0.8125rem;
   font-weight: 400;
   color: var(--sidebar-fg);
 }
 /* 三级嵌套（h4）：更深缩进 */
 .sidebar.margin-sidebar nav[role="doc-toc"] ul ul ul > li > a.nav-link {
-  padding-left: calc(0.75rem + var(--toc-indent) * 2);
+  padding-left: calc(0.75rem + var(--toc-indent));
   font-size: 0.8125rem;
   font-weight: 400;
   color: var(--sidebar-fg);

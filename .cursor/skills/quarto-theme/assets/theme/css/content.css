@@ -3,7 +3,9 @@
 /* ---------- 表格（冷灰 docs：无外框、表头底线 + 行 hairline） ---------- */
 .table {
   --bs-table-hover-bg: transparent;
-  font-size: 0.875rem;
+  /* 表体与正文同档：表格字号一旦小于正文，正文里嵌表格就会出现两次字级跳变，
+     扫读时表格被读成「另一类内容」。表头仍用小号大写（见 thead th）。 */
+  font-size: 1rem;
   border-collapse: collapse;
   display: block; /* 宽表横向滚动，避免移动端溢出 */
   width: 100%;
