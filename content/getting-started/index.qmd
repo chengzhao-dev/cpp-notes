@@ -1,27 +1,29 @@
 ---
 title: "搭建开发环境"
-description: "先配置 Ubuntu C++ 开发环境，再编译、运行和管理第一个程序。"
+description: "先配置 WSL2 上的 Ubuntu 与 C++ 工具链，再编译、运行和管理第一个程序。"
 number-sections: false
 body-classes: index-page
 ---
 
-本部分只完成一条最短路径：准备 WSL2 上的 Ubuntu，编译 `main.cpp`，再用 CMake 固化构建流程。每一步都以前一步的可验证结果为基础，读者可以在每个阶段确认自己是否具备继续阅读的条件。
+::: {.hero-eyebrow}
+Getting Started
+:::
 
-## 准备环境
+## 两步走完入门路线
 
-先完成 Windows、WSL2 上的 Ubuntu、VS Code 和 C++ 工具链的配置。完成后，Ubuntu 中应能找到 `g++` 和 CMake。
+先准备环境，再编译运行第一个程序，后一步用的是前一步装好的工具。两章各自给出可自己复述的检查结果，据此判断能否继续阅读。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [配置 WSL2 开发环境](setup-wsl2.qmd)
-安装 Ubuntu 和 C++ 工具链，准备后续示例所需的编译环境。
+### [搭建 WSL2 开发环境](setup-wsl2.qmd)
+在 Windows 上装好 WSL2 与 Ubuntu，配齐编译器、构建工具和编辑器，让后续每个示例都有地方运行。
 
 [开始学习 →](setup-wsl2.qmd){.cta}
 :::
 
 ::: {.landing-card}
-### [编译并运行第一个程序](first-program.qmd)
-从 `main.cpp` 开始，先用 g++ 编译，再用 CMake 重复同一构建过程。
+### [写出第一个 C++ 程序](first-program.qmd)
+看清一个工程目录包含哪些文件，先用 `g++` 手动编译，再交给 CMake 与 Ninja 自动构建。
 
 [开始学习 →](first-program.qmd){.cta}
 :::
@@ -29,11 +31,11 @@ body-classes: index-page
 
 ## 下一步
 
-完成前两章后，再进入 CMake 多文件工程和 C++ 语言基础。对应章节完成后，这张卡片会成为下一条学习入口。
+两章完成后，环境已经能编译并运行示例。本部分的下一条路线尚未开始写作，完成后再从这里接入；语言基础等其他路线见站点首页。
 
 ::: {.feature-grid}
 ::: {.landing-card .coming-soon}
 ### CMake 与多文件工程
-学习用目标、库和测试组织更大的 C++ 工程。
+把本章的规则扩展成多目标、多文件的工程。
 :::
 :::

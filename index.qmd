@@ -1,23 +1,27 @@
 ---
 title: "C++ 笔记"
-description: "这是一份面向初学者的中文 C++ 个人笔记，内容从 WSL2 与 Ubuntu、一个可运行的 C++ 程序开始，逐步连接语言基础、标准库和工程实践。"
+description: "面向初学者的中文 C++ 笔记：从可运行的程序出发，逐步连接语言基础、标准库和工程实践。"
 number-sections: false
 body-classes: homepage
 ---
 
-## 从可运行的程序开始
+::: {.hero-eyebrow}
+C++ Notes
+:::
 
-先完成开发环境和第一个程序，再进入语言基础。完成这条路线后，可以边阅读边编译和运行后续示例。
+## 从这里开始
+
+先完成开发环境和第一个程序，再进入语言基础。走完这条路线后，你可以边阅读边编译和运行后续所有示例。
 
 ::: {.feature-grid}
 ::: {.landing-card}
 ### [搭建开发环境](content/getting-started/index.qmd)
-配置 WSL2 上的 Ubuntu、VS Code 和 CMake，准备可重复的 C++ 开发环境。
+配置 WSL2 上的 Ubuntu 与 C++ 工具链，编译并运行第一个程序，建立可重复的动手环境。
 
 [开始学习 →](content/getting-started/index.qmd){.cta}
 :::
 
-::: {.landing-card}
+::: {.landing-card .coming-soon}
 ### C++ 语言基础
 从变量、类型、函数和控制流开始，建立理解后续章节所需的语言模型。
 :::

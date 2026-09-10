@@ -2,13 +2,30 @@
 title: "搭建 WSL2 开发环境"
 ---
 
-本章准备一套可运行 C++ 示例的环境。Windows 提供图形界面，WSL2 中的 Ubuntu 提供编译和运行工具。推进顺序是先启用 WSL2 并安装 Ubuntu，再参考镜像站帮助文档换源并装齐 C++ 依赖，最后把 Windows Terminal 和 VS Code 接到 Ubuntu 上。完成之后，Ubuntu 终端中就有 `g++`、CMake、Ninja、gdb 和 clangd 可用。
+本章建立一套能编译并运行 C++ 示例的环境。跟做完成后，Ubuntu 终端里 `g++`、CMake、Ninja、gdb 和 `clangd` 都可用，Windows Terminal 和 VS Code 能直接进入项目目录。后续章节的每个示例都依赖这里的结果，环境未就绪时可以继续阅读，但无法验证任何输出。
 
-## WSL 与 Ubuntu 环境搭建
+## 环境由哪些部分组成
 
-### 启用 WSL2 并安装 Ubuntu
+一台 Windows 机器上的 C++ 开发环境分五层，每层只负责一段流程。逐层确认比逐条运行版本命令更容易定位问题出在哪里。
 
-先决条件是 Windows 10 版本 2004（内部版本 19041）及以上或 Windows 11，并在 BIOS 或 UEFI 中开启 CPU 虚拟化。条件满足后，在管理员 PowerShell 中用一条命令安装 WSL2 与默认发行版：
+| 组成 | 负责什么 | 本章完成判据 |
+|---|---|---|
+| Windows 宿主 | 提供图形界面和 WSL2 运行时 | 输入 `wsl` 能进入 Ubuntu |
+| Ubuntu | 编译、构建和运行程序 | 软件源换好并完成更新 |
+| `g++`、CMake、Ninja、gdb | 编译链接、描述规则、执行构建、调试 | 一条 `apt` 命令安装成功 |
+| `clangd` | 还原真实编译参数，提供代码提示与诊断 | 安装完成 |
+| Windows Terminal、VS Code | 终端显示与编辑调试 | 两者都能打开 Ubuntu 中的项目 |
+
+本章按顺序完成四件事，前一步的结果就是后一步的执行环境，跳过任何一步都会让后面的命令找不到地方运行：
+
+1. 启用 WSL2 并装好 Ubuntu，得到能输入命令的 Linux 终端。
+2. 换用国内镜像源并更新，让软件包能正常下载。
+3. 安装 `g++`、CMake、Ninja、gdb 与 `clangd`，得到编译和提示能力。
+4. 接入 Windows Terminal 与 VS Code，得到日常使用的编辑与调试入口。
+
+## 启用 WSL2 并安装 Ubuntu
+
+先决条件是 Windows 10 版本 2004（内部版本 19041）及以上或 Windows 11，并在 BIOS 或 UEFI 中开启 CPU 虚拟化。条件满足后，在管理员 PowerShell 中用一条命令同时装好 WSL2 和默认发行版。
 
 ```powershell
 # 安装 WSL2 和默认的 Ubuntu
@@ -19,15 +36,11 @@ wsl --install
 
 离开开发环境时运行 `wsl --shutdown` 关闭全部发行版，之后再输入 `wsl` 会重新启动它们。
 
-::: {.callout-warning}
-安装命令提示未启用虚拟机平台时，以管理员身份重新运行 `wsl --install`，并在“启用或关闭 Windows 功能”中确认“虚拟机平台”和“适用于 Linux 的 Windows 子系统”均已勾选。
-:::
-
-### 替换国内镜像源与系统更新
+## 更换软件源并更新系统
 
 Ubuntu 官方软件源在国内访问较慢，首次使用时先换成镜像站。不同 Ubuntu 版本使用的软件源文件格式和路径不同，具体改法以 [清华大学开源软件镜像站的 Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 为准，按本机 Ubuntu 版本选择对应的配置。
 
-换源完成后读取新的软件包索引，并升级已安装的软件包：
+换源完成后读取新的软件包索引，并升级已安装的软件包。从这里开始在 Ubuntu 终端执行。
 
 ```bash
 # 读取新镜像源提供的软件包索引
@@ -40,14 +53,12 @@ $ sudo apt upgrade -y
 两条命令都正常结束，说明镜像源可用。换源只是缩短下载时间，不会改变 Ubuntu 的版本和已安装的软件包。
 
 ::: {.callout-note}
-腾讯云、华为云和阿里云都提供 Ubuntu 镜像，地址与同步策略见 [Ubuntu 镜像站列表](https://launchpad.net/ubuntu/+archivemirrors)，任选一个可访问的镜像站，按 [Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 给出的格式修改配置。
+腾讯云、华为云和阿里云都提供 Ubuntu 镜像，地址与同步策略见 [Ubuntu 镜像站列表](https://launchpad.net/ubuntu/+archivemirrors)。任选一个可访问的镜像站，按 [Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 给出的格式修改配置。
 :::
 
-## C++ 核心依赖安装与验证
+## 安装 C++ 工具链
 
-### 安装编译器、构建工具与调试器
-
-从这里开始在 Ubuntu 终端执行。一条命令装齐编译、构建和调试所需的软件包：
+本节的工具链指编译器、构建工具、调试器与语言服务四组软件包。前三组用一条命令装齐，语言服务单独安装。
 
 ```bash
 # 安装编译器、构建工具和调试器
@@ -57,23 +68,21 @@ $ sudo apt install -y build-essential gdb cmake ninja-build
 这几组软件包各自负责一段流程。`g++` 编译并链接 C++ 程序，CMake 描述构建规则，Ninja 按 CMake 生成的规则执行构建，gdb 调试运行中的程序。`build-essential` 是 Debian 系列的元包，会一并安装 `gcc`、`make` 和标准头文件，因此不需要单独安装编译器。版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[CMake 文档](https://cmake.org/documentation/) 与 [Ninja 手册](https://ninja-build.org/manual.html)。
 
 ::: {.callout-tip}
-安装完成后不必逐条运行版本命令预检环境。后续章节直接执行编译与构建命令，出现 `command not found` 时回到本节重新安装对应的软件包。
+安装完成后不必逐条运行版本命令预检环境。后续章节直接执行编译与构建命令，出现 `command not found` 时回到[常见问题](#常见问题)重装对应的软件包。
 :::
 
-### 配置智能提示语言服务
+### 安装 clangd 语言服务
 
-代码提示和错误诊断由语言服务提供，C++ 侧使用 clangd。安装命令如下：
+代码提示和错误诊断由语言服务提供，C++ 侧使用 `clangd`。
 
 ```bash
 # 安装 clangd 语言服务
 $ sudo apt install -y clangd
 ```
 
-clangd 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 CMake 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#基于构建工具的自动化管理)，编辑器侧的配置见 [clangd 官方文档](https://clangd.llvm.org/installation)。
+`clangd` 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 CMake 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#用-cmake-管理构建)，编辑器侧的配置见 [clangd 官方文档](https://clangd.llvm.org/installation)。
 
-## Windows Terminal 开发环境集成
-
-### 配置 Windows Terminal 为默认 WSL 终端
+## 接入 Windows Terminal 与 VS Code
 
 Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Microsoft Store 或 [GitHub Releases](https://github.com/microsoft/terminal/releases) 安装，步骤见 [安装 Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)。安装后在“设置 → 启动”中把默认配置文件选为 Ubuntu，启动目录设为当前工作路径，新开标签就进入项目所在目录。
 
@@ -81,12 +90,33 @@ Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Micros
 Windows Terminal 只负责显示和键盘输入，Ubuntu 与工具链由 WSL2 提供。更换终端不会改变已安装的开发环境，配色和字体等 Linux 侧偏好可按需调整。
 :::
 
-### 连接 VS Code Remote-WSL 开发环境
-
 VS Code 通过 Remote - WSL 扩展直接编辑和调试 WSL2 中的文件，Windows 侧只需安装 VS Code 本体。在 Ubuntu 的项目目录中运行 `code .`，VS Code 会打开当前目录并在首次连接时安装 WSL 侧的扩展服务端，连接方式见 [VS Code 的 WSL 文档](https://code.visualstudio.com/docs/remote/wsl)。
 
-C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[配置智能提示语言服务](#配置智能提示语言服务)安装的 clangd，不必同时开启两套语言服务。
+C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 clangd 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
+
+## 常见问题
+
+### 安装命令提示未启用虚拟机平台
+
+以管理员身份重新运行 `wsl --install`，并在“启用或关闭 Windows 功能”中确认“虚拟机平台”和“适用于 Linux 的 Windows 子系统”均已勾选。勾选后重启，再次运行安装命令，看到发行版下载进度即说明条件已满足。
+
+### 命令提示 command not found
+
+任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。重装一次即可。
+
+```bash
+# 安装编译器、构建工具和调试器
+$ sudo apt install -y build-essential gdb cmake ninja-build
+```
+
+重新执行刚才失败的命令。命令开始工作即说明恢复，不需要重启 Ubuntu。
 
 ## 本章回顾
 
-环境三件事已经就绪。WSL2 中的 Ubuntu 可用，软件源按镜像站帮助文档换好并完成更新，`g++`、CMake、Ninja、gdb 和 clangd 安装完成，Windows Terminal 与 VS Code 也连上了 Ubuntu。下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 CMake 与 Ninja 自动构建。
+环境五层就绪后，你手上有一套能编译并运行示例的 Linux 环境，每一项都能自己确认：
+
+- 输入 `wsl` 能进入 Ubuntu，`sudo apt update` 能正常读到镜像源。
+- 编译与构建命令都能执行，报错 `command not found` 时按[常见问题](#常见问题)重装对应软件包。
+- Windows Terminal 与 VS Code 都能打开 Ubuntu 中的项目目录。
+
+下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 CMake 与 Ninja 自动构建。

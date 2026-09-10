@@ -2,13 +2,11 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章准备好了 WSL2 上的 Ubuntu。本章从仓库里的 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先看清工程包含哪些文件，再用 `g++` 把它编译运行，最后把同一套流程写进 `CMakeLists.txt`，交给 CMake 与 Ninja 自动执行。
+上一章在 WSL2 的 Ubuntu 里装好了编译器与构建工具。本章从仓库里的 [main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先看清一个工程目录包含哪些文件，再用 `g++` 手动编译运行，最后把同一套规则交给 CMake 与 Ninja 自动执行。两条路径的产物都是 `build/bin/app`，输出都是 `Hello, World!`，看到这一行输出即说明本章完成。
 
-## 项目结构与源码准备
+## 工程目录里有哪些文件
 
-### 梳理工程目录与文件依赖
-
-示例目录包含本章用到的源码、构建文件和构建后产生的结果：
+示例目录 `code/getting-started/first-program/` 里的文件分三类：需要维护的源码与构建规则、把它们串起来的一键脚本、构建产生的结果。先看清这三类，后面两条构建路径操作的是同一批文件。
 
 ```text
 first-program/
@@ -21,7 +19,7 @@ first-program/
     └── compile_commands.json # clangd 读取的编译参数记录
 ```
 
-前三项是需要维护的源文件，`build/` 全部由工具生成。源码提供程序内容，构建规则记录标准与警告选项，脚本把规则和源码串成一条命令。构建完成后才会出现 `build/bin/app`，CMake 生成的缓存和中间文件不在本章讨论范围内。
+前三项由你维护，`build/` 全部由工具生成。`main.cpp` 提供程序内容，`CMakeLists.txt` 记录标准与警告选项，`build-and-run.sh` 把规则和源码串成一条命令。构建完成后才会出现 `build/bin/app`，CMake 生成的缓存和中间文件不在本章讨论范围内。
 
 下图把这三类文件与两条构建路径连成一条线：源码相同，产物也相同。
 
@@ -34,22 +32,17 @@ flowchart TD
   D --> E[运行并输出 Hello, World!]
 ```
 
-
-### 确认核心源码与预期输出
-
-`main.cpp` 只包含一个 `main` 函数，向标准输出一行文本。源码如下：
+`main.cpp` 只有一个 `main` 函数，向标准输出写一行文本：
 
 ```cpp
 {{< include /code/getting-started/first-program/main.cpp >}}
 ```
 
-程序正常运行后的输出是 `Hello, World!`，返回码为 0。后面两条构建路径都以这一行为结果作为判断依据，构建方式不同，预期输出一模一样。
+程序正常运行后的输出是 `Hello, World!`，返回码为 0。后面两条构建路径都以这一行输出作为判断依据，构建方式不同，预期结果一模一样。
 
-## 基于编译器的直接构建流程
+## 用 g++ 直接编译单个源文件
 
-### 设定编译标准与严格警告选项
-
-同一段源码在不同语言标准下含义不同，因此 `g++` 的第一件事情是声明标准。本章统一使用下列选项：
+同一段源码在不同语言标准下含义不同，因此 `g++` 做的第一件事是声明标准。本章统一使用下列选项：
 
 | 选项 | 作用 | 不加会怎样 |
 |---|---|---|
@@ -59,11 +52,7 @@ flowchart TD
 | `-Werror` | 把警告升级为错误 | 带警告的构建仍然成功，问题被推迟 |
 | `-o <路径>` | 指定可执行文件输出位置 | 默认生成当前目录的 `a.out` |
 
-四个选项都会写进 `CMakeLists.txt`，直接编译和自动构建使用同一套判断标准。完整选项列表见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)。
-
-### 执行单文件编译与运行验证
-
-在 Ubuntu 终端的项目目录中执行：
+在 Ubuntu 终端的项目目录中依次执行：
 
 ```bash
 # 创建可执行文件的输出目录
@@ -80,23 +69,21 @@ Hello, World!
 
 `g++` 没有任何输出即代表编译和链接都成功；出现警告或错误时会打印文件名、行号和原因，此时按提示修改源码，不要先继续往下走。看到 `Hello, World!` 说明单个源文件已经跑通「编译 → 链接 → 运行」的完整闭环。
 
+上面四个选项都会原样写进下一节的 `CMakeLists.txt`，直接编译和自动构建使用同一套判断标准。完整选项列表见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)。
+
 ::: {.callout-tip}
 保留 `-Wall -Wextra -Werror` 的价值在于把未初始化变量、类型不匹配等问题挡在构建阶段。编译通过只说明当前代码满足编译器要求，不代表程序逻辑正确。
 :::
 
-## 基于构建工具的自动化管理
+## 用 CMake 管理构建
 
-### 编写项目构建规则文件
-
-一个源文件用 `g++` 足够；文件变多之后，需要把标准、警告和输出位置保存成规则。本章的 `CMakeLists.txt` 只做这件事：
+一个源文件用 `g++` 足够；文件变多之后，需要把标准、警告和输出位置保存成规则，交给工具执行。本节的 `CMakeLists.txt` 只做这件事：
 
 ```cmake
 {{< include /code/getting-started/first-program/CMakeLists.txt >}}
 ```
 
 五段内容依次声明版本要求与项目名称、设定 C++20 标准、把可执行文件统一输出到 `build/bin`、导出编译数据库，最后从 `main.cpp` 构建 `app` 目标并附加警告选项。术语和完整语义见 [CMake 官方文档](https://cmake.org/documentation/)。
-
-### 执行自动化配置与一键运行
 
 CMake 负责生成构建文件，真正执行编译的是底层构建工具。本章使用 Ninja，两条关键命令依次执行：
 
@@ -122,6 +109,8 @@ Hello, World!
 $ bash build-and-run.sh
 ```
 
+脚本本身也值得读一遍，它包含的就是上面三条关键命令：
+
 ```bash
 {{< include /code/getting-started/first-program/build-and-run.sh >}}
 ```
@@ -134,7 +123,7 @@ $ bash build-and-run.sh
 
 ### 提示找不到 g++ 或 cmake
 
-先回到[搭建 WSL2 开发环境](setup-wsl2.qmd)，按[C++ 核心依赖安装与验证](setup-wsl2.qmd#c-核心依赖安装与验证)一节重装软件包：
+先回到[搭建 WSL2 开发环境](setup-wsl2.qmd)，按[安装 C++ 工具链](setup-wsl2.qmd#安装-c-工具链)一节重装软件包：
 
 ```bash
 # 安装编译器、构建工具和调试器
@@ -160,4 +149,12 @@ $ cmake --build build
 
 ## 本章回顾
 
-本章走完了两条构建路径。先用 `g++ -std=c++20 -Wall -Wextra -Werror` 直接编译单个源文件，再把同样的规则和选项写进 `CMakeLists.txt`，由 `cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug` 配置、`cmake --build build` 构建，最终都得到 `build/bin/app` 并输出 `Hello, World!`。下一章把这套规则扩展成多目标、多文件的工程。
+本章走完了两条构建路径，两条路径的产物和输出完全相同。
+
+- 单独验证一个源文件时，用 `g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app`；`g++` 没有输出、运行结果正确即为通过。
+- 日常构建交给 CMake，配置一次 `cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug`，之后只需 `cmake --build build`；重复执行整条流程用 `bash build-and-run.sh`。
+- 判断构建结果只看一行 `Hello, World!` 和返回码 0，构建方式不同不影响验收标准。
+
+`build/` 出现异常时整目录删除再重新配置，源码和规则不受影响。
+
+下一章把这套规则扩展成多目标、多文件的工程。

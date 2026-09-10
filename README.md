@@ -3,9 +3,9 @@
 [![quarto build & deploy](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml/badge.svg)](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
 
-**C++ 笔记**是一份面向初学者的个人学习笔记，记录从可运行示例开始学习 C++ 语言、标准库和工程实践的过程。
+**C++ 笔记**是一份面向初学者的中文 C++ 学习笔记，记录从可运行示例出发学习语言、标准库和工程实践的过程。所有示例在 Linux 上编译运行，Windows 用户通过 WSL2 获得同样的环境。
 
-在线阅读：[chengzhao-dev.github.io/cpp-notes](https://chengzhao-dev.github.io/cpp-notes/)。从入门路线开始，边阅读边编译和运行示例。
+在线阅读：<https://chengzhao-dev.github.io/cpp-notes/>。建议边阅读边编译和运行示例，只读不写无法验证任何结论。
 
 ## 从哪里开始
 
@@ -13,15 +13,13 @@
 
 ### getting-started：环境与第一个程序
 
-1. [搭建开发环境](content/getting-started/index.qmd)：启用 WSL2 上的 Ubuntu，换用国内镜像源，安装编译器与构建工具。
-2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成直接编译，再用 CMake 与 Ninja 自动构建。
-
-开发环境的分工很简单：Windows 提供图形界面，WSL2 上的 Ubuntu 提供编译和运行环境，VS Code 用于编辑，CMake 负责构建。
+1. [搭建 WSL2 开发环境](content/getting-started/setup-wsl2.qmd)：启用 WSL2 上的 Ubuntu，换用国内镜像源，装好编译器、构建工具与编辑器。
+2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成一次直接编译，再用 CMake 与 Ninja 自动构建出同一个可执行文件。
 
 ### 后续 part
 
-语言基础、标准库、对象管理、调试和性能等 part 尚未开始写作，路线和章节状态见
-`.cursor/skills/agent-ops/references/repository-structure.md`。新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
+语言基础、标准库、对象管理、调试与性能等 part 尚未开始写作。章节状态与目录关系见
+`.cursor/skills/agent-ops/references/repository-structure.md`；新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
 
 ## 仓库结构
 
@@ -67,4 +65,4 @@ cpp-notes/
 - 对象管理，包括生命周期、RAII、智能指针和移动语义；
 - 工程实践，包括 CMake、多文件项目、调试和性能。
 
-具体章节状态和目录关系见 `.cursor/skills/agent-ops/references/repository-structure.md`。
+页面本身怎么组织由两类模式约定：教学正文的块序列与入口卡片页的三层结构。依据在知识库 `quarto-docs` 域，分别用 `run.py kb-search "块序列" --domain quarto-docs` 与 `run.py kb-search "卡片" --domain quarto-docs` 查询。
