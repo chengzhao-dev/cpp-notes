@@ -20,14 +20,20 @@ pre::-webkit-scrollbar { height: 8px; width: 8px; }
 pre::-webkit-scrollbar-track { background: transparent; }
 pre::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
 
-/* 简洁圆角 pre：弱底 + 细边，无顶栏/交通灯 */
+/*
+ * 代码块外观只有一个控制点：语言代码块被 div.sourceCode 包裹，外框、圆角归该容器；
+ * pre 只负责底色、内边距与滚动。没有 div 包裹的裸 pre（预期输出、目录树）自己承担
+ * 边框与圆角，两类块的观感一致，也不会出现框中框。
+ */
 pre.sourceCode,
 pre:not(.sourceCode) {
   background-color: var(--code-bg) !important;
-  border: 1px solid var(--code-border);
-  border-radius: var(--code-radius);
   padding: var(--code-padding);
   overflow: auto;
+}
+pre:not(.sourceCode) {
+  border: 1px solid var(--code-border);
+  border-radius: var(--code-radius);
 }
 
 pre.sourceCode code,
@@ -37,7 +43,10 @@ pre:not(.sourceCode) code {
   font-size: var(--code-font-size);
   font-weight: inherit;
   line-height: var(--code-line-height);
-  white-space: pre;
+  /* 与 Quarto 注入的 pre > code.sourceCode 取同一套换行语义，否则
+     站点声明的 code-overflow: wrap 被同特异的本规则静默取消。 */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 pre.sourceCode code > span { line-height: 1.6; }
 
@@ -71,11 +80,6 @@ div.sourceCode {
   font-size: var(--code-font-size);
   line-height: var(--code-line-height);
   text-align: left;
-}
-div.sourceCode pre.sourceCode {
-  border: none;
-  border-radius: 0;
-  padding: var(--code-padding);
 }
 div.sourceCode code {
   color: inherit;
