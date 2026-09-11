@@ -1,7 +1,7 @@
 # knowledge/ 知识库
 
 本目录是领域依据的唯一出处：回答「为什么这样配置、为什么这样设计、为什么会失败」。目录名与对应 Skill 一致。
-「skill 与 knowledge 怎么分工」的权威定义在 `.cursor/skills/catalog.md`「skill 与 knowledge 的分工」，本文件只引用不复制。
+「skill 与 knowledge 怎么分工」的权威定义在 `.agents/skills/catalog.md`「skill 与 knowledge 的分工」，本文件只引用不复制。
 
 ## 目录结构
 
@@ -21,7 +21,7 @@ frontmatter 字段：
 
 | 字段 | 必填 | 作用 |
 |---|---|---|
-| `kb_id` | 是 | 全局唯一，格式 `<domain>-<subdomain>-<主题>-v<N>`；改名等于新建知识 |
+| `kb_id` | 是 | 全局唯一；现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-typography-density-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
 | `domain` | 是 | 检索预过滤维度，取值与 Skill 目录名一致 |
 | `subdomain` | 建议 | 同一 Skill 内的主题筛选 |
@@ -52,14 +52,14 @@ frontmatter 字段：
 ## 索引与验证
 
 ```powershell
-python .cursor/skills/agent-ops/scripts/run.py kb-index            # 增量（按 content_hash 跳过未变文件）
-python .cursor/skills/agent-ops/scripts/run.py kb-index --rebuild  # 改分词或结构后全量重建
-python .cursor/skills/agent-ops/scripts/run.py kb-check            # 格式违规、重复、孤立、断链、P95 延迟
-python .cursor/skills/agent-ops/scripts/run.py kb-eval             # Top-5 召回率、延迟与注入 Token 预算
-python .cursor/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain quarto-docs --explain
+python .agents/skills/agent-ops/scripts/run.py kb-index            # 增量（按 content_hash 跳过未变文件）
+python .agents/skills/agent-ops/scripts/run.py kb-index --rebuild  # 改分词或结构后全量重建
+python .agents/skills/agent-ops/scripts/run.py kb-check            # 格式违规、重复、孤立、断链、P95 延迟
+python .agents/skills/agent-ops/scripts/run.py kb-eval             # Top-5 召回率、延迟与注入 Token 预算
+python .agents/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain quarto-docs --explain
 ```
 
-产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.cursor/skills/python-tools/scripts/`：
+产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/python-tools/scripts/`：
 `kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
 `retriever.py` 五阶段检索、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `run.py check`）。
@@ -67,6 +67,6 @@ python .cursor/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain qua
 ## 新增知识的最小闭环
 
 1. 建文件 → `kb-index` → `kb-check`（重复必须为 0）。
-2. 在 `.cursor/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
+2. 在 `.agents/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做加一行 `kb-search` 入口。
-4. 更新 `.cursor/skills/catalog.md` 路由，最后跑 `run.py check`。
+4. 更新 `.agents/skills/catalog.md` 路由，最后跑 `run.py check`。

@@ -2,17 +2,17 @@
 title: "搭建 WSL2 开发环境"
 ---
 
-本章建立一套能编译并运行 C++ 示例的环境。跟做完成后，Ubuntu 终端里 `g++`、CMake、Ninja、gdb 和 `clangd` 都可用，Windows Terminal 和 VS Code 能直接进入项目目录。后续章节的每个示例都依赖这里的结果，环境未就绪时可以继续阅读，但无法验证任何输出。
+本章建立一套能编译并运行 C++ 示例的环境。完成后，Ubuntu 终端里 `g++`、`CMake`、`Ninja`、`gdb` 和 `clangd` 都可用，Windows Terminal 和 VS Code 能打开同一个项目目录。后续章节以这三个结果为入口：能进入 Ubuntu、能安装工具链、能从 Windows 编辑项目。
 
 ## 环境由哪些部分组成
 
-一台 Windows 机器上的 C++ 开发环境分五层，每层只负责一段流程。逐层确认比逐条运行版本命令更容易定位问题出在哪里。
+一台 Windows 机器上的 C++ 开发环境分五层，每层只负责一段流程。`clangd` 属于语言服务而非构建必需件，与工具链并进第 3 步一起安装。
 
 | 组成 | 负责什么 | 本章完成判据 |
 |---|---|---|
 | Windows 宿主 | 提供图形界面和 WSL2 运行时 | 输入 `wsl` 能进入 Ubuntu |
 | Ubuntu | 编译、构建和运行程序 | 软件源换好并完成更新 |
-| `g++`、CMake、Ninja、gdb | 编译链接、描述规则、执行构建、调试 | 一条 `apt` 命令安装成功 |
+| `g++`、`CMake`、`Ninja`、`gdb` | 编译链接、描述规则、执行构建、调试 | 一条 `apt` 命令安装成功 |
 | `clangd` | 还原真实编译参数，提供代码提示与诊断 | 安装完成 |
 | Windows Terminal、VS Code | 终端显示与编辑调试 | 两者都能打开 Ubuntu 中的项目 |
 
@@ -20,34 +20,30 @@ title: "搭建 WSL2 开发环境"
 
 1. 启用 WSL2 并装好 Ubuntu，得到能输入命令的 Linux 终端。
 2. 换用国内镜像源并更新，让软件包能正常下载。
-3. 安装 `g++`、CMake、Ninja、gdb 与 `clangd`，得到编译和提示能力。
+3. 安装 `g++`、`CMake`、`Ninja`、`gdb` 与 `clangd`，得到编译和提示能力。
 4. 接入 Windows Terminal 与 VS Code，得到日常使用的编辑与调试入口。
 
 ## 启用 WSL2 并安装 Ubuntu
 
-先决条件是 Windows 10 版本 2004（内部版本 19041）及以上或 Windows 11，并在 BIOS 或 UEFI 中开启 CPU 虚拟化。条件满足后，在管理员 PowerShell 中用一条命令同时装好 WSL2 和默认发行版。
+先确认 Windows 10 版本 2004（内部版本 19041）及以上或 Windows 11，并在 BIOS 或 UEFI 中开启 CPU 虚拟化。满足条件后，以管理员身份打开 PowerShell，执行下面的安装命令。
 
 ```powershell
-# 安装 WSL2 和默认的 Ubuntu
 wsl --install
 ```
 
-安装完成后重启电脑。首次打开 Ubuntu 时按提示创建 Linux 用户名和密码，输入密码时不显示字符属于正常现象。需要指定版本时使用 `wsl --install -d Ubuntu-24.04`，支持的发行版名称和参数见 [安装 WSL 发行版](https://learn.microsoft.com/en-us/windows/wsl/install)。
+安装完成后重启电脑。首次打开 Ubuntu 时创建 Linux 用户名和密码；输入密码时不显示字符属于正常现象。看到 Ubuntu 提示符后，本节完成。
 
-离开开发环境时运行 `wsl --shutdown` 关闭全部发行版，之后再输入 `wsl` 会重新启动它们。
+需要指定版本时使用 `wsl --install -d Ubuntu-26.04`，支持的发行版名称和参数见 [安装 WSL 发行版](https://learn.microsoft.com/en-us/windows/wsl/install)。离开开发环境时运行 `wsl --shutdown`；再次输入 `wsl` 会重新启动发行版。
 
 ## 更换软件源并更新系统
 
 Ubuntu 官方软件源在国内访问较慢，首次使用时先换成镜像站。不同 Ubuntu 版本使用的软件源文件格式和路径不同，具体改法以 [清华大学开源软件镜像站的 Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 为准，按本机 Ubuntu 版本选择对应的配置。
 
-换源完成后读取新的软件包索引，并升级已安装的软件包。从这里开始在 Ubuntu 终端执行。
+换源完成后先读取新的软件包索引，再升级已安装的软件包。从这里开始在 Ubuntu 终端执行。
 
 ```bash
-# 读取新镜像源提供的软件包索引
-$ sudo apt update
-
-# 升级已安装的软件包
-$ sudo apt upgrade -y
+sudo apt update
+sudo apt upgrade -y
 ```
 
 两条命令都正常结束，说明镜像源可用。换源只是缩短下载时间，不会改变 Ubuntu 的版本和已安装的软件包。
@@ -58,55 +54,59 @@ $ sudo apt upgrade -y
 
 ## 安装 C++ 工具链
 
-本节的工具链指编译器、构建工具、调试器与语言服务四组软件包。前三组用一条命令装齐，语言服务单独安装。
+目标是让编译、构建、调试和代码诊断都能执行。编译器、构建工具和调试器先用一条命令安装，语言服务再单独安装。
 
 ```bash
-# 安装编译器、构建工具和调试器
-$ sudo apt install -y build-essential gdb cmake ninja-build
+sudo apt install -y build-essential gdb cmake ninja-build
 ```
 
-这几组软件包各自负责一段流程。`g++` 编译并链接 C++ 程序，CMake 描述构建规则，Ninja 按 CMake 生成的规则执行构建，gdb 调试运行中的程序。`build-essential` 是 Debian 系列的元包，会一并安装 `gcc`、`make` 和标准头文件，因此不需要单独安装编译器。版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[CMake 文档](https://cmake.org/documentation/) 与 [Ninja 手册](https://ninja-build.org/manual.html)。
+`g++` 编译并链接 C++ 程序，`CMake` 描述构建规则，`Ninja` 执行 `CMake` 生成的规则，`gdb` 调试运行中的程序。`build-essential` 会一并安装 `gcc`、`make` 和标准头文件，因此不需要再单独安装编译器。
 
-::: {.callout-tip}
-安装完成后不必逐条运行版本命令预检环境。后续章节直接执行编译与构建命令，出现 `command not found` 时回到[常见问题](#常见问题)重装对应的软件包。
-:::
+版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[`CMake` 文档](https://cmake.org/documentation/) 与 [`Ninja` 手册](https://ninja-build.org/manual.html)。安装后直接进入下一节；若后续命令报告 `command not found`，再按常见问题处理。
+
+装完不必逐条跑版本命令预检；报 `command not found` 时回到[常见问题](#常见问题)重装。
 
 ### 安装 clangd 语言服务
 
-代码提示和错误诊断由语言服务提供，C++ 侧使用 `clangd`。
+代码提示和错误诊断由语言服务提供，C++ 侧使用 `clangd`，单独安装一条命令完成。
 
 ```bash
-# 安装 clangd 语言服务
-$ sudo apt install -y clangd
+sudo apt install -y clangd
 ```
 
-`clangd` 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 CMake 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#用-cmake-管理构建)，编辑器侧的配置见 [clangd 官方文档](https://clangd.llvm.org/installation)。
+`clangd` 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 `CMake` 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#用-cmake-管理构建)，编辑器侧的配置见 [clangd 官方文档](https://clangd.llvm.org/installation)。安装命令正常结束后，本节完成。
 
-## 接入 Windows Terminal 与 VS Code
+## 接入终端与编辑器
 
-Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Microsoft Store 或 [GitHub Releases](https://github.com/microsoft/terminal/releases) 安装，步骤见 [安装 Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)。安装后在“设置 → 启动”中把默认配置文件选为 Ubuntu，启动目录设为当前工作路径，新开标签就进入项目所在目录。
+目标是从 Windows 侧进入刚才的 Ubuntu 项目目录。终端只负责输入输出，编辑器负责打开和调试文件；两者都不改变 Ubuntu 中已经安装的工具链。
 
-::: {.callout-note}
-Windows Terminal 只负责显示和键盘输入，Ubuntu 与工具链由 WSL2 提供。更换终端不会改变已安装的开发环境，配色和字体等 Linux 侧偏好可按需调整。
-:::
+### Windows Terminal
+
+Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Microsoft Store 或 [GitHub Releases](https://github.com/microsoft/terminal/releases) 安装，步骤见 [安装 Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)。
+
+安装后在“设置 → 启动”中把默认配置文件选为 Ubuntu，启动目录设为当前工作路径，新开标签就进入项目所在目录。
+
+> Windows Terminal 只负责显示和键盘输入，Ubuntu 与工具链由 WSL2 提供。更换终端不会改变已安装的开发环境，配色和字体等 Linux 侧偏好可按需调整。
+
+### VS Code
 
 VS Code 通过 Remote - WSL 扩展直接编辑和调试 WSL2 中的文件，Windows 侧只需安装 VS Code 本体。在 Ubuntu 的项目目录中运行 `code .`，VS Code 会打开当前目录并在首次连接时安装 WSL 侧的扩展服务端，连接方式见 [VS Code 的 WSL 文档](https://code.visualstudio.com/docs/remote/wsl)。
 
-C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 clangd 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
+C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[`clangd`](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 `clangd` 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
 
 ## 常见问题
 
-### 安装命令提示未启用虚拟机平台
+### 提示未启用虚拟机平台
 
 以管理员身份重新运行 `wsl --install`，并在“启用或关闭 Windows 功能”中确认“虚拟机平台”和“适用于 Linux 的 Windows 子系统”均已勾选。勾选后重启，再次运行安装命令，看到发行版下载进度即说明条件已满足。
 
-### 命令提示 command not found
+### command not found
 
-任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。重装一次即可。
+任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。按[安装 C++ 工具链](#安装-c-工具链)的两条命令重装；只缺 `clangd` 时执行第二条。
 
 ```bash
-# 安装编译器、构建工具和调试器
-$ sudo apt install -y build-essential gdb cmake ninja-build
+sudo apt install -y build-essential gdb cmake ninja-build
+sudo apt install -y clangd
 ```
 
 重新执行刚才失败的命令。命令开始工作即说明恢复，不需要重启 Ubuntu。
@@ -116,7 +116,7 @@ $ sudo apt install -y build-essential gdb cmake ninja-build
 环境五层就绪后，你手上有一套能编译并运行示例的 Linux 环境，每一项都能自己确认：
 
 - 输入 `wsl` 能进入 Ubuntu，`sudo apt update` 能正常读到镜像源。
-- 编译与构建命令都能执行，报错 `command not found` 时按[常见问题](#常见问题)重装对应软件包。
+- 编译与构建命令都能执行，`clangd --version` 能打印版本号；报 `command not found` 时按[常见问题](#常见问题)重装。
 - Windows Terminal 与 VS Code 都能打开 Ubuntu 中的项目目录。
 
-下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 CMake 与 Ninja 自动构建。
+下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 `CMake` 与 `Ninja` 自动构建。

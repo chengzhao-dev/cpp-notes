@@ -19,7 +19,7 @@
 ### 后续 part
 
 语言基础、标准库、对象管理、调试与性能等 part 尚未开始写作。章节状态与目录关系见
-`.cursor/skills/agent-ops/references/repository-structure.md`；新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
+`.agents/skills/agent-ops/references/repository-structure.md`；新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
 
 ## 仓库结构
 
@@ -32,7 +32,7 @@ cpp-notes/
 ├── knowledge/                        # 精简领域知识库（回答「为什么」）
 │   ├── README.md                     # 知识库规范与新增知识闭环
 │   ├── agent-ops/  cpp-content/  github-ops/  quarto-docs/
-├── .cursor/
+├── .agents/
 │   ├── manifest.json                 # 项目能力清单
 │   ├── mcp/                          # 项目级 MCP 服务（server.py）
 │   └── skills/
@@ -53,7 +53,7 @@ cpp-notes/
 
 章节、示例和任务矩阵按相同的 part 与 chapter 名称对齐：`content/<part>/<chapter>.qmd`、
 `code/<part>/<chapter>`（单文件 `.cpp` 或同名工程目录）、
-`.cursor/skills/cpp-content/references/tasks/<part>.md` 里的一行。索引产物在 `temp/knowledge-index/`，
+`.agents/skills/cpp-content/references/tasks/<part>.md` 里的一行。索引产物在 `temp/knowledge-index/`，
 重构报告在 `temp/refactor/`，两者都不入库。
 
 ## 内容范围

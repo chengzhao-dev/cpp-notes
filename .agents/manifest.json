@@ -1,0 +1,14 @@
+{
+  "name": "cpp-notes-agent",
+  "version": "0.1.0",
+  "skillsRoot": ".agents/skills",
+  "mcp": {
+    "name": "cpp-notes",
+    "transport": "stdio",
+    "command": "D:\\ProgramData\\miniforge3\\python.exe",
+    "commandNote": "MCP 固定使用项目指定的 Python 解释器；不通过 PATH 或其他运行时配置自动查找。解释器不可执行时直接报告错误并终止本次调用。",
+    "args": [".agents/mcp/server.py"]
+  },
+  "autoload": false,
+  "autoloadNote": "仅 skillsRoot 是 Codex 项目 skills 入口；MCP 不假设自动发现，必须由宿主显式登记 stdio server。"
+}

@@ -23,7 +23,7 @@ Getting Started
 
 ::: {.landing-card}
 ### [写出第一个 C++ 程序](first-program.qmd)
-看清一个工程目录包含哪些文件，先用 `g++` 手动编译，再交给 CMake 与 Ninja 自动构建。
+看清一个工程目录包含哪些文件，先用 `g++` 手动编译，再交给 `CMake` 与 `Ninja` 自动构建。
 
 [开始学习 →](first-program.qmd){.cta}
 :::

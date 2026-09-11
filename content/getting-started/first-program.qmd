@@ -2,159 +2,94 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章在 WSL2 的 Ubuntu 里装好了编译器与构建工具。本章从仓库里的 [main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先看清一个工程目录包含哪些文件，再用 `g++` 手动编译运行，最后把同一套规则交给 CMake 与 Ninja 自动执行。两条路径的产物都是 `build/bin/app`，输出都是 `Hello, World!`，看到这一行输出即说明本章完成。
+上一章已经准备好了编译器和构建工具。先打开仓库中的 [完整示例工程](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，认识它的文件；再用 `g++` 和 `CMake` 构建同一个程序。运行后看到 `Hello, World!`，本章的练习就完成了。
 
 ## 工程目录里有哪些文件
 
-示例目录 `code/getting-started/first-program/` 里的文件分三类：需要维护的源码与构建规则、把它们串起来的一键脚本、构建产生的结果。先看清这三类，后面两条构建路径操作的是同一批文件。
+先看一眼这个工程，后面的命令都在这里执行。
 
 ```text
 first-program/
-├── main.cpp                  # 程序源码，当前只有一个文件
+├── .vscode/                  # VS Code 工程配置
+├── build/                    # CMake 和 Ninja 生成物，不手动编辑
+│   ├── bin/
+│   │   └── app               # 构建生成的可执行文件
+│   └── compile_commands.json # 工具读取的编译数据库
+├── .clangd                   # clangd 语言服务配置
+├── .clang-format             # C++ 格式化规则
+├── .clang-tidy               # C++ 静态检查规则
+├── build-and-run.sh          # 配置、构建并运行程序
 ├── CMakeLists.txt            # CMake 构建规则
-├── build-and-run.sh          # 一键配置、构建并运行的脚本
-└── build/                    # 构建产物目录，可整目录删除后重建
-    ├── bin/
-    │   └── app               # 编译链接得到的可执行文件
-    └── compile_commands.json # clangd 读取的编译参数记录
+└── main.cpp                  # 程序入口源码
 ```
 
-前三项由你维护，`build/` 全部由工具生成。`main.cpp` 提供程序内容，`CMakeLists.txt` 记录标准与警告选项，`build-and-run.sh` 把规则和源码串成一条命令。构建完成后才会出现 `build/bin/app`，CMake 生成的缓存和中间文件不在本章讨论范围内。
+## 阅读程序源码
 
-下图把这三类文件与两条构建路径连成一条线：源码相同，产物也相同。
-
-```{mermaid}
-flowchart TD
-  A[main.cpp] --> B[g++ 直接编译]
-  A --> C[CMake 配置并构建]
-  B --> D[build/bin/app]
-  C --> D
-  D --> E[运行并输出 Hello, World!]
-```
-
-`main.cpp` 只有一个 `main` 函数，向标准输出写一行文本：
+这个程序只有一个源文件，代码中的注释标出了首次需要认识的部分。
 
 ```cpp
 {{< include /code/getting-started/first-program/main.cpp >}}
 ```
 
-程序正常运行后的输出是 `Hello, World!`，返回码为 0。后面两条构建路径都以这一行输出作为判断依据，构建方式不同，预期结果一模一样。
-
 ## 用 g++ 直接编译单个源文件
 
-同一段源码在不同语言标准下含义不同，因此 `g++` 做的第一件事是声明标准。本章统一使用下列选项：
-
-| 选项 | 作用 | 不加会怎样 |
-|---|---|---|
-| `-std=c++20` | 按 C++20 解析源码 | 使用编译器默认标准，写法可能不生效 |
-| `-Wall` | 打开常用警告 | 常见隐患静默通过 |
-| `-Wextra` | 补充 `-Wall` 之外的警告 | 参数未使用等问题不被提示 |
-| `-Werror` | 把警告升级为错误 | 带警告的构建仍然成功，问题被推迟 |
-| `-o <路径>` | 指定可执行文件输出位置 | 默认生成当前目录的 `a.out` |
-
-在 Ubuntu 终端的项目目录中依次执行：
+在工程目录中依次创建输出目录、编译链接并运行程序。
 
 ```bash
-# 创建可执行文件的输出目录
-$ mkdir -p build/bin
+mkdir -p build/bin
+g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
+./build/bin/app
+```
 
-# 编译并链接 main.cpp，输出到 build/bin/app
-$ g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
+第三条命令输出下面这一行，表示程序正常运行。
 
-# 运行构建结果
-$ ./build/bin/app
-# 预期输出
+```text
 Hello, World!
 ```
 
-`g++` 没有任何输出即代表编译和链接都成功；出现警告或错误时会打印文件名、行号和原因，此时按提示修改源码，不要先继续往下走。看到 `Hello, World!` 说明单个源文件已经跑通「编译 → 链接 → 运行」的完整闭环。
-
-上面四个选项都会原样写进下一节的 `CMakeLists.txt`，直接编译和自动构建使用同一套判断标准。完整选项列表见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)。
-
-::: {.callout-tip}
-保留 `-Wall -Wextra -Werror` 的价值在于把未初始化变量、类型不匹配等问题挡在构建阶段。编译通过只说明当前代码满足编译器要求，不代表程序逻辑正确。
-:::
-
 ## 用 CMake 管理构建
 
-一个源文件用 `g++` 足够；文件变多之后，需要把标准、警告和输出位置保存成规则，交给工具执行。本节的 `CMakeLists.txt` 只做这件事：
+当工程的文件变多时，把标准、警告和输出位置写进 `CMakeLists.txt`，再让构建工具执行这些规则。
 
 ```cmake
 {{< include /code/getting-started/first-program/CMakeLists.txt >}}
 ```
 
-五段内容依次声明版本要求与项目名称、设定 C++20 标准、把可执行文件统一输出到 `build/bin`、导出编译数据库，最后从 `main.cpp` 构建 `app` 目标并附加警告选项。术语和完整语义见 [CMake 官方文档](https://cmake.org/documentation/)。
-
-CMake 负责生成构建文件，真正执行编译的是底层构建工具。本章使用 Ninja，两条关键命令依次执行：
+注释说明了每条规则的职责。`CMake` 生成构建文件，`Ninja` 执行其中的编译规则；先配置，再构建。
 
 ```bash
-# 配置：选定 Ninja 作为构建工具，生成 build/ 并指定 Debug 构建
-$ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
-
-# 构建：调用 Ninja 按依赖关系编译并链接目标
-$ cmake --build build
-
-# 运行构建结果
-$ ./build/bin/app
-# 预期输出
-Hello, World!
+cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
 ```
 
-配置命令的三个参数分工不同。`-G Ninja` 指定底层构建工具，`-B build` 指定生成物目录，`-DCMAKE_BUILD_TYPE=Debug` 写入缓存变量，让构建带上 `-g` 调试信息且不启用优化，便于后续用 gdb 查看变量。构建命令 `cmake --build build` 不关心底层工具是什么，它进入 `build/` 触发一次构建，并且只重建受影响的目标。
+`-G Ninja` 选择底层构建工具，`-B build` 指定生成物目录，`-DCMAKE_BUILD_TYPE=Debug` 选择调试构建。`cmake --build build` 会按规则构建受影响的目标。
 
-示例目录还提供一键脚本，把配置、构建和运行合并成一条命令，适合重复执行：
+## 运行一键脚本
+
+重复执行时，使用工程提供的脚本完成配置、构建和运行。
 
 ```bash
-# 在项目目录中运行完整流程
-$ bash build-and-run.sh
+bash build-and-run.sh
 ```
 
-脚本本身也值得读一遍，它包含的就是上面三条关键命令：
-
-```bash
-{{< include /code/getting-started/first-program/build-and-run.sh >}}
-```
-
-::: {.callout-note}
-配置阶段会生成 `build/compile_commands.json`，clangd 据此还原每个源文件的真实编译参数，让编辑器的诊断和实际构建保持一致。它是构建产物，删除后重新配置即可生成。
-:::
+脚本会先定位工程目录，并在任一步失败时停止；其余命令与上一节一致。可对照 [build-and-run.sh](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/build-and-run.sh) 中的注释阅读。
 
 ## 常见问题
 
-### 提示找不到 g++ 或 cmake
+### 找不到编译器或构建工具
 
-先回到[搭建 WSL2 开发环境](setup-wsl2.qmd)，按[安装 C++ 工具链](setup-wsl2.qmd#安装-c-工具链)一节重装软件包：
+回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，按该节的工具链安装步骤处理后再执行本章命令。
 
-```bash
-# 安装编译器、构建工具和调试器
-$ sudo apt install -y build-essential gdb cmake ninja-build
-```
+### 构建目录缓存了旧选项
 
-安装完成后重新执行本章命令即可。
-
-### 构建目录残留了旧的编译器或选项
-
-`build/` 中的缓存记录了首次配置时的生成器和选项。切换构建工具或修改标准后出现异常时，删除整个 `build/` 再重新配置：
+`build/` 中的缓存记录了首次配置时的生成器和选项。切换构建工具或修改标准后出现异常时，删除整个 `build/`：
 
 ```bash
-# 删除可重建的构建产物目录
-$ rm -rf build
-
-# 重新配置并构建
-$ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
-$ cmake --build build
+rm -rf build
 ```
 
-删除 `build/` 不会影响 `main.cpp`、`CMakeLists.txt` 和 `build-and-run.sh`。
+删除不会影响 `main.cpp`、`CMakeLists.txt` 或 `build-and-run.sh`。接着重新执行[用 CMake 管理构建](#用-cmake-管理构建)中的两条命令。
 
 ## 本章回顾
 
-本章走完了两条构建路径，两条路径的产物和输出完全相同。
-
-- 单独验证一个源文件时，用 `g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app`；`g++` 没有输出、运行结果正确即为通过。
-- 日常构建交给 CMake，配置一次 `cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug`，之后只需 `cmake --build build`；重复执行整条流程用 `bash build-and-run.sh`。
-- 判断构建结果只看一行 `Hello, World!` 和返回码 0，构建方式不同不影响验收标准。
-
-`build/` 出现异常时整目录删除再重新配置，源码和规则不受影响。
-
-下一章把这套规则扩展成多目标、多文件的工程。
+你现在能从完整工程中找到源码和构建规则，手动构建一个源文件，并用 `CMake` 或脚本重复执行构建。后续工程章节会把这套规则扩展成多目标、多文件的工程。

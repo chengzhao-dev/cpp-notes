@@ -3,11 +3,11 @@ kb_id: "cpp-tooling-repo-hygiene-v1"
 title: "仓库一致性与分支保护依据"
 domain: "github-ops"
 subdomain: "repository_hygiene"
-tags: [gitattributes, line_ending, gitignore, branch_protection, renormalize, workflow]
+tags: [gitattributes, line_ending, gitignore, branch_protection, renormalize, workflow, diff_frequency]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-pages-deploy-v1"]
 created: "2026-09-08"
-updated: "2026-09-08"
+updated: "2026-09-11"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 1300
 ---
@@ -73,6 +73,25 @@ estimated_tokens: 1300
 2. 同一行为变更跨多个文件时合并成一组，拆开反而制造不可运行的中间状态
 3. 提交信息前缀的作用是让读者不看 diff 就能判断影响面与是否需要跑检查
 4. 一次任务通常三到五组，超过说明改动本身该拆成多个任务；为拆而拆会让回溯成本高于收益
+
+## Git 对比频率的取舍
+
+### 对比应由任务目标触发
+
+频繁运行 `git status`、`git diff` 和 `git log` 并不会自动提高正确性。它会重复生成相同上下文、增加无关噪音，并可能让代理把注意力从用户目标转移到工作区变化上。Git 检查应当在需要判断变更范围、历史原因或提交状态时触发，而不是作为每一步的固定心跳。
+
+### 场景与建议
+
+| 场景 | 是否需要频繁对比 Git |
+| --- | --- |
+| 写文档、查资料、数据分析、生成文案、普通问答 | 不需要 |
+| Code Review、提交信息生成、变更总结、冲突解决、发布说明 | 需要，但通常只在执行时查一次或几次 |
+| 调试“最近改动导致的问题” | 可能需要，查最近 diff/log 即可 |
+| 维护 skills 仓库本身 | 用 Git 管理即可，不必运行时频繁对比 |
+
+### 重新检查的触发条件
+
+首次确认任务范围后，只有在范围变化、出现合并冲突、需要追溯最近改动或验证失败时重新运行 Git 对比。普通文档编辑和知识检索不应因流程习惯而反复检查工作区。
 
 ## 延伸阅读
 

@@ -6,9 +6,9 @@ subdomain: "writing"
 tags: [chinese, paragraph, sentence, terminology, wording, command]
 level_range: [0, 9]
 created: "2026-09-09"
-updated: "2026-09-09"
+updated: "2026-09-11"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1100
+estimated_tokens: 1450
 ---
 
 # 中文技术写作的段落与措辞案例
@@ -42,3 +42,11 @@ estimated_tokens: 1100
 ## 术语节奏
 
 首次出现时给中文名称与英文检索词，后续固定一种称呼。普通概念不用行内代码；命令、路径、文件名、关键字、API 和配置键使用行内代码。多行可复制命令和完整示例使用标明语言的代码块。
+
+## 读者引导与维护信息分开
+
+正文服务读者当前要完成的动作，作者如何检查磁盘、筛选目录树或安排写作不属于这条路径。把“根据实际目录筛选出的教学视图”写进章节，会让读者误以为需要理解作者的整理过程，反而削弱“接下来做什么”的信号。这类判断留在 `quarto-docs` 的目录树 reference；正文只用一句话引出下一步，例如“先看一眼这个工程，后面的命令都在这里执行”。
+
+目录树中的行尾注释已经给出文件职责，树后再写一段“哪些文件需要维护、哪些文件由工具生成”，只是把同一信息换一种形式重复一次。除非这句话直接影响当前操作，否则删除它；若确实需要边界提醒，也只保留一句，不逐项复述。
+
+这些是中文表达和读者感受的依据；章节导语与任务序列见 `cpp-quarto-chapter-pattern-v1`，目录树边界见 `cpp-quarto-project-tree-diagram-focus-v1`，句内连接和长句拆分仍以本文件前面的案例为准。
