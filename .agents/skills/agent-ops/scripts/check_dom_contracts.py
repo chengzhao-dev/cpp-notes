@@ -20,8 +20,9 @@
      （该层现在包裹代码本身，隐藏它 = 打印/PDF 时代码整块消失。）
   C4 站点图标：每个 HTML 的 <head> 必须含 rel="icon" 且指向 favicon.svg，
      且该图标文件确实被发布到产物目录。
-C5 Mermaid 图表：产物必须包含 Quarto Mermaid 运行时和 mermaid-js 图表占位符，
-      不得退化为普通 sourceCode 代码块。浏览器加载脚本后由占位符转换为 SVG。
+  C5 Mermaid 图表（按产物条件）：产物没有 mermaid-js 占位符，说明正文本就不用图表，
+     契约 N/A；一旦出现占位符，就必须同时包含 Quarto Mermaid 运行时，且不得退化为
+     普通 sourceCode 代码块。浏览器加载脚本后由占位符转换为 SVG。
   C6 代码主题稳定性：源 CSS 必须使用统一代码字体，不得保留按 Bash/PowerShell
       命令 token 强制改色的旧选择器；普通文本代码块不得带语言 token。
   C7 代码块视觉契约：普通文本代码块与语言代码块必须共用 GitHub 代码背景、边框、
@@ -270,18 +271,29 @@ def check_contracts(book_dir, htmls, css_pairs):
         mermaid_blocks += len(re.findall(r"<pre\b[^>]*class=\"[^\"]*\bmermaid-js\b", html))
         if "quarto-diagram/mermaid.min.js" in html and "quarto-diagram/mermaid-init.js" in html:
             mermaid_runtime_pages += 1
-        if re.search(r"<pre\b[^>]*class=\"[^\"]*\bsourceCode\b[^\"]*\"[^>]*>.*?flowchart\s+(?:TD|LR|TB|RL|BT)", html, re.S):
+        if re.search(
+            r"<pre\b[^>]*class=\"[^\"]*\bsourceCode\b[^\"]*\"[^>]*>"
+            r".*?(?:(?:flowchart|graph)\s+(?:TD|TB|LR|RL|BT)"
+            r"|sequenceDiagram|stateDiagram|classDiagram)",
+            html, re.S,
+        ):
             raw_mermaid.append(str(path.relative_to(book_dir)))
-    c5 = mermaid_blocks > 0 and mermaid_runtime_pages > 0 and not raw_mermaid
-    summary = "Mermaid 占位符=%d，运行时页面=%d，普通源码块=%d" % (
-        mermaid_blocks, mermaid_runtime_pages, len(raw_mermaid))
+    # 无占位符 = 正文不用图表，契约 N/A；有占位符才要求 Quarto Mermaid 运行时。
+    c5 = not raw_mermaid and (mermaid_blocks == 0 or mermaid_runtime_pages > 0)
+    if mermaid_blocks == 0 and not raw_mermaid:
+        summary = "正文无 Mermaid 图（契约 N/A）"
+    elif mermaid_blocks == 0:
+        summary = "未发现 mermaid-js 占位符，疑似围栏写错退化为普通源码块=%d" % len(raw_mermaid)
+    else:
+        summary = "Mermaid 占位符=%d，运行时页面=%d，普通源码块=%d" % (
+            mermaid_blocks, mermaid_runtime_pages, len(raw_mermaid))
     if raw_mermaid:
         summary += "（" + ", ".join(raw_mermaid[:3]) + (" …" if len(raw_mermaid) > 3 else "") + "）"
     results.append((
         "C5", "Mermaid 使用 Quarto 图表运行时", c5, summary,
         ["Mermaid 围栏必须使用 ```{mermaid}",
-         "渲染结果需包含 mermaid-js 占位符和 Quarto Mermaid 运行时",
-         "不得退化为带 sourceCode 类的普通 flowchart 代码块"],
+         "正文含 Mermaid 图时，产物必须同时有 mermaid-js 占位符和 Quarto Mermaid 运行时",
+         "不得退化为带 sourceCode 类的普通图表代码块"],
     ))
 
     # ---------- C6 GitHub 代码主题与稳定 token ----------
