@@ -1,7 +1,0 @@
-interface:
-  display_name: "C++ Content"
-  short_description: "Write and verify C++ teaching chapters"
-  default_prompt: "Use $cpp-content to draft the pointers chapter with buildable examples."
-
-policy:
-  allow_implicit_invocation: true
