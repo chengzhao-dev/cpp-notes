@@ -6,7 +6,7 @@
 规范出处：.agents/skills/cpp-content/references/cpp/cpp.md（命名规范）。
 
 用法：python check_ascii_names.py
-退出码：0 = 全部纯 ASCII；1 = 发现非法字符。
+退出码：0 = 全部纯 ASCII，1 = 发现非法字符。
 """
 
 import os
@@ -18,7 +18,7 @@ EXCLUDE_DIRS = {"node_modules", "_book", ".quarto", ".git", "_site", "build"}
 
 
 def first_non_ascii(name):
-    """返回名称中第一个码点 > 127 的字符；无则返回 None。"""
+    """返回名称中第一个码点 > 127 的字符。无则返回 None。"""
     for ch in name:
         if ord(ch) > 127:
             return ch

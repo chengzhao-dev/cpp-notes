@@ -5,7 +5,7 @@
 ## 权威出处规则
 
 - 分工边界与「同一知识点只允许一个出处」的权威定义在 `.agents/skills/catalog.md`「skill 与 knowledge 的分工」，其他文件只引用不复制。
-- 迁移内容前先判定归属：「怎么做」留 `references/`，「为什么」进 `knowledge/`；两处都有时删掉非权威的一份。
+- 迁移内容前先判定归属：「怎么做」留 `references/`，「为什么」进 `knowledge/`，两处都有时删掉非权威的一份。
 
 ## 三层加载契约
 
@@ -38,17 +38,17 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `knowledge/`。
 `check_task_matrix.py` 断言，三者必须同步：
 
 1. 列顺序固定为 `ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注`，行以 `| \`TASK-` 开头且 8 格。
-2. `—` 表示空；无内容占位写作 `—（不新建）`、`—（本章无示例）`，不留裸空白。
+2. `—` 表示空。无内容占位写作 `—（不新建）`、`—（本章无示例）`，不留裸空白。
 3. ID 前缀按 part 固定（ENV/CORE/STL/MEM/PERF/DBG/TOOL/CS），三位数字在 part 内连续。
-4. 文件级读写边界只写一次（`## 公共读写边界` 的 `- **必读**` 行），行间只写差异；
+4. 文件级读写边界只写一次（`## 公共读写边界` 的 `- **必读**` 行），行间只写差异。
    交集变化时先改生成表的章节数据，再 `generate_tasks.py --write`。
-5. 状态只允许 `todo` / `done` / `merged`；merged 章不得留下同名正文。
+5. 状态只允许 `todo` / `done` / `merged`。merged 章不得留下同名正文。
 
 ## 重构执行纪律
 
 - 修改前先检索入口、引用和测试，理解文件职责后再迁移或删除。
 - 需要改名、提取或拆分时，先比较新旧职责，保留有效信息，完成后从整体复核术语、链接、顺序和重复内容。
-- 相同职责只保留一个权威实现；公共逻辑放入对应 skill 的 `scripts/` 或 `references/`。
+- 相同职责只保留一个权威实现。公共逻辑放入对应 skill 的 `scripts/` 或 `references/`。
 - 删除文件后移除空目录（`check_empty.py` 对空文件与空目录都判 FAIL）。
-- Skill 目录与文件名使用 kebab-case 与 ASCII；`agents/openai.yaml` 是宿主 UI 元数据，不参与任务路由。
-- 完成后运行 `python .agents/skills/agent-ops/scripts/run.py check`；涉及知识库再跑 `kb-index`、`kb-check` 和 `kb-eval`。
+- Skill 目录与文件名使用 kebab-case 与 ASCII。`agents/openai.yaml` 是宿主 UI 元数据，不参与任务路由。
+- 完成后运行 `python .agents/skills/agent-ops/scripts/run.py check`。涉及知识库再跑 `kb-index`、`kb-check` 和 `kb-eval`。

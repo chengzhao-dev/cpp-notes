@@ -19,7 +19,7 @@
   python .agents/skills/python-tools/scripts/scaffold/init_project.py --name first-program --dir code/getting-started
 
 用法：python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> [--dir code/<part>]
-退出码：0 成功；1 参数/路径错误。
+退出码：0 成功，1 参数/路径错误。
 """
 
 import argparse
@@ -128,7 +128,7 @@ def main():
         return 1
 
     target = Path(args.dir) / args.name
-    # 目标不存在时由 write() 创建；空目录可以安全复用，非空目录拒绝覆盖。
+    # 目标不存在时由 write() 创建。空目录可以安全复用，非空目录拒绝覆盖。
     if target.exists() and any(target.iterdir()):
         print(f"错误：目标目录已存在且非空：{target}")
         return 1

@@ -5,7 +5,7 @@
 规范出处：.agents/skills/quarto-theme/references/theme-system.md。
 
 用法：python check_layout.py [--book-dir _book]
-退出码：0 = 关键令牌全部存在；1 = 有缺失。
+退出码：0 = 关键令牌全部存在，1 = 有缺失。
 """
 
 import argparse

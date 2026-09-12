@@ -154,7 +154,7 @@ def run_agent(*args: str, timeout: int = 120) -> dict[str, Any]:
 
 
 def validate_python() -> None:
-    """MCP 使用固定解释器；不可用时在启动阶段直接失败。"""
+    """MCP 使用固定解释器。不可用时在启动阶段直接失败。"""
     interpreter = Path(PYTHON)
     if not interpreter.is_file():
         print(f"python interpreter not found: {PYTHON}", file=sys.stderr)

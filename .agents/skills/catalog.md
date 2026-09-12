@@ -6,12 +6,12 @@ L2 `references/**/*.md` ≤160 行 / ≤6000 字符，全部 `name + description
 
 ## skill 与 knowledge 的分工
 
-同一个知识点只允许有一个出处：怎么做（流程、格式约定、硬约束）留 `references/`；为什么（领域结论与取舍依据）进
+同一个知识点只允许有一个出处：怎么做（流程、格式约定、硬约束）留 `references/`，为什么（领域结论与取舍依据）进
 `knowledge/`。`references/` 需要领域依据时只写一行检索入口
 （`python .agents/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain <domain>`），不复制正文。
 
-新增或迁移 `knowledge/` 文件后必须跑 `run.py kb-index` 与 `run.py kb-check`；`kb-eval` 负责召回率与 Token 预算验收。
-索引产物和其他项目临时文件统一在 `temp/<用途>/`（已 gitignore），缺失时子命令自动重建；`.tmp/` 不再作为生成目录。
+新增或迁移 `knowledge/` 文件后必须跑 `run.py kb-index` 与 `run.py kb-check`。`kb-eval` 负责召回率与 Token 预算验收。
+索引产物和其他项目临时文件统一在 `temp/<用途>/`（已 gitignore），缺失时子命令自动重建。`.tmp/` 不再作为生成目录。
 
 ## L1 入口（每次只读命中的那一个）
 
@@ -53,7 +53,7 @@ L2 `references/**/*.md` ≤160 行 / ≤6000 字符，全部 `name + description
 | `quarto-docs/references/zh/section-focus-and-density.md` | 小节主线、命令输出分层与信息密度 | 重排段落、代码块和参数解释 |
 | `quarto-docs/references/zh/project-tree-and-diagram-focus.md` | 工程目录树、隐藏配置与 Mermaid 主线 | 展示项目结构或整理图表邻接内容 |
 | `quarto-docs/references/zh/chinese-review-routing.md` | 句式与措辞案例的知识库路由 | 段落衔接、长句或措辞润色 |
-| `quarto-docs/references/quarto/authoring.md` | 正文结构、文档元素、代码块与交叉引用 | 写改任何 `.qmd` 正文 |
+| `quarto-docs/references/quarto/authoring.md` | 正文结构、文档元素、链接间距与交叉引用 | 写改任何 `.qmd` 正文 |
 | `quarto-docs/references/quarto/terminal-validation.md` | 命令块、实测输出与安装验证边界 | 展示 Ubuntu/WSL 命令或排查步骤 |
 | `quarto-docs/references/quarto/basics.md` | Book 结构、front matter、标题层级（规范唯一出处） | 改 `_quarto.yml` 或章节骨架 |
 | `quarto-docs/references/quarto/rendering-and-output.md` | HTML 现行取值、改动约定与编号陷阱索引 | 调 format/html 选项或渲染异常排错 |
@@ -63,21 +63,21 @@ L2 `references/**/*.md` ≤160 行 / ≤6000 字符，全部 `name + description
 
 | 文件 | domain | 管什么 |
 |---|---|---|
-| `knowledge/README.md` | — | 知识库规范、检索不变量与新增知识闭环；新建或迁移知识文件前必读 |
+| `knowledge/README.md` | — | 知识库规范、检索不变量与新增知识闭环。新建或迁移知识文件前必读 |
 | `knowledge/agent-ops/codex-context-compaction.md` | `agent-ops` | 宿主上下文压缩对长任务的影响与应对契约 |
 | `knowledge/cpp-content/toolchain/build-toolchain.md` | `cpp-content` | 构建工具链选型与版本决策依据 |
 | `knowledge/github-ops/github-pages-deployment.md` | `github-ops` | Pages 部署方式与分支策略依据 |
 | `knowledge/github-ops/repository-hygiene.md` | `github-ops` | 仓库一致性与忽略规则依据 |
 | `knowledge/quarto-docs/output/html-output.md` | `quarto-docs` | Quarto HTML 输出选项与生效边界 |
 | `knowledge/quarto-docs/rendering/rendering-constraints.md` | `quarto-docs` | Quarto 渲染行为与失效模式依据 |
-| `knowledge/quarto-docs/writing/chinese-style-cases.md` | `quarto-docs` | 中文段落、句式与措辞案例 |
+| `knowledge/quarto-docs/writing/chinese-style-cases.md` | `quarto-docs` | 中文段落、句式、标点、措辞与文件名密度案例 |
 | `knowledge/quarto-docs/writing/chapter-and-environment-cases.md` | `quarto-docs` | 章节、环境与命令展示案例 |
 | `knowledge/quarto-docs/writing/chapter-page-pattern.md` | `quarto-docs` | 教学正文的块序列与职责边界 |
 | `knowledge/quarto-docs/writing/section-focus-and-density.md` | `quarto-docs` | 教学小节的主线收束与信息分层 |
 | `knowledge/quarto-docs/writing/project-tree-and-diagram-focus.md` | `quarto-docs` | 工程目录树与图表的事实边界 |
-| `knowledge/quarto-docs/writing/inline-code-boundaries.md` | `quarto-docs` | 行内代码标记边界与一致性依据 |
+| `knowledge/quarto-docs/writing/inline-code-boundaries.md` | `quarto-docs` | 行内代码标记边界与链接间距依据 |
 | `knowledge/quarto-docs/writing/typography-density-pattern.md` | `quarto-docs` | 三栏宽度预算与正文排版密度的判定依据 |
 | `knowledge/quarto-docs/writing/landing-page-pattern.md` | `quarto-docs` | 入口与卡片页的三层结构与卡片职责 |
 
-**禁止**：写正文时读 `quarto-theme/assets/theme/css/*`；查 `build/` 产物；为「了解一下」整包读
-`references/`；把宿主个性化说明（用户全局配置里的六项原则，仓库内不存在该文件）列为阅读项。
+**禁止**：写正文时读 `quarto-theme/assets/theme/css/*`，查 `build/` 产物，为「了解一下」整包读
+`references/`。把宿主个性化说明（用户全局配置里的六项原则，仓库内不存在该文件）列为阅读项。

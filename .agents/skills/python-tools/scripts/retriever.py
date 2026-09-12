@@ -12,13 +12,13 @@
   Stage 2/4 向量与精排 = hashing 向量与词面重合度打分，可插拔点是 embed() 与
              rerank_score()，接上真实模型即可替换，管道其余部分不动。
   Stage 3 的向量路按「维度 到 块」倒排打分（vector_shard），等价于逐块 cosine，
-             是精确检索；分片按 meta.build_seq 缓存，重建索引即失效，不是 ANN。
+             是精确检索。分片按 meta.build_seq 缓存，重建索引即失效，不是 ANN。
   Stage 3 的 BM25 是 SQLite FTS5 的真实 bm25()，不是近似实现。
 
 版本与冲突（§3.6）：supersedes 指向的旧版命中乘 0.35 惩罚，冲突表里较旧的一方
   按块重合度降权（最多降一半）。
 渐进式披露（§3.4）：--toc 只给 L1/L2 摘要地图（几百令牌），再用 --parent <ref_id>
-  取 L3 正文；命中段落末尾含「接下来/下一节」时自动追加 1 个同级 Child（最多 1 次）。
+  取 L3 正文。命中段落末尾含「接下来/下一节」时自动追加 1 个同级 Child（最多 1 次）。
 缓存（§3.5）：非 explain 排名结果按全参数键缓存 24h，命中时不重跑四路召回。
 
 用法：
@@ -26,7 +26,7 @@
     python .agents/skills/python-tools/scripts/retriever.py --explain "std::span 和裸指针加长度比有什么好处"
     python .agents/skills/python-tools/scripts/retriever.py --domain cpp_core --level 5 --budget 2500 "所有权转移"
     python .agents/skills/python-tools/scripts/retriever.py --rounds 2 --json "vector 为什么比 list 快"
-退出码：0 = 有注入结果；2 = 无结果（便于上层脚本判断）。
+退出码：0 = 有注入结果，2 = 无结果（便于上层脚本判断）。
 """
 
 from __future__ import annotations
@@ -288,7 +288,7 @@ def summaries(con: sqlite3.Connection, doc_ids: list[str], kind: str) -> list[di
 def rank_parents(query: str, rows: list[dict], candidates: list[dict]) -> list[dict]:
     """给 --toc 摘要地图的 Parent 排序：概要词面得分 + 子块召回名次加成。
 
-    地图只回 ref_id 和概要，本身必须按查询相关性排列；按索引插入序返回会让
+    地图只回 ref_id 和概要，本身必须按查询相关性排列。按索引插入序返回会让
     「用几百令牌决定读哪个 Parent」变成让 agent 从头翻目录。
     """
     bonus: dict[str, float] = {}
@@ -305,7 +305,7 @@ def rank_parents(query: str, rows: list[dict], candidates: list[dict]) -> list[d
 def prefilter(con: sqlite3.Connection, registry: dict, domain: str, subdomain: str,
               level, tags: list[str]):
     """Stage 2：元数据预过滤，把候选缩到「可能被读到」的最小集合。
-    返回 None 表示不设限；返回空集合由调用方按过滤过窄处理。
+    返回 None 表示不设限。返回空集合由调用方按过滤过窄处理。
     """
     sql = ["SELECT chunk_id FROM chunks WHERE kind=" + chr(39) + "child" + chr(39)
            + " AND status=" + chr(39) + "live" + chr(39)]
@@ -365,7 +365,7 @@ def vector_shard(con: sqlite3.Connection, domain: str = "") -> dict:
     这是精确检索而不是 ANN 近似。meta.build_seq 每次成功索引都递增，序号一变
     就重建分片，因此增量更新与 --rebuild 都不会读到旧内存。
 
-    domain 为空表示全库分片（未带 domain 过滤时的唯一入口）；带 domain 时只读
+    domain 为空表示全库分片（未带 domain 过滤时的唯一入口）。带 domain 时只读
     该分片，候选规模不再随全集增长——这是分片唯一能给的延迟好处，没带过滤
     就不得不遍历全部分片，精确检索本身要求每个 live 块至少被碰一次。
     """
@@ -414,7 +414,7 @@ def vector_shard(con: sqlite3.Connection, domain: str = "") -> dict:
 
 
 def _trim_shards() -> None:
-    """按 LRU 把驻留分片数压回上限；被淘汰的分片落回 cold，下次用到重建。"""
+    """按 LRU 把驻留分片数压回上限。被淘汰的分片落回 cold，下次用到重建。"""
     while len(VECTOR_SHARDS) > RESIDENT_SHARD_LIMIT:
         VECTOR_SHARDS.popitem(last=False)        # 队首总是最久未用的
 
@@ -559,7 +559,7 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
             "vector_rank": index_of(vector, chunk_id),
             "graph_hit": chunk_id in graph,
         })
-    # 精排主导、RRF 次之，再乘版本惩罚；同分时优先更短的 Parent 以省预算
+    # 精排主导、RRF 次之，再乘版本惩罚。同分时优先更短的 Parent 以省预算
     for row in candidates:
         row["score"] = (row["rerank"] + RRF_SCORE_WEIGHT * row["rrf"]) * row["penalty"]
     candidates.sort(key=lambda c: (-c["score"],

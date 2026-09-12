@@ -8,7 +8,7 @@ reference 过长则一次任务就读掉大量无关内容。本脚本把预算�
   - OpenAI Codex：初始 skills 列表最多占上下文 2%，上下文未知时按 8000 characters 封顶。
   - Claude：skill listing 里 description 与 when_to_use 合计在 1536 characters 截断，
     SKILL.md 正文建议 < 5000 tokens。
-字符数对中文是更好的 token 代理（一个汉字约一个 token）；按 UTF-8 字节会把中文多算约
+字符数对中文是更好的 token 代理（一个汉字约一个 token）。按 UTF-8 字节会把中文多算约
 三倍，迫使作者删掉必要内容来「过线」。因此 L1/L2 以字符为主，字节只用在厂商明确按字节
 定义的 L0（project_doc_max_bytes = 65536）。中文没有厂商专属上限，下列数值取自上述通用
 字符预算并按本项目实测余量收敛。
@@ -22,7 +22,7 @@ reference 过长则一次任务就读掉大量无关内容。本脚本把预算�
       （内聚的单一主题不硬拆：拆开会迫使一次读多份，反而更费 token）
 
 用法：python check_skill_size.py [--verbose]
-退出码：0 = 全部在预算内；1 = 有文件越界。
+退出码：0 = 全部在预算内，1 = 有文件越界。
 """
 import argparse
 import io

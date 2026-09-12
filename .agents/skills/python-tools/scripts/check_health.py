@@ -17,7 +17,7 @@
     python .agents/skills/python-tools/scripts/check_health.py            # 体检（有告警时退出码 1）
     python .agents/skills/python-tools/scripts/check_health.py --gate     # 给 run.py check 用：只在 FAIL 时非 0
     python .agents/skills/python-tools/scripts/check_health.py --verbose   # 打印每条超阈值项的具体位置
-退出码：0 = 全部达标（或 --gate 下无 FAIL）；1 = 有 WARN/FAIL。
+退出码：0 = 全部达标（或 --gate 下无 FAIL），1 = 有 WARN/FAIL。
 """
 
 from __future__ import annotations
@@ -133,7 +133,7 @@ def check_index(paths: list[str], registry_out: list) -> tuple[dict, list[str]]:
 def check_catalog() -> tuple[list[str], int]:
     """断言 catalog.md 的 knowledge 表与磁盘上的知识文件一一对应。
 
-    catalog.md 是「谁该读哪份知识」的唯一路由表；`knowledge/` 下新增文件却不登记，
+    catalog.md 是「谁该读哪份知识」的唯一路由表。`knowledge/` 下新增文件却不登记，
     等于写正文时没人会读到它——索引和召回都会绿，只有路由是瞎的。所以这条断言
     独立于索引，直接比对磁盘与表格。`knowledge/README.md` 是规范本身，不参与登记。
     """
@@ -193,7 +193,7 @@ def measure_latency(samples: int) -> tuple[float, float]:
     # 量到的只是空结果集，既掩盖真实冷路径成本，也不覆盖任何现存领域。
     queries = [
         # 工具链
-        "最小构建链为什么要固定编译器版本", "CMake 版本为什么统一取 3.31",
+        "最小构建链为什么要固定编译器版本", "版本要求为什么只写在构建配置里",
         "编译与诊断开关为什么默认全开",
         # Quarto 渲染与输出
         "Quarto 渲染配置为什么会静默失效", "Quarto HTML 输出选项在哪些作用域生效",

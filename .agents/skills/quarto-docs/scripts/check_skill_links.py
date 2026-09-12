@@ -5,18 +5,18 @@
 校验的链接形态：
   - <skill>/references/...、<skill>/templates/...（skills 根相对路径，catalog.md 用这种跨 skill 指路）
   - references/...、templates/...（skill 根相对路径）
-  - scripts/...（skill 根相对路径；未命中时回退按仓库根 scripts/ 解析，两处任一存在即通过）
+  - scripts/...（skill 根相对路径，未命中时回退按仓库根 scripts/ 解析，两处任一存在即通过）
   - ./、../ 相对路径（含跨 skill 的 ../..）
   - .agents/... 全仓库路径
 校验两类引用：
-  - 带扩展名的 .md / .qmd / .py：目标必须存在；
+  - 带扩展名的 .md / .qmd / .py：目标必须存在。
   - 指向 references/ 的无扩展名引用：判为「漏写扩展名」直接 FAIL——该目录下的知识文件一律带
     .md，历史上曾有残留文件因无扩展名躲过全部检查。
 模板路径（紧跟 <占位符> 的目录，如 references/tasks/<part>.md）只校验目录存在。
 其余无扩展名路径（示例命令路径如 ./build/main）跳过。
 
 用法：python check_skill_links.py
-退出码：0 = 全部链接可达；1 = 存在断链。
+退出码：0 = 全部链接可达，1 = 存在断链。
 """
 
 import os

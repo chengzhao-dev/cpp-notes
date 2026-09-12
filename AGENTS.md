@@ -4,12 +4,13 @@
 
 ## 工作标准
 
-- 先理解目标、现状和约束；明确假设。存在多种解释时列出选项，不擅自扩大范围。
-- 用最少、最清晰、可验证的改动解决问题；不做无关重构，不为一次性需求设计扩展框架。
-- 修改前先定位入口、引用、测试和权威规则；保留用户已有改动，只清理由本次改动产生的孤儿代码。
+- 先理解目标、现状和约束。明确假设。存在多种解释时列出选项，不擅自扩大范围。
+- 用最少、最清晰、可验证的改动解决问题。不做无关重构，不为一次性需求设计扩展框架。
+- 修改前先定位入口、引用、测试和权威规则。保留用户已有改动，只清理由本次改动产生的孤儿代码。
 - 把需求转成验收标准：先复现或建立检查，再实现，最后运行与风险匹配的验证。
-- 默认简洁输出，说明做了什么、如何验证、未完成项和风险；不回显密钥、凭据、`.env` 或无关个人信息。
-- 维护仓库规范时保持单一权威出处；流程和格式放 skill/reference，领域原因放 `knowledge/`。
+- 默认简洁输出，说明做了什么、如何验证、未完成项和风险。不回显密钥、凭据、`.env` 或无关个人信息。
+- 维护仓库规范时保持单一权威出处。流程和格式放 skill/reference，领域原因放 `knowledge/`。
+- 构建配置和脚本的版本规则见 `cpp-content` 的代码风格 reference。QMD 代码块、`include` 文件和正文标点规则见 `quarto-docs` 对应 reference。
 
 ## C++ Notes 项目
 
@@ -18,18 +19,18 @@
 | 路径 | 职责 |
 | --- | --- |
 | `content/<part>/` | Quarto 章节正文 |
-| `code/<part>/` | 单文件示例或同名工程；`build/` 是产物 |
+| `code/<part>/` | 单文件示例或同名工程，`build/` 是产物 |
 | `.agents/skills/` | Codex 项目 skills、references、任务矩阵和工具脚本 |
-| `.agents/mcp/` | 项目级 MCP stdio server 与说明；由宿主显式配置，不假设自动发现 |
+| `.agents/mcp/` | 项目级 MCP stdio server 与说明，由宿主显式配置，不假设自动发现 |
 | `.agents/skills/quarto-theme/assets/theme/` | 页面主题、样式和字体资源 |
 | `knowledge/` | 回答“为什么”的精简领域知识库 |
 | `temp/` | 索引和分析产物，不入库 |
 
-章节、示例和任务矩阵按相同的 part/chapter 对齐；任务矩阵 `.agents/skills/cpp-content/references/tasks/<part>.md` 是状态与读写边界的唯一出处。
+章节、示例和任务矩阵按相同的 part/chapter 对齐。任务矩阵 `.agents/skills/cpp-content/references/tasks/<part>.md` 是状态与读写边界的唯一出处。
 
 ## 常用命令
 
-以下命令中的 Python 必须按“固定路径优先、PATH 回退”规则解析；候选均不可用时立即停止，不伪造结果。
+以下命令中的 Python 必须按“固定路径优先、PATH 回退”规则解析。候选均不可用时立即停止，不伪造结果。
 
 | 命令 | 用途 |
 | --- | --- |
@@ -43,19 +44,19 @@
 
 ## 读取、编辑与验收边界
 
-1. 每次任务先运行 `scope`，只读 UNIT、READ 和必要 reference；不整包读取 references。
-2. 永不读取或索引 `_book/**`、`code/**/build/**`、`.quarto/**`、`.cache/**`、`.tmp/**`；产物检查交给脚本。
-3. 预计读取超过 8 个文件或需要全仓检索时才派侦察代理；编辑回主线程完成。
-4. 中文文件使用 UTF-8 无 BOM、LF；修改 `.qmd`、skill 或主题 CSS 后先跑编码检查。
-5. 修改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 会触发整本渲染；确认代价后运行 `render`。
-6. `AGENTS.md` 受 `project_doc_max_bytes = 65536` 约束；`.agents/skills/` 的 L1/L2 体量由 `check_skill_size.py` 强制。
-7. 长任务每轮推进一个可验证子目标；上下文压缩后重读本文件与 `git status`；每轮用一次 `run.py check` 收口。
-8. Git 对比服务于审查、冲突解决、发布和最近改动调试；普通文档任务不重复运行。
+1. 每次任务先运行 `scope`，只读 UNIT、READ 和必要 reference。不整包读取 references。
+2. 永不读取或索引 `_book/**`、`code/**/build/**`、`.quarto/**`、`.cache/**`、`.tmp/**`。产物检查交给脚本。
+3. 预计读取超过 8 个文件或需要全仓检索时才派侦察代理。编辑回主线程完成。
+4. 中文文件使用 UTF-8 无 BOM、LF。修改 `.qmd`、skill 或主题 CSS 后先跑编码检查。QMD 正文标点和句长遵循 `quarto-docs/references/zh/writing-principles.md`。
+5. 修改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 会触发整本渲染。确认代价后运行 `render`。
+6. `AGENTS.md` 受 `project_doc_max_bytes = 65536` 约束。`.agents/skills/` 的 L1/L2 体量由 `check_skill_size.py` 强制。
+7. 长任务每轮推进一个可验证子目标。上下文压缩后重读本文件与 `git status`。每轮用一次 `run.py check` 收口。
+8. Git 对比服务于审查、冲突解决、发布和最近改动调试。普通文档任务不重复运行。
 
 ## Python 运行时
 
-依次尝试 `CPP_MEMO_PYTHON`、`.agents/skills/python-tools/assets/config/runtime.json` 中的 `python` 字段（可选、本机文件、已被 `.gitignore` 忽略）、PATH。Windows 上不要把 `python` 别名写入提交的宿主配置；MCP 配置应指向 `.agents/mcp/server.py`，使用本机解析出的绝对 Python 路径。
+依次尝试 `CPP_MEMO_PYTHON`、`.agents/skills/python-tools/assets/config/runtime.json` 中的 `python` 字段（可选、本机文件、已被 `.gitignore` 忽略）、PATH。Windows 上不要把 `python` 别名写入提交的宿主配置。MCP 配置应指向 `.agents/mcp/server.py`，使用本机解析出的绝对 Python 路径。
 
 ## 初始化兼容
 
-Codex 或其他工具重新生成规则时必须合并本文件，不得覆盖项目结构、命令、安全约束和读取边界；`AGENTS.md` 是唯一项目级总入口，宿主专用文件只能引用它。
+Codex 或其他工具重新生成规则时必须合并本文件，不得覆盖项目结构、命令、安全约束和读取边界。`AGENTS.md` 是唯一项目级总入口，宿主专用文件只能引用它。

@@ -19,7 +19,7 @@
 ### 后续 part
 
 语言基础、标准库、对象管理、调试与性能等 part 尚未开始写作。章节状态与目录关系见
-`.agents/skills/agent-ops/references/repository-structure.md`；新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
+`.agents/skills/agent-ops/references/repository-structure.md`。新增 part 时在上一节之后追加同名小节，编号从 1 重新开始。
 
 ## 仓库结构
 
@@ -60,9 +60,9 @@ cpp-notes/
 
 当前路线从入门环境和第一个程序开始，逐步覆盖：
 
-- C++ 语言基础，包括变量、类型、函数和控制流；
-- 标准库，包括容器、算法和迭代器；
-- 对象管理，包括生命周期、RAII、智能指针和移动语义；
+- C++ 语言基础，包括变量、类型、函数和控制流。
+- 标准库，包括容器、算法和迭代器。
+- 对象管理，包括生命周期、RAII、智能指针和移动语义。
 - 工程实践，包括 CMake、多文件项目、调试和性能。
 
 页面本身怎么组织由两类模式约定：教学正文的块序列与入口卡片页的三层结构。依据在知识库 `quarto-docs` 域，分别用 `run.py kb-search "块序列" --domain quarto-docs` 与 `run.py kb-search "卡片" --domain quarto-docs` 查询。

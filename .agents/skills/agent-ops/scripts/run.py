@@ -2,13 +2,13 @@
 """agent 命令统一入口：把易踩坑的 Windows/PowerShell 调用包成稳定的单轮输出。
 
 为什么需要它：省 token 的最大杠杆不是「少读文件」，而是「少几轮」。在 Windows 上
-手写 PowerShell/cmd 命令常因引号与 GBK 编码失败，每次重试都把整段上下文与输出重付一遍；
+手写 PowerShell/cmd 命令常因引号与 GBK 编码失败，每次重试都把整段上下文与输出重付一遍。
 渲染与校验的原始输出动辄上千行，全量回灌同样昂贵。本脚本用 Python 直接 subprocess
 调用（不经 PowerShell 解析），并对输出做截断与分级：成功只回一行，失败才展开。
 
 子命令：
-  check   一次跑完全部产物/源码校验（默认 terse：仅一行结论）
-  verify  编译校验 C++ 示例（Windows 自动经 WSL2；可 --changed 增量校验）
+  check   一次跑完全部产物/源码校验（默认 terse：仅一行结论，可 --strict）
+  verify  编译校验 C++ 示例（Windows 自动经 WSL2，可 --changed 增量校验）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
   scope   解析任务作用域，输出 UNIT/READ/DENY 清单
   build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
@@ -20,7 +20,8 @@
   kb-scale  三层索引的规模基准（P95 拐点，验证 100MB–1GB 目标）
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
-退出码：透传被包装命令的退出码；0 = 成功。
+  --strict   仅 check：把正文分号、链接间距等软规则升级为失败
+退出码：透传被包装命令的退出码，0 = 成功。
 """
 
 import argparse
@@ -41,7 +42,7 @@ class ToolNotFound(RuntimeError):
 
 
 def runtime_config():
-    """读取本机运行时配置；配置缺失或损坏时交给后续搜索。"""
+    """读取本机运行时配置。配置缺失或损坏时交给后续搜索。"""
     try:
         return json.loads(RUNTIME_CONFIG.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -49,7 +50,7 @@ def runtime_config():
 
 
 def python_version(candidate):
-    """返回解释器版本元组；无法执行时返回空值。"""
+    """返回解释器版本元组。无法执行时返回空值。"""
     try:
         result = subprocess.run(
             [candidate, "-c", "import sys; print(sys.version_info[:2])"],
@@ -108,6 +109,7 @@ CHECKS = [
     ("links", ".agents/skills/quarto-docs/scripts/check_skill_links.py", False),
     ("inline-code", ".agents/skills/agent-ops/scripts/check_inline_code.py", False),
     ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False),
+    ("punctuation", ".agents/skills/agent-ops/scripts/check_punctuation.py", False),
     ("typography", ".agents/skills/quarto-theme/scripts/check_typography.py", True),
     ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False),
     ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False),
@@ -159,7 +161,7 @@ def interpret(rc, text, verbose, label):
 
 
 def cmd_check(args):
-    """一次跑完全部校验；默认只回一行总结。"""
+    """一次跑完全部校验。默认只回一行总结。"""
     details, failed, reported = [], [], []
     for name, script, need_book in CHECKS:
         path = ROOT / script
@@ -172,6 +174,8 @@ def cmd_check(args):
         argv = [PY, str(path)]
         if need_book:
             argv += ["--book-dir", "_book"]
+        if getattr(args, "strict", False) and name in {"punctuation", "docs"}:
+            argv.append("--strict")
         rc, text = run(argv)
         if rc != 0:
             failed.append(name)
@@ -199,7 +203,7 @@ def cmd_check(args):
 
 
 def cmd_verify(args):
-    """编译校验示例；Windows 自动调用 WSL，默认只回结论行以控制输出量。"""
+    """编译校验示例。Windows 自动调用 WSL，默认只回结论行以控制输出量。"""
     argv = [PY, str(ROOT / ".agents/skills/cpp-content/scripts/verify_examples.py")]
     if args.style:
         argv.append("--style")
@@ -229,7 +233,7 @@ def cmd_verify(args):
 
 
 def changed_paths():
-    """返回相对 HEAD 的工作区路径；全局 C++ 改动时返回 None。"""
+    """返回相对 HEAD 的工作区路径。全局 C++ 改动时返回 None。"""
     result = subprocess.run(
         ["git", "status", "--porcelain=v1", "-z"], cwd=str(ROOT),
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False,
@@ -439,7 +443,9 @@ def main():
     parser = argparse.ArgumentParser(description="agent 命令统一入口（默认 terse 输出）")
     subs = parser.add_subparsers(dest="cmd", required=True)
 
-    subs.add_parser("check", parents=[common], help="一次跑完全部校验")
+    p = subs.add_parser("check", parents=[common], help="一次跑完全部校验")
+    p.add_argument("--strict", action="store_true",
+                   help="把正文分号、链接间距等软规则升级为失败（作用于 punctuation 与 docs）")
     p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
     p.add_argument("--changed", action="store_true", help="只校验相对 HEAD 修改的 C++ 内容")

@@ -3,12 +3,12 @@
 
 用法：
   python scaffold_chapter.py --topic <ascii-name> [--part <part>] [--title "中文标题"]
-创建 content/<part>/<topic>.qmd（title 已填入；--part 默认与 topic 同名），
+创建 content/<part>/<topic>.qmd（title 已填入，--part 默认与 topic 同名），
 模板位于 .agents/skills/cpp-content/templates/cpp-topic.qmd。
 part 索引页 index.qmd 不由本脚本生成。
 之后需手动在 _quarto.yml 的 book.chapters 注册，并运行 verify_examples.py。
 
-退出码：0 = 创建成功；1 = 参数/路径错误。
+退出码：0 = 创建成功，1 = 参数/路径错误。
 """
 
 import argparse

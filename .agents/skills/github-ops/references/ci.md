@@ -27,7 +27,7 @@
 可选 `--style` 需 WSL 内 clang 工具链，CI 默认仅编译校验。
 
 ## CI 持续集成与检查规范
-官方依据：[GitHub Actions workflow syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)、[GITHUB_TOKEN 权限](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication) 与 [Pages deployment](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。
+官方依据：[GitHub Actions workflow syntax](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)、[GITHUB_TOKEN 权限](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication)与 [Pages deployment](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。
 
 ### 核心工作流清单
 
@@ -44,4 +44,4 @@
 ### 调试与排错
 
 - 当 CI 失败时，先在本地通过 .agents/skills/agent-ops/scripts/run.py check 与 .agents/skills/agent-ops/scripts/run.py verify 进行复现，禁止盲目推 commit 试错。
-- 每个 workflow 显式声明最小 `permissions`；新增步骤只申请实际需要的权限，并为部署步骤单独说明写权限来源。
+- 每个 workflow 显式声明最小 `permissions`。新增步骤只申请实际需要的权限，并为部署步骤单独说明写权限来源。

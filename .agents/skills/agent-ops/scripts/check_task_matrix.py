@@ -11,14 +11,14 @@ reference 路径一旦与磁盘脱节，agent 就会按失效路由去读不存�
   2. ID：前缀与 part 匹配、同 part 内连续编号、全局唯一。
   3. 前置：依赖的 id 必须真实存在（不允许幽灵依赖）。
   4. 读取项：公共必读与本章专项必读指向的文件必须存在于磁盘。
-  5. 正文：列内容必须是 `content/<part>/<chapter>.qmd`；done 必须存在且已在 `_quarto.yml`
+  5. 正文：列内容必须是 `content/<part>/<chapter>.qmd`，done 必须存在且已在 `_quarto.yml`
      注册，todo 与 merged 必须不存在。
-  6. 示例：merged 不留路径；done 指向的示例必须存在。
+  6. 示例：merged 不留路径，done 指向的示例必须存在。
   7. 生成脚本：`generate_tasks.py` 的章节表与磁盘逐字节一致（防再次脱节）。
   8. 可路由：每章都能被 `scope.py` 解析，且 `all_units` 数量与矩阵行数相同。
 
 用法：python check_task_matrix.py [--verbose]
-退出码：0 = 一致；1 = 存在漂移。
+退出码：0 = 一致，1 = 存在漂移。
 """
 
 import argparse

@@ -10,10 +10,10 @@ python .agents/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分�
 
 ## 硬约束
 
-- 未明确要求时不 commit、push、创建 PR；不 force-push main；不建空 commit。
-- 不用 `git commit --amend`（除非修复刚失败且未推送的 commit）；不用 `-i` 交互式；不跳过 hooks；不更新 `git config`（除非明确要求）。
+- 未明确要求时不 commit、push、创建 PR。不 force-push main。不建空 commit。
+- 不用 `git commit --amend`（除非修复刚失败且未推送的 commit）。不用 `-i` 交互式。不跳过 hooks。不更新 `git config`（除非明确要求）。
 - 只 `git add` 显式路径，禁止 `git add -A` 裹挟用户既有未提交改动。
-- 必传 `.agents/skills/**`；必不传 `/.agents/skills/python-tools/assets/config/runtime.json`（本机 Python 运行时配置）、`_book/`、`.quarto/`、`node_modules/`。忽略规则统一放根 `.gitignore`，不在嵌套目录放「自忽略 `.gitignore`」。
+- 必传 `.agents/skills/**`。必不传 `/.agents/skills/python-tools/assets/config/runtime.json`（本机 Python 运行时配置）、`_book/`、`.quarto/`、`node_modules/`。忽略规则统一放根 `.gitignore`，不在嵌套目录放「自忽略 `.gitignore`」。
 
 ## Git 对比频率
 
@@ -26,12 +26,12 @@ Git 对比服务于当前任务，不要在每个步骤重复运行 `git status`
 | 调试“最近改动导致的问题” | 可能需要，查最近 diff/log 即可 |
 | 维护 skills 仓库本身 | 用 Git 管理即可，不必运行时频繁对比 |
 
-执行 Git 操作前读取一次足够的状态即可；只有任务范围变化、出现冲突或验证失败时才重新检查。
+执行 Git 操作前读取一次足够的状态即可。只有任务范围变化、出现冲突或验证失败时才重新检查。
 
 ## 仓库格式基线
 
-文本一律 LF、编码一律 UTF-8 无 BOM；二进制扩展名显式声明为 binary，`*.bat`/`*.cmd` 保持 CRLF。
-中文文件禁止经过系统代码页或 GBK 往返转换；改动 `.qmd` 或规范文档后先跑编码检查。
+文本一律 LF、编码一律 UTF-8 无 BOM。二进制扩展名显式声明为 binary，`*.bat`/`*.cmd` 保持 CRLF。
+中文文件禁止经过系统代码页或 GBK 往返转换。改动 `.qmd` 或规范文档后先跑编码检查。
 
 ```powershell
 git check-ignore -v .agents/skills/python-tools/assets/config/runtime.json _book .quarto node_modules/
@@ -60,10 +60,10 @@ git diff
 git log --oneline -10
 ```
 
-以上检查仅适用于确实涉及提交、变更总结、审查、冲突解决或发布说明的任务；普通文档、资料、分析和问答不需要例行运行。
+以上检查仅适用于确实涉及提交、变更总结、审查、冲突解决或发布说明的任务。普通文档、资料、分析和问答不需要例行运行。
 
 再按改动范围跑检查：`python .agents/skills/agent-ops/scripts/run.py verify --changed`、`python .agents/skills/agent-ops/scripts/run.py check`、`git diff --check`。
-只有改主题或 Quarto 全局配置才整本渲染；只有改 C++ 全局配置或校验器才全量验证；不要让 `build/`、`.cache/`、`.tmp/` 触发校验。
+只有改主题或 Quarto 全局配置才整本渲染。只有改 C++ 全局配置或校验器才全量验证。不要让 `build/`、`.cache/`、`.tmp/` 触发校验。
 
 ## 大更新怎么分组
 
@@ -80,7 +80,7 @@ git push origin main          # 远端只推 main
 git pull                      # 拉取并合并
 ```
 
-远端只保留 `main`（源码）与 `gh-pages`（`_book/` 产物）；Ruleset `block-extra-branches` 禁止新建其它远端分支（管理员同样受限，紧急时在 Settings → Rules 临时关闭）。本地临时分支可随意建、合并后用 `git branch -d` 删除，**不要** `git push -u origin <feat-branch>`。`gh-pages` 仅由 Actions 更新，勿手工推源码。
+远端只保留 `main`（源码）与 `gh-pages`（`_book/` 产物）。Ruleset `block-extra-branches` 禁止新建其它远端分支（管理员同样受限，紧急时在 Settings → Rules 临时关闭）。本地临时分支可随意建、合并后用 `git branch -d` 删除，**不要** `git push -u origin <feat-branch>`。`gh-pages` 仅由 Actions 更新，勿手工推源码。
 
 ## 回滚
 
@@ -92,4 +92,4 @@ git reset --soft HEAD~1       # 撤销最近一次 commit（保留改动）
 
 ## 文档兼容性
 
-README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字；Skill、`knowledge/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。
+README 面向 GitHub 阅读，保留徽章、图片和外部链接的标准 Markdown 写法并为图片提供替代文字。Skill、`knowledge/` 和 `AGENTS.md` 以纯文本、表格、编号步骤和代码块为主，默认不放 Mermaid 或图片。改完 Markdown 跑统一文档检查，避免把 GitHub 专用语法误判为 Quarto 错误。

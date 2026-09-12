@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """语义分块器：把 knowledge/ 下的 Markdown 切成 Parent / Child 两层 Chunk。
 
-边界规则（对齐知识库规范）：## 是 Parent 边界，### 是 Child 边界；#### 及更深的
+边界规则（对齐知识库规范）：## 是 Parent 边界，### 是 Child 边界，#### 及更深的
 标题并入所属 Child 不再单独成块，否则父子映射会出现三层歧义。首个 ## 之前的概述
 单独成一个 Parent，否则文档开头会被静默丢掉。
 
@@ -18,7 +18,7 @@ Parent 不注入前缀，因为它本身就带标题。只有标题没有正文�
     python .agents/skills/python-tools/scripts/chunker.py --all         # 忽略哈希，强制全量重切
     python .agents/skills/python-tools/scripts/chunker.py --verbose      # 逐篇打印 Parent/Child 数量
     python .agents/skills/python-tools/scripts/chunker.py --show         # 打印每篇的 Child 标题路径与令牌数
-退出码：0 = 成功；1 = 有文件不符合规范（缺字段、无 ## 段落）。
+退出码：0 = 成功，1 = 有文件不符合规范（缺字段、无 ## 段落）。
 """
 
 from __future__ import annotations
@@ -142,7 +142,7 @@ def split_doc(path: Path) -> tuple[dict, list[dict]]:
 
 
 def build(all_files: bool = False, verbose: bool = False) -> dict:
-    """切分全部知识文件并返回注册表；内容未变的文件复用旧条目。"""
+    """切分全部知识文件并返回注册表。内容未变的文件复用旧条目。"""
     previous = kb.read_json(kb.REGISTRY_PATH, {"documents": {}, "chunks": {}})
     old_docs = previous.get("documents", {})
     old_chunks = previous.get("chunks", {})

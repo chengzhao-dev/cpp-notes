@@ -23,13 +23,13 @@
 | learncpp.com | 章节拆分粒度、渐进式披露 |
 | zh.cppreference.com | 译名、标准措辞、复杂度（`## 深入` 引标准时以此为准） |
 | CMake 官方文档 | 构建章节的 command/variable 语义与注释措辞 |
-| Google C++ Style Guide | 命名与排版；**例外：本仓库启用异常**，不用「不使用异常」条款 |
+| Google C++ Style Guide | 命名与排版。**例外：本仓库启用异常**，不用「不使用异常」条款 |
 
-这些来源用于不同层次：Primer 和 LearnCpp 参考教学顺序，Stroustrup 参考语言整体观，Effective C++ 参考可执行规则，cppreference 负责标准精度；它们不是逐段翻译的材料。
+这些来源用于不同层次：Primer 和 LearnCpp 参考教学顺序，Stroustrup 参考语言整体观，Effective C++ 参考可执行规则，cppreference 负责标准精度，它们不是逐段翻译的材料。
 
 ## Callout（只用内置类型）
 
-使用内置 `note`、`tip`、`warning`、`important` 或 `caution`，并保留全局中文类型标题。不要在块内重复写“最佳实践”“关键洞察”或“深入”；自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `.agents/skills/quarto-docs/references/quarto/rendering-and-output.md` 陷阱 #12。
+使用内置 `note`、`tip`、`warning`、`important` 或 `caution`，并保留全局中文类型标题。不要在块内重复写“最佳实践”“关键洞察”或“深入”。自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `.agents/skills/quarto-docs/references/quarto/rendering-and-output.md` 陷阱 #12。
 
 ## 核心主题索引
 
@@ -58,18 +58,18 @@
 
 首次出现时使用“中文名称（英文名称）”，必要时补充标准拼写。例如：资源获取即初始化（Resource Acquisition Is Initialization，RAII）、未定义行为（undefined behavior，UB）。后续固定使用一种中文名称，并保留英文术语作为检索入口。
 
-普通概念不用反引号；命令、路径、文件名、关键字、API、配置键和代码字面量保留反引号。不要把整句说明或卡片标题包进反引号。
+普通概念不用反引号。命令、路径、文件名、关键字、API、配置键和代码字面量保留反引号。不要把整句说明或卡片标题包进反引号。
 
 ### 版本边界
 
-涉及 C++20、C++23 或 C++26 的特性必须标注版本。正文说明读者当前需要的行为和用法，参考链接补充完整限制；不要把实验性或较新标准特性写成所有编译器都支持。
+涉及 C++20、C++23 或 C++26 的特性必须标注版本。正文说明读者当前需要的行为和用法，参考链接补充完整限制。不要把实验性或较新标准特性写成所有编译器都支持。
 
 标准库内容至少核对：
 
-- 参数和返回值的语义；
-- 复杂度和异常保证；
-- 生命周期、所有权和迭代器失效；
-- 特性首次进入的标准版本；
+- 参数和返回值的语义。
+- 复杂度和异常保证。
+- 生命周期、所有权和迭代器失效。
+- 特性首次进入的标准版本。
 - GCC、Clang 或 CMake 当前工具链的支持边界。
 
 ### 中文资料的使用层次

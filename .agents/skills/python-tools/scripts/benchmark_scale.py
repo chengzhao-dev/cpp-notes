@@ -16,7 +16,7 @@ kb-check 的 P95 好看不代表十万级仍然好看，因为向量路的打分
 用法：
     python .agents/skills/python-tools/scripts/benchmark_scale.py                # 默认 1k/10k/50k/100k
     python .agents/skills/python-tools/scripts/benchmark_scale.py --sizes 1000,10000 --repeats 5
-退出码：0 = 全部级别 P95 < 200ms；1 = 有级别超标（即需要换 ANN 的证据）。
+退出码：0 = 全部级别 P95 < 200ms，1 = 有级别超标（即需要换 ANN 的证据）。
 拐点口径：报告第一个破线的 Chunk 数，作为「当前实现能撑到多大」的可复现证据。
 """
 

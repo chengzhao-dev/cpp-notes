@@ -4,8 +4,8 @@
 口径：
   Top-5 召回率 = 至少有一个期望 Leaf 进入前 5 的查询数 / 总查询数
   前 5 个候选按 Stage 5 的口径计：Child 与它回溯出的 Parent 都算召回内容，
-  因为检索器实际交给 LLM 的是 Parent；只按 Child id 计分会让导航类查询恒定差一层。
-  期望答案写成标题片段（见 eval_set.py），运行时展开为真实 chunk_id；
+  因为检索器实际交给 LLM 的是 Parent。只按 Child id 计分会让导航类查询恒定差一层。
+  期望答案写成标题片段（见 eval_set.py），运行时展开为真实 chunk_id。
   片段命中 0 个或多个文档之外的解析失败都算 ERROR，避免评测集悄悄过期。
 指标：Top-5 召回率 >= 92%（且样本 >= 200）、P95 < 200ms、单次注入 <= 6000 令牌。
 
@@ -14,7 +14,7 @@
     python scripts/evaluate.py --topk 5        # 改 K
     python scripts/evaluate.py --verbose       # 列出未命中查询
     python scripts/evaluate.py --gate          # 只卡召回率与样本数（延迟由体检负责）
-退出码：0 = 达标；1 = 未达标；3 = 评测集或索引有问题（不是检索质量差）。
+退出码：0 = 达标，1 = 未达标，3 = 评测集或索引有问题（不是检索质量差）。
 """
 
 from __future__ import annotations
@@ -58,7 +58,7 @@ def leaf_index() -> dict:
 
 
 def expand(fragment: str, mapping: dict, errors: list):
-    """把"片段|片段"展开为 chunk_id 集合；解析不到就记 ERROR。"""
+    """把"片段|片段"展开为 chunk_id 集合。解析不到就记 ERROR。"""
     ids = set()
     for part in [p.strip() for p in fragment.split("|") if p.strip()]:
         hit = set()
@@ -99,7 +99,7 @@ def measure(queries: list, topk: int):
         used = result["budget"]["used"]
         injected_max = max(injected_max, used)
         if result.get("mode") == "toc":
-            # 导航意图按规范返回摘要地图，不是正文排名；这里把地图里的 Parent
+            # 导航意图按规范返回摘要地图，不是正文排名。这里把地图里的 Parent
             # 展开成它的 Child，再按同一口径判命中，否则导航永远算不中。
             ranked = toc_chunks(result, topk)
         else:

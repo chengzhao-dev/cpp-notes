@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """校验渲染产物中的 callout 是否真的渲染成提示框（防自定义类静默退化）。
 
-Quarto 只认内置 5 类 callout（note/tip/warning/important/caution）；未知的
+Quarto 只认内置 5 类 callout（note/tip/warning/important/caution）。未知的
 .callout-<name> 类会被静默丢弃，callout 退化成带 <h2> 的 <section>，既没有
 提示框样式，又混进右侧目录。本脚本扫描 _book/**/*.html 抓这一回归。
 
 用法：python check_callouts.py [--book-dir _book]
-退出码：0 = 全部正常；1 = 发现退化的 callout。
+退出码：0 = 全部正常，1 = 发现退化的 callout。
 """
 
 import argparse
@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-# Quarto 内置 callout 类型（唯一的合法集合；none 用于无类型 callout）
+# Quarto 内置 callout 类型（唯一的合法集合，none 用于无类型 callout）
 BUILTIN_TYPES = {"none", "note", "tip", "warning", "important", "caution"}
 
 # <section ... class="level2 callout-xxx"> => callout 退化成了普通小节
@@ -44,7 +44,7 @@ def check_file(path):
                 continue
             if c.startswith("callout-") and c[len("callout-") :] not in BUILTIN_TYPES:
                 unknown.add(c[len("callout-") :])
-        # 标题容器应紧随本 div 出现；用下一个 callout div 的起点作为窗口边界
+        # 标题容器应紧随本 div 出现。用下一个 callout div 的起点作为窗口边界
         if "callout-titled" in classes:
             stop = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
             window = text[m.start() : min(stop, m.start() + 3000)]

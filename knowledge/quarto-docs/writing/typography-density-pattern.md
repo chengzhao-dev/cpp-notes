@@ -7,7 +7,7 @@ tags: [grid_width, gutter, code_block, border, text_wrap, density, paragraph_box
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-10"
-updated: "2026-09-10"
+updated: "2026-09-12"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 1500
 ---
@@ -15,7 +15,7 @@ estimated_tokens: 1500
 # 三栏宽度预算与正文排版密度的判定依据
 
 > 本文件记录「页面看着乱」这一类问题的可测量成因与阈值，是这块领域知识的唯一出处。
-> 页面由哪些块组成、每块职责见标识 `cpp-quarto-chapter-pattern-v1` 的知识文件；
+> 页面由哪些块组成、每块职责见标识 `cpp-quarto-chapter-pattern-v1` 的知识文件。
 > 渲染取值见标识 `cpp-tooling-quarto-render-v2` 与 `cpp-tooling-quarto-html-v2` 的知识文件。
 > 断言由 `.agents/skills/quarto-theme/scripts/check_typography.py` 在 1280 与 1100 两档视口执行。
 
@@ -67,9 +67,9 @@ sidebar + body + margin + 2 × gutter <= 目标视口
 
 逐条示例命令带 `$ ` 提示符和行内注释时，一个 30 行的块里真正要敲的往往只有三行。提示符不能复制（粘进终端会报错），注释与命令同色同权重，读者必须自己做一次「哪几行有用」的筛选。
 
-三类信息因此分归三个位置：命令进标语言的代码块，只放可敲内容；说明进紧邻的正文段落；输出进紧随其后的无语言 `text` 块。「哪一行是输出」由块边界表达，不再依赖 `# 预期输出` 这类注释约定。
+三类信息因此分归三个位置：命令进代码块，说明进正文段落，输出进紧随其后的 `text` 块。「哪一行是输出」由块边界表达，不再依赖 `# 预期输出` 这类注释约定，读者先决定要不要做，再看到怎么做。
 
-命令块与输出块之间只留一个空行，视觉上仍是一组；说明段放在命令块之前，读者先决定要不要做，再看到怎么做。
+位置的分配、提示符与注释写法、代码块语言选择等操作细则的唯一出处是 `.agents/skills/quarto-docs/references/quarto/terminal-validation.md`，本文件只保留成因。
 
 ## 目录折行与侧栏宽度
 
@@ -79,4 +79,4 @@ sidebar + body + margin + 2 × gutter <= 目标视口
 
 ## 与自动化断言的分界
 
-本文件只解释成因与阈值。数值断言全部在 `.agents/skills/quarto-theme/scripts/check_typography.py`，浏览器侧测量在同级 `measure_pages.mjs`；改标题、改缩进、改 grid 之后由 `run.py check` 判定，不靠人工目测长期维持。正文高度上限按当前两章实测值设置为 4300px 与 5100px，仅用于捕获后续异常增长。
+本文件只解释成因与阈值。数值断言全部在 `.agents/skills/quarto-theme/scripts/check_typography.py`，浏览器侧测量在同级 `measure_pages.mjs`。改标题、改缩进、改 grid 之后由 `run.py check` 判定，不靠人工目测长期维持。正文高度上限按当前两章实测值设置为 4300px 与 5100px，仅用于捕获后续异常增长。

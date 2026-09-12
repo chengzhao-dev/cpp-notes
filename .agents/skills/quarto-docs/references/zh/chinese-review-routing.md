@@ -8,4 +8,4 @@
 
 遇到段落跳跃、术语密集、命令解释不闭环或多页面重复时，运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "中文段落衔接 代码块闭环" --domain quarto-docs`。
 
-导语、过渡句或目录树邻接文字显得生硬时，先区分读者引导和作者维护说明，再检索自然句式案例；运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "导语动作链 自然衔接 维护说明" --domain quarto-docs`。
+导语、过渡句或目录树邻接文字显得生硬时，先区分读者引导和作者维护说明，再检索自然句式案例。运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "导语动作链 自然衔接 维护说明" --domain quarto-docs`。

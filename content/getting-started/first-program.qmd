@@ -2,11 +2,11 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章已经准备好了编译器和构建工具。先打开仓库中的 [完整示例工程](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，认识它的文件；再用 `g++` 和 `CMake` 构建同一个程序。运行后看到 `Hello, World!`，本章的练习就完成了。
+上一章装好了编译器和构建工具。本章从仓库里的[完整示例工程](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)开始，先看清工程里有哪些文件，再用 `g++` 和 `CMake` 分别构建同一个程序。程序运行后输出 `Hello, World!`，本章就完成了。
 
 ## 工程目录里有哪些文件
 
-先看一眼这个工程，后面的命令都在这里执行。
+工程目录如下。后面的命令都在这个目录里执行。
 
 ```text
 first-program/
@@ -36,8 +36,11 @@ first-program/
 在工程目录中依次创建输出目录、编译链接并运行程序。
 
 ```bash
+# 创建存放可执行文件的目录
 mkdir -p build/bin
+# 按 C++20 标准编译并链接，警告视为错误
 g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
+# 运行刚构建出的程序
 ./build/bin/app
 ```
 
@@ -55,14 +58,22 @@ Hello, World!
 {{< include /code/getting-started/first-program/CMakeLists.txt >}}
 ```
 
-注释说明了每条规则的职责。`CMake` 生成构建文件，`Ninja` 执行其中的编译规则；先配置，再构建。
+注释说明了每条规则的职责。`CMake` 生成构建文件，`Ninja` 执行其中的编译规则。先配置，再构建。
 
 ```bash
+# 配置：生成 Ninja 构建文件，build/ 存放生成物
 cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
+# 构建：按 CMakeLists.txt 的规则编译链接
 cmake --build build
 ```
 
-`-G Ninja` 选择底层构建工具，`-B build` 指定生成物目录，`-DCMAKE_BUILD_TYPE=Debug` 选择调试构建。`cmake --build build` 会按规则构建受影响的目标。
+三个选项分别决定一件事：
+
+- `-G Ninja` 选择底层构建工具。
+- `-B build` 指定生成物目录，源码目录保持干净。
+- `-DCMAKE_BUILD_TYPE=Debug` 选择调试构建，这个值会连同生成器一起记进缓存。
+
+`cmake --build build` 按 `CMakeLists.txt` 记录的规则构建受影响的目标。
 
 ## 运行一键脚本
 
@@ -72,7 +83,7 @@ cmake --build build
 bash build-and-run.sh
 ```
 
-脚本会先定位工程目录，并在任一步失败时停止；其余命令与上一节一致。可对照 [build-and-run.sh](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/build-and-run.sh) 中的注释阅读。
+脚本会先定位工程目录，并在任一步失败时停止。其余命令与上一节一致。可对照 [build-and-run.sh](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/build-and-run.sh) 中的注释阅读。
 
 ## 常见问题
 
@@ -88,7 +99,7 @@ bash build-and-run.sh
 rm -rf build
 ```
 
-删除不会影响 `main.cpp`、`CMakeLists.txt` 或 `build-and-run.sh`。接着重新执行[用 CMake 管理构建](#用-cmake-管理构建)中的两条命令。
+删除只影响生成物，源码和构建配置不受影响。接着重新执行[用 CMake 管理构建](#用-cmake-管理构建)中的两条命令。
 
 ## 本章回顾
 

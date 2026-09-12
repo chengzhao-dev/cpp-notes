@@ -2,7 +2,7 @@
 
 ## 设计令牌（GitHub 风格）
 
-本文件是本仓库明暗双主题的**令牌规范来源**。页面颜色参考 GitHub Light / GitHub Dark，代码高亮由 Quarto 的同名主题提供；实际生效位置在 `.agents/skills/quarto-theme/assets/theme/css/tokens.css`，二者保持同步。
+本文件是本仓库明暗双主题的**令牌规范来源**。页面颜色参考 GitHub Light / GitHub Dark，代码高亮由 Quarto 的同名主题提供。实际生效位置在 `.agents/skills/quarto-theme/assets/theme/css/tokens.css`，二者保持同步。
 
 ### 令牌对照表
 
@@ -41,21 +41,21 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 
 ### 组件约定
 
-- **代码块**：简洁圆角 pre，弱底 + 细边，无顶栏/交通灯；复制钮右上角，hover/focus 显示。
-- **Callout**：左 3px 色条 + 浅底 + `border-radius: 6px`；标题在上、内容在下。
+- **代码块**：简洁圆角 pre，弱底 + 细边，无顶栏/交通灯，复制钮右上角，hover/focus 显示。
+- **Callout**：左 3px 色条 + 浅底 + `border-radius: 6px`，标题在上、内容在下。
 - **侧栏 active**：浅底高亮 + GitHub 蓝色左轨（`--accent`）。
-- **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影；网格一行最多两列。
-- **首页与组件**：采用 GitHub 文档式细边框、冷灰分隔线和轻背景；卡片 hover 只改变边框或背景，不改变尺寸。
+- **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影，网格一行最多两列。
+- **首页与组件**：采用 GitHub 文档式细边框、冷灰分隔线和轻背景，卡片 hover 只改变边框或背景，不改变尺寸。
 - **顶栏品牌标**：与 `.agents/skills/quarto-theme/assets/theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
-- **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角；`text` 内容不启用语言 token。
-- **`.code-caption`**：图或代码块的一句附属说明，`--text-secondary` 次要文字色、字号略小，紧贴所描述对象（`base.css` 已压缩其与代码块的间距）；写作侧规则见 quarto-docs `authoring.md`。
+- **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角，`text` 内容不启用语言 token。
+- **`.code-caption`**：图或代码块的一句附属说明，`--text-secondary` 次要文字色、字号略小，紧贴所描述对象（`base.css` 已压缩其与代码块的间距），写作侧规则见 quarto-docs `authoring.md`。
 
 ### 字体栈（三处同步）
 
 自托管 OFL 字体（`.agents/skills/quarto-theme/assets/theme/assets/fonts/` + `.agents/skills/quarto-theme/assets/theme/css/fonts.css`），无第三方 CDN：
 
 - Sans：`Inter` → `Noto Sans SC` → 系统/CJK 回退（`theme-*.scss`、`tokens.css --ui-font`）
-- Mono：`JetBrains Mono` → `Noto Sans Mono CJK SC` / `Noto Sans SC` → ui-monospace 回退；代码主题使用 GitHub Light / GitHub Dark。代码块统一左对齐，终端输出保留原始空格。
+- Mono：`JetBrains Mono` → `Noto Sans Mono CJK SC` / `Noto Sans SC` → ui-monospace 回退。代码主题使用 GitHub Light / GitHub Dark。代码块统一左对齐，终端输出保留原始空格。
 
 ### 正文字号
 
@@ -66,7 +66,7 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 | H2 | 24px / w600 / mt 3rem mb 1rem |
 | H3 | 20px / w600 |
 
-章节分隔：Quarto 默认 h2 下边框；qmd 不写 `---` 分节线。
+章节分隔：Quarto 默认 h2 下边框，qmd 不写 `---` 分节线。
 
 ### 设计来源
 
@@ -77,7 +77,7 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 ## 主题结构与组件规则（scss 变量 / css 组件）
 官方字段依据 Quarto [HTML format reference](https://quarto.org/docs/reference/formats/html.html)；以下 CSS/SCSS 选择器、令牌和装配顺序是本项目契约，不是 Quarto 内置 API。
 
-本文件规定 `.agents/skills/quarto-theme/assets/theme/scss/`（主题变量）与 `.agents/skills/quarto-theme/assets/theme/css/`（组件规则）下各文件的职责、组件规则要点、以及**新增配色/callout/组件的流程**。渲染/缓存命令以 `AGENTS.md` 为准；令牌表见本文件「设计令牌」。
+本文件规定 `.agents/skills/quarto-theme/assets/theme/scss/`（主题变量）与 `.agents/skills/quarto-theme/assets/theme/css/`（组件规则）下各文件的职责、组件规则要点、以及**新增配色/callout/组件的流程**。渲染/缓存命令以 `AGENTS.md` 为准。令牌表见本文件「设计令牌」。
 
 ### 文件职责
 
@@ -85,16 +85,16 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 |---|---|---|
 | `.agents/skills/quarto-theme/assets/theme/scss/theme-*.scss` | Bootstrap/主题变量（`$primary`、`$body-color`、`$callout-color-*` 等） | 组件规则 |
 | `.agents/skills/quarto-theme/assets/theme/css/tokens.css` | CSS 变量令牌（亮暗两块） | 组件选择器 |
-| `.agents/skills/quarto-theme/assets/theme/css/*.css` | 按域拆分的组件规则；加载顺序 = `_quarto.yml` 的 `css:` 列表 | Bootstrap 变量 |
+| `.agents/skills/quarto-theme/assets/theme/css/*.css` | 按域拆分的组件规则。加载顺序 = `_quarto.yml` 的 `css:` 列表 | Bootstrap 变量 |
 
 ### 关键结构约定
 
 - **垂直节奏**：块间距由 `#quarto-document-content > *` 与 `section > *` 的上边距统一控制（正文↔代码块 1.375rem、标题上 3.375/2.5/2.0rem 等）。**不要**再对 `pre`/`p` 单独设 `margin-bottom`。
-- **顶栏**：与页面同底色 + 底部 1px 发丝线；搜索/主题切换/面包屑用 `--navbar-*` 令牌。
+- **顶栏**：与页面同底色 + 底部 1px 发丝线，搜索/主题切换/面包屑用 `--navbar-*` 令牌。
 - **正文链接**：强调色（`--link-color: #0969DA`，GitHub 蓝）+ 细下划线。
 - **表格**：无外框/斑马纹，表头底线 + 行 hairline。
-- **callout**：左 3px 色条 + 浅底 + 小圆角（Mintlify 语法）；标题在上、内容在下。
-- **代码块**：简洁圆角 pre，复制钮 hover/focus 显示；配色交给 `highlight-style: github-light/dark`。
+- **callout**：左 3px 色条 + 浅底 + 小圆角（Mintlify 语法），标题在上、内容在下。
+- **代码块**：简洁圆角 pre，复制钮 hover/focus 显示。配色交给 `highlight-style: github-light/dark`。
 - **侧栏 active**：浅底 + GitHub 蓝左轨（`--accent`）。
 
 ### 新增 callout 的流程
@@ -114,12 +114,12 @@ SASS 层 `$callout-color-*`（`theme-*.scss`）与上表 border 色一致，驱�
 - 语义颜色由 Pandoc/Quarto 的 token 提供，CSS 只负责背景、布局、字体和稳定的基础色。
 - 括号、标点、`$`、版本号和普通输出必须保持连续的基础色，不按命令名或字符内容覆盖。
 - `text` 代码块用于命令输出和纯文本演示，不启用语言高亮，但与 `cpp`、`cmake`、`bash`、`powershell` 共用字体、字号、行高和字重。
-- 三类代码块（`text`、语言代码块、`include` 代码）共用内边距、边框和 `--code-*` 令牌；页面明暗使用 GitHub 中性灰、蓝色链接和绿色状态色。
+- 三类代码块（`text`、语言代码块、`include` 代码）共用内边距、边框和 `--code-*` 令牌。页面明暗使用 GitHub 中性灰、蓝色链接和绿色状态色。
 
 ### 产物契约断言
 
 `.agents/skills/agent-ops/scripts/check_dom_contracts.py` 断言以下项，改 DOM 相关样式前后各跑一次：
 
 - 复制按钮 hover 作用域限定在 `.code-copy-outer-scaffold`（Quarto 1.10 起按钮与 `div.sourceCode` 是兄弟）。
-- `@media print` 不得隐藏 scaffold 本身；`@media (hover: none)` 提供触屏兜底。
-- favicon 注入与发布；Mermaid 输出 SVG 而不是源码块。
+- `@media print` 不得隐藏 scaffold 本身。`@media (hover: none)` 提供触屏兜底。
+- favicon 注入与发布。Mermaid 输出 SVG 而不是源码块。

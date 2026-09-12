@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """生成站点图标 favicon.svg（纯标准库，无第三方依赖）。
 
-图标形状参数集中在本文件顶部，`svg_text()` 据此序列化 SVG；同一套参数也能
+图标形状参数集中在本文件顶部，`svg_text()` 据此序列化 SVG。同一套参数也能
 光栅化（`render()`），供 `--preview` 出小尺寸放大图，人工核对 16/32px 是否糊。
 
 设计参考 GitHub / Cursor 等主流站点 favicon 的共性：强对比单色剪影、边缘留白、
@@ -21,7 +21,7 @@ import struct
 import zlib
 from pathlib import Path
 
-# GitHub Primer 级对比：亮色标签页用深底白字，暗色反过来；「++」用站点绿点强调色
+# GitHub Primer 级对比：亮色标签页用深底白字，暗色反过来，「++」用站点绿点强调色
 LIGHT_BG = (0x0D, 0x11, 0x17)
 LIGHT_FG = (0xFF, 0xFF, 0xFF)
 LIGHT_ACCENT = (0x3F, 0xB9, 0x50)  # 对齐 --dot-accent 暗色
@@ -32,12 +32,12 @@ VB = 64.0
 CORNER_R = 15.0  # 保留清晰轮廓，同时接近 Quarto 的简洁品牌标
 PAD = 4.0  # 字形相对画布的安全边距
 
-# 「C」：实心圆环缺口；圆心偏左，给右侧两个「+」留足间隙
+# 「C」：实心圆环缺口，圆心偏左，给右侧两个「+」留足间隙
 C_CX, C_CY = 20.0, 32.0
 C_ROUT, C_RIN = 13.0, 5.75
 C_OPEN = 48.0  # 开口半角（度）
 
-# 两个「+」：实心十字；中心距须足够，避免 16px 下糊成一条
+# 两个「+」：实心十字，中心距须足够，避免 16px 下糊成一条
 PLUS_CY = 32.0
 PLUS_ARM = 4.5
 PLUS_T = 4.25
@@ -106,7 +106,7 @@ def sample(x, y):
     p_a = 0.0
     for cx in PLUS_CX:
         p_a = max(p_a, min(1.0, max(0.0, _coverage_plus(x, y, cx))))
-    # 先铺底，再叠 C（白），再叠 ++（绿）；重叠处绿优先于白
+    # 先铺底，再叠 C（白），再叠 ++（绿）。重叠处绿优先于白
     r, g, b = LIGHT_BG
     if c_a > 0:
         r = round(r * (1 - c_a) + LIGHT_FG[0] * c_a)

@@ -6,7 +6,7 @@
 把两种口径逐名比对，并且主动把分片池打爆一次，确认 cold 分片重建后结果不变。
 
 用法：python .agents/skills/python-tools/scripts/test_vector_sharding.py
-退出码：0 = 断言全过；非 0 = 分片语义又被改坏了。
+退出码：0 = 断言全过，非 0 = 分片语义又被改坏了。
 """
 
 from __future__ import annotations
@@ -109,7 +109,7 @@ assert all(brute.get(cid, 0.0) <= 0.0 for cid in whole[len(head):]), (
     "非正分块挤进了正分块前面")
 
 # 3) 热/温/冷：驻留数不得超上限，淘汰后重建必须同结果
-# 上限是生产取值（RESIDENT_SHARD_LIMIT=6），这里把它调小才能看见淘汰；
+# 上限是生产取值（RESIDENT_SHARD_LIMIT=6），这里把它调小才能看见淘汰。
 # 取值本身不是被验证的对象，被验证的是 LRU 语义与 cold 重建的一致性。
 limit = retriever.RESIDENT_SHARD_LIMIT
 retriever.RESIDENT_SHARD_LIMIT = 2

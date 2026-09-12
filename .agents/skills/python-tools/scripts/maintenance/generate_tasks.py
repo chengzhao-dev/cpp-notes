@@ -2,18 +2,18 @@
 """由单一章节表生成 8 个 part 任务矩阵（`cpp-content/references/tasks/<part>.md`）。
 
 为什么需要它：矩阵是 `scope.py` 的唯一路由表，也是章节状态的权威记录。手工维护 8 个文件
-容易写歪表头、漏掉「公共必读」交集、或让 scope 解析不到刚登记的章节；本脚本把这些规则
+容易写歪表头、漏掉「公共必读」交集、或让 scope 解析不到刚登记的章节。本脚本把这些规则
 固化成一次生成，并用 --check 与磁盘比对，防止脚本与内容再次脱节。
 
 数据契约（与 scope.py 的解析规则一一对应，改格式必须两处同改）：
   - 每行一章，列顺序固定：ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注
-  - 行以 "| `TASK-" 开头，且至少 8 格；`—` 表示空；正文/示例只写第一个反引号路径
+  - 行以竖线加反引号 TASK- 开头，且至少 8 格。`—` 表示空。正文/示例只写第一个反引号路径
   - 「公共必读」行由本 part 全部章节的必读交集推导（scope.py 把该行作为通用 READ）
 
 用法：
-  python generate_tasks.py --check   # 只比对，报告漂移；退出码 1 = 磁盘与表不一致（默认）
+  python generate_tasks.py --check   # 只比对，报告漂移。退出码 1 = 磁盘与表不一致（默认）
   python generate_tasks.py --write   # 用表覆盖重写 8 个矩阵
-退出码：0 = 一致 / 写入成功；1 = 存在漂移（check 模式）。
+退出码：0 = 一致 / 写入成功，1 = 存在漂移（check 模式）。
 """
 
 import argparse
@@ -46,13 +46,13 @@ def cpp(name):
 #   status: todo | done | merged
 #   dep:    前置任务完整 ID，无前置写 None
 #   spec:   专项必读（reference 文件名），无差异写 None —— 与公共集相同即无专项
-#   code:   示例路径覆盖；None 表示按默认单文件 code/<part>/<chapter>.cpp
+#   code:   示例路径覆盖，None 表示按默认单文件 code/<part>/<chapter>.cpp
 CHAPTERS = [
     ("getting-started", "setup-wsl2", "done", None, "engineering.md", "—（本章无示例）", "—"),
     ("getting-started", "install-toolchain", "merged", "TASK-ENV-001", None, None,
      "已并入 ENV-001 的「安装 C++ 构建工具链」一节，勿再新建同名 qmd"),
     ("getting-started", "first-program", "done", "TASK-ENV-001", "cpp.md",
-     "code/getting-started/first-program/", "先 g++ 直编，再最小 CMakeLists；多文件与目标留给 cmake-intro"),
+     "code/getting-started/first-program/", "先 g++ 直编，再最小 CMakeLists。多文件与目标留给 cmake-intro"),
     ("getting-started", "cmake-intro", "todo", "TASK-ENV-003", "engineering.md", None, "—"),
     ("core", "intro", "todo", "TASK-ENV-003", "cpp.md", None, "—"),
     ("core", "variables", "todo", "TASK-CORE-001", "cpp.md", None, "—"),
@@ -102,11 +102,11 @@ def render(part, rows):
         f"本文件是 {part} 全部章节任务的唯一权威记录：一行一章，读写边界与验收在文件级统一，"
         "只有差异写进行内。改状态只改本表「状态」列，仓库内不存在其它 INDEX 文件。", "",
         "## 公共读写边界", "",
-        "- **必读**: `AGENTS.md`；本文件；" + "；".join(f"`{p}`" for p in commons),
+        "- **必读**: `AGENTS.md`、本文件、" + "、".join(f"`{p}`" for p in commons),
         "- **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）",
         "- **禁止**: `.agents/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、"
         "示例目录下的 `build/`（CMake 产物）", "",
-        "示例默认单文件 `code/<part>/<chapter>.cpp`；需要构建工程时改用同名子目录，产物落其 `build/`。", "",
+        "示例默认单文件 `code/<part>/<chapter>.cpp`，需要构建工程时改用同名子目录，产物落其 `build/`。", "",
         "## 统一验收（每章完成时逐项确认）", "",
         "- [ ] 正文符合体量预算，`run.py check` 与 `run.py render` 通过",
         "- [ ] 示例经 `run.py verify --changed` 编译通过，正文承诺的输出与实测一致",
@@ -124,7 +124,7 @@ def render(part, rows):
             body = f"`content/{part_}/{chapter}.qmd`"
             example = (f"`code/{part_}/{chapter}.cpp`" if code is None
                        else code if code.startswith("—") else f"`{code}`")
-            spec_cell = "；".join(f"`{p}`" for p in extra) or "—"
+            spec_cell = "、".join(f"`{p}`" for p in extra) or "—"
         lines.append("| `{}` | {} | {} | {} | {} | {} | {} | {} |".format(
             tid, chapter, status, f"`{dep}`" if dep else "—", body, example, spec_cell, note))
     return "\n".join(lines) + "\n"
@@ -168,7 +168,7 @@ def main():
         return 0
     if drift:
         print(f"DRIFT: {len(drift)} 个矩阵与章节表不一致：{', '.join(drift)}")
-        print("确认以脚本为准时运行 generate_tasks.py --write；否则先修 CHAPTERS。")
+        print("确认以脚本为准时运行 generate_tasks.py --write。否则先修 CHAPTERS。")
         return 1
     print(f"OK: {len(ORDER)} 个矩阵与章节表一致，共 {len(CHAPTERS)} 章。")
     return 0

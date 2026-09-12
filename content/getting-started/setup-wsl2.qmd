@@ -2,7 +2,7 @@
 title: "搭建 WSL2 开发环境"
 ---
 
-本章建立一套能编译并运行 C++ 示例的环境。完成后，Ubuntu 终端里 `g++`、`CMake`、`Ninja`、`gdb` 和 `clangd` 都可用，Windows Terminal 和 VS Code 能打开同一个项目目录。后续章节以这三个结果为入口：能进入 Ubuntu、能安装工具链、能从 Windows 编辑项目。
+本章建立一套能编译并运行 C++ 示例的环境。完成后，Ubuntu 终端里 `g++`、`CMake`、`Ninja`、`gdb` 和 `clangd` 都可用，Windows Terminal 和 VS Code 能打开同一个项目目录。
 
 ## 环境由哪些部分组成
 
@@ -16,7 +16,7 @@ title: "搭建 WSL2 开发环境"
 | `clangd` | 还原真实编译参数，提供代码提示与诊断 | 安装完成 |
 | Windows Terminal、VS Code | 终端显示与编辑调试 | 两者都能打开 Ubuntu 中的项目 |
 
-本章按顺序完成四件事，前一步的结果就是后一步的执行环境，跳过任何一步都会让后面的命令找不到地方运行：
+本章按顺序完成四件事，前一步的结果就是后一步的执行环境：
 
 1. 启用 WSL2 并装好 Ubuntu，得到能输入命令的 Linux 终端。
 2. 换用国内镜像源并更新，让软件包能正常下载。
@@ -31,15 +31,22 @@ title: "搭建 WSL2 开发环境"
 wsl --install
 ```
 
-安装完成后重启电脑。首次打开 Ubuntu 时创建 Linux 用户名和密码；输入密码时不显示字符属于正常现象。看到 Ubuntu 提示符后，本节完成。
+安装完成后重启电脑。首次打开 Ubuntu 时创建 Linux 用户名和密码。输入密码时不显示字符属于正常现象。看到 Ubuntu 提示符后，本节完成。
 
-需要指定版本时使用 `wsl --install -d Ubuntu-26.04`，支持的发行版名称和参数见 [安装 WSL 发行版](https://learn.microsoft.com/en-us/windows/wsl/install)。离开开发环境时运行 `wsl --shutdown`；再次输入 `wsl` 会重新启动发行版。
+想指定发行版时，先运行 `wsl --list --online` 选定一个名称，再替换进下面命令的尖括号。尖括号本身不是要输入的内容。
+
+```powershell
+# 安装指定的发行版
+wsl --install -d <发行版名称>
+```
+
+发行版名称由 Microsoft 维护，会随版本更新变化，所以这里不预先固定版本号。完整参数见[安装 WSL 发行版](https://learn.microsoft.com/en-us/windows/wsl/install)。离开开发环境时运行 `wsl --shutdown`，再次输入 `wsl` 会重新启动发行版。
 
 ## 更换软件源并更新系统
 
-Ubuntu 官方软件源在国内访问较慢，首次使用时先换成镜像站。不同 Ubuntu 版本使用的软件源文件格式和路径不同，具体改法以 [清华大学开源软件镜像站的 Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 为准，按本机 Ubuntu 版本选择对应的配置。
+Ubuntu 官方软件源在国内访问较慢，首次使用时先换成镜像站。不同 Ubuntu 版本的软件源文件格式和路径不同，具体改法以[清华大学开源软件镜像站的 Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)为准。
 
-换源完成后先读取新的软件包索引，再升级已安装的软件包。从这里开始在 Ubuntu 终端执行。
+换源完成后读取新的软件包索引，再升级已安装的软件包。从这里开始在 Ubuntu 终端执行。
 
 ```bash
 sudo apt update
@@ -49,7 +56,7 @@ sudo apt upgrade -y
 两条命令都正常结束，说明镜像源可用。换源只是缩短下载时间，不会改变 Ubuntu 的版本和已安装的软件包。
 
 ::: {.callout-note}
-腾讯云、华为云和阿里云都提供 Ubuntu 镜像，地址与同步策略见 [Ubuntu 镜像站列表](https://launchpad.net/ubuntu/+archivemirrors)。任选一个可访问的镜像站，按 [Ubuntu 使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/) 给出的格式修改配置。
+腾讯云、华为云和阿里云都提供 Ubuntu 镜像，地址与同步策略见 [Ubuntu 镜像站列表](https://launchpad.net/ubuntu/+archivemirrors)，改法仍按上面的使用帮助。
 :::
 
 ## 安装 C++ 工具链
@@ -62,9 +69,9 @@ sudo apt install -y build-essential gdb cmake ninja-build
 
 `g++` 编译并链接 C++ 程序，`CMake` 描述构建规则，`Ninja` 执行 `CMake` 生成的规则，`gdb` 调试运行中的程序。`build-essential` 会一并安装 `gcc`、`make` 和标准头文件，因此不需要再单独安装编译器。
 
-版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[`CMake` 文档](https://cmake.org/documentation/) 与 [`Ninja` 手册](https://ninja-build.org/manual.html)。安装后直接进入下一节；若后续命令报告 `command not found`，再按常见问题处理。
+版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[CMake 文档](https://cmake.org/documentation/)、[Ninja 手册](https://ninja-build.org/manual.html)。安装后直接进入下一节。若后续命令报告 `command not found`，再按常见问题处理。
 
-装完不必逐条跑版本命令预检；报 `command not found` 时回到[常见问题](#常见问题)重装。
+装完不必逐条跑版本命令预检。报 `command not found` 时回到[常见问题](#常见问题)重装。
 
 ### 安装 clangd 语言服务
 
@@ -78,21 +85,19 @@ sudo apt install -y clangd
 
 ## 接入终端与编辑器
 
-目标是从 Windows 侧进入刚才的 Ubuntu 项目目录。终端只负责输入输出，编辑器负责打开和调试文件；两者都不改变 Ubuntu 中已经安装的工具链。
+目标是从 Windows 侧进入刚才的 Ubuntu 项目目录。终端只负责显示和键盘输入，编辑器负责打开和调试文件，两者都不改变 WSL2 提供的 Ubuntu 和已安装的工具链。
 
 ### Windows Terminal
 
-Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Microsoft Store 或 [GitHub Releases](https://github.com/microsoft/terminal/releases) 安装，步骤见 [安装 Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)。
+Windows Terminal 提供多标签、分屏和 GPU 加速文本渲染，从 Microsoft Store 或 [GitHub Releases](https://github.com/microsoft/terminal/releases) 安装，步骤见[安装 Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)。
 
-安装后在“设置 → 启动”中把默认配置文件选为 Ubuntu，启动目录设为当前工作路径，新开标签就进入项目所在目录。
-
-> Windows Terminal 只负责显示和键盘输入，Ubuntu 与工具链由 WSL2 提供。更换终端不会改变已安装的开发环境，配色和字体等 Linux 侧偏好可按需调整。
+安装后在“设置 → 启动”中把默认配置文件选为 Ubuntu，启动目录设为当前工作路径，新开标签就进入项目所在目录。配色和字体等偏好可按需调整，换终端不影响已装好的环境。
 
 ### VS Code
 
 VS Code 通过 Remote - WSL 扩展直接编辑和调试 WSL2 中的文件，Windows 侧只需安装 VS Code 本体。在 Ubuntu 的项目目录中运行 `code .`，VS Code 会打开当前目录并在首次连接时安装 WSL 侧的扩展服务端，连接方式见 [VS Code 的 WSL 文档](https://code.visualstudio.com/docs/remote/wsl)。
 
-C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[`clangd`](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 `clangd` 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
+C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 clangd 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
 
 ## 常见问题
 
@@ -102,7 +107,7 @@ C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?i
 
 ### command not found
 
-任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。按[安装 C++ 工具链](#安装-c-工具链)的两条命令重装；只缺 `clangd` 时执行第二条。
+任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。按[安装 C++ 工具链](#安装-c-工具链)的两条命令重装。只缺 `clangd` 时执行第二条。
 
 ```bash
 sudo apt install -y build-essential gdb cmake ninja-build
@@ -116,7 +121,7 @@ sudo apt install -y clangd
 环境五层就绪后，你手上有一套能编译并运行示例的 Linux 环境，每一项都能自己确认：
 
 - 输入 `wsl` 能进入 Ubuntu，`sudo apt update` 能正常读到镜像源。
-- 编译与构建命令都能执行，`clangd --version` 能打印版本号；报 `command not found` 时按[常见问题](#常见问题)重装。
+- 编译与构建命令都能执行，`clangd --version` 能打印版本号。报 `command not found` 时按[常见问题](#常见问题)重装。
 - Windows Terminal 与 VS Code 都能打开 Ubuntu 中的项目目录。
 
 下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 `CMake` 与 `Ninja` 自动构建。

@@ -8,14 +8,14 @@
 
 零新增元数据：路由表就是 .agents/skills/cpp-content/references/tasks/<part>.md 任务矩阵。
 「公共必读」行给出该 part 每章共用的 reference，矩阵行的「专项必读」列给出该章独有的部分，
-「状态」列给出是否已开工；因此矩阵改名或合并章节都不需要改本脚本。
+「状态」列给出是否已开工，因此矩阵改名或合并章节都不需要改本脚本。
 
 用法：
   python scope.py <part>/<chapter>      # 一个章节单元（矩阵登记即可解析，正文可尚未存在）
   python scope.py <仓库内任意路径>       # 由路径反查其所属单元
   python scope.py theme|dev|repo        # 非章节类域任务
   python scope.py --list                # 列出矩阵登记的全部章节单元与状态
-退出码：0 = 解析成功；1 = 目标无法解析（提示按约定命名，不做猜测）。
+退出码：0 = 解析成功，1 = 目标无法解析（提示按约定命名，不做猜测）。
 """
 
 import argparse
@@ -84,7 +84,7 @@ def repo_paths(text):
 
 
 def matrix_path(root, part):
-    """part 对应的任务矩阵文件；不存在返回 None。"""
+    """part 对应的任务矩阵文件。不存在返回 None。"""
     path = root / TASKS_DIR / f"{part}.md"
     return path if path.is_file() else None
 
@@ -121,7 +121,7 @@ def parse_matrix(path):
 
 
 def first_path(cell):
-    """取单元格里的第一个仓库路径；「—（不新建）」之类返回空串。"""
+    """取单元格里的第一个仓库路径。「—（不新建）」之类返回空串。"""
     paths = repo_paths(cell)
     return paths[0] if paths else ""
 
@@ -144,7 +144,7 @@ def resolve_path(target, root):
     """由任意仓库内路径反查所属章节单元。
 
     `content/<part>/<chapter>.qmd` 与 `code/<part>/<chapter>.cpp` 取文件主名，
-    `code/<part>/<chapter>/...` 取第三段目录名；两者都要求章节已在矩阵登记。
+    `code/<part>/<chapter>/...` 取第三段目录名。两者都要求章节已在矩阵登记。
     """
     path = (root / target).resolve()
     try:

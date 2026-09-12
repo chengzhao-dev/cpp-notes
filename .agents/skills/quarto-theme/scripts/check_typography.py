@@ -6,15 +6,15 @@
 里的阈值变成断言，改 grid、改缩进、改文案之后由 run.py check 判定，不靠人工目视维持。
 
 口径（唯一出处在同级 measure_pages.mjs）：
-  盒子 = 代码块 / 表格 / 提示框 / 引用块 / 图表容器，只算最外层；
-  文字带 = 盒子之外的 p 与 li；节 = 正文的直接子 section（一个 ## 一节）。
+  盒子 = 代码块 / 表格 / 提示框 / 引用块 / 图表容器，只算最外层。
+  文字带 = 盒子之外的 p 与 li。节 = 正文的直接子 section（一个 ## 一节）。
 
 断言分两组：
   T1 计算样式与几何：1280 与 1100 两档视口，由 measure_pages.mjs 测量后在此断言。
   T2 锚点：全仓 .qmd 里的 `#锚点` 引用（含同页引用）必须能在 _book 产物中找到同名 id。
 
 用法：python check_typography.py [--book-dir _book] [--verbose]
-退出码：0 = 全部通过；1 = 有断言失败；2 = 产物目录不存在或测量器不可用。
+退出码：0 = 全部通过，1 = 有断言失败，2 = 产物目录不存在或测量器不可用。
 闸门：1100 档正文 < 540px 或目录仍折行时，按计划把 _quarto.yml 的 margin-width
       由 256px 降回 224px 复测，不要再压 sidebar-width 或 --toc-indent。
 """
@@ -35,7 +35,7 @@ sys.path.insert(0, str(ROOT / ".agents" / "skills" / "python-tools" / "scripts")
 from temp_paths import temp_dir  # noqa: E402
 MEASURE = Path(__file__).resolve().parent / "measure_pages.mjs"
 
-# 阈值出处见 typography-density-pattern.md；改数值必须同时改那份知识文件。
+# 阈值出处见 typography-density-pattern.md。改数值必须同时改那份知识文件。
 WIDTH_FLOOR = {1280: 640, 1100: 540}        # 正文段落实测宽度下限（px）
 # 当前正文与主题间距的实测上限，用于捕获后续意外增长。
 HEIGHT_CEIL = {"setup-wsl2": 4300, "first-program": 5100}   # 正文容器高上限（1280 档）
@@ -52,7 +52,7 @@ FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 
 
 def resolve_node():
-    """按 CPP_MEMO_NODE、PATH 顺序解析 node；缺失时返回 None。"""
+    """按 CPP_MEMO_NODE、PATH 顺序解析 node。缺失时返回 None。"""
     for candidate in (os.environ.get("CPP_MEMO_NODE"), shutil.which("node")):
         if candidate and Path(candidate).is_file():
             return str(candidate)
@@ -76,7 +76,7 @@ def resolve_playwright_root():
 
 
 def measure(book_dir, verbose):
-    """跑浏览器测量器，返回解析后的指标；运行时不可用时返回 None。"""
+    """跑浏览器测量器，返回解析后的指标。运行时不可用时返回 None。"""
     node = resolve_node()
     pw_root = resolve_playwright_root()
     if not node or not pw_root or not MEASURE.is_file():

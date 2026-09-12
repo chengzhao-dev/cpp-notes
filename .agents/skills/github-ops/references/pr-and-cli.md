@@ -15,7 +15,7 @@ gh issue list
 ## Issue / PR / Release
 ### PR
 
-- 小步提交；描述含测试计划
+- 小步提交。描述含测试计划
 - 合并前 `quarto render` 与 `verify_examples.py` 通过
 
 ### Issue

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """编译校验仓库中的 C++ 示例，确保文档随附正确可运行的代码。
 
-编译环境：Windows 调用 wsl.exe，按需启动默认 WSL2 Ubuntu，再使用 g++/clang++；
+编译环境：Windows 调用 wsl.exe，按需启动默认 WSL2 Ubuntu，再使用 g++/clang++。
 Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
 用法：
   python verify_examples.py
@@ -11,18 +11,18 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
 
 Windows 下使用仓库配置的 Python 3.12 运行：
   python .agents/skills/agent-ops/scripts/run.py verify
-退出码：0 = 全部通过；1 = 至少一处失败。
+退出码：0 = 全部通过，1 = 至少一处失败。
 
 编译阶段：
-  1. code/ 下书籍示例（规范见 references/cpp/engineering.md，-std=c++20 -Wall -Wextra）；
+  1. code/ 下书籍示例（规范见 references/cpp/engineering.md，-std=c++20 -Wall -Wextra）。
      跳过 build/ 等构建目录，不校验 CMake 生成物
   2. 本 skill references/cpp/*.md 内嵌完整示例（含 int main 的 ```cpp 块）
   3. content/**/*.qmd 内嵌完整示例
-风格阶段（仅 --style；规范见 references/cpp/code-style.md）：
+风格阶段（仅 --style，规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
   S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
-  配置显式指向 .agents/skills/cpp-content/assets/config/（.clang-format、.clang-tidy）；
-  clang 工具缺失/过旧时降级为警告；编译始终是硬门槛。
+  配置显式指向 .agents/skills/cpp-content/assets/config/（.clang-format、.clang-tidy）。
+  clang 工具缺失/过旧时降级为警告。编译始终是硬门槛。
 """
 
 import argparse
@@ -50,14 +50,14 @@ ON_WINDOWS = platform.system() == "Windows"
 
 
 def tool_major_version(tool):
-    """返回编译环境内工具的主版本号；无法探测时返回 0。"""
+    """返回编译环境内工具的主版本号。无法探测时返回 0。"""
     result = sh(f"{tool} --version 2>&1")
     m = re.search(r"version\s+(\d+)\.", result.stdout or "")
     return int(m.group(1)) if m else 0
 
 
 def to_env_path(native_path):
-    """Windows 上把 D:\\dir\\f.cpp 转成 WSL 可见的 /mnt/d/dir/f.cpp；Linux 原样返回。"""
+    """Windows 上把 D:\\dir\\f.cpp 转成 WSL 可见的 /mnt/d/dir/f.cpp，Linux 原样返回。"""
     if not ON_WINDOWS:
         return native_path
     drive = native_path[0].lower()
@@ -65,7 +65,7 @@ def to_env_path(native_path):
 
 
 def sh(cmd, timeout=120):
-    """在编译环境执行命令；Windows 经 WSL 按需启动 Ubuntu。"""
+    """在编译环境执行命令。Windows 经 WSL 按需启动 Ubuntu。"""
     argv = ["wsl", "bash", "-c", cmd] if ON_WINDOWS else ["bash", "-c", cmd]
     return subprocess.run(
         argv,
@@ -95,7 +95,7 @@ def compile_source(compiler, standard, env_path, out_name):
 
 
 def compile_block(compiler, standard, body, label):
-    """编译一个从 markdown 抽出的 cpp 代码块；返回 (ok, message)。"""
+    """编译一个从 markdown 抽出的 cpp 代码块。返回 (ok, message)。"""
     directory = temp_dir("runtime")
     tmp = directory / "__qmd_block.cpp"
     with tmp.open("w", encoding="utf-8", newline="\n") as fh:

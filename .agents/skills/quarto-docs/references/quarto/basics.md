@@ -38,7 +38,7 @@ format: html
 | 字段 | 作用 |
 |---|---|
 | `title` / `subtitle` | 标题 / 副标题 |
-| `description` | **只有根 `index.qmd` 会渲染成页面可见副标题**（产物里的 `<div class="description">`）。part 封面写该字段只产出 `<meta name="description">` 供搜索引擎使用，页面上不显示，因此分组引导句必须写成 `##` 下的正文段落；普通章节不写该字段 |
+| `description` | **只有根 `index.qmd` 会渲染成页面可见副标题**（产物里的 `<div class="description">`）。part 封面写该字段只产出 `<meta name="description">` 供搜索引擎使用，页面上不显示，因此分组引导句必须写成 `##` 下的正文段落。普通章节不写该字段 |
 | `author` / `date` | 作者 / 日期（`today` 自动取当天） |
 | `format` | 输出格式（`html`/`pdf`/`revealjs`），可写对象形式配置子选项 |
 | `lang` | 语言，如 `zh`（影响部分 HTML 行为与 PDF） |
@@ -80,7 +80,7 @@ format:
     # references/quarto/rendering-and-output.md 的现行取值表为准，本文件不复制
 ```
 
-- `book:` 下的 `title`、`author`、`date` 为书目信息；`chapters` 定义章节顺序。
+- `book:` 下的 `title`、`author`、`date` 为书目信息，`chapters` 定义章节顺序。
 - **`index.qmd` 必须存在**，作为 Book 首页/入口。
 - 章节可放子目录（如 `content/getting-started/setup-wsl2.qmd`），在 `chapters` 写相对路径。
 - **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本书在用），产生分卷/分部标题。索引页的 `.hero-eyebrow` 是可选视觉组件，只在正文真的写了该 div 时生效，与 `part:` 的写法无关，不构成索引页的硬性要求。
@@ -91,7 +91,7 @@ format:
 
 章节标题**二选一**：用 YAML `title:` **或**顶层 `# H1`，二者皆有时同文本必然重复渲染（YAML 标题进标题栏 `<header>`，`# H1` 另成一级章节），并造成**章节编号/结构错乱**。
 
-推荐写法——用 `title:`，**不要**再写同文本 `# H1`；小节从 `##`（H2）开始：
+推荐写法——用 `title:`，**不要**再写同文本 `# H1`，小节从 `##`（H2）开始：
 
 ```markdown
 ---
@@ -105,12 +105,12 @@ title: "章节标题"
 ```
 
 - 侧边栏 / TOC / 面包屑 / 章节号均取自 `title:`。
-- 首页 `index.qmd` 同理：去掉重复 `# H1`；其 `description:` **会**显示为可见引导段。
+- 首页 `index.qmd` 同理：去掉重复 `# H1`，其 `description:` **会**显示为可见引导段。
 - 普通章节若需可见开篇说明，**在正文顶部写普通段落**（`description:` 在此只进 `<meta>`）。
 - 页面内不得再出现顶层 `# H1`（它会被当作又一个编号章节，重复且错位）。
 - **标题层级归并（H2 伞 + H3 子）**：多个内容高度相关、同属一个大阶段的同级 `##` 小节，
   应归并为一个 `##` 伞标题，各块降为 `###` 子标题，避免平铺过多同级 H2 造成结构破碎。
-  示例：章首用一段正文引言交代动机和读者收益，路线图紧跟其后；
+  示例：章首用一段正文引言交代动机和读者收益，路线图紧跟其后。
   其后 `## 准备与安装` 下挂 `### 先决条件`、`### 安装 WSL2`（内含基本验证与常见问题 callout）、`### 启动与关闭`。
   归并前先 grep 确认无 `@sec-` / `#anchor` 交叉引用这些标题，以免断链。
 

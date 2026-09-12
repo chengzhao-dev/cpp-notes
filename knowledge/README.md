@@ -13,7 +13,7 @@ knowledge/
 └── agent-ops/                    # Agent 运行、重构与维护
 ```
 
-按性质创建子目录，不创建空目录；文件名与目录名一律纯 ASCII。
+按性质创建子目录，不创建空目录。文件名与目录名一律纯 ASCII。
 
 ## 文件规范（强制）
 
@@ -21,7 +21,7 @@ frontmatter 字段：
 
 | 字段 | 必填 | 作用 |
 |---|---|---|
-| `kb_id` | 是 | 全局唯一；现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-typography-density-v1`），历史 id 保持不改名，改名等于新建知识 |
+| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-typography-density-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
 | `domain` | 是 | 检索预过滤维度，取值与 Skill 目录名一致 |
 | `subdomain` | 建议 | 同一 Skill 内的主题筛选 |
@@ -38,12 +38,12 @@ frontmatter 字段：
 1. 全文只有一个 `# H1`，与 `title` 一致。
 2. `##` 是 **Parent Chunk** 边界（返回给 LLM 的大块），`###` 是 **Child Chunk** 边界（精准匹配的小块）。
 3. 每个 `###` 下必须有正文：只有标题没有内容的壳块会被分块器丢弃。
-4. 不复述 skill 侧的写作约定；需要指向别处时写「见标识 `<kb_id>` 的知识文件」。
+4. 不复述 skill 侧的写作约定。需要指向别处时写「见标识 `<kb_id>` 的知识文件」。
 5. 表格不超过 30 行，禁止段落中间的 HTML 锚点跳转。
 
 ## 检索不变量
 
-1. 不产出无正文的标题壳 Child；不产出与 Parent 逐字节相同的 Child。
+1. 不产出无正文的标题壳 Child。不产出与 Parent 逐字节相同的 Child。
 2. 每个 Child 都带 `[标题路径] ` 前缀，保证独立可判读。
 3. 检索器交给 LLM 的是 Stage 5 回溯后的 Parent，评测口径必须与之一致。
 4. 中文分词取二元组，ASCII 标识符整体保留并拆下划线，**语言关键字永不作为停用词**。

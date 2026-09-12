@@ -8,7 +8,7 @@ WSL 之间用同一个文件跑。SQLite 自带 FTS5 与 bm25()，单文件、�
 三层索引的实际落地：
   Layer 1 关键词：FTS5 虚表（CJK 二元组 + ASCII 标识符），bm25() 排序 —— 完整可用。
   Layer 2 向量：chunks.vector 存定长 packed-float 数组，向量由本文件的 embed()
-               生成，无外部模型时是 hashing trick 的词分布向量，不是神经嵌入；
+               生成，无外部模型时是 hashing trick 的词分布向量，不是神经嵌入。
                接真实模型只需替换 embed()。规模侧由 retriever.vector_chard 建成
                「维度 到 块」的倒排分片，仍是精确余弦检索（不是 goal 3.2 点名的
                HNSW/FAISS 那类 ANN：本机无第三方包且禁网，无法安装），代价见
@@ -17,14 +17,14 @@ WSL 之间用同一个文件跑。SQLite 自带 FTS5 与 bm25()，单文件、�
   Layer 3 图谱：concept / edge / community 三张表，节点来自 Chunk 里的 C++ 标识符与
                标签，边是同块共现，社区是连通分量摘要。
 
-增量策略：以 content_hash 为准，未变的 Chunk 不重新 embed、不重建 FTS 行；
+增量策略：以 content_hash 为准，未变的 Chunk 不重新 embed、不重建 FTS 行。
 删除的文件与消失的 Chunk 标 deprecated 而不是物理删除，支持回溯。
 
 用法：
     python .agents/skills/python-tools/scripts/indexer.py              # 增量构建（先跑 chunker）
     python .agents/skills/python-tools/scripts/indexer.py --rebuild    # 推倒重建
     python .agents/skills/python-tools/scripts/indexer.py --verbose    # 打印每层的行数与耗时
-退出码：0 = 成功；1 = 注册表缺失或有文件不符合规范。
+退出码：0 = 成功，1 = 注册表缺失或有文件不符合规范。
 """
 
 from __future__ import annotations
@@ -182,7 +182,7 @@ def align_fts_rowids(con: sqlite3.Connection) -> int:
     """把 chunks_fts 的 rowid 对齐到主表，返回重建的行数。
 
     FTS5 里 chunk_id 是 UNINDEXED 列，按它删除会退化成全表扫描，增量索引因此
-    近似 O(N^2)。对齐后删改都按 rowid 定位，代价与索引规模无关；历史行的 rowid
+    近似 O(N^2)。对齐后删改都按 rowid 定位，代价与索引规模无关。历史行的 rowid
     与主表无对应关系，所以只在布局迁移时整体重建一次。
     """
     con.execute("DELETE FROM chunks_fts")
@@ -346,7 +346,7 @@ def summarize(value: str, limit: int) -> str:
 
 
 def build_summaries(con: sqlite3.Connection, registry: dict) -> tuple[int, int]:
-    """写入 L1（文档一句话）与 L2（每个 Parent 概要）；L3 就是 Chunk 本身。
+    """写入 L1（文档一句话）与 L2（每个 Parent 概要）。L3 就是 Chunk 本身。
 
     摘要随索引一起重建，因此永远不比正文陈旧。单独记一份摘要时间戳只会多出
     第二个真相源，增量判断仍然只看 content_hash。

@@ -32,7 +32,7 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 1. 改 `format: html:` 任何取值都属于主题级改动，会触发整本渲染，先确认代价再走 `run.py render`。
 2. 新增或删减 `.agents/skills/quarto-theme/assets/theme/css/**` 组件样式表时，同步修改配置里的样式表清单，否则新样式不参与渲染。
 3. 页面视觉问题（提示符配色、文件名条、术语色）改 `.agents/skills/quarto-theme/assets/theme/**` 与设计令牌，不在文档里内联样式，也不改高亮配置。
-4. 流程图使用图表专用围栏，配色由主题样式控制；配置里不指定图表主题名。
+4. 流程图使用图表专用围栏，配色由主题样式控制。配置里不指定图表主题名。
 5. 拿不准选项名、默认值或嵌套层级时查官方参考页，不凭记忆写 YAML（入口见本文件 #8）。
 
 ### 验证
@@ -60,18 +60,18 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 ### 3. 路径与资源 404
 
 - **症状**：本地正常，发布后图片或资源打不开。
-- **处置**：改用相对路径，不要写死 `https://...` 指向内部资源；核对文件名大小写，站点托管区分大小写。
+- **处置**：改用相对路径，不要写死 `https://...` 指向内部资源，核对文件名大小写，站点托管区分大小写。
 
 ### 4. 主题/TOC 不生效
 
 - **症状**：改了 `theme:` 或 `toc:` 页面没变化。
-- **处置**：先硬刷新（Ctrl+Shift+R）排除缓存；再确认两者位于 `format: html:` 下。TOC 只收录 `##` 及以下的真实 Markdown 标题，`**加粗**` 与裸 `<h2>` 不会进入。
+- **处置**：先硬刷新（Ctrl+Shift+R）排除缓存，再确认两者位于 `format: html:` 下。TOC 只收录 `##` 及以下的真实 Markdown 标题，`**加粗**` 与裸 `<h2>` 不会进入。
 
 ### 5. 中文乱码/编码
 
 - **症状**：中文变成「锟/鐜/绔」类字串，或文件带 BOM、行尾变 CRLF。
-- **处置**：改 `.qmd` 或 Skill 文档后先跑 `python .agents/skills/agent-ops/scripts/check_encoding.py`；失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）；front matter 可设 `lang: zh`。
-- **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入；不要让系统代码页参与中文读写。
+- **处置**：改 `.qmd` 或 Skill 文档后先跑 `python .agents/skills/agent-ops/scripts/check_encoding.py`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
+- **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入，不要让系统代码页参与中文读写。
 - **自检**：`python .agents/skills/agent-ops/scripts/run.py check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
 
 ### 6. 渲染失败排查顺序
@@ -95,7 +95,7 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 ### 9. 路径/名称含特殊字符导致渲染失败
 
 - **症状**：`quarto render` 报 `recoverEncode: invalid argument (cannot encode character '\8209')`，错误栈在 `main.lua` 的 `writeFullIndex`/`io.open`。
-- **处置**：项目、目录、文件名一律纯 ASCII，连字符一律用普通 `-`（U+002D）。可用 `.agents/skills/quarto-docs/scripts/check_ascii_names.py` 校验整个仓库；命名规范见 `../../../cpp-content/references/cpp/cpp.md`。
+- **处置**：项目、目录、文件名一律纯 ASCII，连字符一律用普通 `-`（U+002D）。可用 `.agents/skills/quarto-docs/scripts/check_ascii_names.py` 校验整个仓库。命名规范见 `../../../cpp-content/references/cpp/cpp.md`。
 - **定位隐藏字符**（把目录名转成字节，查看是否出现 `E2 80 91`）：
 
 ```powershell
@@ -106,7 +106,7 @@ $d = Get-ChildItem -LiteralPath "D:\Github" -Force
 ### 10. YAML `title:` 与同文本 `# H1` 重复 → 页面出现两个标题
 
 - **症状**：标题重复出现两遍，Book 章节结构错位。
-- **处置**：章节标题**二选一**，用 YAML `title:` 后不再写同文本 `# H1`，页面内小节从 `##` 开始；开篇可见文字写正文顶部。普通章节**不要写** `description:`（仅 `index.qmd` 封面页可见）。规范唯一出处见 `basics.md`「章节标题约定」。
+- **处置**：章节标题**二选一**，用 YAML `title:` 后不再写同文本 `# H1`，页面内小节从 `##` 开始。开篇可见文字写正文顶部。普通章节**不要写** `description:`（仅 `index.qmd` 封面页可见）。规范唯一出处见 `basics.md`「章节标题约定」。
 
 ### 11. `---` 紧接段落 → 前一段被解析为 setext 二级标题
 

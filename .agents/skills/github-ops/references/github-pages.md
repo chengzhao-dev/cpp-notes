@@ -15,8 +15,8 @@ Actions 渲染 + 推 `gh-pages` 产物分支，配置在 `.github/workflows/page
 1. Pages 设置选 **Deploy from a branch** → 分支 `gh-pages`、目录 `/ (root)`。
 2. `quarto render` → `python3 .agents/skills/python-tools/scripts/render/defer_mermaid.py`（本地 render 不自动跑，CI 必须执行）。
 3. `peaceiris/actions-gh-pages@v4` 上传 `./_book` 到 `gh-pages`，`force_orphan: true`。
-4. 幂等纠正 Pages 源：先 POST 再 PUT，返回 409 属正常；非 2xx/409 时提示去 Settings → Pages 手工选择。
-5. `permissions` 只需 `contents: write` 与 `pages: write`；不用 `configure-pages`/`upload-pages-artifact`/`deploy-pages`，也不需要 `id-token: write`。
+4. 幂等纠正 Pages 源：先 POST 再 PUT，返回 409 属正常，非 2xx/409 时提示去 Settings → Pages 手工选择。
+5. `permissions` 只需 `contents: write` 与 `pages: write`。不用 `configure-pages`/`upload-pages-artifact`/`deploy-pages`，也不需要 `id-token: write`。
 
 ## 备选模式（新项目或无 Actions 时）
 
@@ -39,5 +39,5 @@ Actions 渲染 + 推 `gh-pages` 产物分支，配置在 `.github/workflows/page
 ## 页面未更新时的处置
 
 1. 先看工作流是否成功，再核对部署源的分支与目录，最后才考虑缓存与分发延迟。
-2. 任务成功但页面未变时不要重复触发部署；原因未确认前重复部署只会加深半更新风险。
+2. 任务成功但页面未变时不要重复触发部署。原因未确认前重复部署只会加深半更新风险。
 3. 本地正常、线上 404 优先查文件名大小写。
