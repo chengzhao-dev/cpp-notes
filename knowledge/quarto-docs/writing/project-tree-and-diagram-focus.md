@@ -7,7 +7,7 @@ tags: [project_tree, hidden_config, build_output, cache, information_architectur
 level_range: [0, 5]
 dependencies: ["cpp-quarto-chapter-pattern-v1", "cpp-quarto-section-focus-density-v1", "cpp-quarto-typography-density-v1"]
 created: "2026-09-11"
-updated: "2026-09-11"
+updated: "2026-09-12"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 1250
 ---
@@ -21,6 +21,8 @@ estimated_tokens: 1250
 文件名、大小写和层级是读者复制命令、定位配置和理解构建产物的依据。目录树若凭想象添加文件，读者会在实际工程中找不到它。若把所有缓存照搬进来，读者又会把生成物误认为需要维护的项目文件。因此先从磁盘确认，再筛选当前任务需要的教学视图。
 
 `.cache/`、日志、对象文件和 CMake 内部缓存没有独立教学任务，可以省略。`build/` 虽然也是生成目录，但其中的可执行文件和 `compile_commands.json` 能证明构建闭环或解释 `clangd`，所以只展开这两个关键产物。
+
+入门工程的根行写作 `first-program/`，并标注“示例工程根目录”。固定注释词典如下：`.vscode/` 是“VS Code 工作区配置”，`build/` 是“CMake/Ninja 构建输出目录，请勿手动修改”，`compile_commands.json` 是“供 clangd 等工具读取的编译数据库”，`build-and-run.sh` 是“配置、构建并运行程序的脚本”。注释统一采用名词化的“路径 + 用途或性质 + 必要提醒”结构。
 
 ## 展示顺序服务于工程心智模型
 

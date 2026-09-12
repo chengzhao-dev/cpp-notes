@@ -6,7 +6,7 @@ subdomain: "toolchain"
 tags: [toolchain, cmake, compiler_flags, sanitizer, warnings, optimization, header]
 level_range: [0, 9]
 created: "2026-09-09"
-updated: "2026-09-11"
+updated: "2026-09-12"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 296
 ---
@@ -20,6 +20,8 @@ estimated_tokens: 296
 ## 编译与诊断
 
 示例使用 C++20、常见警告和可重复的构建配置。Sanitizer 用于调试和未定义行为专题。不要把未启用的诊断选项留在入门示例中。优化必须先测量基线，再报告收益、代价和适用范围。
+
+`g++` 是编译器命令，负责把源文件编译并链接为可执行文件。CMake 是构建系统，负责读取构建规则并生成底层构建文件。Ninja 是 CMake 可以生成的底层构建工具，负责执行具体的编译和链接步骤。教程应使用“通过 `g++` 命令行编译，通过 CMake 配置和构建”的表述，避免把三者写成同一层级的工具。
 
 ## CMake
 
