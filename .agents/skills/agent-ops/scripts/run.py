@@ -34,7 +34,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 MIN_PYTHON = (3, 12)
-RUNTIME_CONFIG = ROOT / ".agents" / "skills" / "python-tools" / "assets" / "config" / "runtime.json"
+MANIFEST = ROOT / ".agents" / "manifest.json"
+TOOL_CONFIG = ROOT / ".agents" / "skills" / "python-tools" / "assets" / "config" / "runtime.json"
 
 
 class ToolNotFound(RuntimeError):
@@ -42,9 +43,9 @@ class ToolNotFound(RuntimeError):
 
 
 def runtime_config():
-    """读取本机运行时配置。配置缺失或损坏时交给后续搜索。"""
+    """读取外部工具配置；不得用于选择 Python。"""
     try:
-        return json.loads(RUNTIME_CONFIG.read_text(encoding="utf-8"))
+        return json.loads(TOOL_CONFIG.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {}
 
@@ -64,11 +65,12 @@ def python_version(candidate):
 
 
 def select_python():
-    """按固定路径优先、PATH 回退选择满足最低版本的 Python。"""
-    config = runtime_config()
-    candidates = [os.environ.get("CPP_MEMO_PYTHON"), config.get("python")]
-    candidates.extend(shutil.which(name) for name in ("python", "python3"))
-    candidates.append(sys.executable)
+    """只使用 manifest 指定且满足最低版本的 Python。"""
+    try:
+        config = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    candidates = [config.get("mcp", {}).get("command")]
     seen = set()
     for candidate in candidates:
         if not candidate:
@@ -427,10 +429,8 @@ def main():
         pass
 
     if PY is None:
-        print("FAIL  找不到满足 Python >= 3.12 的解释器；请安装 Python 或设置 CPP_MEMO_PYTHON")
+        print("FAIL  manifest 未提供可执行的 Python >= 3.12；请修复 .agents/manifest.json 的 mcp.command")
         return 1
-    if Path(PY).resolve() != Path(sys.executable).resolve():
-        os.execv(PY, [PY, str(Path(__file__).resolve()), *sys.argv[1:]])
     if sys.version_info < MIN_PYTHON:
         required = ".".join(map(str, MIN_PYTHON))
         print(f"FAIL  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")

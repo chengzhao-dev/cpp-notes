@@ -13,7 +13,8 @@ python .agents/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分�
 - 未明确要求时不 commit、push、创建 PR。不 force-push main。不建空 commit。
 - 不用 `git commit --amend`（除非修复刚失败且未推送的 commit）。不用 `-i` 交互式。不跳过 hooks。不更新 `git config`（除非明确要求）。
 - 只 `git add` 显式路径，禁止 `git add -A` 裹挟用户既有未提交改动。
-- 必传 `.agents/skills/**`。必不传 `/.agents/skills/python-tools/assets/config/runtime.json`（本机 Python 运行时配置）、`_book/`、`.quarto/`、`node_modules/`。忽略规则统一放根 `.gitignore`，不在嵌套目录放「自忽略 `.gitignore`」。
+- 提交信息使用中文分类前缀，例如“文档：”“修复：”“维护：”，让读者不看 diff 就能判断影响面与是否需要跑检查。整句保持中文，只有没有合适中文译名时才保留 `CMake`、`Ninja`、`clangd` 等技术标识。
+- 必传 `.agents/skills/**`。必不传本机运行时配置、`_book/`、`.quarto/`、`node_modules/`。项目 Python 唯一来源为已提交的 `.agents/manifest.json`，不得新增第二份解释器路径。忽略规则统一放根 `.gitignore`，不在嵌套目录放「自忽略 `.gitignore`」。
 
 ## Git 对比频率
 
@@ -69,7 +70,7 @@ git log --oneline -10
 
 先看 `git status --short`、`git diff --stat`、`git diff --name-only`，再按可独立回滚的边界分组暂存，每组显式路径 `git add`，随后检查 `git diff --cached --check` 与 `git diff --cached --stat`。
 
-前缀：`docs:` 文档与写作规范、`feat:` 新增功能或章节、`fix:` 行为修复、`refactor:` 不改变行为的结构调整、`chore:` 配置与维护。一次任务通常 3–5 个提交，按实际边界决定，不为拆分而拆分。
+前缀：`文档：` 表示文档与写作规范，`功能：` 表示新增功能或章节，`修复：` 表示行为修复，`重构：` 表示不改变行为的结构调整，`维护：` 表示配置与维护。一次任务通常 3–5 个提交，按实际边界决定，不为拆分而拆分。
 
 ## 日常流程与分支
 

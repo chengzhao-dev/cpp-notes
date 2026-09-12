@@ -7,7 +7,7 @@ tags: [gitattributes, line_ending, gitignore, branch_protection, renormalize, wo
 level_range: [0, 9]
 dependencies: ["cpp-tooling-pages-deploy-v1"]
 created: "2026-09-08"
-updated: "2026-09-11"
+updated: "2026-09-12"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 1300
 ---
@@ -73,6 +73,8 @@ estimated_tokens: 1300
 2. 同一行为变更跨多个文件时合并成一组，拆开反而制造不可运行的中间状态
 3. 提交信息前缀的作用是让读者不看 diff 就能判断影响面与是否需要跑检查
 4. 一次任务通常三到五组，超过说明改动本身该拆成多个任务。为拆而拆会让回溯成本高于收益
+
+面向中文读者的仓库统一使用中文分类前缀，例如“文档：”“修复：”“维护：”。分类前缀先标出变更性质，正文再说明动机与影响。`CMake`、`Ninja`、`clangd` 等没有稳定中文译名的技术标识可以保留英文，其余句子保持中文，避免同一项目出现中英文混杂的提交历史。
 
 ## Git 对比频率的取舍
 

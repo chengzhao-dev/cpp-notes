@@ -30,6 +30,7 @@ metadata:
 3. 目录、文件名、命令、版本和路径以磁盘实测为准。确认不了就不写、不伪造。
 4. 重构默认在原文件上局部进行，不因「重构」删除后重写，除非用户明确要求或原结构已无法安全修复。
 5. 任务矩阵、`scope.py` 与 `generate_tasks.py` 三者同格式。改任一处必须跑 `run.py check`（含 `tasks` 一致性检查）。
+6. 面向本项目用户的 Agent 回复默认使用中文，命令、路径、文件名和其他技术标识保留原文。
 
 ## 工作流程
 
@@ -42,4 +43,3 @@ metadata:
 
 - [ ] `python .agents/skills/agent-ops/scripts/run.py check` 全通过，`git diff --check` 干净。
 - [ ] 每条规则都能指向唯一出处，L1/L2 均在预算内。
-- [ ] 保留用户既有改动，`content/`、`code/` 无回归。

@@ -18,7 +18,17 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
-PYTHON = r"D:\ProgramData\miniforge3\python.exe"
+MANIFEST = ROOT / ".agents" / "manifest.json"
+
+
+def manifest_python() -> str | None:
+    try:
+        return str(json.loads(MANIFEST.read_text(encoding="utf-8"))["mcp"]["command"])
+    except (OSError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+PYTHON = manifest_python()
 MAX_READ_BYTES = 512 * 1024
 MAX_OUTPUT_CHARS = 12_000
 MAX_CONTEXT_LINES = 3
@@ -150,11 +160,16 @@ def run_command(args: list[str], timeout: int = 120) -> dict[str, Any]:
 
 
 def run_agent(*args: str, timeout: int = 120) -> dict[str, Any]:
+    if not PYTHON:
+        return {"exitCode": 127, "output": "manifest mcp.command is missing"}
     return run_command([PYTHON, str(ROOT / ".agents/skills/agent-ops/scripts/run.py"), *args], timeout)
 
 
 def validate_python() -> None:
     """MCP 使用固定解释器。不可用时在启动阶段直接失败。"""
+    if not PYTHON:
+        print("manifest mcp.command is missing", file=sys.stderr)
+        raise SystemExit(127)
     interpreter = Path(PYTHON)
     if not interpreter.is_file():
         print(f"python interpreter not found: {PYTHON}", file=sys.stderr)

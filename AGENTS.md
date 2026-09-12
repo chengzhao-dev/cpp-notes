@@ -30,7 +30,7 @@
 
 ## 常用命令
 
-以下命令中的 Python 必须按“固定路径优先、PATH 回退”规则解析。候选均不可用时立即停止，不伪造结果。
+以下命令统一由 `.agents/manifest.json` 的 `mcp.command` 指定 Python 解释器执行。该字段是仓库唯一 Python 来源；缺失、不可执行或版本不足时立即停止，不回退到 PATH、环境变量或其他配置。
 
 | 命令 | 用途 |
 | --- | --- |
@@ -55,7 +55,7 @@
 
 ## Python 运行时
 
-依次尝试 `CPP_MEMO_PYTHON`、`.agents/skills/python-tools/assets/config/runtime.json` 中的 `python` 字段（可选、本机文件、已被 `.gitignore` 忽略）、PATH。Windows 上不要把 `python` 别名写入提交的宿主配置。MCP 配置应指向 `.agents/mcp/server.py`，使用本机解析出的绝对 Python 路径。
+所有仓库脚本直接读取 `.agents/manifest.json` 中的 `mcp.command`。Skills、MCP 与维护命令不得另行读取 `CPP_MEMO_PYTHON`、`runtime.json.python`、PATH 或 `sys.executable` 作为项目 Python 来源。MCP 配置仍指向 `.agents/mcp/server.py`，由该 server 读取同一字段。
 
 ## 初始化兼容
 

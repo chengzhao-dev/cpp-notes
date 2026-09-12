@@ -6,12 +6,12 @@
 
 ## 启动
 
-skills 和知识库中的命令继续使用通用的 `python` 写法。MCP 宿主配置固定使用项目指定的 `D:\ProgramData\miniforge3\python.exe`，不通过 PATH 或其他运行时配置查找。
+skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用 `.agents/manifest.json` 的 `mcp.command`，不通过 PATH 或其他运行时配置查找。
 
 在仓库根目录执行：
 
 ```powershell
-D:\ProgramData\miniforge3\python.exe .agents/mcp/server.py
+<manifest 中 mcp.command 的绝对路径> .agents/mcp/server.py
 ```
 
 服务通过 stdin 接收 JSON-RPC 2.0 消息，通过 stdout 返回 JSON-RPC 2.0 消息。MCP 客户端通常会自动完成下面的初始化流程。服务本身不会自动注册到宿主：
@@ -67,7 +67,7 @@ D:\ProgramData\miniforge3\python.exe .agents/mcp/server.py
 {
   "mcpServers": {
     "cpp-notes": {
-      "command": "D:\\ProgramData\\miniforge3\\python.exe",
+      "command": "<manifest 中 mcp.command 的绝对路径>",
       "args": [".agents/mcp/server.py"]
     }
   }
