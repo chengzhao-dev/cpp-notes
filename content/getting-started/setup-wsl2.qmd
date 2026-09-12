@@ -2,7 +2,11 @@
 title: "搭建 WSL2 开发环境"
 ---
 
-本章建立一套能编译并运行 C++ 示例的环境。完成后，Ubuntu 终端里 `g++`、`CMake`、`Ninja`、`gdb` 和 `clangd` 都可用，Windows Terminal 和 VS Code 能打开同一个项目目录。
+本章建立一套能编译并运行 C++ 示例的环境。命令块会标明执行环境：`powershell` 在 Windows 管理员 PowerShell 执行，`bash` 在 Ubuntu 终端执行，`text` 只用于核对输出。
+
+## 目标与前置条件
+
+完成后，Ubuntu 中的编译、构建、调试和诊断工具可用，Windows Terminal 与 VS Code 能打开同一个 WSL 项目目录。开始前准备 Windows 10 2004（内部版本 19041）或 Windows 11，并在 BIOS/UEFI 中启用 CPU 虚拟化。
 
 ## 环境由哪些部分组成
 
@@ -31,7 +35,7 @@ title: "搭建 WSL2 开发环境"
 wsl --install
 ```
 
-安装完成后重启电脑。首次打开 Ubuntu 时创建 Linux 用户名和密码。输入密码时不显示字符属于正常现象。看到 Ubuntu 提示符后，本节完成。
+安装完成后重启电脑。首次打开 Ubuntu 时创建 Linux 用户名和密码。输入密码时不显示字符属于正常现象。看到 Ubuntu 提示符后继续执行后续步骤。
 
 想指定发行版时，先运行 `wsl --list --online` 选定一个名称，再替换进下面命令的尖括号。尖括号本身不是要输入的内容。
 
@@ -69,9 +73,7 @@ sudo apt install -y build-essential gdb cmake ninja-build
 
 `g++` 编译并链接 C++ 程序，`CMake` 描述构建规则，`Ninja` 执行 `CMake` 生成的规则，`gdb` 调试运行中的程序。`build-essential` 会一并安装 `gcc`、`make` 和标准头文件，因此不需要再单独安装编译器。
 
-版本号和完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[CMake 文档](https://cmake.org/documentation/)、[Ninja 手册](https://ninja-build.org/manual.html)。安装后直接进入下一节。若后续命令报告 `command not found`，再按常见问题处理。
-
-装完不必逐条跑版本命令预检。报 `command not found` 时回到[常见问题](#常见问题)重装。
+安装后直接进入统一验收；版本和手册链接集中在本章末尾。
 
 ### 安装 clangd 语言服务
 
@@ -81,7 +83,7 @@ sudo apt install -y build-essential gdb cmake ninja-build
 sudo apt install -y clangd
 ```
 
-`clangd` 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 `CMake` 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#用-cmake-管理构建)，编辑器侧的配置见 [clangd 官方文档](https://clangd.llvm.org/installation)。安装命令正常结束后，本节完成。
+`clangd` 靠 `compile_commands.json` 还原每个源文件的真实编译参数，因此它给出的诊断和实际构建结果一致。这份文件由 `CMake` 在配置阶段导出，写法见[写出第一个 C++ 程序](first-program.qmd#用-cmake-管理构建)。
 
 ## 接入终端与编辑器
 
@@ -99,29 +101,47 @@ VS Code 通过 Remote - WSL 扩展直接编辑和调试 WSL2 中的文件，Wind
 
 C++ 侧需要两类扩展。[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) 提供调试支持，[clangd](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd) 提供代码提示。两者角色不同，代码提示交给[安装 clangd 语言服务](#安装-clangd-语言服务)装好的 `clangd`，不必同时开启两套语言服务。
 
-## 常见问题
+## 统一验收
+
+在 Ubuntu 终端逐项执行：
+
+```bash
+wsl --status
+command -v g++ cmake ninja gdb clangd
+g++ --version
+cmake --version
+clangd --version
+```
+
+验收标准是 `wsl --status` 能返回状态，`command -v` 为每个工具打印路径，版本命令退出码为 0。`clangd` 是否能提供准确诊断，还需在下一章完成 `CMake` 配置并生成 `compile_commands.json`。
+
+## 排错
 
 ### 提示未启用虚拟机平台
 
 以管理员身份重新运行 `wsl --install`，并在“启用或关闭 Windows 功能”中确认“虚拟机平台”和“适用于 Linux 的 Windows 子系统”均已勾选。勾选后重启，再次运行安装命令，看到发行版下载进度即说明条件已满足。
 
-### command not found
-
-任何一条工具命令都提示 `command not found` 时，说明对应软件包没有装上。按[安装 C++ 工具链](#安装-c-工具链)的两条命令重装。只缺 `clangd` 时执行第二条。
-
-```bash
-sudo apt install -y build-essential gdb cmake ninja-build
-sudo apt install -y clangd
-```
-
-重新执行刚才失败的命令。命令开始工作即说明恢复，不需要重启 Ubuntu。
+| 症状 | 原因 | 处理 |
+| --- | --- | --- |
+| `wsl --install` 提示虚拟机平台未启用 | Windows 功能或 BIOS 虚拟化未开启 | 以管理员身份启用“虚拟机平台”和“适用于 Linux 的 Windows 子系统”，重启后重试 |
+| 工具提示 `command not found` | 对应 Ubuntu 软件包未安装或索引过期 | 运行 `sudo apt update`，再按[安装 C++ 工具链](#安装-c-工具链)安装缺失包 |
+| `clangd` 没有项目诊断 | 没有生成 `compile_commands.json` | 在项目根目录执行下一章的 `CMake` 配置命令，并确认 `build/compile_commands.json` 存在 |
+| `code .` 未连接 WSL | VS Code 未安装 Remote - WSL 或命令在 Windows 终端执行 | 在 Ubuntu 项目目录执行 `code .`，并安装 Remote - WSL |
 
 ## 本章回顾
 
 环境五层就绪后，你手上有一套能编译并运行示例的 Linux 环境，每一项都能自己确认：
 
 - 输入 `wsl` 能进入 Ubuntu，`sudo apt update` 能正常读到镜像源。
-- 编译与构建命令都能执行，`clangd --version` 能打印版本号。报 `command not found` 时按[常见问题](#常见问题)重装。
+- 编译与构建命令都能执行，`clangd --version` 能打印版本号；异常按[排错](#排错)处理。
 - Windows Terminal 与 VS Code 都能打开 Ubuntu 中的项目目录。
 
 下一章从 [code/getting-started/first-program/main.cpp](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/main.cpp) 出发，先用 `g++` 直接编译运行，再交给 `CMake` 与 `Ninja` 自动构建。
+
+## 延伸阅读
+
+- [安装 WSL 发行版](https://learn.microsoft.com/en-us/windows/wsl/install)
+- [Ubuntu 镜像使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)
+- [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)、[CMake 文档](https://cmake.org/documentation/)、[Ninja 手册](https://ninja-build.org/manual.html)
+- [VS Code 的 WSL 文档](https://code.visualstudio.com/docs/remote/wsl)
+- [clangd 安装文档](https://clangd.llvm.org/installation)
