@@ -122,17 +122,64 @@ dd {
   margin-left: 1.2rem;
   color: var(--text-secondary);
 }
-details {
+/* 排错字段使用 Pandoc 定义列表：标签与说明并列，避免连续 strong 形成视觉噪声。 */
+#quarto-document-content .troubleshooting {
+  max-width: 100%;
+  margin: 1.125rem 0 0;
+}
+#quarto-document-content .troubleshooting > dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.75rem;
+  margin: 0;
+  max-width: 100%;
+}
+#quarto-document-content .troubleshooting > dl > dt {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+#quarto-document-content .troubleshooting > dl > dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--body-color);
+}
+#quarto-document-content .troubleshooting > dl > dd > :first-child {
+  margin-top: 0;
+}
+#quarto-document-content .troubleshooting > dl > dd > :last-child {
+  margin-bottom: 0;
+}
+@media (max-width: 767.98px) {
+  #quarto-document-content .troubleshooting > dl {
+    display: block;
+  }
+  #quarto-document-content .troubleshooting > dl > dt {
+    margin-top: 0.8rem;
+  }
+  #quarto-document-content .troubleshooting > dl > dt:first-child {
+    margin-top: 0;
+  }
+  #quarto-document-content .troubleshooting > dl > dd {
+    margin-top: 0.15rem;
+  }
+}
+#quarto-document-content details.answer-disclosure {
   border: 1px solid var(--card-border);
   border-radius: 8px;
   padding: 0.6rem 1rem;
   margin: 1.2rem 0;
 }
-summary {
+#quarto-document-content details.answer-disclosure > summary {
   cursor: pointer;
   font-weight: 600;
 }
-details[open] summary {
+#quarto-document-content details.answer-disclosure > summary > p {
+  display: inline;
+  margin: 0;
+}
+#quarto-document-content details.answer-disclosure[open] > summary {
   margin-bottom: 0.5rem;
 }
 
@@ -192,19 +239,20 @@ html {
 #quarto-document-content {
   color: var(--body-color);
   letter-spacing: normal;
-  /* 不启用 palt：思源黑体（Noto Sans SC）的 palt 会把全角标点（，。：；）压成
-     比例宽度，观感如同英文标点（系统字体时代是空操作，换 Web 字体后显形，已移除） */
+  /* 不启用 palt：中文字体的 palt 会把全角标点（，。：；）压成比例宽度，
+     观感如同英文标点（系统字体时代是空操作，换 Web 字体后显形，已移除） */
   text-spacing-trim: trim-start;      /* 中文标点起首去半角空白（较新浏览器） */
 }
 
-/* GitHub Markdown 正文约束：长文保持稳定列宽，组件不撑破三栏布局。 */
+/* GitHub Markdown 正文约束：普通段落使用正文列的实际宽度，组件不撑破三栏布局。
+   页面列宽由 Quarto grid 与 --content-width 决定；不要再用 75ch 对段落做第二次限宽。 */
 #quarto-document-content {
   max-width: min(100%, var(--content-width));
   min-width: 0;
 }
 #quarto-document-content > p,
 #quarto-document-content section > p {
-  max-width: 75ch;
+  max-width: 100%;
 }
 #quarto-document-content :is(pre, table, figure, .callout, .cell) {
   max-width: 100%;

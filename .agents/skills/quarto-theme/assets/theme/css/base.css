@@ -126,7 +126,7 @@ body.homepage #quarto-document-content h1 {
 /* ---------- 垂直节奏（上边距节奏，参考 mdBook / React / Vue 的 prose 模式） ----------
    Quarto 把每个 h2 章节内容包在 <section class="level2"> 里，因此对主容器与各 section
    的直属块级子元素统一重置 margin，用上边距节奏控制间距
-   —— 统一控制点：下方 #quarto-document-content > * + * 的 1.375rem 是【正文段落间距唯一来源】，
+   —— 统一控制点：下方 #quarto-document-content > * + * 的 1.125rem 是【正文段落间距唯一来源】，
       对 content/*.qmd 与首页 index.qmd 一视同仁（二者正文都在 #quarto-document-content 内），
       故章节与首页段落/列表间距天然一致；章节标题间距见下方 h2/h3 规则。 */
 #quarto-document-content > *,
@@ -134,14 +134,14 @@ body.homepage #quarto-document-content h1 {
   margin-top: 0;
   margin-bottom: 0;
 }
-/* 正文块间距 1.375rem，保持文档阅读节奏 */
+/* 正文块间距 1.125rem，保持文档阅读节奏 */
 #quarto-document-content > * + *,
 #quarto-document-content section > * + * {
-  margin-top: 1.375rem;
+  margin-top: 1.125rem;
 }
 #quarto-document-content p,
 #quarto-document-content li {
-  line-height: 1.75;
+  line-height: 1.65;
 }
 /* 代码块↔代码块：额外 +0.4rem，命令序列更疏朗 */
 #quarto-document-content > :is(.code-copy-outer-scaffold, pre) + :is(.code-copy-outer-scaffold, pre),
@@ -164,6 +164,10 @@ body.homepage #quarto-document-content h1 {
 #quarto-document-content section > :is(p, .code-caption) + :is(.code-copy-outer-scaffold, pre) {
   margin-top: 1.375rem;
 }
+/* 列表项由 li 自身承担块间距，上面的 section 直属子元素规则覆盖不到代码块后的验证句。 */
+#quarto-document-content li > :is(.code-copy-outer-scaffold, .code-with-filename, pre, div.sourceCode) + p {
+  margin-top: var(--code-followup-gap);
+}
 /* 说明段紧贴其描述代码块（覆盖上方间距） */
 #quarto-document-content > .code-caption + :is(.code-copy-outer-scaffold, pre),
 #quarto-document-content section > .code-caption + :is(.code-copy-outer-scaffold, pre) {
@@ -179,8 +183,8 @@ body.homepage #quarto-document-content h1 {
 /* h2 间距：保持章节之间的清晰节奏 */
 #quarto-document-content > h2,
 #quarto-document-content section > h2 {
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+  margin-top: 2.75rem;
+  margin-bottom: 0.9rem;
 }
 /* 章节页首段引言：进一步拉近与标题的间距（标题块 margin-bottom 已为 0，这里再上拉一点）
    —— 间距控制点：标题块 line-height/margin-bottom（上方 #title-block-header… .title）＋ 此处首段 margin-top */
@@ -189,7 +193,7 @@ body.homepage #quarto-document-content h1 {
 }
 #quarto-document-content > h3,
 #quarto-document-content section > h3 {
-  margin-top: 2.5rem;
+  margin-top: 2rem;
 }
 #quarto-document-content > h4,
 #quarto-document-content > h5,
@@ -199,7 +203,7 @@ body.homepage #quarto-document-content h1 {
 }
 /* 标题紧接的首段/列表收紧，让「标题—首段」成组（段→标题仍保留上方疏朗留白） */
 #quarto-document-content :is(h2, h3, h4) + :is(p, ul, ol) {
-  margin-top: 0.75rem;
+  margin-top: 0.625rem;
 }
 /* 中文段落健壮性：长英文/代码/URL 不撑破列宽；避免末行孤字；CJK 换行规范 */
 #quarto-document-content p,

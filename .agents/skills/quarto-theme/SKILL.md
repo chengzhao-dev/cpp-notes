@@ -9,6 +9,7 @@ metadata:
 
 明暗双主题采用 GitHub Light / GitHub Dark 色板，保留适合教程阅读的三栏布局。只负责样式与令牌，页面结构交给 `quarto-docs`。
 
+正文列宽由 `_quarto.yml` 的 Quarto grid 与 `tokens.css` 的 `--content-width` 共同决定。普通段落、列表和排错定义列表应占满实际正文列，不能在组件 CSS 中再次用 `ch` 限宽；只有首页标题描述等明确的短导语才保留独立的阅读宽度。排错字段使用 `.troubleshooting` 定义列表，标签不通过连续的 `strong` 实现。
 ## 适用场景
 
 - 改 `scss/` 变量、`css/` 组件规则、`tokens.css` 令牌、`includes/` 与字体图标资源。
@@ -19,26 +20,26 @@ metadata:
 
 | 任务 | 读取 |
 | --- | --- |
-| 改任何主题文件（含文件职责、组件规则、新增流程） | `references/theme-system.md` + **目标那一个** css 文件 |
+| 改任何主题文件（含文件职责、组件规则、阅读密度与首页 Hero） | `references/theme-system.md` + **目标那一个** css 文件 |
 | 改样式的代价与运行边界 | `.agents/skills/agent-ops/references/repository-structure.md` |
 
 禁止通读整个 `.agents/skills/quarto-theme/assets/theme/css/`，禁止为「看一下」加载无关 css。
-
 ## P0 硬约束
 
-1. 颜色、字号、间距的唯一出处是 `tokens.css`。组件 css 不写字面色值。
+1. 页面语义颜色和跨组件共享尺度只从 `tokens.css` 引用；组件 css 不写十六进制或 `rgb()` 色值，一次性几何值可以保留在组件内。
 2. 改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 前确认整本重渲染代价，改后跑 `run.py render`。
-3. 令牌语义、复制按钮作用域、`@media print`、触屏兜底、Mermaid 输出 SVG 由 `check_dom_contracts.py` 断言，改前后各跑一次。
+3. 代码标题、令牌语义、复制按钮作用域、`@media print`、触屏兜底与 Mermaid SVG 由 `check_dom_contracts.py` 断言，改前后各跑一次。
 4. 不按字符内容、DOM 位置或命令名覆盖高亮颜色，语义色交给 Pandoc/Quarto token。
+5. 正文使用自托管 `Fixel Text`、`LXGW WenKai Screen`，代码使用 `LXGW Bright Code`，中文回退仍为 `LXGW WenKai Screen`。改字体前必须同步 16 个 WenKai 与 16 个 Bright Code 分包、`fonts.css`、SCSS 字体栈、CSS 令牌、OFL 说明和覆盖检查。
 
 ## 工作流程
 
 1. 先定位承载该样式的 css 文件，再读它和 `theme-system.md`，不扩散到其他 css。令牌改在 `tokens.css`，组件规则只引用令牌。
 2. 新增配色或 callout 按 `references/theme-system.md`「新增流程」四步走完并同步令牌表。
-3. 运行 `python .agents/skills/agent-ops/scripts/run.py render`，用产物确认明暗两态。
+3. 运行 `& .agents/skills/agent-ops/scripts/run.ps1 render`，用产物确认明暗两态。
 
 ## 完成判据
 
-- [ ] `run.py check` 全通过，含 `layout`、`dom`、`callouts`、`typography`（有 `_book/` 时该四项必须实际执行，不得 MISS）。
-- [ ] 明暗两态与触屏兜底均在渲染产物中确认，无新增色值硬编码。
+- [ ] `run.py check` 全通过，含 `layout`、`dom`、`callouts`（有 `_book/` 时这三项必须实际执行，不得 MISS）。
+- [ ] 明暗两态与触屏兜底在浏览器运行时可用时由 `layout` 自动确认；不可用时明确显示 SKIP，不宣称已验证。
 - [ ] 新增令牌已写回 `references/theme-system.md`。

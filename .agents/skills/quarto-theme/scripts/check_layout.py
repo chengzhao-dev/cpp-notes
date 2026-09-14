@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""校验关键设计令牌与组件选择器是否进入渲染产物（_book）。
+"""校验关键设计令牌、字体资产与可用的浏览器布局指标。
 
-用单次字面匹配（子串查找）+ 计数，不对压缩后大 CSS 做宽模式扫描。
+静态阶段用单次字面匹配（子串查找）+ 计数，不对压缩后大 CSS 做宽模式扫描。
+Node、Playwright 与 Edge 可用时，调用 measure_pages.mjs 验证真实几何；不可用时
+输出明确 SKIP，不把静态断言冒充布局验收。
 规范出处：.agents/skills/quarto-theme/references/theme-system.md。
 
 用法：python check_layout.py [--book-dir _book]
@@ -9,8 +11,33 @@
 """
 
 import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
 import sys
+from html.parser import HTMLParser
 from pathlib import Path
+
+THEME_DIR = Path(__file__).resolve().parents[1]
+FONT_DIR = THEME_DIR / "assets" / "theme" / "assets" / "fonts"
+FONTS_CSS = THEME_DIR / "assets" / "theme" / "css" / "fonts.css"
+MEASURE_SCRIPT = Path(__file__).resolve().parent / "measure_pages.mjs"
+ROOT = THEME_DIR.parents[2]
+FONT_FAMILIES = ("LXGW WenKai Screen", "LXGW Bright Code")
+EXPECTED_FONT_FACES = {
+    "Fixel Text": 3,
+    "LXGW WenKai Screen": 16,
+    "LXGW Bright Code": 16,
+}
+EXPECTED_FONT_RANGES = {
+    "LXGW WenKai Screen": 11471,
+    "LXGW Bright Code": 11471,
+}
+# 16 路分包的最重页面实测约 1.95 MB；上限保留少量余量，避免把粗分包误判为回归。
+FONT_PAGE_BYTES_LIMIT = 2_100_000
+FONT_PAGE_FACES_LIMIT = 16
 
 # 与 references/theme-system.md / .agents/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
 CHECKS = [
@@ -18,20 +45,390 @@ CHECKS = [
     ("light GitHub link #0969DA", "#0969DA"),
     ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
     ("dark navbar page-bg token", "--navbar-bg: #0D1117"),
-    ("body line-height 1.75", "line-height: 1.75"),
-    ("GitHub content width", "--content-width: 800px"),
+    ("body line-height 1.65", "line-height: 1.65"),
+    ("GitHub content width", "--content-width: 840px"),
+    ("code title background", "--code-title-bg"),
+    ("code title foreground", "--code-title-fg"),
+    ("code title padding", "--code-title-padding"),
+    ("light code background", "--code-bg: #F6F8FA"),
+    ("dark code background", "--code-bg: #161B22"),
+    ("ui font stack", '--ui-font: "Fixel Text", "LXGW WenKai Screen"'),
+    ("cjk font fallback", '"LXGW WenKai Screen"'),
+    ("code font stack", '--mono-font: "LXGW Bright Code", "LXGW WenKai Screen"'),
+    ("bright code family", '"LXGW Bright Code"'),
+    ("code followup gap", "--code-followup-gap: 1rem"),
+    ("list code followup spacing", "margin-top: var(--code-followup-gap)"),
+    ("list code with filename selector", "li > :is(.code-copy-outer-scaffold, .code-with-filename"),
     ("GitHub readable body font", "font-size: 1rem"),
     ("accent dot token", "--dot-accent"),
     ("dark page #0D1117", "#0D1117"),
     ("dark body #E6EDF3", "#E6EDF3"),
     ("dark link #4493F8", "#4493F8"),
     ("callout note border light", "--callout-note-border: #2563EB"),
+    ("h2 rhythm", "margin-top: 2.75rem"),
+    ("paragraphs follow the body column", "max-width: 100%"),
+    ("troubleshooting definition list", ".troubleshooting > dl"),
+    ("troubleshooting responsive fallback", ".troubleshooting > dl > dt:first-child"),
+    ("answer disclosure container", "details.answer-disclosure"),
+    ("answer disclosure summary", "details.answer-disclosure > summary"),
+    ("answer disclosure paragraph reset", "details.answer-disclosure > summary > p"),
     # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 rendering-and-output.md #12）
     ("callout tip (best-practice semantics)", "--callout-tip-border"),
     ("callout warning (key-insight semantics)", "--callout-warning-border"),
     ("callout important (deep-dive semantics)", "--callout-important-border"),
     ("feature-grid max two columns", "calc((100% - 1.25rem) / 2)"),
 ]
+
+CALLOUT_CHECKS = [
+    ("callout body font 16px", "font-size: 1rem;"),
+    ("callout title font 15px", "font-size: 0.9375rem;"),
+    ("callout padding 16px", "padding: 1rem;"),
+    ("callout header gap 8px", "margin: 0 0 0.5rem;"),
+]
+
+FORBIDDEN_FONT_REFERENCES = [
+    ("Inter reference", "Inter"),
+    ("Noto Sans SC reference", "Noto Sans SC"),
+    ("Noto Sans Mono CJK SC reference", "Noto Sans Mono CJK SC"),
+    ("JetBrains Mono reference", "JetBrains Mono"),
+    ("local font fallback", "local("),
+]
+
+
+class VisibleTextParser(HTMLParser):
+    """Extract visible text from rendered pages without script/style content."""
+
+    def __init__(self, code_only=False):
+        super().__init__(convert_charrefs=True)
+        self.hidden_depth = 0
+        self.pre_depth = 0
+        self.code_depth = 0
+        self.code_only = code_only
+        self.chunks = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in {"script", "style"}:
+            self.hidden_depth += 1
+        if tag == "pre":
+            self.pre_depth += 1
+        if tag == "code":
+            self.code_depth += 1
+
+    def handle_endtag(self, tag):
+        if tag in {"script", "style"} and self.hidden_depth:
+            self.hidden_depth -= 1
+        if tag == "pre" and self.pre_depth:
+            self.pre_depth -= 1
+        if tag == "code" and self.code_depth:
+            self.code_depth -= 1
+
+    def handle_data(self, data):
+        in_code = bool(self.pre_depth or self.code_depth)
+        if not self.hidden_depth and (not self.code_only or in_code):
+            self.chunks.append(data)
+
+
+def parse_unicode_ranges(css_text, family):
+    """Return the unicode ranges declared for one self-hosted font family."""
+    ranges = []
+    for block in re.findall(r"@font-face\s*\{([^}]*)\}", css_text, re.S):
+        if not re.search(
+            rf'font-family\s*:\s*["\']{re.escape(family)}["\']', block
+        ):
+            continue
+        match = re.search(r"unicode-range:([^;}]+)", block)
+        if not match:
+            continue
+        for token in match.group(1).split(","):
+            token = token.strip()
+            if not token.startswith("U+"):
+                continue
+            value = token[2:]
+            if "-" in value:
+                start, end = value.split("-", 1)
+                ranges.append((int(start, 16), int(end, 16)))
+            else:
+                point = int(value, 16)
+                ranges.append((point, point))
+    return ranges
+
+
+def font_face_entries(css_text):
+    """Parse family and URL pairs from @font-face blocks."""
+    entries = []
+    for block in re.findall(r"@font-face\s*\{([^}]*)\}", css_text, re.S):
+        family = re.search(r"font-family\s*:\s*[\"']([^\"']+)[\"']", block)
+        url = re.search(r"url\(\s*[\"']?([^\"')]+)", block)
+        if family and url:
+            entries.append((family.group(1), url.group(1)))
+    return entries
+
+
+def check_font_assets(css_text):
+    """Return missing, duplicate, orphan, and invalid-font diagnostics."""
+    entries = font_face_entries(css_text)
+    problems = []
+    referenced = {}
+    for family, url in entries:
+        target = (FONTS_CSS.parent / url).resolve()
+        referenced.setdefault(target, []).append(family)
+        if not target.is_file():
+            problems.append(f"missing font asset: {family} -> {target.name}")
+            continue
+        if target.read_bytes()[:4] != b"wOF2":
+            problems.append(f"invalid WOFF2 signature: {target.name}")
+
+    for family, expected in EXPECTED_FONT_FACES.items():
+        actual = sum(1 for item, _url in entries if item == family)
+        if actual != expected:
+            problems.append(f"{family} font faces={actual}, expected={expected}")
+
+    for target, families in referenced.items():
+        if len(families) > 1:
+            problems.append(f"font URL reused {len(families)} times: {target.name}")
+
+    referenced_paths = set(referenced)
+    actual_paths = set(FONT_DIR.glob("*.woff2"))
+    for path in sorted(actual_paths - referenced_paths):
+        problems.append(f"orphan font asset: {path.name}")
+    if not actual_paths:
+        problems.append("no WOFF2 font assets found")
+    return problems
+
+
+def check_font_partition(css_text):
+    """Return overlap or coverage problems in the CJK font partitions."""
+    problems = []
+    for family, expected_count in EXPECTED_FONT_RANGES.items():
+        covered = set()
+        overlaps = set()
+        for start, end in parse_unicode_ranges(css_text, family):
+            points = set(range(start, end + 1))
+            overlaps.update(covered & points)
+            covered.update(points)
+        if overlaps:
+            sample = ", ".join(f"U+{point:X}" for point in sorted(overlaps)[:8])
+            problems.append(
+                f"{family} unicode-range overlaps: {len(overlaps)} ({sample})"
+            )
+        if len(covered) != expected_count:
+            problems.append(
+                f"{family} unicode-range coverage={len(covered)}, "
+                f"expected={expected_count}"
+            )
+    return problems
+
+
+def resolve_node():
+    candidates = [os.environ.get("CPP_MEMO_NODE"), shutil.which("node")]
+    cache = Path.home() / ".cache" / "codex-runtimes"
+    if cache.is_dir():
+        candidates.extend(
+            str(path)
+            for path in sorted(cache.glob("*/dependencies/node/bin/node*"))
+        )
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file():
+            return str(candidate)
+    return None
+
+
+def resolve_playwright_root():
+    candidates = [os.environ.get("CPP_MEMO_NODE_PATH"), os.environ.get("NODE_PATH")]
+    cache = Path.home() / ".cache" / "codex-runtimes"
+    if cache.is_dir():
+        candidates.extend(
+            str(path)
+            for path in sorted(cache.glob("*/dependencies/node/node_modules"))
+        )
+    for candidate in candidates:
+        if candidate and (Path(candidate) / "playwright" / "index.js").is_file():
+            return str(candidate)
+    return None
+
+
+def browser_layout(book_dir, verbose):
+    """Measure rendered pages and return (problems, skipped_reason)."""
+    node = resolve_node()
+    playwright_root = resolve_playwright_root()
+    if not node or not playwright_root or not MEASURE_SCRIPT.is_file():
+        return [], (
+            "Node/Playwright/Edge 运行时不可用"
+            f" (node={node or '无'}, NODE_PATH={playwright_root or '无'})"
+        )
+
+    shots_dir = ROOT / "temp" / "theme-regression"
+    out_file = shots_dir / "measure.json"
+    shots_dir.mkdir(parents=True, exist_ok=True)
+    env = dict(os.environ, NODE_PATH=playwright_root, PYTHONIOENCODING="utf-8")
+    proc = subprocess.run(
+        [
+            node,
+            str(MEASURE_SCRIPT),
+            "--book-dir",
+            str(book_dir),
+            "--out",
+            str(out_file),
+            "--shots-dir",
+            str(shots_dir),
+        ],
+        cwd=str(ROOT),
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    output = proc.stdout.decode("utf-8", errors="replace")
+    if proc.returncode == 2:
+        return [], output.strip()
+    if proc.returncode != 0 or not out_file.is_file():
+        return [f"browser measurement failed (exit={proc.returncode})"], output.strip()
+
+    metrics = json.loads(out_file.read_text(encoding="utf-8"))
+    problems = []
+    font_assets_by_name = {}
+    for _family, url in font_face_entries(FONTS_CSS.read_text(encoding="utf-8")):
+        target = (FONTS_CSS.parent / url).resolve()
+        font_assets_by_name[target.name] = target.stat().st_size if target.is_file() else 0
+    width_floor = {1280: 640, 1100: 540}
+    for width_text, pages in metrics["viewports"].items():
+        width = int(width_text)
+        for key, data in pages.items():
+            scheme, page_id = key.split(":", 1)
+            label = f"{scheme}:{page_id}@{width}"
+            if data.get("error"):
+                problems.append(f"{label}: {data['error']}")
+                continue
+            requested_fonts = data.get("requestedFonts", [])
+            unknown_fonts = sorted(set(requested_fonts) - set(font_assets_by_name))
+            if unknown_fonts:
+                problems.append(f"{label}: unknown font requests {unknown_fonts}")
+            loaded_fonts = [
+                (filename, font_assets_by_name[filename])
+                for filename in requested_fonts
+                if filename in font_assets_by_name
+            ]
+            loaded_font_bytes = sum(size for _name, size in loaded_fonts)
+            if len(loaded_fonts) > FONT_PAGE_FACES_LIMIT:
+                problems.append(
+                    f"{label}: 字体请求 {len(loaded_fonts)} > {FONT_PAGE_FACES_LIMIT}"
+                )
+            if loaded_font_bytes > FONT_PAGE_BYTES_LIMIT:
+                problems.append(
+                    f"{label}: 字体字节 {loaded_font_bytes} > {FONT_PAGE_BYTES_LIMIT}"
+                )
+            data["loadedFontCount"] = len(loaded_fonts)
+            data["loadedFontBytes"] = loaded_font_bytes
+            if data["paragraphWidth"] < width_floor[width]:
+                problems.append(
+                    f"{label}: 正文段宽 {data['paragraphWidth']}px < {width_floor[width]}px"
+                )
+            paragraph_font_size = data.get("paragraphFontSize", 0)
+            for index, callout in enumerate(data.get("callouts", []), 1):
+                if abs(callout["bodyFontSize"] - paragraph_font_size) > 0.01:
+                    problems.append(
+                        f"{label}: Callout#{index} 正文 {callout['bodyFontSize']}px "
+                        f"!= 正文 {paragraph_font_size}px"
+                    )
+                if abs(callout["titleFontSize"] - 15) > 0.01:
+                    problems.append(
+                        f"{label}: Callout#{index} 标题 {callout['titleFontSize']}px != 15px"
+                    )
+                if (
+                    abs(callout["paddingTop"] - 16) > 0.01
+                    or abs(callout["paddingBottom"] - 16) > 0.01
+                ):
+                    problems.append(
+                        f"{label}: Callout#{index} 内边距 "
+                        f"{callout['paddingTop']}/{callout['paddingBottom']}px != 16/16px"
+                    )
+                if callout["width"] + 1 < data["paragraphWidth"]:
+                    problems.append(
+                        f"{label}: Callout#{index} 宽 {callout['width']}px "
+                        f"< 正文列 {data['paragraphWidth']}px"
+                    )
+            if any(not item["scrolls"] for item in data["overflow"]):
+                first = next(item for item in data["overflow"] if not item["scrolls"])
+                problems.append(
+                    f"{label}: 横向溢出 {first['tag']}.{first['classes']} "
+                    f"{first['scrollWidth']}>{first['clientWidth']}"
+                )
+            wrapped = [item for item in data["tocItems"] if item["height"] > 30]
+            if wrapped:
+                problems.append(
+                    f"{label}: 目录折行 {len(wrapped)} 项，最高 {max(item['height'] for item in wrapped)}px"
+                )
+            for block in data["languageBlocks"]:
+                if block["outerBorder"] != 1 or block["innerBorder"] != 0:
+                    problems.append(
+                        f"{label}: 代码边框 outer={block['outerBorder']} inner={block['innerBorder']}"
+                    )
+                    break
+            wraps = {
+                item["whiteSpace"]
+                for item in data["languageBlocks"] + data["barePres"]
+                if item["whiteSpace"]
+            }
+            if wraps - {"pre-wrap"}:
+                problems.append(f"{label}: 代码 white-space={sorted(wraps)}")
+            if page_id.startswith("content/"):
+                ratio = data["textBandCount"] / data["boxCount"] if data["boxCount"] else float("inf")
+                if ratio < 2.4:
+                    problems.append(
+                        f"{label}: 文字带/盒子 {ratio:.2f} < 2.4"
+                    )
+    if verbose:
+        for width, pages in metrics["viewports"].items():
+            for key, data in pages.items():
+                print(
+                    f"      {key}@{width} 正文宽={data['paragraphWidth']} "
+                    f"带/盒={data['textBandCount']}/{data['boxCount']} "
+                    f"正文号={data.get('paragraphFontSize', 0):g} "
+                    f"Callout={len(data.get('callouts', []))} "
+                    f"字体={data.get('loadedFontCount', 0)}/"
+                    f"{data.get('loadedFontBytes', 0)}B "
+                    f"溢出={len(data['overflow'])}"
+                )
+    return problems, None
+
+
+def needs_cjk_coverage(codepoint):
+    """Only assert self-hosted coverage for CJK text and CJK punctuation."""
+    return (
+        0x2E80 <= codepoint <= 0x9FFF
+        or 0xF900 <= codepoint <= 0xFAFF
+        or 0x3000 <= codepoint <= 0x303F
+        or 0xFF00 <= codepoint <= 0xFFEF
+    )
+
+
+def check_font_coverage(book_dir):
+    """Check Chinese coverage for UI text and code text separately."""
+    css_path = THEME_DIR / "assets" / "theme" / "css" / "fonts.css"
+    css_text = css_path.read_text(encoding="utf-8")
+    ranges = {
+        family: parse_unicode_ranges(css_text, family)
+        for family in FONT_FAMILIES
+    }
+    missing = {family: set() for family in FONT_FAMILIES}
+    for html_path in sorted(book_dir.rglob("*.html")):
+        html_text = html_path.read_text(encoding="utf-8", errors="ignore")
+        page_parser = VisibleTextParser()
+        page_parser.feed(html_text)
+        code_parser = VisibleTextParser(code_only=True)
+        code_parser.feed(html_text)
+        for family, chunks in (
+            ("LXGW WenKai Screen", page_parser.chunks),
+            ("LXGW Bright Code", code_parser.chunks),
+        ):
+            for chunk in chunks:
+                for char in chunk:
+                    codepoint = ord(char)
+                    if needs_cjk_coverage(codepoint) and not any(
+                        start <= codepoint <= end
+                        for start, end in ranges[family]
+                    ):
+                        missing[family].add(char)
+    return ranges, missing
 
 
 def main():
@@ -43,6 +440,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--book-dir", default="_book", help="渲染产物目录（默认 _book）")
+    parser.add_argument("--verbose", action="store_true", help="展开浏览器测量指标")
     args = parser.parse_args()
 
     book_dir = Path(args.book_dir)
@@ -63,11 +461,95 @@ def main():
         if not found:
             fail += 1
 
+    callouts_css = (
+        THEME_DIR / "assets" / "theme" / "css" / "callouts.css"
+    ).read_text(encoding="utf-8")
+    for name, pattern in CALLOUT_CHECKS:
+        found = pattern in callouts_css
+        mark = "OK  " if found else "MISS"
+        print(f"  {mark} {name}  ({pattern})")
+        if not found:
+            fail += 1
+
+    theme_texts = [
+        p.read_text(encoding="utf-8", errors="ignore")
+        for p in sorted((THEME_DIR / "assets" / "theme").rglob("*"))
+        if p.suffix in {".css", ".scss"}
+    ]
+    theme_text = "\n".join(theme_texts)
+    for name, pattern in FORBIDDEN_FONT_REFERENCES:
+        found = pattern in theme_text
+        mark = "MISS" if found else "OK  "
+        print(f"  {mark} {name}  (forbidden)")
+        if found:
+            fail += 1
+
+    legacy_font_files = sorted(
+        p.name
+        for pattern in ("inter-*", "noto-sans-sc-*", "jetbrains-mono-*")
+        for p in FONT_DIR.glob(pattern)
+    )
+    print(f"  {'MISS' if legacy_font_files else 'OK  '} legacy font files removed")
+    if legacy_font_files:
+        print("       " + ", ".join(legacy_font_files))
+        fail += 1
+
+    font_asset_problems = check_font_assets(FONTS_CSS.read_text(encoding="utf-8"))
+    print(
+        f"  {'OK  ' if not font_asset_problems else 'MISS'} font asset set"
+        f"  (Fixel=3, WenKai=16, Bright=16)"
+    )
+    for problem in font_asset_problems:
+        print(f"       {problem}")
+    if font_asset_problems:
+        fail += 1
+
+    font_partition_problems = check_font_partition(
+        FONTS_CSS.read_text(encoding="utf-8")
+    )
+    print(
+        f"  {'OK  ' if not font_partition_problems else 'MISS'} font partitions"
+        "  (non-overlap + full CJK coverage)"
+    )
+    for problem in font_partition_problems:
+        print(f"       {problem}")
+    if font_partition_problems:
+        fail += 1
+
+    ranges, missing = check_font_coverage(book_dir)
+    coverage_ok = all(ranges.values()) and not any(missing.values())
+    print(
+        f"  {'OK  ' if coverage_ok else 'MISS'} CJK font coverage"
+        f"  (ranges={sum(map(len, ranges.values()))}, "
+        f"missing={sum(map(len, missing.values()))})"
+    )
+    for family, chars in missing.items():
+        if chars:
+            print(f"       {family}: " + "".join(sorted(chars)[:20]))
+    if not coverage_ok:
+        fail += 1
+
+    browser_problems, browser_note = browser_layout(book_dir, args.verbose)
+    if browser_note and not browser_problems:
+        print(f"  SKIP browser-layout  {browser_note}")
+    else:
+        print(
+            f"  {'OK  ' if not browser_problems else 'MISS'} browser-layout"
+            f"  (viewports=1280,1100; schemes=light,dark)"
+        )
+        for problem in browser_problems:
+            print(f"       {problem}")
+        if browser_problems:
+            fail += 1
+
     print()
     if fail == 0:
-        print("All key tokens/selectors present.")
+        if browser_note:
+            print(f"PASS theme-static；SKIP browser-layout {browser_note}")
+        else:
+            print("PASS theme-static；browser-layout 1280/1100 light/dark")
         return 0
-    print(f"{fail} token(s) missing; check .agents/skills/quarto-theme/assets/theme/css/*.css and the SASS cache.")
+    print(f"{fail} theme check(s) failed; inspect the diagnostics above.")
     return 1
 
 

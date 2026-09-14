@@ -115,7 +115,7 @@ body::-webkit-scrollbar-thumb {
   line-height: 1.4;
   border-radius: 0;
   /* 单行条目高度：1.5rem 恰好容纳一行 0.8125rem/1.4 文字，条目折到两行时
-     高度会明显超过此值，check_typography.py 据此判定「目录锯齿」。 */
+     高度会明显超过此值，改缩进或 grid 后需人工复看右侧目录是否折行。 */
   min-height: 1.5rem;
   display: flex;
   align-items: center;

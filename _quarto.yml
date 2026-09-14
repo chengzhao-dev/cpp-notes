@@ -37,11 +37,10 @@ format:
     grid:
       # 三栏宽度预算：sidebar + body + margin + 两条 gutter 必须 <= 目标视口，
       # 否则 Quarto 按比例压缩正文列（body-width 只是上限声明，不是保证值）。
-      # 272 + 800 + 256 + 32 = 1360；256 是「接入终端与编辑器」这类长混合标题
-      # 不折行所需的最小侧栏宽度。
-      sidebar-width: 272px
-      body-width: 800px
-      margin-width: 256px
+      # 256 + 840 + 216 + 32 = 1344；正文目标宽度为 840px。
+      sidebar-width: 256px
+      body-width: 840px
+      margin-width: 216px
       gutter-width: 1rem
     respect-user-color-scheme: true
     toc: true

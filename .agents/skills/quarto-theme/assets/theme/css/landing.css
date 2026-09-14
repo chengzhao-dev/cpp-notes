@@ -123,42 +123,41 @@
    双选择器：body.homepage（YAML body-classes）或结构命中（标题块为首子元素且紧跟卡片网格）任一即可生效。 */
 body.homepage #title-block-header.quarto-title-block.default,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 2.25rem 1.5rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
   margin: 0 0 2rem;
-  text-align: center;
+  text-align: left;
 }
 body.homepage #title-block-header.quarto-title-block.default .quarto-title .title,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default .quarto-title .title {
-  text-align: center;
+  text-align: left;
   font-size: 2.25rem;
   margin-bottom: 0.5rem;
 }
 body.homepage #title-block-header.quarto-title-block.default .description,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default .description {
-  text-align: center;
-  max-width: 60ch;
-  margin: 0 auto;
+  text-align: left;
+  max-width: 65ch;
+  margin: 1.25rem 0 0;
   font-size: 1.125rem;
   color: var(--text-secondary);
 }
 body.homepage .feature-grid,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) .feature-grid {
-  margin-top: 0;
-  text-align: center;
+  margin-top: 1.5rem;
+  text-align: left;
 }
 body.homepage .landing-card,
 #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) .landing-card {
-  text-align: center;
+  text-align: left;
 }
 
 @media (max-width: 767.98px) {
   body.homepage #title-block-header.quarto-title-block.default,
   #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default {
-    padding: 1.5rem 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
   }
   body.homepage #title-block-header.quarto-title-block.default .quarto-title .title,
   #quarto-document-content:has(> #title-block-header:first-child + .feature-grid) #title-block-header.quarto-title-block.default .quarto-title .title {
