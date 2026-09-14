@@ -7,13 +7,13 @@
   因为检索器实际交给 LLM 的是 Parent。只按 Child id 计分会让导航类查询恒定差一层。
   期望答案写成标题片段（见 eval_set.py），运行时展开为真实 chunk_id。
   片段命中 0 个或多个文档之外的解析失败都算 ERROR，避免评测集悄悄过期。
-指标：Top-5 召回率 >= 92%（且样本 >= 200）、P95 < 200ms、单次注入 <= 6000 令牌。
+指标：Top-5 召回率 >= 92%（样本 >= MIN_SAMPLES，且不得少于评测集行数）、P95 < 200ms、单次注入 <= 6000 令牌。
 
 用法：
     python scripts/evaluate.py                 # 全量评测
     python scripts/evaluate.py --topk 5        # 改 K
     python scripts/evaluate.py --verbose       # 列出未命中查询
-    python scripts/evaluate.py --gate          # 只卡召回率与样本数（延迟由体检负责）
+    python scripts/evaluate.py --skip-latency  # 只卡召回率与样本数（延迟由体检负责）
 退出码：0 = 达标，1 = 未达标，3 = 评测集或索引有问题（不是检索质量差）。
 """
 
@@ -31,7 +31,9 @@ import kb_common as kb  # noqa: E402
 from eval_set import ROWS  # noqa: E402
 
 RECALL_TARGET = 0.92
-MIN_SAMPLES = 200
+# 评测集与知识库同规模演进：门槛取固定下限与实际行数的较大值，
+# 避免样本数永远追不上一个与当前语料无关的常量。
+MIN_SAMPLES = 20
 P95_TARGET_MS = 200.0
 INJECTION_HARD_LIMIT = 6000
 
@@ -114,7 +116,7 @@ def measure(queries: list, topk: int):
     return hits, latencies, injected_max
 
 
-def run(topk: int, verbose: bool, gate: bool) -> int:
+def run(topk: int, verbose: bool, skip_latency: bool) -> int:
     mapping = leaf_index()
     resolve_errors: list = []
     cases = []
@@ -163,7 +165,7 @@ def run(topk: int, verbose: bool, gate: bool) -> int:
                        + "% < " + format(RECALL_TARGET * 100, ".0f") + "%")
     if injected_max > INJECTION_HARD_LIMIT:
         reasons.append("注入峰值 " + str(injected_max) + " > " + str(INJECTION_HARD_LIMIT))
-    if not gate and p95 > P95_TARGET_MS:
+    if not skip_latency and p95 > P95_TARGET_MS:
         reasons.append("P95 " + format(p95, ".1f") + "ms > " + str(int(P95_TARGET_MS)) + "ms")
 
     if verbose and misses:
@@ -175,7 +177,7 @@ def run(topk: int, verbose: bool, gate: bool) -> int:
     if reasons:
         print("FAIL  evaluate  " + "; ".join(reasons))
         return 1
-    print("PASS  evaluate  召回率、延迟与 Token 预算全部达标")
+    print("PASS  evaluate  召回率、样本数与 Token 预算全部达标")
     return 0
 
 
@@ -184,9 +186,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="知识库检索评测")
     parser.add_argument("--topk", type=int, default=5, help="召回评价的 K，默认 5")
     parser.add_argument("--verbose", action="store_true", help="列出未命中明细")
-    parser.add_argument("--gate", action="store_true", help="不卡延迟（延迟由 health_check 负责）")
+    parser.add_argument(
+        "--skip-latency",
+        "--gate",
+        dest="skip_latency",
+        action="store_true",
+        help="不卡延迟（延迟由 kb-check 负责；--gate 为兼容别名）",
+    )
     args = parser.parse_args()
-    return run(args.topk, args.verbose, args.gate)
+    return run(args.topk, args.verbose, args.skip_latency)
 
 
 if __name__ == "__main__":

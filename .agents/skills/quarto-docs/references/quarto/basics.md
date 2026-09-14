@@ -1,6 +1,6 @@
 # Quarto 基础（Book 项目）
 
-本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的取值只在 `knowledge/quarto-docs/output/html-output.md` 列一份，本文件不复制，避免两处随修订漂移。
+本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的选项语义与失效边界归 `knowledge/quarto-docs/output/html-output.md`，本项目现行取值归 `rendering-and-output.md`，本文件不复制。
 
 > 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节
 

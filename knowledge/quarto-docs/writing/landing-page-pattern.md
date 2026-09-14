@@ -3,13 +3,13 @@ kb_id: "cpp-quarto-landing-pattern-v1"
 title: "入口与卡片页的三层结构与卡片职责"
 domain: "quarto-docs"
 subdomain: "page_pattern"
-tags: [page, landing, card, hero, index, readme, wayfinding, grouping]
+tags: [page, landing, card, hero, index, readme, wayfinding, grouping, promise_boundary, content_status]
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-10"
-updated: "2026-09-10"
+updated: "2026-09-14"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1600
+estimated_tokens: 1700
 ---
 
 # 入口与卡片页的三层结构与卡片职责
@@ -37,14 +37,18 @@ estimated_tokens: 1600
 - 尚未开始写作的主题保留卡片位并标记为未完成状态，且不提供入口链接：读者点了打不开，损失比看不到更大。
 - 已完成与未完成在同一网格内混排时，把未完成的排在后面。
 
+承诺边界按当前已发布内容计算。卡片不得把后续计划写成现有能力，也不得声称正文未安装、未展示或无法核验的组件；未完成主题只在卡片状态和后续导航中出现，正文不暴露写作进度。
+
 ## 网格按读者阶段分组
 
 分组依据是读者所处阶段，不是主题的学科分类。同一个主题在两个阶段都需要时，出现在读者实际会来找它的那一组。
 
 - 一个网格对应一个可完成的阶段，读者读完这一组应当能宣布某个目标达成。
 - 每组的引导段说明这组的完成判据，卡片说明各自分工，两者不重复同一句话。
-- 网格固定两列，卡片数优先取偶数。只剩一张时保持半行宽度而不是拉伸，避免同一页里出现两种卡片宽度。
 - 组与组之间按读者实际推进顺序排列，先出现的组是读者下一步真正会用的。
+
+网格列数、未完成卡片和响应式布局属于页面实现，归 `landing.css` 与
+`landing-page-pattern` 写作 reference；本文件只说明分组依据与承诺边界。
 
 ## README 与站点入口页的分工
 

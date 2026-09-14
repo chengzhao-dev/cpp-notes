@@ -125,13 +125,42 @@ def main():
                 bad.append((rel, link, os.path.relpath(target, repo_root)))
 
     if not bad:
-        print("OK: all internal references/templates/scripts and relative links resolve.")
+        catalog = os.path.join(skills_root, "catalog.md")
+        catalog_text = open(catalog, encoding="utf-8").read() if os.path.isfile(catalog) else ""
+        for path in sorted(reference_paths(skills_root)):
+            rel_path = os.path.relpath(path, skills_root).replace(os.sep, "/")
+            if rel_path.startswith("cpp-content/references/tasks/"):
+                continue
+            if rel_path not in catalog_text:
+                bad.append((rel_path, "catalog.md", "reference 未登记"))
+        knowledge_root = os.path.join(repo_root, "knowledge")
+        if os.path.isdir(knowledge_root):
+            for dirpath, _dirnames, filenames in os.walk(knowledge_root):
+                for filename in filenames:
+                    if not filename.endswith(".md") or filename == "README.md":
+                        continue
+                    rel_path = os.path.relpath(
+                        os.path.join(dirpath, filename), repo_root
+                    ).replace(os.sep, "/")
+                    if rel_path not in catalog_text:
+                        bad.append((rel_path, "catalog.md", "knowledge 未登记"))
+
+    if not bad:
+        print("OK: all internal references/templates/scripts, relative links, and catalog entries resolve.")
         return 0
 
     print(f"Found {len(bad)} broken link(s):")
     for rel, link, reason in bad:
         print(f"  {rel} -> {link} ({reason})")
     return 1
+
+
+def reference_paths(skills_root):
+    """Yield every L2 reference Markdown file below the skills root."""
+    for dirpath, _dirnames, filenames in os.walk(skills_root):
+        for filename in filenames:
+            if filename.endswith(".md") and os.sep + "references" + os.sep in dirpath:
+                yield os.path.join(dirpath, filename)
 
 
 if __name__ == "__main__":

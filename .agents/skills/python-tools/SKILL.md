@@ -26,7 +26,7 @@ metadata:
 ## P0 硬约束
 
 1. 仓库检查一律走 `.agents/skills/agent-ops/scripts/run.py`，不绕过它直接串脚本。
-2. 运行时只读取 `.agents/manifest.json` 的 `mcp.command`；不得使用 `CPP_MEMO_PYTHON`、`runtime.json.python`、PATH 或 `sys.executable` 回退。字段缺失、路径不可执行或 Python 版本不足时立即中止，不伪造结果。
+2. 运行时只读取 `.agents/manifest.json` 的 `mcp.command`，不得使用 `CPP_MEMO_PYTHON`、`runtime.json.python`、PATH 或 `sys.executable` 回退。字段缺失、路径不可执行或 Python 版本不足时立即中止，不伪造结果。
 3. 知识库正文只在根 `knowledge/`。所有项目临时产物（包括脚本测试、测量和基准的中间文件）统一写在 `temp/<用途>/`，索引产物写在 `temp/knowledge-index/`（均不入库）。
 4. 作用域、检索和索引统一跳过构建产物、Quarto 缓存、依赖目录、Python 缓存与密钥文件。规则来源是根目录 `.gitignore`，不再依赖 `.agents/ignore` 或 `.agents/indexingignore`。
 5. 脚本改动后同步更新 `AGENTS.md` 命令表与 `run.py` 子命令说明。
@@ -39,5 +39,5 @@ metadata:
 
 ## 完成判据
 
-- [ ] `python -m compileall .agents` 通过，`run.py check` 全通过。
+- [ ] `& .agents/skills/agent-ops/scripts/run.ps1 check` 全通过。
 - [ ] 相关 `test_*.py` 通过。未新增顶层脚本目录或空目录。

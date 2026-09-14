@@ -5,7 +5,7 @@ domain: "quarto-docs"
 subdomain: "writing"
 tags: [project_tree, hidden_config, build_output, cache, information_architecture]
 level_range: [0, 5]
-dependencies: ["cpp-quarto-chapter-pattern-v1", "cpp-quarto-section-focus-density-v1", "cpp-quarto-typography-density-v1"]
+dependencies: ["cpp-quarto-chapter-pattern-v1", "cpp-quarto-section-focus-density-v1"]
 created: "2026-09-11"
 updated: "2026-09-12"
 chunk_strategy: "semantic_heading"
@@ -14,21 +14,17 @@ estimated_tokens: 1250
 
 # 工程目录树与图表的事实边界
 
-本文解释工程目录和流程图为什么要分层呈现。具体操作规则见 `quarto-docs` 的工程目录树 reference。页面块序列见 `cpp-quarto-chapter-pattern-v1`，小节主线见 `cpp-quarto-section-focus-density-v1`，视觉密度见 `cpp-quarto-typography-density-v1`。
+本文解释工程目录和流程图为什么要分层呈现。具体操作规则见 `quarto-docs` 的工程目录树 reference。页面块序列见 `cpp-quarto-chapter-pattern-v1`，小节主线见 `cpp-quarto-section-focus-density-v1`。
 
 ## 目录树必须先尊重磁盘事实
 
 文件名、大小写和层级是读者复制命令、定位配置和理解构建产物的依据。目录树若凭想象添加文件，读者会在实际工程中找不到它。若把所有缓存照搬进来，读者又会把生成物误认为需要维护的项目文件。因此先从磁盘确认，再筛选当前任务需要的教学视图。
 
-`.cache/`、日志、对象文件和 CMake 内部缓存没有独立教学任务，可以省略。`build/` 虽然也是生成目录，但其中的可执行文件和 `compile_commands.json` 能证明构建闭环或解释 `clangd`，所以只展开这两个关键产物。
-
-入门工程的根行写作 `first-program/`，并标注“示例工程根目录”。固定注释词典如下：`.vscode/` 是“VS Code 工作区配置”，`build/` 是“CMake/Ninja 构建输出目录，请勿手动修改”，`compile_commands.json` 是“供 clangd 等工具读取的编译数据库”，`build-and-run.sh` 是“配置、构建并运行程序的脚本”。注释统一采用名词化的“路径 + 用途或性质 + 必要提醒”结构。
+`.cache/`、日志和对象文件通常没有独立教学任务，可以省略。`build/` 虽然也是生成目录，但其中的可执行文件和 `compile_commands.json` 能证明构建闭环或解释 `clangd`，因此是否展开取决于当前任务。精确文件清单与注释由 `project-tree-and-diagram-focus` reference 维护。
 
 ## 展示顺序服务于工程心智模型
 
-磁盘枚举顺序是事实来源，不一定是最佳阅读顺序。把 `.vscode/` 作为工程入口配置放在首项，紧接 `build/` 建立“项目配置与生成结果分离”的边界，再连续展示 `.clangd`、`.clang-format`、`.clang-tidy`，读者能一次看全工具链配置。随后是脚本、`CMakeLists.txt` 和源码，正好对应“自动执行 → 构建规则 → 被构建对象”的理解路径。
-
-同类配置只展示一部分会制造错误的必需性判断：读者无法知道遗漏文件是不存在、被忽略还是不重要。完整展示并在树内注释职责，能避免树后再出现第二套逐项解释。
+磁盘枚举顺序是事实来源，不一定是最佳阅读顺序。展示顺序要让读者形成“工程配置 → 生成结果 → 工具配置 → 自动执行 → 构建规则 → 源码”的心智模型，具体顺序由写作 reference 维护。同类配置只展示一部分会制造错误的必需性判断，因此筛选边界必须在当前任务内有明确理由。
 
 ## 正式 C++ 章节以标题和文字衔接
 

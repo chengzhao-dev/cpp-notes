@@ -26,6 +26,10 @@ TASKS = ROOT / ".agents" / "skills" / "cpp-content" / "references" / "tasks"
 SKILL_REFS = ".agents/skills/"
 
 # 所有 part 共用的写作规范必读（专项 ref 之外的最小公共集）
+EXTRA_COMMON = {
+    "getting-started": [SKILL_REFS + "quarto-docs/references/zh/cpp-chapter-writing.md"],
+}
+
 COMMON_BASE = [
     SKILL_REFS + "quarto-docs/references/quarto/authoring.md",
     SKILL_REFS + "quarto-docs/references/zh/writing-style-core.md",
@@ -52,7 +56,7 @@ CHAPTERS = [
     ("getting-started", "install-toolchain", "merged", "TASK-ENV-001", None, None,
      "已并入 ENV-001 的「安装 C++ 构建工具链」一节，勿再新建同名 qmd"),
     ("getting-started", "first-program", "done", "TASK-ENV-001", "cpp.md",
-     "code/getting-started/first-program/", "先 g++ 直编，再最小 CMakeLists。多文件与目标留给 cmake-intro"),
+     "code/getting-started/first-program/", "先直接编译，再最小 CMakeLists。多文件与目标留给 cmake-intro"),
     ("getting-started", "cmake-intro", "todo", "TASK-ENV-003", "engineering.md", None, "—"),
     ("core", "intro", "todo", "TASK-ENV-003", "cpp.md", None, "—"),
     ("core", "variables", "todo", "TASK-CORE-001", "cpp.md", None, "—"),
@@ -94,7 +98,7 @@ def task_id(part, chapter):
 
 def render(part, rows):
     """渲染一个 part 的矩阵文本。rows 已按 ID 升序。"""
-    reqs = [COMMON_BASE + ([cpp(spec)] if spec and not _is_merged(status) else [])
+    reqs = [COMMON_BASE + EXTRA_COMMON.get(part_, []) + ([cpp(spec)] if spec and not _is_merged(status) else [])
             for part_, chapter, status, dep, spec, code, note in rows]
     commons = sorted(set.intersection(*[set(r) for r in reqs]))
     lines = [

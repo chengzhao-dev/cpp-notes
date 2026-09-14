@@ -1,11 +1,13 @@
-## 中文措辞审校路由
-本文件只定义适用范围。项目常用替换词、冗余表达、过度承诺和中文技术文档的反例归知识库维护。
+# 中文审校路由
 
-润色阶段运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "中文技术文档 措辞替换" --domain quarto-docs`。
+本文件只定义适用范围。项目常用的替换词、冗余表达、过度承诺、段落衔接和自然句式案例归知识库维护。
 
-## 中文段落与句式路由
-本文件只定义适用范围。中文段落的连接关系、长句拆分、术语节奏、代码块前后闭环和多文件复核属于项目知识库案例。
+遇到措辞、导语、段落跳跃、术语密集、命令解释不闭环或多页面重复时，先区分读者引导和作者维护说明，再运行：
 
-遇到段落跳跃、术语密集、命令解释不闭环或多页面重复时，运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "中文段落衔接 代码块闭环" --domain quarto-docs`。
+```bash
+& .agents/skills/agent-ops/scripts/run.ps1 kb-search "中文技术文档 措辞替换" --domain quarto-docs
+```
 
-导语、过渡句或目录树邻接文字显得生硬时，先区分读者引导和作者维护说明，再检索自然句式案例。运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "导语动作链 自然衔接 维护说明" --domain quarto-docs`。
+工具动作被压缩成“对照直编”一类不透明说法时，先还原动作、对象和顺序，再改写成“直接编译指定文件”一类可执行表述。
+
+行内代码和链接间距的具体依据由 `references/quarto/authoring.md` 路由。

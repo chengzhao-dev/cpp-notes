@@ -2,13 +2,13 @@
 
 ## HTML 输出配置
 
-> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、不折叠
+> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、代码块不折叠；回顾答案使用原生 details
 
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
 ```powershell
-python .agents/skills/agent-ops/scripts/run.py kb-search "html 输出选项" --domain quarto-docs --subdomain html_output
-python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
+& .agents/skills/agent-ops/scripts/run.ps1 kb-search "html 输出选项" --domain quarto-docs --subdomain html_output
+& .agents/skills/agent-ops/scripts/run.ps1 kb-search --toc "代码块显示"
 ```
 
 ### 本仓库的现行取值
@@ -22,10 +22,12 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 | `toc` / `toc-depth` / `toc-location` | `true` / `4` / `right` | 右侧目录，窄屏会折叠，不作唯一定位手段 |
 | `number-sections` | `false` | 因此标题不手填序号，见 `basics.md` |
 | `code-copy` / `code-overflow` | `true` / `wrap` | 长行换行，不让读者横向拖动 |
-| `grid` | sidebar 280 / body 800 / margin 240 / gutter 1.5em | 页面栅格 |
+| `grid` | sidebar 256 / body 840 / margin 216 / gutter 1rem | 页面栅格 |
 | `lang` | `zh` | 影响部分 HTML 行为与提示框默认词 |
 
 本仓库**不开启**代码行号（`code-line-numbers`）与代码折叠（`code-fold`）：取舍依据见 `cpp-tooling-quarto-html-v2` 的知识文件。
+
+站点 QMD 代码块使用 `{.语言 filename="标题"}`。Quarto 会把标题渲染为 `.code-with-filename-file`，外观与复制按钮位置由主题统一控制；标题缺失由 `check_docs.py` 拦截。
 
 ### 改动约定
 
@@ -42,7 +44,7 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 
 ## 渲染与发布排查索引
 按症状查此表：每条只给可执行处置。**行为成因与取舍**的唯一出处是知识库，用
-`python .agents/skills/agent-ops/scripts/run.py kb-search "<症状关键词>"` 取用
+`& .agents/skills/agent-ops/scripts/run.ps1 kb-search "<症状关键词>"` 取用
 （可加 `--domain quarto-docs --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
 
 > 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · `{{< include >}}` 必须包在带语言名的围栏里
@@ -70,9 +72,9 @@ python .agents/skills/agent-ops/scripts/run.py kb-search --toc "代码块显示"
 ### 5. 中文乱码/编码
 
 - **症状**：中文变成「锟/鐜/绔」类字串，或文件带 BOM、行尾变 CRLF。
-- **处置**：改 `.qmd` 或 Skill 文档后先跑 `python .agents/skills/agent-ops/scripts/check_encoding.py`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
+- **处置**：改 `.qmd` 或 Skill 文档后先跑 `& .agents/skills/agent-ops/scripts/run.ps1 check`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
 - **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入，不要让系统代码页参与中文读写。
-- **自检**：`python .agents/skills/agent-ops/scripts/run.py check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
+- **自检**：`& .agents/skills/agent-ops/scripts/run.ps1 check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
 
 ### 6. 渲染失败排查顺序
 
@@ -117,9 +119,9 @@ $d = Get-ChildItem -LiteralPath "D:\Github" -Force
 
 - **症状**：源文件写了 `::: {.callout-best-practice}`，渲染后没有左色条提示框，且块内 `## 标题` 混进右侧目录。
 - **处置**：只用内置 `note`/`tip`/`warning`/`important`/`caution` 五类，标题写在块内首行 `## …`，并保留全局中文类型标题。「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring.md`「Callout 提示框」。
-- **自检**：渲染后跑 `python .agents/skills/quarto-docs/scripts/check_callouts.py`，它扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
+- **自检**：渲染后跑 `& .agents/skills/agent-ops/scripts/run.ps1 check`，`callouts` 项会扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
 
-### 13. `{{< include >}}` 引用代码文件未加围栏 → 乱码式排版、目录被污染
+### 13. `{{< include >}}` 引用代码文件未加属性围栏 → 乱码式排版、目录被污染
 
 - **症状**：渲染出的脚本失去高亮与等宽底色，`#` 注释行变成大号标题，含 `*`、`_` 的行变成斜体或粗体，右侧目录多出假标题。
-- **处置**：`{{< include >}}` 整体放进带语言名的围栏，按扩展名选 `cpp`、`bash`、`cmake`、`powershell`，**没有一个例外**。规则见 `authoring.md`「代码块」。
+- **处置**：`{{< include >}}` 整体放进 `{.cpp filename="main.cpp"}` 形式的属性围栏，按扩展名选语言并把 `filename` 写成真实文件名，**没有一个例外**。规则见 `authoring.md`「代码块」。

@@ -7,8 +7,8 @@
 | 格式违规 | 0 | Frontmatter 缺字段 / 无 ## 段落，文件根本没进索引 |
 | 未索引文档 | 0 | knowledge 下有文件但注册表里没有，通常是上表违规连带 |
 | 孤立 Chunk | 0 | Child 找不到 Parent，Stage 5 回溯会静默降级 |
-| 重复 Chunk | <= 10 | 同一 hash 出现多次，检索结果互相挤占预算 |
-| 图谱断链 | <= 5 | 概念节点的 chunk_id 指向不存在的 Chunk |
+| 重复 Chunk | 0 | 同一 hash 出现多次，检索结果互相挤占预算 |
+| 图谱断链 | 0 | 概念节点的 chunk_id 指向不存在的 Chunk |
 | 检索 P95 | <= 200ms | 评测集上端到端延迟，超标即验收不通过 |
 | 陈旧条目 | 0 | 源码 hash 变了但索引还是旧的，说明增量没跑 |
 | 目录缺登记 | 0 | `knowledge/` 有文件但 `catalog.md` 知识表没有它，路由表与知识库漂移 |
@@ -34,8 +34,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kb_common as kb  # noqa: E402
 
 LIMITS = {
-    "format": 0, "unindexed": 0, "orphan": 0, "duplicate": 10,
-    "graph_broken": 5, "stale": 0, "p95_ms": 200.0, "dangling": 0, "catalog": 0,
+    "format": 0, "unindexed": 0, "orphan": 0, "duplicate": 0,
+    "graph_broken": 0, "stale": 0, "p95_ms": 200.0, "dangling": 0, "catalog": 0,
 }
 ROOT_PATH = kb.ROOT
 CATALOG_PATH = ROOT_PATH / ".agents" / "skills" / "catalog.md"
@@ -201,7 +201,7 @@ def measure_latency(samples: int) -> tuple[float, float]:
         # 页面块序列
         "教学正文的块序列为什么固定为五段", "一个二级标题对应一个可验证任务",
         "常见问题与本章回顾如何分工", "元素选择的判定依据是什么",
-        # 排版密度
+        # 页面几何与信息密度
         "正文三栏为什么被压缩", "段落和盒子的比例为什么要设阈值",
         "命令和输出为什么要分块", "代码块为什么不能做成框中框",
         # 入口页与写作案例

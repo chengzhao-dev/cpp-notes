@@ -21,7 +21,7 @@ frontmatter 字段：
 
 | 字段 | 必填 | 作用 |
 |---|---|---|
-| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-typography-density-v1`），历史 id 保持不改名，改名等于新建知识 |
+| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-pattern-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
 | `domain` | 是 | 检索预过滤维度，取值与 Skill 目录名一致 |
 | `subdomain` | 建议 | 同一 Skill 内的主题筛选 |
@@ -52,11 +52,11 @@ frontmatter 字段：
 ## 索引与验证
 
 ```powershell
-python .agents/skills/agent-ops/scripts/run.py kb-index            # 增量（按 content_hash 跳过未变文件）
-python .agents/skills/agent-ops/scripts/run.py kb-index --rebuild  # 改分词或结构后全量重建
-python .agents/skills/agent-ops/scripts/run.py kb-check            # 格式违规、重复、孤立、断链、P95 延迟
-python .agents/skills/agent-ops/scripts/run.py kb-eval             # Top-5 召回率、延迟与注入 Token 预算
-python .agents/skills/agent-ops/scripts/run.py kb-search "<查询>" --domain quarto-docs --explain
+& .agents/skills/agent-ops/scripts/run.ps1 kb-index            # 增量（按 content_hash 跳过未变文件）
+& .agents/skills/agent-ops/scripts/run.ps1 kb-index --rebuild  # 改分词或结构后全量重建
+& .agents/skills/agent-ops/scripts/run.ps1 kb-check            # 格式违规、重复、孤立、断链、P95 延迟
+& .agents/skills/agent-ops/scripts/run.ps1 kb-eval             # Top-5 召回率与注入 Token 预算
+& .agents/skills/agent-ops/scripts/run.ps1 kb-search "<查询>" --domain quarto-docs --explain
 ```
 
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/python-tools/scripts/`：
