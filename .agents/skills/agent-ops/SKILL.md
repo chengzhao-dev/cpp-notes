@@ -41,5 +41,5 @@ metadata:
 
 ## 完成判据
 
-- [ ] `python .agents/skills/agent-ops/scripts/run.py check` 全通过，`git diff --check` 干净。
+- [ ] `& .agents/skills/agent-ops/scripts/run.ps1 check` 全通过，`git diff --check` 干净。
 - [ ] 每条规则都能指向唯一出处，L1/L2 均在预算内。

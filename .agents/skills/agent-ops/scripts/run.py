@@ -7,7 +7,7 @@
 调用（不经 PowerShell 解析），并对输出做截断与分级：成功只回一行，失败才展开。
 
 子命令：
-  check   一次跑完全部产物/源码校验（默认 terse：仅一行结论，可 --strict）
+  check   一次跑完全部产物/源码校验（默认 terse；缺 _book 时产物项 SKIP，可 --require-book）
   verify  编译校验 C++ 示例（Windows 自动经 WSL2，可 --changed 增量校验）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
   scope   解析任务作用域，输出 UNIT/READ/DENY 清单
@@ -16,7 +16,7 @@
   kb-index  增量或全量重建知识库索引（knowledge/ -> temp/knowledge-index/）
   kb-search  知识库单次检索（透传 retriever 参数，如 --toc/--parent/--explain）
   kb-check  知识库健康度与检索延迟测量
-  kb-eval   标注集召回率与 Token 预算验收
+  kb-eval   标注集召回率与 Token 预算验收（延迟由 kb-check 负责）
   kb-scale  三层索引的规模基准（P95 拐点，验证 100MB–1GB 目标）
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
@@ -95,28 +95,34 @@ def resolve_tool(name):
     candidates = [os.environ.get(env_name), config.get(Path(name).stem), shutil.which(name)]
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
+            # Windows 的 PATH 常先返回 .cmd 包装器；Quarto 的 .cmd 会把
+            # Deno/Sass 相对路径解析到当前工作目录，优先同目录 .exe 可避免该问题。
+            if Path(candidate).suffix.lower() == ".cmd":
+                executable = Path(candidate).with_suffix(".exe")
+                if executable.is_file():
+                    return str(executable)
             return str(candidate)
     raise ToolNotFound(f"找不到工具 {name}；请配置 {env_name} 或安装后加入 PATH")
 
-# 校验项：(名称, 脚本相对路径, 需要 _book 产物)
+# 校验项：(名称, 脚本相对路径, 需要 _book 产物, 固定参数)
 CHECKS = [
-    ("empty", ".agents/skills/agent-ops/scripts/check_empty.py", False),
-    ("encoding", ".agents/skills/agent-ops/scripts/check_encoding.py", False),
-    ("agent-controls", ".agents/skills/agent-ops/scripts/test_agent_controls.py", False),
-    ("layout", ".agents/skills/quarto-theme/scripts/check_layout.py", True),
-    ("callouts", ".agents/skills/quarto-docs/scripts/check_callouts.py", True),
-    ("dom", ".agents/skills/agent-ops/scripts/check_dom_contracts.py", True),
-    ("size", ".agents/skills/agent-ops/scripts/check_skill_size.py", False),
-    ("ascii", ".agents/skills/quarto-docs/scripts/check_ascii_names.py", False),
-    ("links", ".agents/skills/quarto-docs/scripts/check_skill_links.py", False),
-    ("inline-code", ".agents/skills/agent-ops/scripts/check_inline_code.py", False),
-    ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False),
-    ("punctuation", ".agents/skills/agent-ops/scripts/check_punctuation.py", False),
-    ("typography", ".agents/skills/quarto-theme/scripts/check_typography.py", True),
-    ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False),
-    ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False),
-    ("vector-eq", ".agents/skills/python-tools/scripts/test_vector_index_equivalence.py", False),
-    ("vector-shard", ".agents/skills/python-tools/scripts/test_vector_sharding.py", False),
+    ("empty", ".agents/skills/agent-ops/scripts/check_empty.py", False, ()),
+    ("encoding", ".agents/skills/agent-ops/scripts/check_encoding.py", False, ()),
+    ("agent-controls", ".agents/skills/agent-ops/scripts/test_agent_controls.py", False, ()),
+    ("layout", ".agents/skills/quarto-theme/scripts/check_layout.py", True, ()),
+    ("callouts", ".agents/skills/quarto-docs/scripts/check_callouts.py", True, ()),
+    ("dom", ".agents/skills/agent-ops/scripts/check_dom_contracts.py", True, ()),
+    ("size", ".agents/skills/agent-ops/scripts/check_skill_size.py", False, ()),
+    ("ascii", ".agents/skills/quarto-docs/scripts/check_ascii_names.py", False, ()),
+    ("links", ".agents/skills/quarto-docs/scripts/check_skill_links.py", False, ()),
+    ("inline-code", ".agents/skills/agent-ops/scripts/check_inline_code.py", False, ()),
+    ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False, ()),
+    ("punctuation", ".agents/skills/agent-ops/scripts/check_punctuation.py", False, ()),
+    ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False, ()),
+    ("kb", ".agents/skills/python-tools/scripts/check_health.py", False, ("--gate",)),
+    ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False, ()),
+    ("vector-eq", ".agents/skills/python-tools/scripts/test_vector_index_equivalence.py", False, ()),
+    ("vector-shard", ".agents/skills/python-tools/scripts/test_vector_sharding.py", False, ()),
 ]
 
 # 成功判据行：命中即认为该步通过，用于从大输出里挑出唯一有价值的一行
@@ -164,16 +170,27 @@ def interpret(rc, text, verbose, label):
 
 def cmd_check(args):
     """一次跑完全部校验。默认只回一行总结。"""
-    details, failed, reported = [], [], []
-    for name, script, need_book in CHECKS:
+    details, failed, reported, skipped = [], [], [], []
+    kb_ready = True
+    if any(name == "kb" for name, *_rest in CHECKS):
+        rc = ensure_kb_index()
+        if rc != 0:
+            failed.append("kb:index")
+            kb_ready = False
+    for name, script, need_book, extra in CHECKS:
         path = ROOT / script
         if not path.is_file():
             failed.append(f"{name}:脚本缺失")
             continue
-        if need_book and not (ROOT / "_book").is_dir():
-            failed.append(f"{name}:未渲染")
+        if name == "kb" and not kb_ready:
             continue
-        argv = [PY, str(path)]
+        if need_book and not (ROOT / "_book").is_dir():
+            if getattr(args, "require_book", False):
+                failed.append(f"{name}:未渲染")
+            else:
+                skipped.append(f"{name}:未渲染")
+            continue
+        argv = [PY, str(path), *extra]
         if need_book:
             argv += ["--book-dir", "_book"]
         if getattr(args, "strict", False) and name in {"punctuation", "docs"}:
@@ -187,12 +204,22 @@ def cmd_check(args):
         else:
             if any(line.startswith("REPORT encoding") for line in text.splitlines()):
                 reported.append(name)
+            skip_line = next(
+                (line.strip() for line in text.splitlines() if line.strip().startswith("SKIP ")),
+                "",
+            )
+            if skip_line:
+                skipped.append(f"{name}:{skip_line}")
             last = next((ln for ln in reversed(text.splitlines())
                          if any(h in ln for h in PASS_HINTS)), "")
-            details.append(f"{name}={last.strip() or 'ok'}")
+            details.append(
+                f"{name}={skip_line or last.strip() or 'ok'}"
+            )
 
     if not failed:
         suffix = f"；软报告={','.join(reported)}" if reported else ""
+        if skipped:
+            suffix += f"；SKIP={';'.join(skipped)}"
         print(f"PASS  check {len(CHECKS)} 项全通过{suffix}")
         if args.verbose:
             for d in details:
@@ -216,7 +243,7 @@ def cmd_verify(args):
         else:
             paths = relevant_cpp_paths(changed)
             if not paths:
-                print("SKIP  verify --changed  没有修改的 C++ 源文件或内嵌示例")
+                print("SKIP  verify --changed  没有修改的 C++ 源文件、QMD 或 reference 示例")
                 return 0
             argv += ["--paths", *paths]
     rc, text = run(argv)
@@ -242,15 +269,24 @@ def changed_paths():
     )
     raw = result.stdout.decode("utf-8", errors="replace")
     paths = []
-    for item in raw.split("\0"):
+    items = raw.split("\0")
+    index = 0
+    while index < len(items):
+        item = items[index]
         if not item or len(item) < 4:
+            index += 1
             continue
-        path = item[3:].split(" -> ")[-1].strip('"')
+        status = item[:2]
+        path = item[3:].strip('"')
+        if "R" in status or "C" in status:
+            index += 1
         path = path.replace("\\", "/")
         if any(part in {"build", ".cache", ".tmp", "temp", ".quarto", "__pycache__"}
                for part in path.split("/")):
+            index += 1
             continue
         paths.append(path)
+        index += 1
 
     global_prefixes = (
         ".agents/skills/cpp-content/assets/config/",
@@ -274,6 +310,12 @@ def relevant_cpp_paths(paths):
             selected.append(path)
         elif path.endswith(".qmd") and (ROOT / path).is_file():
             selected.append(path)
+        elif (
+            path.startswith(".agents/skills/cpp-content/references/cpp/")
+            and path.endswith(".md")
+            and (ROOT / path).is_file()
+        ):
+            selected.append(path)
     return selected
 
 
@@ -290,6 +332,7 @@ def cmd_render(args):
     for ln in err[:10]:
         print(f"      {ln}")
     if not args.skip_check:
+        args.require_book = True
         return cmd_check(args)
     return 0
 
@@ -298,6 +341,8 @@ def cmd_scope(args):
     argv = [PY, str(ROOT / ".agents/skills/agent-ops/scripts/scope.py")]
     if args.list:
         argv.append("--list")
+    if args.verbose:
+        argv.append("--verbose")
     if args.target:
         argv.append(args.target)
     rc, text = run(argv)
@@ -327,24 +372,27 @@ def cmd_build(args):
 
 
 def cmd_status(args):
-    """git 状态：区分「本次 agent 改动」与「用户既有未提交改动」。"""
+    """git 状态：按维护域与内容域归类，不推断改动归属。"""
     rc, text = run(["git", "status", "--porcelain"])
-    agent_prefixes = (".agents/skills/agent-ops/scripts/", "operations/", ".agents/skills/",
-                      ".config/", ".agents/skills/quarto-theme/assets/theme/", "",
-                      "_quarto.yml", "AGENTS.md")
-    mine, theirs = [], []
+    maintenance, content = [], []
     for ln in text.splitlines():
         if not ln.strip():
             continue
         body = ln[3:].split(" -> ")[-1].strip().strip('"')
-        (mine if body.startswith(agent_prefixes) else theirs).append(ln)
-    print(f"agent 域文件 {len(mine)} 项 / 其它改动 {len(theirs)} 项")
-    for ln in mine:
+        (maintenance if status_group(body) == "maintenance" else content).append(ln)
+    print(f"维护域文件 {len(maintenance)} 项 / 内容与工程域 {len(content)} 项")
+    for ln in maintenance:
         print(f"  {ln}")
     if args.all:
-        for ln in theirs:
-            print(f"  (其它) {ln}")
+        for ln in content:
+            print(f"  (内容/工程) {ln}")
     return rc
+
+
+def status_group(path):
+    """按文件域归类 git 状态，不推断改动作者。"""
+    maintenance_prefixes = (".agents/", "AGENTS.md", ".gitattributes", ".gitignore")
+    return "maintenance" if path.startswith(maintenance_prefixes) else "content"
 
 
 KB_INDEX_DB = "temp/knowledge-index/kb_index.sqlite"
@@ -399,13 +447,11 @@ def cmd_kb_check(args):
 
 
 def cmd_kb_eval(args):
-    """标注集验收：Top-K 召回率、注入令牌与延迟。"""
+    """标注集验收：Top-K 召回率与注入令牌，延迟由 kb-check 负责。"""
     rc = ensure_kb_index()
     if rc != 0:
         return rc
-    argv = [PY, kb_script("evaluator.py"), "--topk", str(args.topk)]
-    if args.gate:
-        argv.append("--gate")
+    argv = [PY, kb_script("evaluator.py"), "--topk", str(args.topk), "--skip-latency"]
     if args.verbose:
         argv.append("--verbose")
     rc, text = run(argv)
@@ -435,6 +481,14 @@ def main():
         required = ".".join(map(str, MIN_PYTHON))
         print(f"FAIL  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")
         return 1
+    configured = Path(PY).resolve()
+    current = Path(sys.executable).resolve()
+    if current != configured:
+        print(
+            "FAIL  run.py 必须由 manifest.mcp.command 指定的解释器执行；"
+            f"当前={current}，配置={configured}"
+        )
+        return 1
 
     # 公共参数：用 parents 挂到每个子命令上，这样 --verbose 放前放后都能识别
     common = argparse.ArgumentParser(add_help=False)
@@ -446,20 +500,21 @@ def main():
     p = subs.add_parser("check", parents=[common], help="一次跑完全部校验")
     p.add_argument("--strict", action="store_true",
                    help="把正文分号、链接间距等软规则升级为失败（作用于 punctuation 与 docs）")
+    p.add_argument("--require-book", action="store_true",
+                   help="缺少 _book/ 时让 layout/callouts/dom 失败，默认显示 SKIP")
     p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
     p.add_argument("--changed", action="store_true", help="只校验相对 HEAD 修改的 C++ 内容")
     p = subs.add_parser("render", parents=[common], help="渲染并自动校验")
     p.add_argument("--no-ignore", action="store_true", help="传给 quarto --no-quartoignore")
     p.add_argument("--skip-check", action="store_true", help="渲染后不跑校验")
-    p.add_argument("--quiet-warn", action="store_true", help="不提示整本重渲染代价")
     p = subs.add_parser("scope", parents=[common], help="输出任务作用域清单")
     p.add_argument("target", nargs="?")
     p.add_argument("--list", action="store_true")
     p = subs.add_parser("build", parents=[common], help="WSL 内跑章节示例一键构建")
     p.add_argument("target")
     p = subs.add_parser("status", parents=[common], help="精简 git 状态")
-    p.add_argument("--all", action="store_true", help="同时列出用户既有改动")
+    p.add_argument("--all", action="store_true", help="同时列出内容与工程域改动")
     p = subs.add_parser("kb-index", parents=[common], help="重建或增量更新知识库索引")
     p.add_argument("--rebuild", action="store_true", help="清空索引后全量重建")
     p = subs.add_parser("kb-search", parents=[common], help="知识库检索（参数透传 retriever）")
@@ -468,7 +523,6 @@ def main():
     p.add_argument("--gate", action="store_true", help="只把结构性问题视为失败")
     p = subs.add_parser("kb-eval", parents=[common], help="标注集召回率与预算验收")
     p.add_argument("--topk", type=int, default=5, help="召回评价的 K，默认 5")
-    p.add_argument("--gate", action="store_true", help="不卡延迟（延迟由 kb-check 负责）")
     p = subs.add_parser("kb-scale", parents=[common], help="三层索引规模基准与 P95 拐点")
     p.add_argument("--sizes", default="1000,10000,50000,100000", help="逗号分隔的 Chunk 数")
     p.add_argument("--repeats", type=int, default=3, help="每级重复次数")

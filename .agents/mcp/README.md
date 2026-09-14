@@ -37,11 +37,11 @@ skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用 `.
 | `project_verify` | 运行 C++ 示例校验 | 可能生成构建产物 |
 | `project_render` | 渲染 Quarto Book 并校验 | 是，生成 `_book/` |
 | `project_build` | 构建指定章节示例 | 是，生成 `build/` |
-| `project_review` | 运行仓库检查与改动示例校验 | 可能生成检查/构建缓存 |
+| `project_review` | 运行仓库预检与改动示例校验，供后续缺陷审查使用 | 可能生成检查/构建缓存 |
 
 `project_read` 支持可选的 `startLine`/`endLine`，默认仍受最大字节数限制。`project_search` 支持 `maxResults` 和 `contextLines`，结果带有 `truncated` 标记。先用 `project_scope`，再按范围读取，避免整包进入上下文。
 
-`project_edit` 必须提供 `expected_sha256`，并且 `old_text` 只能精确匹配一次。文件在 Agent 读取后被其他进程修改时，编辑会拒绝执行。MCP 不提供任意 shell、文件删除、`git commit` 或 `git push` 工具。
+`project_edit` 必须提供 `expectedSha256`，并且 `oldText` 只能精确匹配一次。文件在 Agent 读取后被其他进程修改时，编辑会拒绝执行。MCP 不提供任意 shell、文件删除、`git commit` 或 `git push` 工具。
 
 ## 资源
 

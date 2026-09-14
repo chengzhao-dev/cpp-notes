@@ -32,6 +32,7 @@ PYTHON = manifest_python()
 MAX_READ_BYTES = 512 * 1024
 MAX_OUTPUT_CHARS = 12_000
 MAX_CONTEXT_LINES = 3
+MIN_PYTHON = (3, 12)
 SUPPORTED_PROTOCOLS = ("2025-06-18", "2025-03-26", "2024-11-05")
 DENIED_PARTS = {".git", ".quarto", "_book", "node_modules", ".cache", ".tmp", "temp"}
 DENIED_SUFFIXES = {".key", ".pem", ".p12", ".pfx"}
@@ -191,6 +192,28 @@ def validate_python() -> None:
     if result.returncode != 0:
         print(f"python interpreter failed with exit code {result.returncode}: {result.stdout.strip()}", file=sys.stderr)
         raise SystemExit(result.returncode)
+    try:
+        version = subprocess.run(
+            [PYTHON, "-c", "import sys; print(f'{sys.version_info[0]}.{sys.version_info[1]}')"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+        major, minor = (int(part) for part in version.stdout.strip().split(".", 1))
+    except (OSError, ValueError):
+        print("python interpreter version could not be determined", file=sys.stderr)
+        raise SystemExit(126)
+    if (major, minor) < MIN_PYTHON:
+        print(
+            f"python interpreter must be >= {MIN_PYTHON[0]}.{MIN_PYTHON[1]}; "
+            f"got {major}.{minor}",
+            file=sys.stderr,
+        )
+        raise SystemExit(126)
 
 
 def tool_result(value: Any, is_error: bool = False) -> dict[str, Any]:
@@ -206,14 +229,8 @@ def tool_result(value: Any, is_error: bool = False) -> dict[str, Any]:
 TOOLS = [
     {
         "name": "project_review",
-        "description": "Run code and documentation review checks on modified files using defect-first criteria.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "target": {"type": "string", "description": "Optional file path to review, default to changed files"}
-            },
-            "additionalProperties": False,
-        },
+        "description": "Run the repository preflight checks before a defect-first review.",
+        "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
     },
     {
         "name": "project_status",
@@ -342,7 +359,6 @@ def handle_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
         path.write_text(updated, encoding="utf-8", newline="\n")
         return tool_result({"path": args["path"], "sha256": sha256_text(updated), "changed": True})
     if name == "project_review":
-        target = args.get("target")
         check_res = run_agent("check")
         verify_res = run_agent("verify", "--changed")
         output = f"Review Summary:\n- Check Suite: exit {check_res['exitCode']}\n{check_res['output']}\n- C++ Verify: exit {verify_res['exitCode']}\n{verify_res['output']}"

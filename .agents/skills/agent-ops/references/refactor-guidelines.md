@@ -51,4 +51,4 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `knowledge/`。
 - 相同职责只保留一个权威实现。公共逻辑放入对应 skill 的 `scripts/` 或 `references/`。
 - 删除文件后移除空目录（`check_empty.py` 对空文件与空目录都判 FAIL）。
 - Skill 目录与文件名使用 kebab-case 与 ASCII。`agents/openai.yaml` 是宿主 UI 元数据，不参与任务路由。
-- 完成后运行 `python .agents/skills/agent-ops/scripts/run.py check`。涉及知识库再跑 `kb-index`、`kb-check` 和 `kb-eval`。
+- 完成后运行 `& .agents/skills/agent-ops/scripts/run.ps1 check`。涉及知识库再跑 `kb-index`、`kb-check` 和 `kb-eval`。

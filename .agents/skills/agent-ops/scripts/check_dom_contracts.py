@@ -27,6 +27,10 @@
       命令 token 强制改色的旧选择器。普通文本代码块不得带语言 token。
   C7 代码块视觉契约：普通文本代码块与语言代码块必须共用 GitHub 代码背景、边框、
       字体和布局令牌，避免两套代码块样式分叉。
+  C8 代码来源标题：QMD 代码块必须由 .code-with-filename 包裹，且主题必须提供
+      标题背景、文字和间距令牌；标题条不能退化为普通代码块。
+  C9 可折叠答案：产物中的 details.answer-disclosure 必须默认收起，
+      摘要必须包含“查看答案”，且答案区不得混入标题层级。
 
 用法：python check_dom_contracts.py [--book-dir _book] [--verbose]
 退出码：0 = 全部契约通过，1 = 有契约失败，2 = 产物目录不存在（需先 quarto render）。
@@ -50,13 +54,14 @@ VOID_TAGS = {
 
 
 class Node:
-    """极简 DOM 节点：只保留契约所需的 tag / class / 父子关系。"""
+    """极简 DOM 节点：只保留契约所需的 tag / class / attrs / 父子关系。"""
 
-    __slots__ = ("tag", "classes", "children", "parent")
+    __slots__ = ("tag", "classes", "attrs", "children", "parent")
 
-    def __init__(self, tag, classes, parent):
+    def __init__(self, tag, classes, attrs, parent):
         self.tag = tag
         self.classes = set(classes)
+        self.attrs = attrs
         self.children = []
         self.parent = parent
 
@@ -66,14 +71,14 @@ class TreeBuilder(HTMLParser):
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.root = Node("#root", set(), None)
+        self.root = Node("#root", set(), {}, None)
         self.stack = [self.root]
         self.link_rels = []  # [(rel, href)] 供 favicon 契约使用
 
     def handle_starttag(self, tag, attrs):
         attrd = dict(attrs)
         classes = (attrd.get("class") or "").split()
-        node = Node(tag, classes, self.stack[-1])
+        node = Node(tag, classes, attrd, self.stack[-1])
         self.stack[-1].children.append(node)
         if tag == "link":
             self.link_rels.append(((attrd.get("rel") or "").lower(), attrd.get("href") or ""))
@@ -349,6 +354,88 @@ def check_contracts(book_dir, htmls, css_pairs):
         [
             ".agents/skills/quarto-theme/assets/theme/css/code.css 应让 pre.sourceCode、pre:not(.sourceCode) 与 div.sourceCode 共用布局",
             "背景、边框、字体、字号、行高和内边距应引用 .agents/skills/quarto-theme/assets/theme/css/tokens.css 的代码令牌",
+        ],
+    ))
+
+    # ---------- C8 代码来源标题 ----------
+    titled_blocks = 0
+    untitled = []
+    for path, tree, _rels in htmls:
+        wrappers = [n for n in walk(tree) if "code-with-filename" in n.classes]
+        titled_blocks += len(wrappers)
+        for node in walk(tree):
+            if node.tag != "pre":
+                continue
+            if any(is_descendant(node, wrapper) for wrapper in wrappers):
+                continue
+            untitled.append(str(path.relative_to(book_dir)))
+    title_tokens = all(token in source_css_text for token in (
+        "--code-title-bg", "--code-title-fg", "--code-title-font-size", "--code-title-padding",
+    ))
+    c8 = titled_blocks > 0 and not untitled and title_tokens
+    summary = "代码标题块=%d，未包裹 pre=%d，标题令牌=%s" % (
+        titled_blocks, len(untitled), title_tokens)
+    if untitled:
+        summary += "（" + ", ".join(sorted(set(untitled))[:3]) + " …）"
+    results.append((
+        "C8", "代码块来源标题已渲染并受主题控制", c8, summary,
+        [
+            "站点 QMD 代码块必须使用 {.语言 filename=\"标题\"} 属性围栏",
+            "产物中的 pre 必须位于 .code-with-filename 下",
+            "tokens.css 必须提供 --code-title-bg/fg/font-size/padding",
+        ],
+    ))
+
+    # ---------- C9 可折叠答案 ----------
+    answer_total = 0
+    answer_open = []
+    answer_summary = []
+    answer_heading = []
+    for path, _root, _link_rels in htmls:
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        pattern = re.compile(
+            r"<details\b(?P<attrs>[^>]*)>(?P<body>.*?)</details>",
+            flags=re.S | re.I,
+        )
+        for match in pattern.finditer(text):
+            attrs = match.group("attrs")
+            if "answer-disclosure" not in attrs:
+                continue
+            answer_total += 1
+            rel = str(path.relative_to(book_dir))
+            if re.search(r"\bopen\b", attrs):
+                answer_open.append(rel)
+            summary_match = re.search(
+                r"<summary\b[^>]*>(?P<summary>.*?)</summary>",
+                match.group("body"),
+                flags=re.S | re.I,
+            )
+            visible = re.sub(r"<[^>]+>", "", summary_match.group("summary")).strip() if summary_match else ""
+            if visible != "查看答案":
+                answer_summary.append(rel)
+            if re.search(r"<h[1-6]\b", match.group("body"), flags=re.I):
+                answer_heading.append(rel)
+    c9 = (
+        answer_total > 0
+        and not answer_open
+        and not answer_summary
+        and not answer_heading
+    )
+    summary = "答案块=%d，默认展开=%d，摘要异常=%d，内部标题=%d" % (
+        answer_total,
+        len(answer_open),
+        len(answer_summary),
+        len(answer_heading),
+    )
+    results.append((
+        "C9", "可折叠答案默认收起且摘要与层级正确", c9, summary,
+        [
+            "站点 QMD 使用 <details class=\"answer-disclosure\"> 和 <summary>查看答案</summary>",
+            "answer-disclosure 不得带 open 属性",
+            "折叠答案内部不得出现 h1–h6",
         ],
     ))
 

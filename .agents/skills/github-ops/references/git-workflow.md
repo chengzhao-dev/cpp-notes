@@ -5,7 +5,7 @@
 为什么这样归一化行尾、为什么远端只留两个分支、提交按什么边界切分，都在知识库，一条命令取用：
 
 ```powershell
-python .agents/skills/agent-ops/scripts/run.py kb-search "仓库一致性与分支保护依据" --domain github-ops
+& .agents/skills/agent-ops/scripts/run.ps1 kb-search "仓库一致性与分支保护依据" --domain github-ops
 ```
 
 ## 硬约束
@@ -63,7 +63,7 @@ git log --oneline -10
 
 以上检查仅适用于确实涉及提交、变更总结、审查、冲突解决或发布说明的任务。普通文档、资料、分析和问答不需要例行运行。
 
-再按改动范围跑检查：`python .agents/skills/agent-ops/scripts/run.py verify --changed`、`python .agents/skills/agent-ops/scripts/run.py check`、`git diff --check`。
+再按改动范围跑检查：`& .agents/skills/agent-ops/scripts/run.ps1 verify --changed`、`& .agents/skills/agent-ops/scripts/run.ps1 check`、`git diff --check`。
 只有改主题或 Quarto 全局配置才整本渲染。只有改 C++ 全局配置或校验器才全量验证。不要让 `build/`、`.cache/`、`.tmp/` 触发校验。
 
 ## 大更新怎么分组

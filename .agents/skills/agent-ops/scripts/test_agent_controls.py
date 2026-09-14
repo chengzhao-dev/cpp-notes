@@ -19,6 +19,8 @@ def load(path: Path, name: str):
 
 encoding = load(ROOT / ".agents/skills/agent-ops/scripts/check_encoding.py", "check_encoding")
 mcp = load(ROOT / ".agents/mcp/server.py", "mcp_server")
+runner = load(ROOT / ".agents/skills/agent-ops/scripts/run.py", "run_agent")
+scope = load(ROOT / ".agents/skills/agent-ops/scripts/scope.py", "scope")
 
 
 def main() -> int:
@@ -44,11 +46,21 @@ def main() -> int:
     assert read["structuredContent"]["startLine"] == 1
     assert read["structuredContent"]["totalLines"] >= 2
     search = mcp.handle_tool("project_search", {
-        "query": "run.py", "path": "AGENTS.md",
+        "query": "run.ps1", "path": "AGENTS.md",
         "maxResults": 1, "contextLines": 1,
     })
     item = search["structuredContent"]["results"][0]
     assert item["line"] > 0 and isinstance(item["before"], list)
+    review = next(tool for tool in mcp.TOOLS if tool["name"] == "project_review")
+    assert review["inputSchema"]["properties"] == {}
+    assert runner.status_group(".agents/skills/catalog.md") == "maintenance"
+    assert runner.status_group("knowledge/README.md") == "content"
+    assert scope.resolve_repo_domain(
+        ".agents/skills/github-ops/SKILL.md", ROOT
+    )["label"] == "skill github-ops"
+    assert scope.resolve_repo_domain(
+        "knowledge/README.md", ROOT
+    )["label"] == "knowledge"
     print("PASS agent controls")
     return 0
 

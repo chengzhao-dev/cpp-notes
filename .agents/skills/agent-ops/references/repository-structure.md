@@ -16,7 +16,7 @@
 | 入口与卡片页（index.qmd） | ≤45 行 | 只做定位，不承担讲解 |
 | 根 README.md | ≤90 行 | 路线与仓库结构，细节指向文档站与 skills |
 
-两类页面的组织依据是知识库 `quarto-docs` 域的两个条目，分别查询（多词短语会整体匹配不到，必须单 token）：`python .agents/skills/agent-ops/scripts/run.py kb-search "块序列" --domain quarto-docs` 与 `python .agents/skills/agent-ops/scripts/run.py kb-search "卡片" --domain quarto-docs`。
+两类页面的组织依据是知识库 `quarto-docs` 域的两个条目：`cpp-quarto-chapter-pattern-v1` 与 `cpp-quarto-landing-pattern-v1`。
 
 ## Agent 运行约定
 统一入口是 `.agents/skills/agent-ops/scripts/run.py`。先用 `scope` 确定读取边界，再按需运行 `check`、`verify`、`render` 或 `kb-*` 子命令。

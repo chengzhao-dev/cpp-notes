@@ -30,17 +30,17 @@
 
 ## 常用命令
 
-以下命令统一由 `.agents/manifest.json` 的 `mcp.command` 指定 Python 解释器执行。该字段是仓库唯一 Python 来源；缺失、不可执行或版本不足时立即停止，不回退到 PATH、环境变量或其他配置。
+以下命令统一由 `.agents/manifest.json` 的 `mcp.command` 指定 Python 解释器执行。该字段是仓库唯一 Python 来源。缺失、不可执行或版本不足时立即停止，不回退到 PATH、环境变量或其他配置。
 
 | 命令 | 用途 |
 | --- | --- |
-| `python .agents/skills/agent-ops/scripts/run.py scope <目标>` | 输出最小读取作用域 |
-| `python .agents/skills/agent-ops/scripts/run.py check` | 批量运行编码、文档、主题和产物检查 |
-| `python .agents/skills/agent-ops/scripts/run.py render` | 渲染 Book 并自动检查 |
-| `python .agents/skills/agent-ops/scripts/run.py verify --changed` | 增量校验 C++ 示例 |
-| `python .agents/skills/agent-ops/scripts/run.py build <part>/<chapter>` | 在 WSL 构建单章示例 |
-| `python .agents/skills/agent-ops/scripts/run.py kb-index [--rebuild]` | 构建知识库索引 |
-| `python .agents/skills/agent-ops/scripts/run.py kb-check` | 检查知识库结构与检索延迟 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 scope <目标>` | 输出最小读取作用域 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 check` | 批量运行编码、文档、主题和产物检查 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 render` | 渲染 Book 并自动检查 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 verify --changed` | 增量校验 C++ 示例 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 build <part>/<chapter>` | 在 WSL 构建单章示例 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 kb-index [--rebuild]` | 构建知识库索引 |
+| `& .agents/skills/agent-ops/scripts/run.ps1 kb-check` | 检查知识库结构与检索延迟 |
 
 ## 读取、编辑与验收边界
 
@@ -50,7 +50,7 @@
 4. 中文文件使用 UTF-8 无 BOM、LF。修改 `.qmd`、skill 或主题 CSS 后先跑编码检查。QMD 正文标点和句长遵循 `quarto-docs/references/zh/writing-principles.md`。
 5. 修改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 会触发整本渲染。确认代价后运行 `render`。
 6. `AGENTS.md` 受 `project_doc_max_bytes = 65536` 约束。`.agents/skills/` 的 L1/L2 体量由 `check_skill_size.py` 强制。
-7. 长任务每轮推进一个可验证子目标。上下文压缩后重读本文件与 `git status`。每轮用一次 `run.py check` 收口。
+7. 长任务每轮推进一个可验证子目标。上下文压缩后重读本文件与 `git status`。每轮用一次 `run.ps1 check` 收口。
 8. Git 对比服务于审查、冲突解决、发布和最近改动调试。普通文档任务不重复运行。
 
 ## Python 运行时

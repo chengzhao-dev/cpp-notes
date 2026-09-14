@@ -8,6 +8,7 @@
 import argparse
 from pathlib import Path
 import re
+import shlex
 import sys
 
 ROOT = Path(__file__).resolve().parents[4]
@@ -16,17 +17,48 @@ FENCE = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
 HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 LINK = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 LINK_TEXT = re.compile(r"(?<!!)\[(?P<label>[^\]\n]+)\]\((?P<url>[^)\n]*)\)")
+ANSWER_DETAILS = re.compile(r"^(?P<indent>[ \t]*)<details(?P<attrs>[^>]*)>$")
 CJK = re.compile(r"[\u4e00-\u9fff]")
 WIDE = re.compile(r"[\u3000-\u303f\uff00-\uffef]")
 ASCII_EDGE = re.compile(r"[A-Za-z0-9_.+\-/]")
 IMAGE = re.compile(r"!\[([^]]*)\]\(([^)]+)\)")
-CALLOUT = re.compile(r"^\s*:::\s*\{\.callout-([\w-]+)\}")
+CALLOUT = re.compile(r"^\s*:::\s*\{\.callout-([\w-]+)(?:\s+[^}]*)?\}")
+CALLOUT_OPEN = re.compile(r"^\s*:::\s*\{\.callout-[\w-]+(?:\s+[^}]*)?\}\s*$")
+CALLOUT_CLOSE = re.compile(r"^\s*:::\s*$")
 CALLOUTS = {"note", "tip", "warning", "important", "caution"}
 CODE_EXTENSIONS = {".cpp", ".cc", ".cxx", ".h", ".hpp", ".cmake", ".sh", ".bash"}
 CODE_NAMES = {"CMakeLists.txt"}
 CODE_LANGUAGES = {"cpp", "c", "bash", "sh", "shell", "powershell", "ps1", "cmake", "text", "markdown", "yaml", "json", "toml", "mermaid"}
 SHELL_LANGUAGES = {"bash", "sh", "shell"}
 POWERSHELL_LANGUAGES = {"powershell", "ps1"}
+
+
+def parse_fence_info(info):
+    """解析普通语言围栏与 Quarto/Pandoc 属性围栏。"""
+    info = info.strip()
+    if not info:
+        return "", {}, None
+    if not info.startswith("{"):
+        return info.split()[0], {}, None
+    if not info.endswith("}"):
+        return "", {}, f"属性围栏缺少右花括号：{info}"
+    try:
+        tokens = shlex.split(info[1:-1])
+    except ValueError as exc:
+        return "", {}, f"属性围栏无法解析：{exc}"
+    language = ""
+    attributes = {}
+    for token in tokens:
+        if token.startswith(".") and not language:
+            language = token[1:]
+            continue
+        if "=" in token:
+            key, value = token.split("=", 1)
+            attributes[key] = value.strip("\"'")
+            continue
+        if not language:
+            language = token
+    return language, attributes, None
 
 
 def documents():
@@ -150,6 +182,67 @@ def check_link_spacing(rel, lines, blocks):
     return errors, notices
 
 
+def check_callout_placement(rel, lines):
+    """检查正文 Callout 是否是任务末尾的独立块。"""
+    errors = []
+    in_fence = False
+    opening_line = None
+    for index, line in enumerate(lines):
+        if FENCE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if opening_line is None:
+            if not CALLOUT_OPEN.match(line):
+                continue
+            if index and lines[index - 1].strip():
+                errors.append(f"{rel}:{index + 1}: DOC-E13 Callout 前必须留空行")
+            opening_line = index + 1
+            continue
+        if not CALLOUT_CLOSE.match(line):
+            continue
+        next_index = index + 1
+        while next_index < len(lines) and not lines[next_index].strip():
+            next_index += 1
+        if index + 1 < len(lines) and lines[index + 1].strip():
+            errors.append(f"{rel}:{index + 1}: DOC-E13 Callout 后必须留空行")
+        if next_index < len(lines) and not HEADING.match(lines[next_index]):
+            errors.append(f"{rel}:{opening_line}: DOC-E13 Callout 必须是当前任务的最后一个信息块")
+        opening_line = None
+    if opening_line is not None:
+        errors.append(f"{rel}:{opening_line}: DOC-E13 Callout 未闭合")
+    return errors
+
+
+def check_answer_disclosures(rel, lines):
+    """检查可折叠答案必须位于列表内、默认收起并带固定摘要。"""
+    errors = []
+    index = 0
+    while index < len(lines):
+        match = ANSWER_DETAILS.match(lines[index])
+        if not match or 'class="answer-disclosure"' not in match.group("attrs"):
+            index += 1
+            continue
+        line_number = index + 1
+        if len(match.group("indent").expandtabs(4)) < 3:
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案必须缩进在对应列表项下")
+        if re.search(r"\bopen\b", match.group("attrs")):
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案必须默认收起")
+        closing = None
+        for candidate in range(index + 1, len(lines)):
+            if lines[candidate].strip() == "</details>":
+                closing = candidate
+                break
+        if closing is None:
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案缺少 </details>")
+            break
+        if not any("<summary>查看答案</summary>" in line for line in lines[index + 1:closing]):
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案摘要必须为“查看答案”")
+        index = closing + 1
+    return errors
+
+
 def check(path):
     rel = path.relative_to(ROOT).as_posix()
     errors, notices = [], []
@@ -165,6 +258,8 @@ def check(path):
     fence_info = ""
     headings = []
     blocks = []
+    callout_section = None
+    callout_counts = {}
     lines = text.splitlines()
     for number, line in enumerate(lines, 1):
         match = FENCE.match(line)
@@ -181,15 +276,43 @@ def check(path):
             heading = HEADING.match(line)
             if heading:
                 headings.append((number, len(heading.group(1)), heading.group(2)))
+                if len(heading.group(1)) <= 3:
+                    callout_section = number
                 if kind in {"qmd", "readme", "agents"} and "`" in heading.group(2):
                     errors.append(f"{rel}:{number}: DOC-E2 标题不应使用反引号")
                 elif "`" in heading.group(2):
                     notices.append(f"{rel}:{number}: DOC-N4 标题含反引号，请确认是否便于检索")
+                if (
+                    kind == "qmd"
+                    and rel.startswith("content/")
+                    and not rel.endswith("/index.qmd")
+                    and len(heading.group(1)) == 1
+                ):
+                    errors.append(f"{rel}:{number}: DOC-E15 普通章节标题只由 YAML title 提供，正文禁止 H1")
             callout = CALLOUT.match(line)
             if callout and callout.group(1) not in CALLOUTS:
                 errors.append(f"{rel}:{number}: DOC-E3 callout 类型不受支持")
+            elif CALLOUT_OPEN.match(line):
+                callout_counts[callout_section] = callout_counts.get(callout_section, 0) + 1
+                if callout_counts[callout_section] > 1:
+                    errors.append(f"{rel}:{number}: DOC-E16 同一任务最多保留一个 Callout")
     if in_fence:
         errors.append(f"{rel}:{fence_start}: DOC-E4 代码围栏未闭合")
+    if kind == "qmd" and rel.startswith("content/"):
+        errors.extend(check_answer_disclosures(rel, lines))
+        errors.extend(check_callout_placement(rel, lines))
+        front_end = 0
+        if lines and lines[0].strip() == "---":
+            for index in range(1, len(lines)):
+                if lines[index].strip() == "---":
+                    front_end = index
+                    break
+        if not rel.endswith("/index.qmd"):
+            for number, line in enumerate(lines[1:front_end], 2):
+                if re.match(r"^description\s*:", line):
+                    errors.append(
+                        f"{rel}:{number}: DOC-E17 普通章节不使用 description，开篇说明写正文段落"
+                    )
     previous = 0
     for number, level, _title in headings:
         if previous and level > previous + 1:
@@ -201,11 +324,15 @@ def check(path):
         if start == previous_end + 1:
             errors.append(f"{rel}:{start}: DOC-E11 相邻代码块之间应保留一个空行")
     for start, end, info in blocks:
-        language = info.split()[0] if info else ""
-        if language == "{mermaid}":
-            language = "mermaid"
+        language, attributes, parse_error = parse_fence_info(info)
+        if parse_error:
+            errors.append(f"{rel}:{start}: DOC-E14 {parse_error}")
         body = "\n".join(lines[start:end - 1])
         if kind == "qmd":
+            if language and language != "mermaid" and not attributes.get("filename"):
+                errors.append(
+                    f"{rel}:{start}: DOC-E14 站点 QMD 代码块必须用 filename 属性标明来源或运行环境"
+                )
             if language == "mermaid" and not info.startswith("{mermaid}"):
                 errors.append(f"{rel}:{start}: DOC-E6 Mermaid 必须使用 {{mermaid}} 围栏")
             if language and language not in CODE_LANGUAGES:
@@ -290,7 +417,10 @@ def main():
         errors.extend(found_errors)
         notices.extend(found_notices)
     source_paths = sorted(
-        p for base in (ROOT / "code", ROOT / ".agents" / "skills" / "python-tools" / "scripts" / "cpp" / "templates")
+        p for base in (
+            ROOT / "code",
+            ROOT / ".agents" / "skills" / "python-tools" / "scripts" / "scaffold" / "templates",
+        )
         if base.is_dir() for p in base.rglob("*")
         if p.is_file() and (p.suffix.lower() in CODE_EXTENSIONS or p.name in CODE_NAMES)
         and not any(part in SKIP for part in p.parts)

@@ -162,8 +162,7 @@ def resolve_path(target, root):
 
 DOMAIN_READ = {
     "theme": [".agents/skills/quarto-theme/SKILL.md",
-              ".agents/skills/quarto-theme/references/theme-system.md",
-              ".agents/skills/quarto-theme/assets/theme/css/"],
+              ".agents/skills/quarto-theme/references/theme-system.md"],
     "dev": [".agents/skills/agent-ops/assets/config/editorconfig",
             ".agents/skills/python-tools/scripts/scaffold/"],
     "repo": ["AGENTS.md", ".agents/skills/catalog.md",
@@ -171,7 +170,47 @@ DOMAIN_READ = {
 }
 
 
-def emit(unit, root, out):
+def resolve_repo_domain(target, root):
+    """把 skill、Knowledge、MCP 或任意仓库路径解析成最小读取域。"""
+    path = (root / target).resolve()
+    try:
+        rel_path = rel(path, root)
+    except ValueError:
+        return None
+    parts = rel_path.split("/")
+    if parts[:2] == [".agents", "skills"]:
+        if len(parts) == 2:
+            return {
+                "kind": "repo",
+                "label": "skills",
+                "reads": [".agents/skills/catalog.md"],
+            }
+        skill = parts[2]
+        reads = [".agents/skills/catalog.md", f".agents/skills/{skill}/SKILL.md"]
+        if len(parts) > 3 and path.is_file():
+            reads.append(rel_path)
+        elif len(parts) > 3 and path.is_dir():
+            reads.append(rel_path + "/")
+        return {"kind": "repo", "label": f"skill {skill}", "reads": reads}
+    if parts[:2] == [".agents", "mcp"]:
+        return {
+            "kind": "repo",
+            "label": "mcp",
+            "reads": [".agents/mcp/README.md", rel_path],
+        }
+    if parts and parts[0] == "knowledge":
+        reads = ["knowledge/README.md"]
+        if len(parts) > 1 and path.is_file():
+            reads.append(rel_path)
+        elif len(parts) > 1 and path.is_dir():
+            reads.append(rel_path + "/")
+        return {"kind": "repo", "label": "knowledge", "reads": reads}
+    if path.exists():
+        return {"kind": "repo", "label": "path", "reads": [rel_path]}
+    return None
+
+
+def emit(unit, root, out, verbose=False):
     """按固定格式打印 UNIT/READ/DENY 三段。"""
     lines = out
 
@@ -193,9 +232,10 @@ def emit(unit, root, out):
             lines.append(f"UNIT  {rel(single, root)}")
         elif code_dir.is_dir():
             files = unit_files(code_dir, root)
-            for item in files[:MAX_UNIT_FILES]:
+            shown = files if verbose else files[:MAX_UNIT_FILES]
+            for item in shown:
                 lines.append(f"UNIT  {item}")
-            if len(files) > MAX_UNIT_FILES:
+            if not verbose and len(files) > MAX_UNIT_FILES:
                 lines.append(f"UNIT  …共 {len(files)} 个源文件（已截断，--verbose 看全量）")
             if is_code_dir(code_dir):
                 lines.append(f"HOLD  code/{part}/{chapter}/build/ 存在构建产物：已排除，勿读")
@@ -208,9 +248,13 @@ def emit(unit, root, out):
             lines.append(f"READ  {ref}{mark}（本章专项）")
         lines.append("DENY  其它 content/** 与 code/** 单元（跨章只按 @sec- 引用，不读正文）")
     else:
-        lines.append(f"SCOPE {unit['kind']}")
-        for ref in DOMAIN_READ[unit["kind"]]:
+        label = unit.get("label", unit["kind"])
+        lines.append(f"SCOPE {unit['kind']} {label}".rstrip())
+        refs = unit.get("reads") or DOMAIN_READ[unit["kind"]]
+        for ref in refs:
             lines.append(f"READ  {ref}")
+        if unit["kind"] == "theme":
+            lines.append("RULE  只读取与当前任务直接相关的那一个主题资源或 CSS，禁止通读整个 css/。")
         lines.append("DENY  content/** 与 code/**（本域任务不改正文与示例）")
 
     for deny in ALWAYS_DENY:
@@ -235,8 +279,9 @@ def main():
         pass
 
     parser = argparse.ArgumentParser(description="解析任务作用域（UNIT/READ/DENY 清单）")
-    parser.add_argument("target", nargs="?", help="章节 <part>/<chapter>、仓库内路径，或 theme/dev/repo")
+    parser.add_argument("target", nargs="?", help="章节 <part>/<chapter>、skill/knowledge/MCP/仓库内路径，或 theme/dev/repo")
     parser.add_argument("--list", action="store_true", help="列出任务矩阵登记的全部章节单元")
+    parser.add_argument("--verbose", action="store_true", help="展开被截断的 UNIT 文件")
     args = parser.parse_args()
 
     root = repo_root()
@@ -258,17 +303,17 @@ def main():
     if target in DOMAIN_READ:
         unit = {"kind": target}
     else:
-        unit = find_chapter(target, root) or resolve_path(target, root)
+        unit = find_chapter(target, root) or resolve_path(target, root) or resolve_repo_domain(target, root)
 
     if not unit:
         print(f"无法解析目标：{target}")
-        print("支持形式：<part>/<chapter>、仓库内路径、或 theme/dev/repo。")
+        print("支持形式：<part>/<chapter>、skill/knowledge/MCP/仓库内路径，或 theme/dev/repo。")
         print("章节须先在 .agents/skills/cpp-content/references/tasks/<part>.md 任务矩阵登记；")
         print("未登记时请按约定补行，本脚本不做猜测。可用 --list 查看现有单元。")
         return 1
 
     out = []
-    emit(unit, root, out)
+    emit(unit, root, out, args.verbose)
     print("\n".join(out))
     return 0
 

@@ -34,7 +34,7 @@ metadata:
 
 ## 工作流程
 
-1. 先跑 `python .agents/skills/agent-ops/scripts/run.py status` 看清工作区，确认不覆盖他人改动。
+1. 先跑 `& .agents/skills/agent-ops/scripts/run.ps1 status --all` 看清工作区，确认不覆盖他人改动。
 2. 按路由读取对应 reference，再执行操作。
 3. 提交信息使用中文分类前缀（如“文档：”“修复：”“维护：”）说明动机与影响，一次提交只做一件事。整句保持中文，仅在没有合适中文译名时保留技术标识。
 4. 推 `main` 触发 `.github/workflows/pages.yml` 部署。PR 触发 `render-check.yml` 跑渲染与示例校验。
