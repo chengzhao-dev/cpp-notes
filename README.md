@@ -13,8 +13,8 @@
 
 ### getting-started：环境与第一个程序
 
-1. [搭建 WSL2 开发环境](content/getting-started/setup-wsl2.qmd)：启用 WSL2 上的 Ubuntu，换用国内镜像源，装好编译器、构建工具与编辑器。
-2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成一次直接编译，再用 CMake 与 Ninja 自动构建出同一个可执行文件。
+1. [搭建 WSL2 开发环境](content/getting-started/setup-wsl2.qmd)：启用 WSL2 上的 Ubuntu，换用国内镜像源，装好编译器、CMake、Ninja、调试器与语言服务。
+2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)：用 `main.cpp` 完成一次直接编译，再用 CMake + Ninja 自动构建出同一个可执行文件。
 
 ### 后续 part
 
@@ -37,7 +37,7 @@ cpp-notes/
 │   ├── mcp/                          # 项目级 MCP 服务（server.py）
 │   └── skills/
 │       ├── catalog.md                # skill/reference/knowledge 全景路由表（先读这里）
-│       ├── agent-ops/                # 统一入口 run.py、scope 与各项检查脚本
+│       ├── agent-ops/                # 统一入口 run.ps1/run.py、scope 与各项检查脚本
 │       ├── code-review/              # 只读缺陷审查
 │       ├── cpp-content/              # C++ 内容：references/cpp/、references/tasks/、模板与校验
 │       ├── github-ops/               # git、gh CLI、Pages、CI 操作清单
@@ -65,4 +65,4 @@ cpp-notes/
 - 对象管理，包括生命周期、RAII、智能指针和移动语义。
 - 工程实践，包括 CMake、多文件项目、调试和性能。
 
-页面本身怎么组织由两类模式约定：教学正文的块序列与入口卡片页的三层结构。依据在知识库 `quarto-docs` 域，分别用 `run.py kb-search "块序列" --domain quarto-docs` 与 `run.py kb-search "卡片" --domain quarto-docs` 查询。
+页面本身怎么组织由两类模式约定：教学正文的块序列与入口卡片页的三层结构。依据在知识库 `quarto-docs` 域，分别用 `run.ps1 kb-search "块序列" --domain quarto-docs` 与 `run.ps1 kb-search "卡片" --domain quarto-docs` 查询。

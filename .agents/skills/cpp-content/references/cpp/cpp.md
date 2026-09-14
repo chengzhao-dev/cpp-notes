@@ -27,9 +27,9 @@
 
 这些来源用于不同层次：Primer 和 LearnCpp 参考教学顺序，Stroustrup 参考语言整体观，Effective C++ 参考可执行规则，cppreference 负责标准精度，它们不是逐段翻译的材料。
 
-## Callout（只用内置类型）
+## Callout
 
-使用内置 `note`、`tip`、`warning`、`important` 或 `caution`，并保留全局中文类型标题。不要在块内重复写“最佳实践”“关键洞察”或“深入”。自定义 `.callout-*` 类会被 Quarto 静默丢弃，见 `.agents/skills/quarto-docs/references/quarto/rendering-and-output.md` 陷阱 #12。
+Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/references/quarto/authoring.md`，这里只记录 C++ 章节不应把必经步骤或普通说明放进提示框。
 
 ## 核心主题索引
 
@@ -44,8 +44,8 @@
 ## 示例约定
 
 - 源码：`code/<part>/<name>.cpp`，与 `content/<part>/` 对齐。
- - 新建工程：`python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。
-- 校验：`python .agents/skills/cpp-content/scripts/verify_examples.py`。
+- 新建工程：`python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。
+- 校验：`& .agents/skills/agent-ops/scripts/run.ps1 verify`。
 
 ## 命名
 

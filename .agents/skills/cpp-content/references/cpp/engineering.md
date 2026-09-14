@@ -24,7 +24,7 @@ project/
 ## CMake 现代写法
 
 - target-based：`target_link_libraries`、`target_compile_features`。
-- 构建决策依据用 `run.py kb-search "C++ 构建 工具链" --domain cpp-content` 取用。
+- 默认 CMake + Ninja 构建链的决策依据用 `run.ps1 kb-search "CMake Ninja 构建链" --domain cpp-content` 取用。
 
 ## 示例与章节落点
 
@@ -38,4 +38,4 @@ project/
 ## 工具链写作路由
 本文件只保留通用约束：先给当前任务的最小成功路径，环境、版本、平台、参数和诊断案例进入知识库。命令、说明与输出的排布细则见 `.agents/skills/quarto-docs/references/quarto/terminal-validation.md`。
 
-需要项目工具链依据时，运行 `python .agents/skills/agent-ops/scripts/run.py kb-search "C++ 构建 工具链" --domain cpp-content`。
+需要项目工具链依据时，运行 `& .agents/skills/agent-ops/scripts/run.ps1 kb-search "CMake Ninja 构建链" --domain cpp-content`。

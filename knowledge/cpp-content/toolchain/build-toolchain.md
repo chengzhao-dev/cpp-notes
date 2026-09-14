@@ -3,29 +3,37 @@ kb_id: "cpp-tooling-build-chain-v2"
 title: "C++ 构建与工具链决策依据"
 domain: "cpp-content"
 subdomain: "toolchain"
-tags: [toolchain, cmake, compiler_flags, sanitizer, warnings, optimization, header]
+tags: [toolchain, cmake, ninja, ninja-build, generator, compiler_flags, sanitizer, warnings, optimization, header, build_essential, clangd, compile_commands]
 level_range: [0, 9]
 created: "2026-09-09"
-updated: "2026-09-12"
+updated: "2026-09-14"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 296
+estimated_tokens: 360
 ---
 
 # C++ 构建与工具链决策依据
 
 ## 最小构建链
 
-本项目在 Windows 的 WSL2 Linux 环境中使用 GCC 或 Clang 与 CMake。先让最小程序编译和运行，再把命令固化为 CMake 目标。MSVC 仅作为对照，不是主线前置条件。
+本项目在 Windows 的 WSL2 Linux 环境中使用 GCC 或 Clang、CMake 与 Ninja。先让最小程序编译和运行，再把命令固化为 CMake 目标。MSVC 仅作为对照，不是主线前置条件。
+
+入门环境按“编译器 → CMake + Ninja → 调试器 → 语言服务”建立依赖层次。编译器把源码变成可执行文件，CMake 描述工程并生成构建规则，Ninja 执行这些规则，调试器服务运行期排查，语言服务依赖编译数据库提供编辑体验。`build-essential` 是 Debian/Ubuntu 的元包，安装它会一并提供编译器和标准头文件，因此不需要再单独安装编译器。Ubuntu 中的 Ninja 软件包名为 `ninja-build`，安装后执行命令为 `ninja`。语言服务的依赖链是 `CMake` 在配置阶段生成 `compile_commands.json`，`clangd` 再按其中的真实编译参数提供代码提示与诊断。默认 Ubuntu 是当前教程为降低选择成本采用的教学路径，不代表发行版优劣。
 
 ## 编译与诊断
 
 示例使用 C++20、常见警告和可重复的构建配置。Sanitizer 用于调试和未定义行为专题。不要把未启用的诊断选项留在入门示例中。优化必须先测量基线，再报告收益、代价和适用范围。
 
-`g++` 是编译器命令，负责把源文件编译并链接为可执行文件。CMake 是构建系统，负责读取构建规则并生成底层构建文件。Ninja 是 CMake 可以生成的底层构建工具，负责执行具体的编译和链接步骤。教程应使用“通过 `g++` 命令行编译，通过 CMake 配置和构建”的表述，避免把三者写成同一层级的工具。
+`g++` 是编译器命令，负责把源文件编译并链接为可执行文件。CMake 读取 `CMakeLists.txt` 并生成底层构建规则，Ninja 执行这些编译和链接规则。`cmake --build <dir>` 是 CMake 提供的统一构建入口，会调用配置阶段已选定的 Ninja。教程应使用“通过 `g++` 命令行编译，通过 CMake 配置 Ninja 并构建”的表述，避免把编译器、构建描述工具和规则执行工具写成同一层级的工具。
 
 ## CMake
 
-用目标属性表达语言版本、包含路径、编译选项和链接依赖，避免依赖全局变量。配置、构建和运行是独立步骤，每一步都应有可观察产物。
+用目标属性表达语言版本、包含路径、编译选项和链接依赖，避免依赖全局变量。配置、构建和运行是独立步骤，每一步都应有可观察产物。项目默认以 `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug` 配置，再以 `cmake --build build` 构建。`-G Ninja` 是配置命令的选择，不应写进 `CMakeLists.txt`，后者必须保持生成器无关。两阶段的重跑条件不同：配置读取 `CMakeLists.txt` 并生成构建规则与编译数据库，只有构建规则变化时才需要重跑。构建按规则增量编译，改源码时反复跑。把差异写清，读者才知道改一行源码不需要重新配置，也不需要删 `build/`。
+
+构建类型、编译器路径和生成器记录在 `CMake` 缓存里。已有 `build/` 时，CMake 不会把已配置的生成器自动替换为 Ninja，读者只重跑构建仍会使用旧规则。这类“值与产物不一致”的坑用一条判据收束：缓存文件里的记录才是当前生效的配置。
+
+### 旧构建目录的诊断顺序
+
+`cmake --build <dir> --target clean` 只清理目标产物，不删除 `CMakeCache.txt` 中的编译器、生成器和路径缓存。解决旧构建目录造成的配置问题时，应先用新的目录执行 `cmake -S . -B build-fresh -G Ninja -DCMAKE_BUILD_TYPE=Debug`，而不是把 clean 误当成清空配置。随后执行 `cmake --build build-fresh` 并运行 `build-fresh/bin/app` 验证新链路。诊断时同时切换构建类型会把工具链问题与优化、调试信息差异混在一起，因此保持 Debug，确认新目录可用后再处理旧目录。
 
 ### 版本要求只写在构建配置里
 

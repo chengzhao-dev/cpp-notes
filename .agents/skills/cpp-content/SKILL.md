@@ -18,7 +18,7 @@ metadata:
 
 | 要做的事 | 读取 |
 | --- | --- |
-| 开工前定位作用域 | `python .agents/skills/agent-ops/scripts/run.py scope <part>/<chapter>` |
+| 开工前定位作用域 | `& .agents/skills/agent-ops/scripts/run.ps1 scope <part>/<chapter>` |
 | 章节设计与示例递进 | `references/cpp/teaching-method.md` |
 | 语言 / 标准库 / 内存与模板要点 | `references/cpp/cpp.md`、`references/cpp/stl.md`、`references/cpp/modern-cpp.md`（按主题只读一个） |
 | 术语核对、规则型内容、示例练习、代码风格 | `references/cpp/cpp.md`、`references/cpp/effective-rules.md`、`references/cpp/examples-practice.md`、`references/cpp/code-style.md` |
@@ -30,14 +30,14 @@ metadata:
 2. 示例必须可编译可运行：`-std=c++20 -Wall -Wextra`，完整示例带 `int main`，片段首行标 `// 片段`。
 3. 正文里的输出必须来自实测。拿不到结果就不写、不伪造。
 4. 示例路径与章节对齐：单文件 `code/<part>/<name>.cpp`，工程章 `code/<part>/<chapter>/`，`build/` 不入库、不读、不校验。
-5. 标注 C++ 版本并用 `cpp.md` 核对译名。正文按正确流程展开，warning/error 仅放排查章节或短 callout，按文件名、行号和原因修复，成功判据放输出或代码注释。
+5. 标注 C++ 版本并用 `cpp.md` 核对译名。正文按正确流程展开，warning/error 仅放 `常见错误`；其中的每个症状用 `###`，按“定位 → 修复 → 验证”的有序流程处理，修复动作必须点名具体对象，成功判据放在验证步骤。构建章以 CMake 配置和 `cmake --build <dir>` 为读者动作，后端工具只有直接执行时才进入正文。章节收尾、Callout、排错和回顾格式以 `quarto-docs` 对应 reference 为准，这里不复制第二套规则。
 
 ## 工作流程
 
 1. 跑 `run.py scope <part>/<chapter>`，只读 UNIT 与 READ 所列文件。
 2. 回答四问：读者遇到什么问题、完成后能做什么、需先理解什么、怎样最小验证。
 3. 按「问题场景 → 心智模型 → 规则 → 最小示例 → 行为解释 → 限制与验证」组织正文。
-4. 新建工程用 `python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。改示例跑 `run.py verify --changed`，单章用 `run.py build <part>/<chapter>`。
+4. 新建工程用 `python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。改示例跑 `run.ps1 verify --changed`，单章用 `run.ps1 build <part>/<chapter>`。
 
 ## 完成判据
 

@@ -34,8 +34,10 @@ LAYOUTS = ("auto", "bare", "simple", "complete")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = SCRIPT_DIR / "templates"
-REPO_ROOT = SCRIPT_DIR.parent.parent.parent
-CPP_CONFIG_DIR = REPO_ROOT / ".config" / "cpp"
+REPO_ROOT = SCRIPT_DIR.parents[4]
+CPP_CONFIG_DIR = (
+    REPO_ROOT / ".agents" / "skills" / "cpp-content" / "assets" / "config"
+)
 
 
 def write(path, text):
@@ -54,18 +56,20 @@ def setup_development_configs(target_dir, no_clang):
         return
     for name in (".clang-format", ".clang-tidy", ".clangd"):
         bundled = CPP_CONFIG_DIR / name
-        if bundled.is_file():
-            shutil.copyfile(bundled, target_dir / name)
-            print(f"  copy   {name}")
+        if not bundled.is_file():
+            raise FileNotFoundError(f"缺少 C++ 配置模板：{bundled}")
+        shutil.copyfile(bundled, target_dir / name)
+        print(f"  copy   {name}")
 
     vscode_template = CPP_CONFIG_DIR / ".vscode"
     vscode_target = target_dir / ".vscode"
     vscode_target.mkdir(parents=True, exist_ok=True)
     for name in ("settings.json", "extensions.json"):
         bundled = vscode_template / name
-        if bundled.is_file():
-            shutil.copyfile(bundled, vscode_target / name)
-            print(f"  copy   .vscode/{name}")
+        if not bundled.is_file():
+            raise FileNotFoundError(f"缺少 VS Code 配置模板：{bundled}")
+        shutil.copyfile(bundled, vscode_target / name)
+        print(f"  copy   .vscode/{name}")
 
 
 def readme_text(name, layout):
@@ -76,7 +80,7 @@ def readme_text(name, layout):
             "",
             "```bash",
             "# 验证 C++ 示例",
-            "$ python .agents/skills/cpp-content/scripts/verify_examples.py",
+            "$ & .agents/skills/agent-ops/scripts/run.ps1 verify",
             "```",
         ]
     else:
@@ -86,14 +90,14 @@ def readme_text(name, layout):
             "构建与运行：",
             "",
             "```bash",
-            "# 配置：生成 Ninja 构建文件，指定 Debug 构建",
-            "$ cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug",
+            "# 配置 Ninja Debug 构建",
+            "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug",
             "",
-            "# 构建：调用 Ninja 编译并链接目标",
-            "$ cmake --build build",
+            "# 构建项目",
+            "cmake --build build",
             "",
             "# 运行构建结果",
-            "$ ./build/bin/app",
+            "./build/bin/app",
             "```",
             "",
             "配置阶段会生成 `build/compile_commands.json`，供 clangd 提供与实际构建一致的补全、跳转和诊断。",
@@ -151,7 +155,11 @@ def main():
         if layout == "complete":
             render(TEMPLATE_DIR / "build-and-run.sh", target / "build-and-run.sh", name)
 
-    setup_development_configs(target, args.no_clang)
+    try:
+        setup_development_configs(target, args.no_clang)
+    except FileNotFoundError as exc:
+        print(f"错误：{exc}")
+        return 1
     if args.readme:
         write(target / "README.md", readme_text(name, layout))
 
@@ -160,7 +168,7 @@ def main():
     elif layout == "complete":
         print("\n下一步：编辑源码并运行 bash build-and-run.sh。")
     else:
-        print("\n下一步：编辑源码并运行 cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug。")
+        print("\n下一步：编辑源码并运行 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug。")
     return 0
 
 

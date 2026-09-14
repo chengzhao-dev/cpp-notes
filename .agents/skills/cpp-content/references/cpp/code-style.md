@@ -20,19 +20,19 @@
 
 ```bash
 # 校验 code/ 下全部 C++ 示例
-python .agents/skills/cpp-content/scripts/verify_examples.py
+& .agents/skills/agent-ops/scripts/run.ps1 verify
 ```
 
 检查 C++ 格式：
 
 ```bash
 # 追加 clang-format 与 clang-tidy 检查
-python .agents/skills/cpp-content/scripts/verify_examples.py --style
+& .agents/skills/agent-ops/scripts/run.ps1 verify --style
 ```
 
 clang 配置源位于 `.agents/skills/cpp-content/assets/config/`，由 `.agents/skills/python-tools/scripts/scaffold/init_project.py` 复制到独立工程根目录。
 
-Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `python .agents/skills/agent-ops/scripts/run.py verify`。单章节构建使用 `python .agents/skills/agent-ops/scripts/run.py build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
+Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `& .agents/skills/agent-ops/scripts/run.ps1 verify`。单章节构建使用 `& .agents/skills/agent-ops/scripts/run.ps1 build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
 
 ## 示例
 
@@ -54,7 +54,7 @@ Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一
 - 讲 `vector` 时只注释 `std::vector`、元素访问和迭代器等 vector 重点，不重复注释 `iostream` 或 `std::cout`。
 - CMake 命令和变量优先采用 CMake 官方中文文档术语。C++ 语言和标准库优先参考主流中文教材与 [cppreference 中文站](https://zh.cppreference.com/)。
 
-一个代码块只承担一个主要学习目标。`cpp`、`bash`、`powershell` 和 `cmake` 围栏都在代码内部写注释，注释放在被说明代码的上一行，不加行尾长注释，命令块不加 `$ ` 与 `PS>` 提示符。多行原理说明留在正文，正文只做详细说明。`{{< include /code/... >}}` 引用的真实源码文件使用常规简洁注释，命令输出使用紧随其后的 `text` 块，细则见 `quarto-docs` 的 `terminal-validation.md`。各代码块内部的逻辑块之间留一个空行。
+一个代码块只承担一个主要学习目标。`cpp`、`bash`、`powershell` 和 `cmake` 围栏都在代码内部写注释，注释放在被说明代码的上一行，不加行尾长注释，命令块不加 `$ ` 与 `PS>` 提示符。多行原理说明留在正文，正文只做详细说明。命令块的总注释、子注释和中文标点细则以 `quarto-docs` 的 `terminal-validation.md` 为准。`{{< include /code/... >}}` 引用的真实源码文件使用常规简洁注释，命令输出使用紧随其后的 `text` 块。各代码块内部的逻辑块之间留一个空行。
 
 代码和终端输出左对齐，保留必要缩进，字段名与说明的对齐交给表格。Shell、CMake 和 C++ 示例禁止把长解释写成行尾注释。中文说明使用完整句子，代码语法中的标点不受正文标点规则影响。
 

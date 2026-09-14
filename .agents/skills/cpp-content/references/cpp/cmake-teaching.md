@@ -14,7 +14,7 @@ CMake 章节先让目标运行，再逐步把命令行参数固化为目标属�
 
 ## 默认构建参数
 
-示例工程与脚手架统一使用 `-G Ninja -DCMAKE_BUILD_TYPE=Debug`：Ninja 构建快、日志简洁，Debug 给构建加上 `-g` 且不启用优化，便于 gdb 打断点和查看变量。`CMAKE_EXPORT_COMPILE_COMMANDS` 保持开启，让 clangd 读到与实际构建一致的编译参数。发布构建在同一目录改用 `-DCMAKE_BUILD_TYPE=Release` 即可，入门章节不展开。
+示例工程与脚手架统一使用 `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug` 配置，再用 `cmake --build build` 编译目标。`-G Ninja` 在配置阶段选择 Ninja 生成器，`CMakeLists.txt` 保持生成器无关。构建仍通过 `cmake --build` 进入，因而读者不必把项目命令改成后端专用命令。Debug 给构建加上 `-g` 且不启用优化，便于 gdb 打断点和查看变量。`CMAKE_EXPORT_COMPILE_COMMANDS` 保持开启，让 clangd 读到与实际构建一致的编译参数。发布构建在同一目录改用 `-DCMAKE_BUILD_TYPE=Release` 即可，入门章节不展开。
 
 ## 目标导向
 

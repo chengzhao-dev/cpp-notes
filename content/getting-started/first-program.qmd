@@ -2,19 +2,19 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章已经安装好编译器和构建工具。本章以仓库中的[完整示例工程](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)为起点，先查看工程文件结构，再分别通过 `g++` 命令行和 `CMake` 构建 `Hello, World!` 示例程序。运行生成的可执行文件并看到 `Hello, World!` 后，就完成了本章的实践目标。
+上一章已经准备好这份笔记所需的 Linux 开发环境。先打开完整示例工程 [first-program](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，并进入它的工程根目录。
 
-## 工程目录里有哪些文件
+`Hello, World!` 是许多人的第一个 C++ 程序。它用最少的代码验证从源码到可执行文件，再到终端输出的完整链路。接下来先通读这份源码，明确程序要做什么，再分别用 `g++` 和 `CMake + Ninja` 把它构建并运行起来。
 
-工程目录如下。后面的命令都在这个目录里执行。
+## 认识 Hello, World! 程序
 
-```text
+下面的目录是本章示例的文件清单，后续命令都在 `first-program/` 工程根目录执行。
+
+### 查看工程目录
+
+```{.text filename="工程目录"}
 first-program/                # 示例工程根目录
 ├── .vscode/                  # VS Code 工作区配置
-├── build/                    # CMake/Ninja 构建输出目录，请勿手动修改
-│   ├── bin/
-│   │   └── app               # 构建生成的可执行文件
-│   └── compile_commands.json # 供 clangd 等工具读取的编译数据库
 ├── .clangd                   # clangd 语言服务配置
 ├── .clang-format             # C++ 格式化规则
 ├── .clang-tidy               # C++ 静态检查规则
@@ -23,106 +23,212 @@ first-program/                # 示例工程根目录
 └── main.cpp                  # Hello, World! 示例程序的入口源码
 ```
 
-## 阅读程序源码
+`main.cpp` 是程序入口，`CMakeLists.txt` 定义构建规则。其余文件服务于代码格式、静态检查、语言服务和编辑器集成。
 
-`Hello, World!` 示例程序只有一个源文件，代码中的注释标出了本节首次需要认识的部分。
+第一次执行 `CMake` 配置后，工程会生成 `build/`，其中包含构建产物和编译数据库。
 
-```cpp
+### 阅读程序源码
+
+`Hello, World!` 示例只有一个源文件，用最少的代码向终端输出一行文字。先通读源码，再让编译器把它变成可执行程序。
+
+```{.cpp filename="main.cpp"}
 {{< include /code/getting-started/first-program/main.cpp >}}
 ```
 
-## 用 g++ 直接编译并运行 main.cpp
+## 用 g++ 构建并运行
 
-下面在工程根目录中创建输出目录，编译并链接 `main.cpp`，再运行生成的可执行文件。
+在工程根目录创建输出目录，再编译并运行 `main.cpp`。这条路径直接把源文件变成可执行程序。
 
-```bash
+```{.bash filename="Ubuntu Bash（工程根目录）"}
 # 创建用于存放可执行文件的目录
 mkdir -p build/bin
-# 按 C++20 标准编译并链接，并将所有警告视为错误
+
+# 编译并链接 C++20 程序
 g++ -std=c++20 -Wall -Wextra -Werror main.cpp -o build/bin/app
+
 # 运行刚生成的可执行文件
 ./build/bin/app
 ```
 
-如果看到下面的输出，就说明 `Hello, World!` 示例程序已经成功构建并运行。
+程序输出如下：
 
-```text
+```{.text filename="输出"}
 Hello, World!
 ```
 
-## 用 CMake 配置、构建并运行
+输出包含 `Hello, World!`，并且 `build/bin/app` 已生成，说明编译器已经把源文件转换为可运行程序。下一节会用 `CMake + Ninja` 生成同一个程序，作为后续工程的默认开发链。
 
-当工程需要统一管理构建规则时，可以将 C++ 标准、警告选项和输出路径写入 `CMakeLists.txt`，再由构建工具执行这些规则。
+::: {.callout-note title="关键选项"}
+- `-std=c++20`：使用 C++20 语言标准。
+- `-Wall -Wextra -Werror`：启用常见警告，并把警告视为错误。
+- `-o build/bin/app`：把可执行文件写入 `build/bin/app`。
 
-### 配置并构建 Hello, World! 示例程序
+完整选项见 [GCC 手册](https://gcc.gnu.org/onlinedocs/gcc/)。
+:::
 
-下面的 `CMakeLists.txt` 定义了 `Hello, World!` 示例程序的构建规则。
+## 用 CMake + Ninja 构建并运行
 
-```cmake
+### 配置并构建示例
+
+先阅读工程的 `CMakeLists.txt`。它会为同一个 `main.cpp` 生成构建规则和 `build/bin/app` 输出位置。
+
+```{.cmake filename="CMakeLists.txt"}
 {{< include /code/getting-started/first-program/CMakeLists.txt >}}
 ```
 
-文件中的注释说明了每条规则的作用。`CMake` 负责生成 `Ninja` 构建文件，`Ninja` 负责执行其中的编译和链接规则。使用 `CMake` 时，先配置，再构建。
+`CMakeLists.txt` 声明了 C++ 标准、警告选项和输出位置。它不绑定具体构建工具，Ninja 由配置命令选择。在工程根目录先配置构建目录。
 
-```bash
-# 配置阶段：生成 Ninja 构建文件，构建产物写入 build/
-cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Debug
-# 构建阶段：按 CMake 生成的规则编译并链接
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置 CMake 工程并选择 Ninja 生成器
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+```
+
+输出末尾包含 `Build files have been written to`，说明 `CMake` 已在 `build/` 中为 `Ninja` 生成构建规则。接着通过 `CMake` 的统一入口按这些规则构建程序。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 按生成的规则编译并链接
 cmake --build build
 ```
 
-这三个选项的作用分别如下：
+构建命令退出码为 `0`，并生成 `build/bin/app`，说明 `CMake` 配置、`Ninja` 构建和链接两个阶段都已完成。
 
-- `-G Ninja`：指定生成器为 `Ninja`。
-- `-B build`：指定构建目录为 `build/`，使源码目录保持整洁。
-- `-DCMAKE_BUILD_TYPE=Debug`：指定构建类型为 `Debug`，该值会与生成器信息一起写入 `CMake` 缓存。
+构建结束后运行生成的程序。
 
-`cmake --build build` 会调用已配置的底层构建工具，按 `build/` 中生成的构建规则构建需要更新的目标。
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+./build/bin/app
+```
 
-| 参数 | 作用 | 成功判据 |
-| --- | --- | --- |
-| `-G Ninja` | 选择 `Ninja` 生成器 | 配置阶段退出码为 0，`build/build.ninja` 存在 |
-| `-B build` | 将生成物集中到 `build/` | 源码目录不新增构建文件 |
-| `-DCMAKE_BUILD_TYPE=Debug` | 选择调试构建类型 | `CMakeCache.txt` 中记录 `Debug` |
+输出如下：
 
-配置阶段负责生成规则和 `compile_commands.json`，构建阶段负责执行编译与链接；两阶段都退出码为 0，才算 `CMake` 流程完成。
+```{.text filename="输出"}
+Hello, World!
+```
 
-### 用脚本一键配置、构建并运行
+看到 `Hello, World!`，说明 `CMake + Ninja` 的配置、构建和运行都已完成。
 
-如果不想每次手动执行上一节的命令，可以运行工程提供的 `build-and-run.sh`。
+::: {.callout-note title="关键选项"}
+- `-S .`：把当前目录作为源码目录。
+- `-B build`：把配置缓存和构建产物放入 `build/`。
+- `-G Ninja`：选择 Ninja 作为构建规则的执行工具。
+- `-DCMAKE_BUILD_TYPE=Debug`：选择调试构建，发布构建可改为 `Release`。
 
-```bash
+完整选项见 [CMake 文档](https://cmake.org/documentation/)。
+:::
+
+### 用脚本一键运行
+
+脚本把配置、构建和运行串成一步执行。它先定位到工程根目录，再调用上一节的 `CMake + Ninja` 命令，最后运行生成的程序。
+
+```{.bash filename="build-and-run.sh"}
+{{< include /code/getting-started/first-program/build-and-run.sh >}}
+```
+
+在工程根目录运行下面的命令即可完成整条流程。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
 # 一键完成配置、构建并运行
 bash build-and-run.sh
 ```
 
-脚本会先定位工程根目录，并在任一步失败时停止。它封装了上一节的配置、构建和运行命令，可以对照 [build-and-run.sh](https://github.com/chengzhao-dev/cpp-notes/blob/main/code/getting-started/first-program/build-and-run.sh) 中的注释阅读每一步。
+脚本会依次打印“配置”“构建”“运行”及 `CMake` 输出。最后看到 `Hello, World!`，说明它已经完成 `CMake + Ninja` 的配置、构建和运行。
 
-## 常见问题与排查
+## 选择构建方式
 
-### 找不到编译器或构建工具
+两条主线跑通后，按工程规模选择构建方式：
 
-如果执行本章命令时提示找不到 `g++`、`CMake` 或 `Ninja`，请回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，按该节的工具链安装步骤处理后再执行本章命令。
+- 单个源文件：用 `g++` 直接编译，命令最短，适合第一次验证。
+- 多文件或多目标工程：用 `CMake + Ninja` 管理并执行构建规则，适合持续开发和扩展。
 
-### 构建目录缓存了旧选项
+后续工程默认使用 `CMake + Ninja`。`build-and-run.sh` 是当前构建链的一键入口，执行前面的配置、构建和运行步骤，不是第三种构建系统。需要调整构建配置时，仍直接使用 `cmake` 命令。
 
-`build/` 中的缓存记录了首次配置时的生成器和选项。切换构建工具或修改 C++ 标准后出现异常时，先清理或移走缓存，让 `CMake` 重新配置：
+## 常见错误
 
-```bash
-# 先清理目标；确认当前目录是示例工程根目录后执行
-cmake --build build --target clean
-# 需要完全重配时移走缓存，确认新构建成功后再删除备份
-mv build build.backup
-```
+### 找不到编译器、CMake 或 Ninja
 
-清理或移走 `build/` 只影响构建产物，源码和构建配置不受影响。接着重新执行[配置并构建 Hello, World! 示例程序](#配置并构建-hello-world-示例程序)中的两条命令；确认无误后再删除 `build.backup`。
+在工程根目录运行命令时提示找不到 `g++`、`cmake` 或 `ninja`。
 
-## 小结
+1. **定位缺失工具**
 
-本章完成后，你应该能够：
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 检查编译器、CMake 和 Ninja 是否可用
+   command -v g++ cmake ninja
+   ```
 
-- 从完整工程中找到源码和构建规则。
-- 用 `g++` 手动编译单个源文件。
-- 用 `CMake` 或脚本完成配置、构建和运行。
+   `command -v` 为每个已安装的工具打印路径，缺失的名字不打印任何内容。
 
-后续章节会在此基础上介绍多目标、多文件工程的构建方式。
+2. **安装缺失工具**
+
+   执行 `sudo apt update`，再按[安装 C++ 工具链](setup-wsl2.qmd#安装-c-工具链)重新安装整套工具。
+
+3. **验证安装**
+
+   再次执行定位命令，确认 `g++`、`cmake` 和 `ninja` 都输出路径。
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 重新检查编译器、CMake 和 Ninja
+   command -v g++ cmake ninja
+   ```
+
+### 构建目录来自旧环境
+
+如果 `build/` 已经由其他编译器或生成器配置过，先把它视为旧环境，而不是直接复用。确认当前目录是示例工程根目录，并检查 `build/CMakeCache.txt` 是否来自旧环境。`cmake --build build --target clean` 只会清理已生成的目标文件，不会删除 `CMakeCache.txt` 中记录的编译器、生成器和路径。要重新选择 Ninja 或切换工具链，应使用新的构建目录重新配置。
+
+1. **定位旧缓存**
+
+   确认 `build/CMakeCache.txt` 存在，并查看它记录的 `CMAKE_GENERATOR` 和编译器路径是否与当前环境一致。
+
+2. **重新配置构建目录**
+
+   用新的 `build-fresh` 目录重新配置，保留旧目录作为回退。
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 用独立目录配置 Ninja Debug 构建
+   cmake -S . -B build-fresh -G Ninja -DCMAKE_BUILD_TYPE=Debug
+   ```
+
+3. **构建并验证**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 构建新的配置
+   cmake --build build-fresh
+   # 运行新构建的程序
+   ./build-fresh/bin/app
+   ```
+
+   配置和构建成功后，程序输出如下：
+
+   ```{.text filename="输出"}
+   Hello, World!
+   ```
+
+   看到 `Hello, World!`，说明新构建目录可以正常使用。确认无误后再处理旧目录。
+
+## 本章回顾
+
+本章用同一个 `Hello, World!` 程序走通了直接构建和 `CMake + Ninja` 构建两条路径。可以思考以下问题：
+
+1. `main.cpp` 从源码到终端输出，中间经过哪些步骤？
+
+   <details class="answer-disclosure">
+   <summary>查看答案</summary>
+
+   `g++` 读取 `main.cpp`，编译并链接得到 `build/bin/app`。运行这个可执行文件后，程序把 `Hello, World!` 写到终端。
+   </details>
+
+2. 单文件程序直接使用 `g++` 有什么好处，代码变多后为什么使用 `CMake + Ninja`？
+
+   <details class="answer-disclosure">
+   <summary>查看答案</summary>
+
+   单文件程序直接使用 `g++` 时命令最短，适合快速验证。源文件和构建目标增多后，手写命令难以维护；`CMake` 负责描述构建规则，`Ninja` 负责执行规则并支持增量构建。
+   </details>
+
+3. 脚本已经封装了命令，为什么还要理解它执行的配置和构建步骤？
+
+   <details class="answer-disclosure">
+   <summary>查看答案</summary>
+
+   脚本只是把配置、构建和运行步骤串成一个便利入口，并没有替代这些步骤。理解每一步后，才能在失败时判断问题发生在哪个阶段，也才知道怎样调整构建目录或编译选项。
+   </details>
+
+下一章会在此基础上介绍多文件和多目标工程的构建方式。

@@ -41,7 +41,7 @@ SKIP_DIRS = {"build", ".git", "__pycache__", ".venv"}
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[4]
-CPP_CONFIG_DIR = REPO_ROOT / ".config" / "cpp"
+CPP_CONFIG_DIR = SKILL_ROOT / "assets" / "config"
 sys.path.insert(0, str(REPO_ROOT / ".agents" / "skills" / "python-tools" / "scripts"))
 from temp_paths import temp_dir  # noqa: E402
 
@@ -146,6 +146,7 @@ def main():
         os.path.normpath(os.path.join(repo_root, path))
         for path in (args.paths or [])
     }
+    consumed_paths = set()
     fail = 0
     style_targets = []
 
@@ -166,6 +167,15 @@ def main():
                 for fn in filenames
                 if fn.endswith(".cpp")
                 and (not args.paths or os.path.normpath(os.path.join(dirpath, fn)) in selected_paths)
+            )
+            consumed_paths.update(
+                os.path.normpath(path)
+                for path in (
+                    os.path.join(dirpath, fn)
+                    for fn in filenames
+                    if fn.endswith(".cpp")
+                    and os.path.normpath(os.path.join(dirpath, fn)) in selected_paths
+                )
             )
         cpp_files.sort()
     if cpp_files:
@@ -198,11 +208,14 @@ def main():
     print()
     print("=== Phase 2: full examples embedded in skill C++ references ===")
     total2 = 0
-    if os.path.isdir(ref_dir) and not args.paths:
+    if os.path.isdir(ref_dir):
         for name in sorted(os.listdir(ref_dir)):
             if not name.endswith(".md"):
                 continue
             ref_file = os.path.join(ref_dir, name)
+            if args.paths and os.path.normpath(ref_file) not in selected_paths:
+                continue
+            consumed_paths.add(os.path.normpath(ref_file))
             for idx, body in extract_full_blocks(ref_file):
                 total2 += 1
                 ok, msg = compile_block(args.compiler, args.standard, body, f"{name[:-3]} #{idx}")
@@ -227,6 +240,7 @@ def main():
             rel = os.path.relpath(qf, repo_root)
             if args.paths and os.path.normpath(qf) not in selected_paths:
                 continue
+            consumed_paths.add(os.path.normpath(qf))
             for idx, body in extract_full_blocks(qf):
                 total3 += 1
                 ok, msg = compile_block(args.compiler, args.standard, body, f"{rel} #{idx}")
@@ -237,6 +251,14 @@ def main():
             print("  (none found)")
     else:
         print("  content/ not found, skipped.")
+
+    unmatched = sorted(selected_paths - consumed_paths)
+    if unmatched:
+        fail += 1
+        print()
+        print("=== Unconsumed selected paths ===")
+        for path in unmatched:
+            print(f"  FAIL {os.path.relpath(path, repo_root)}")
 
     # ---------- 风格阶段：clang-format（硬门槛）+ clang-tidy（报告） ----------
     if args.style:
