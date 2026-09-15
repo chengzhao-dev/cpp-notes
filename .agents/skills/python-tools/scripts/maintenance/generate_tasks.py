@@ -78,7 +78,7 @@ CHAPTERS = [
     ("performance", "profiling", "todo", "TASK-MEM-002", "performance-and-pitfalls.md", None, "—"),
     ("performance", "cache-locality", "todo", "TASK-PERF-001", "performance-and-pitfalls.md", None, "—"),
     ("performance", "rvo-nrvo", "todo", "TASK-MEM-004", "performance-and-pitfalls.md", None, "—"),
-    ("debugging", "gdb-basics", "todo", "TASK-ENV-003", "performance-and-pitfalls.md", None, "—"),
+    ("debugging", "lldb-basics", "todo", "TASK-ENV-003", "performance-and-pitfalls.md", None, "—"),
     ("debugging", "sanitizers", "todo", "TASK-DBG-001", "performance-and-pitfalls.md", None, "—"),
     ("debugging", "common-bugs", "todo", "TASK-DBG-001", "performance-and-pitfalls.md", None, "—"),
     ("toolchain", "cmake-targets", "todo", "TASK-ENV-004", "engineering.md", None, "—"),

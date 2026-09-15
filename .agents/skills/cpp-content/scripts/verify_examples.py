@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """编译校验仓库中的 C++ 示例，确保文档随附正确可运行的代码。
 
-编译环境：Windows 调用 wsl.exe，按需启动默认 WSL2 Ubuntu，再使用 g++/clang++。
+编译环境：Windows 调用 wsl.exe，按需启动默认 WSL2 Ubuntu，再使用 clang++ 和 libc++。
 Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
 用法：
   python verify_examples.py
@@ -90,7 +90,8 @@ def env_tool_exists(tool):
 
 
 def compile_source(compiler, standard, env_path, out_name):
-    cmd = f"{compiler} -std={standard} -Wall -Wextra -o /tmp/{out_name} '{env_path}' 2>&1"
+    cmd = (f"{compiler} -std={standard} -stdlib=libc++ -Wall -Wextra "
+           f"-o /tmp/{out_name} '{env_path}' 2>&1")
     return sh(cmd)
 
 
@@ -133,7 +134,7 @@ def main():
         pass
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--compiler", default="g++")
+    parser.add_argument("--compiler", default="clang++")
     parser.add_argument("--standard", default="c++20")
     parser.add_argument("--source-dir", default="code")
     parser.add_argument("--paths", nargs="*", help="只校验指定的 .cpp 或 .qmd 文件")
@@ -151,8 +152,8 @@ def main():
     style_targets = []
 
     if not env_available():
-        print("未检测到可用的编译环境（Windows 需 WSL2，Linux 需 bash + g++/clang++）。")
-        print("Windows：wsl --install 后在 WSL2 内装 build-essential。")
+        print("未检测到可用的编译环境（Windows 需 WSL2，Linux 需 bash + clang++）。")
+        print("Windows：wsl --install 后在 WSL2 内装 clang、libc++ 和构建工具。")
         return 1
 
     # ---------- 阶段 1：code/ 目录 ----------
@@ -293,7 +294,8 @@ def main():
             for f in style_targets:
                 rel = os.path.relpath(f, repo_root)
                 print(f"tidy: {rel} (informational)")
-                result = sh(f"clang-tidy --quiet {tidy_arg} '{to_env_path(f)}' -- -std=c++20 2>&1")
+                result = sh(f"clang-tidy --quiet {tidy_arg} '{to_env_path(f)}' "
+                            f"-- -std=c++20 -stdlib=libc++ 2>&1")
                 out = "\n".join((result.stdout or "").splitlines() + (result.stderr or "").splitlines())
                 for line in out.splitlines():
                     print(f"    {line}")

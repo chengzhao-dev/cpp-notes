@@ -90,8 +90,8 @@ def readme_text(name, layout):
             "构建与运行：",
             "",
             "```bash",
-            "# 配置 Ninja Debug 构建",
-            "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug",
+            "# 配置 clang++ 与 Ninja Debug 构建",
+            "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++",
             "",
             "# 构建项目",
             "cmake --build build",
@@ -168,7 +168,8 @@ def main():
     elif layout == "complete":
         print("\n下一步：编辑源码并运行 bash build-and-run.sh。")
     else:
-        print("\n下一步：编辑源码并运行 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug。")
+        print("\n下一步：编辑源码并运行 cmake -S . -B build -G Ninja "
+              "-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++。")
     return 0
 
 

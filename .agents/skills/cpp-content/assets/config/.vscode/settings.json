@@ -5,7 +5,7 @@
     "C_Cpp.formatting": "disabled",
 
     "clangd.arguments": [
-        "--query-driver=/usr/bin/g++,/usr/bin/clang++",
+        "--query-driver=/usr/bin/clang++",
         "--header-insertion=never",
         "--background-index",
         "--clang-tidy=false"
@@ -37,5 +37,5 @@
     },
 
     "cmake.configureOnOpen": false,
-    "terminal.integrated.defaultProfile.linux": "Ubuntu"
+    "terminal.integrated.defaultProfile.linux": "bash"
 }

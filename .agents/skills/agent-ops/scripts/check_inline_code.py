@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[4]
-TOOLS = ("g++", "clangd", "gdb", "CMake")
+TOOLS = ("clang++", "clangd", "lldb", "CMake")
 TOKEN_RE = re.compile(r"(?<![A-Za-z0-9_+.-])(%s)(?![A-Za-z0-9_+.-])" % "|".join(map(re.escape, TOOLS)))
 
 

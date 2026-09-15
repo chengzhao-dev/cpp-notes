@@ -66,7 +66,7 @@ L2 `references/**/*.md` ≤160 行 / ≤6000 字符，全部 `name + description
 |---|---|---|
 | `knowledge/README.md` | — | 知识库规范、检索不变量与新增知识闭环。新建或迁移知识文件前必读 |
 | `knowledge/agent-ops/codex-context-compaction.md` | `agent-ops` | 宿主上下文压缩对长任务的影响与应对契约 |
-| `knowledge/cpp-content/toolchain/build-toolchain.md` | `cpp-content` | 默认 CMake + Ninja 构建链、缓存恢复与版本决策依据 |
+| `knowledge/cpp-content/toolchain/build-toolchain.md` | `cpp-content` | 默认 clang++/libc++ + CMake + Ninja 构建链、缓存恢复与版本决策依据 |
 | `knowledge/github-ops/github-pages-deployment.md` | `github-ops` | Pages 部署方式与分支策略依据 |
 | `knowledge/github-ops/repository-hygiene.md` | `github-ops` | 仓库一致性与忽略规则依据 |
 | `knowledge/quarto-docs/output/html-output.md` | `quarto-docs` | Quarto HTML 输出选项与生效边界 |

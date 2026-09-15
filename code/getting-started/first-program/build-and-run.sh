@@ -16,9 +16,9 @@ cd "$project_dir"
 build_dir="build"
 target="app"
 
-# 配置 Ninja Debug 构建
+# 配置 clang++ 与 Ninja Debug 构建
 printf '\n==> 配置\n\n'
-cmake -S . -B "$build_dir" -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -S . -B "$build_dir" -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
 
 # 构建 CMakeLists.txt 中声明的目标。
 printf '\n==> 构建\n\n'

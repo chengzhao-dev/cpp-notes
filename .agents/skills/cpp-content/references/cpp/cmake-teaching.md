@@ -14,7 +14,7 @@ CMake 章节先让目标运行，再逐步把命令行参数固化为目标属�
 
 ## 默认构建参数
 
-示例工程与脚手架统一使用 `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug` 配置，再用 `cmake --build build` 编译目标。`-G Ninja` 在配置阶段选择 Ninja 生成器，`CMakeLists.txt` 保持生成器无关。构建仍通过 `cmake --build` 进入，因而读者不必把项目命令改成后端专用命令。Debug 给构建加上 `-g` 且不启用优化，便于 gdb 打断点和查看变量。`CMAKE_EXPORT_COMPILE_COMMANDS` 保持开启，让 clangd 读到与实际构建一致的编译参数。发布构建在同一目录改用 `-DCMAKE_BUILD_TYPE=Release` 即可，入门章节不展开。
+示例工程与脚手架统一使用 `cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++` 配置，再用 `cmake --build build` 编译目标。`-G Ninja` 选择 Ninja 生成器，显式指定编译器可避免 CMake 选择其他 C++ 驱动，`CMakeLists.txt` 保持生成器无关。构建仍通过 `cmake --build` 进入，因而读者不必把项目命令改成后端专用命令。Debug 给构建加上 `-g` 且不启用优化，便于 lldb 打断点和查看变量。`CMAKE_EXPORT_COMPILE_COMMANDS` 保持开启，让 clangd 读到与实际构建一致的编译参数。发布构建在同一目录改用 `-DCMAKE_BUILD_TYPE=Release` 即可，入门章节不展开。
 
 ## 目标导向
 
@@ -23,6 +23,12 @@ CMake 章节先让目标运行，再逐步把命令行参数固化为目标属�
 ## 编译数据库
 
 配置阶段生成 `compile_commands.json` 时，说明它记录每个源文件的真实编译参数，供 clangd、脚本和编辑器使用。它是构建结果，不是手写配置。删除后可通过重新配置生成。
+
+## Clang/LLVM 工具链一致性
+
+编译、语言服务和调试统一使用 Clang/LLVM 工具链。CMake 显式选择 `clang++`，目标同时用 `-stdlib=libc++` 配置编译与链接，`.clangd` 的兜底参数也选择 libc++。这样 clangd 读取的编译数据库与真实构建使用同一驱动和标准库，不依赖 GCC 专用参数过滤。
+
+旧构建目录可能缓存过其他编译器。切换编译器或标准库时应在新的构建目录重新配置，不能只运行 `cmake --build`。项目不保留 GCC 编译器作为后备路径。
 
 ## 章节落点
 

@@ -20,6 +20,6 @@
 
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-DBG-001` | gdb-basics | todo | `TASK-ENV-003` | `content/debugging/gdb-basics.qmd` | `code/debugging/gdb-basics.cpp` | — | — |
+| `TASK-DBG-001` | lldb-basics | todo | `TASK-ENV-003` | `content/debugging/lldb-basics.qmd` | `code/debugging/lldb-basics.cpp` | — | — |
 | `TASK-DBG-002` | sanitizers | todo | `TASK-DBG-001` | `content/debugging/sanitizers.qmd` | `code/debugging/sanitizers.cpp` | — | — |
 | `TASK-DBG-003` | common-bugs | todo | `TASK-DBG-001` | `content/debugging/common-bugs.qmd` | `code/debugging/common-bugs.cpp` | — | — |
