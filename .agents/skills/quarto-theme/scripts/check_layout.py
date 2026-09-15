@@ -67,11 +67,8 @@ CHECKS = [
     ("callout note border light", "--callout-note-border: #2563EB"),
     ("h2 rhythm", "margin-top: 2.75rem"),
     ("paragraphs follow the body column", "max-width: 100%"),
-    ("troubleshooting definition list", ".troubleshooting > dl"),
-    ("troubleshooting responsive fallback", ".troubleshooting > dl > dt:first-child"),
     ("answer disclosure container", "details.answer-disclosure"),
     ("answer disclosure summary", "details.answer-disclosure > summary"),
-    ("answer disclosure paragraph reset", "details.answer-disclosure > summary > p"),
     # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 rendering-and-output.md #12）
     ("callout tip (best-practice semantics)", "--callout-tip-border"),
     ("callout warning (key-insight semantics)", "--callout-warning-border"),
@@ -289,7 +286,7 @@ def browser_layout(book_dir, verbose):
     for _family, url in font_face_entries(FONTS_CSS.read_text(encoding="utf-8")):
         target = (FONTS_CSS.parent / url).resolve()
         font_assets_by_name[target.name] = target.stat().st_size if target.is_file() else 0
-    width_floor = {1280: 640, 1100: 540}
+    width_floor = {1280: 640, 1100: 540, 768: 500, 390: 320}
     for width_text, pages in metrics["viewports"].items():
         width = int(width_text)
         for key, data in pages.items():
@@ -322,6 +319,16 @@ def browser_layout(book_dir, verbose):
                 problems.append(
                     f"{label}: 正文段宽 {data['paragraphWidth']}px < {width_floor[width]}px"
                 )
+            if width <= 768:
+                hidden_copy = [
+                    opacity
+                    for opacity in data.get("copyButtonOpacities", [])
+                    if opacity < 0.99
+                ]
+                if hidden_copy:
+                    problems.append(
+                        f"{label}: 触屏复制按钮不可见 opacity={hidden_copy}"
+                    )
             paragraph_font_size = data.get("paragraphFontSize", 0)
             for index, callout in enumerate(data.get("callouts", []), 1):
                 if abs(callout["bodyFontSize"] - paragraph_font_size) > 0.01:
@@ -386,6 +393,7 @@ def browser_layout(book_dir, verbose):
                     f"Callout={len(data.get('callouts', []))} "
                     f"字体={data.get('loadedFontCount', 0)}/"
                     f"{data.get('loadedFontBytes', 0)}B "
+                    f"复制钮={data.get('copyButtonOpacities', [])} "
                     f"溢出={len(data['overflow'])}"
                 )
     return problems, None
@@ -535,7 +543,7 @@ def main():
     else:
         print(
             f"  {'OK  ' if not browser_problems else 'MISS'} browser-layout"
-            f"  (viewports=1280,1100; schemes=light,dark)"
+            f"  (viewports=1280,1100,768,390; schemes=light,dark)"
         )
         for problem in browser_problems:
             print(f"       {problem}")
@@ -547,7 +555,7 @@ def main():
         if browser_note:
             print(f"PASS theme-static；SKIP browser-layout {browser_note}")
         else:
-            print("PASS theme-static；browser-layout 1280/1100 light/dark")
+            print("PASS theme-static；browser-layout 1280/1100/768/390 light/dark")
         return 0
     print(f"{fail} theme check(s) failed; inspect the diagnostics above.")
     return 1

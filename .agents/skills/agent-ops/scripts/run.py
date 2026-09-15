@@ -141,7 +141,10 @@ def run(argv, cwd=ROOT, env=None):
     command = list(argv)
     if command and not Path(command[0]).is_file():
         command[0] = resolve_tool(command[0])
-    proc = subprocess.run(command, cwd=str(cwd), env=env, stdout=subprocess.PIPE,
+    child_env = dict(os.environ if env is None else env)
+    if PY and Path(command[0]).resolve() == Path(PY).resolve():
+        child_env["PYTHONIOENCODING"] = "utf-8"
+    proc = subprocess.run(command, cwd=str(cwd), env=child_env, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
     text = proc.stdout.decode("utf-8", errors="replace")
     return proc.returncode, text
@@ -209,6 +212,9 @@ def cmd_check(args):
                 "",
             )
             if skip_line:
+                if name == "layout" and getattr(args, "require_browser", False):
+                    failed.append(f"{name}:{skip_line}")
+                    continue
                 skipped.append(f"{name}:{skip_line}")
             last = next((ln for ln in reversed(text.splitlines())
                          if any(h in ln for h in PASS_HINTS)), "")
@@ -220,7 +226,9 @@ def cmd_check(args):
         suffix = f"；软报告={','.join(reported)}" if reported else ""
         if skipped:
             suffix += f"；SKIP={';'.join(skipped)}"
-        print(f"PASS  check {len(CHECKS)} 项全通过{suffix}")
+            print(f"PASS  check {len(CHECKS)} 项已执行{suffix}")
+        else:
+            print(f"PASS  check {len(CHECKS)} 项全通过{suffix}")
         if args.verbose:
             for d in details:
                 print(f"      {d}")
@@ -502,12 +510,16 @@ def main():
                    help="把正文分号、链接间距等软规则升级为失败（作用于 punctuation 与 docs）")
     p.add_argument("--require-book", action="store_true",
                    help="缺少 _book/ 时让 layout/callouts/dom 失败，默认显示 SKIP")
+    p.add_argument("--require-browser", action="store_true",
+                   help="浏览器布局检查未执行时失败，默认显示 SKIP")
     p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
     p.add_argument("--changed", action="store_true", help="只校验相对 HEAD 修改的 C++ 内容")
     p = subs.add_parser("render", parents=[common], help="渲染并自动校验")
     p.add_argument("--no-ignore", action="store_true", help="传给 quarto --no-quartoignore")
     p.add_argument("--skip-check", action="store_true", help="渲染后不跑校验")
+    p.add_argument("--require-browser", action="store_true",
+                   help="浏览器布局检查未执行时失败")
     p = subs.add_parser("scope", parents=[common], help="输出任务作用域清单")
     p.add_argument("target", nargs="?")
     p.add_argument("--list", action="store_true")

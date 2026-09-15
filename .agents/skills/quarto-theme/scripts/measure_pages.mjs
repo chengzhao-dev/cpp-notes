@@ -19,7 +19,7 @@ const require = createRequire(import.meta.url);
 const bookDir = resolve(flag("--book-dir", "_book"));
 const outFile = flag("--out", "");
 const shotsDir = flag("--shots-dir", "");
-const viewports = [1280, 1100];
+const viewports = [1280, 1100, 768, 390];
 const colorSchemes = ["light", "dark"];
 
 async function collectHtml(directory) {
@@ -132,6 +132,8 @@ async function collect(page, pageId, scheme) {
         });
       }
     }
+    const copyButtonOpacities = [...root.querySelectorAll(".code-copy-button")]
+      .map((button) => px(style(button).opacity));
     const rootStyle = style(root);
     return {
       pageId,
@@ -157,6 +159,7 @@ async function collect(page, pageId, scheme) {
       callouts,
       tocItems,
       overflow,
+      copyButtonOpacities,
       contentWidth: px(rootStyle.width),
       color: rootStyle.color,
       backgroundColor: style(document.body).backgroundColor,
@@ -181,8 +184,11 @@ async function main() {
       for (const scheme of colorSchemes) {
         for (const file of htmlFiles) {
           const pageId = relative(bookDir, file).split(sep).join("/");
+          const touch = width <= 768;
           const context = await browser.newContext({
-            viewport: { width, height: 900 },
+            viewport: { width, height: touch ? 844 : 900 },
+            hasTouch: touch,
+            isMobile: touch,
             colorScheme: scheme,
           });
           const page = await context.newPage();

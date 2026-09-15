@@ -34,15 +34,13 @@
 - **顶栏品牌标**：与 `.agents/skills/quarto-theme/assets/theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
 - **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角，`text` 内容不启用语言 token。
 - **`.code-caption`**：图或代码块的一句附属说明，`--text-secondary` 次要文字色、字号略小，紧贴所描述对象（`base.css` 已压缩其与代码块的间距），写作侧规则见 quarto-docs `authoring.md`。
-- **`.troubleshooting`**：排错字段用 Pandoc `<dl>`，桌面端标签与说明并列，窄屏上下排列；无背景、无外框，标签用 `--text-secondary`，说明用 `--body-color`，不以连续 `strong` 制造层级。
-- **可折叠答案**：`details.answer-disclosure` 使用原生 `summary` 展开，默认收起，边框和圆角与卡片一致；`summary` 中的段落重置边距，明暗两态共用令牌。
+- **可折叠答案**：`details.answer-disclosure` 使用原生 `summary` 展开，默认收起，边框和圆角与卡片一致；`summary` 直接承载固定摘要文本，明暗两态共用令牌。
 
 ### 页面列宽与正文宽度
 
 - Quarto `grid.body-width` 是正文列的上限；sidebar、body、margin 与两条 gutter 的合计超过视口时，浏览器会压缩正文列。当前取值只在 `_quarto.yml` 维护。
 - `--content-width` 只限制正文容器的最大宽度，不代表每个段落都必须再按字符数收窄。
 - 普通段落、列表、代码块、表格和 callout 使用实际正文列宽；首页标题描述可以单独使用 `ch` 控制导语长度。
-- 排错定义列表及说明使用实际正文列宽；`.troubleshooting` 只负责结构与响应式排列，不引入第二层字符宽度限制。
 - 主题 CSS 不得用 `75ch` 等第二层限制覆盖正文列。窄屏由父容器缩放，内容保持 `max-width: 100%` 并避免横向溢出。
 
 ### 字体栈（三处同步）
@@ -102,7 +100,8 @@ Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 
 ### 校验
 
-用 `scripts/check_layout.py` 校验令牌、资产和可用的浏览器几何；需要刷新编译缓存时执行一次完整渲染。
+用 `scripts/check_layout.py` 校验令牌、资产和可用的浏览器几何；发布验收覆盖
+`1280/1100/768/390` 的明暗两态和触屏复制按钮。需要刷新编译缓存时执行一次完整渲染。
 
 ### 代码高亮契约
 
