@@ -17,7 +17,15 @@ FENCE = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
 HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 LINK = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
 LINK_TEXT = re.compile(r"(?<!!)\[(?P<label>[^\]\n]+)\]\((?P<url>[^)\n]*)\)")
-ANSWER_DETAILS = re.compile(r"^(?P<indent>[ \t]*)<details(?P<attrs>[^>]*)>$")
+ANSWER_OPEN = re.compile(
+    r"^(?P<indent>[ \t]*):::\s*\{(?P<attrs>[^}]*)\}\s*$"
+)
+ANSWER_CLASS = re.compile(r"(?:^|\s)\.answer(?:\s|$)")
+ANSWER_CLOSE = re.compile(r"^[ \t]*:::\s*$")
+RAW_ANSWER_DETAILS = re.compile(
+    r"^(?P<indent>[ \t]*)<details\b(?P<attrs>[^>]*)>"
+)
+ORDERED_LIST = re.compile(r"^[ \t]*\d+[.)][ \t]+\S")
 CJK = re.compile(r"[\u4e00-\u9fff]")
 WIDE = re.compile(r"[\u3000-\u303f\uff00-\uffef]")
 ASCII_EDGE = re.compile(r"[A-Za-z0-9_.+\-/]")
@@ -215,30 +223,98 @@ def check_callout_placement(rel, lines):
     return errors
 
 
+def has_html_class(attrs, name):
+    """Return whether an HTML attribute string contains one class token."""
+    match = re.search(
+        r"""\bclass\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))""",
+        attrs,
+        re.IGNORECASE,
+    )
+    if not match:
+        return False
+    value = next(group for group in match.groups() if group is not None)
+    return name in value.split()
+
+
+def find_answer_close(lines, start):
+    """Find the matching fenced-div close, ignoring fenced code and nested divs."""
+    depth = 1
+    in_fence = False
+    fence_char = ""
+    fence_size = 0
+    for candidate in range(start + 1, len(lines)):
+        fence = FENCE.match(lines[candidate])
+        if fence:
+            marker, _info = fence.groups()
+            if not in_fence:
+                in_fence, fence_char, fence_size = True, marker[0], len(marker)
+            elif marker[0] == fence_char and len(marker) >= fence_size:
+                in_fence = False
+            continue
+        if in_fence:
+            continue
+        if ANSWER_CLOSE.match(lines[candidate]):
+            depth -= 1
+            if depth == 0:
+                return candidate
+        elif re.match(r"^[ \t]*:::\s*\S", lines[candidate]):
+            depth += 1
+    return None
+
+
 def check_answer_disclosures(rel, lines):
-    """检查可折叠答案必须位于列表内、默认收起并带固定摘要。"""
+    """检查可折叠答案使用站点组件、位于列表内并正常闭合。"""
     errors = []
     index = 0
+    in_fence = False
+    fence_char = ""
+    fence_size = 0
     while index < len(lines):
-        match = ANSWER_DETAILS.match(lines[index])
-        if not match or 'class="answer-disclosure"' not in match.group("attrs"):
+        fence = FENCE.match(lines[index])
+        if fence:
+            marker, _info = fence.groups()
+            if not in_fence:
+                in_fence, fence_char, fence_size = True, marker[0], len(marker)
+            elif marker[0] == fence_char and len(marker) >= fence_size:
+                in_fence = False
             index += 1
             continue
+        if in_fence:
+            index += 1
+            continue
+
+        raw_match = RAW_ANSWER_DETAILS.match(lines[index])
+        if raw_match and has_html_class(raw_match.group("attrs"), "answer-disclosure"):
+            errors.append(
+                f"{rel}:{index + 1}: DOC-E18 可折叠答案必须使用 ::: {{.answer}} 组件"
+            )
+            index += 1
+            continue
+
+        match = ANSWER_OPEN.match(lines[index])
+        if not match or not ANSWER_CLASS.search(match.group("attrs")):
+            index += 1
+            continue
+
         line_number = index + 1
         if len(match.group("indent").expandtabs(4)) < 3:
             errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案必须缩进在对应列表项下")
-        if re.search(r"\bopen\b", match.group("attrs")):
-            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案必须默认收起")
-        closing = None
-        for candidate in range(index + 1, len(lines)):
-            if lines[candidate].strip() == "</details>":
-                closing = candidate
-                break
+        closing = find_answer_close(lines, index)
         if closing is None:
-            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案缺少 </details>")
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案缺少结束标记 :::")
             break
-        if not any("<summary>查看答案</summary>" in line for line in lines[index + 1:closing]):
-            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案摘要必须为“查看答案”")
+        content = [
+            (candidate, line)
+            for candidate, line in enumerate(lines[index + 1:closing], index + 1)
+            if line.strip()
+        ]
+        if not content:
+            errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案不能为空")
+        elif ORDERED_LIST.match(content[0][1]):
+            errors.append(
+                f"{rel}:{line_number}: DOC-E19 列表型答案必须以导语开头，"
+                "先说明对象、起止范围或顺序"
+            )
         index = closing + 1
     return errors
 

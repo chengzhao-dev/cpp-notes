@@ -65,6 +65,8 @@ format:
       # 明暗模式都采用 GitHub 官方风格；不再叠加自定义 token 颜色。
       light: github-light
       dark: github-dark
+    filters:
+      - .agents/skills/quarto-docs/scripts/answer-disclosure.lua
     # mermaid 不配置 theme：quarto-diagram 的 init.js 走 --mermaid-* 变量驱动的
     # 内置 themeCSS 路径，配色/字体由 theme/css/mermaid.css 控制（明暗自适应）
     include-in-header:

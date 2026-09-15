@@ -3,7 +3,7 @@ kb_id: "cpp-quarto-chapter-pattern-v1"
 title: "教学正文的页面块序列与职责边界"
 domain: "quarto-docs"
 subdomain: "page_pattern"
-tags: [page, block, sequence, preface, task, granularity, recap, ordering, checklist, answer_disclosure, details, self_check]
+tags: [page, block, sequence, preface, task, granularity, recap, ordering, checklist, answer_disclosure, answer_intro, list_answer, details, self_check]
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chapter-environment-v1"]
 created: "2026-09-10"
@@ -81,7 +81,11 @@ estimated_tokens: 1650
 
 答案紧跟问题，是为了让读者在核对时同时看到条件和结论，不必在章末寻找对应关系。答案集中到单独区域后，问题与解释会形成两套编号或两跳导航，回顾就从自测退化成答案列表。
 
-使用原生 `<details>/<summary>` 不需要额外 JavaScript，键盘可以直接操作，也没有 `##` 标题进入右侧目录。答案仍只使用本章已经讲过的概念；需要引入新知识时，应改写成正文任务或后续章节内容。
+答案采用原生折叠语义，不依赖脚本模拟可访问交互，也不会作为 `##` 标题进入右侧目录。固定摘要让每个问题都使用一致的自测入口；正文仍只使用本章已经讲过的概念；需要引入新知识时，应改写成正文任务或后续章节内容。具体组件写法见 `quarto-docs` 的 `authoring` reference，本文件只解释为什么。
+
+### 列表型答案为什么先写导语
+
+列表型答案展开后，问题可能已经离开读者视线。答案若直接进入编号步骤，读者需要先猜测这些步骤回答的是哪条链路；先写一句复用问题对象和起止状态的导语，既能确认答案与问题对应，也能在细节之前建立整体顺序。段落型答案不需要为统一格式强行补导语。
 
 ## 元素选择的判定依据
 

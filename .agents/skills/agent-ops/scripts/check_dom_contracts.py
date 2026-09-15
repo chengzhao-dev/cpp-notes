@@ -433,7 +433,7 @@ def check_contracts(book_dir, htmls, css_pairs):
     results.append((
         "C9", "可折叠答案默认收起且摘要与层级正确", c9, summary,
         [
-            "站点 QMD 使用 <details class=\"answer-disclosure\"> 和 <summary>查看答案</summary>",
+            "站点 QMD 使用 {.answer} 组件，产物为 details.answer-disclosure 和固定摘要",
             "answer-disclosure 不得带 open 属性",
             "折叠答案内部不得出现 h1–h6",
         ],

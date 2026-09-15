@@ -2,7 +2,7 @@
 
 ## HTML 输出配置
 
-> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、代码块不折叠；回顾答案使用原生 details
+> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、代码块不折叠；回顾答案使用 `.answer` 并渲染为原生 details
 
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
@@ -19,6 +19,7 @@
 |---|---|---|
 | `theme` | `light: [cosmo, .agents/skills/quarto-theme/assets/theme/scss/theme-light.scss]` + `dark: [darkly, …]` | 内置主题与项目样式叠加，顺序决定覆盖关系 |
 | `highlight-style` | `light: github-light` + `dark: github-dark` | 明暗分别指定，语义颜色交给引擎 |
+| `filters` | `.agents/skills/quarto-docs/scripts/answer-disclosure.lua` | 将正文 `.answer` 转为默认收起的原生 `details` |
 | `toc` / `toc-depth` / `toc-location` | `true` / `4` / `right` | 右侧目录，窄屏会折叠，不作唯一定位手段 |
 | `number-sections` | `false` | 因此标题不手填序号，见 `basics.md` |
 | `code-copy` / `code-overflow` | `true` / `wrap` | 长行换行，不让读者横向拖动 |

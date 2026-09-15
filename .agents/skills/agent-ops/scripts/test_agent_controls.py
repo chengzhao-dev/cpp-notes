@@ -18,6 +18,7 @@ def load(path: Path, name: str):
 
 
 encoding = load(ROOT / ".agents/skills/agent-ops/scripts/check_encoding.py", "check_encoding")
+docs = load(ROOT / ".agents/skills/agent-ops/scripts/check_docs.py", "check_docs")
 mcp = load(ROOT / ".agents/mcp/server.py", "mcp_server")
 runner = load(ROOT / ".agents/skills/agent-ops/scripts/run.py", "run_agent")
 scope = load(ROOT / ".agents/skills/agent-ops/scripts/scope.py", "scope")
@@ -29,6 +30,43 @@ def main() -> int:
     assert encoding.suspicious("\u951f" * 4)
     assert encoding.severity(Path(".agents/skills/agent-ops/scripts/x.py")) == "hard"
     assert encoding.severity(Path("content/core/intro.qmd")) == "hard"
+
+    valid_answer = [
+        "   ::: {.answer}",
+        "   从源码到程序运行依次经过以下步骤：",
+        "   1. 编译源码。",
+        "   :::",
+    ]
+    assert docs.check_answer_disclosures("content/test.qmd", valid_answer) == []
+    raw_answer = ['   <details class="legacy answer-disclosure">']
+    assert any(
+        "DOC-E18" in error
+        for error in docs.check_answer_disclosures("content/test.qmd", raw_answer)
+    )
+    empty_answer = ["   ::: {.answer}", "   :::"]
+    assert any(
+        "不能为空" in error
+        for error in docs.check_answer_disclosures("content/test.qmd", empty_answer)
+    )
+    list_without_intro = [
+        "   ::: {.answer}",
+        "   1. 编译源码。",
+        "   :::",
+    ]
+    assert any(
+        "DOC-E19" in error
+        for error in docs.check_answer_disclosures("content/test.qmd", list_without_intro)
+    )
+    fenced_marker = [
+        "   ::: {.answer}",
+        "   从源码到程序运行依次经过以下步骤：",
+        "   ```text",
+        "   :::",
+        "   ```",
+        "   1. 编译源码。",
+        "   :::",
+    ]
+    assert docs.check_answer_disclosures("content/test.qmd", fenced_marker) == []
 
     assert mcp.redact("API_KEY=secret-value") == "API_KEY=[REDACTED]"
     assert "abc.def-123" not in mcp.redact("Authorization: Bearer abc.def-123")
