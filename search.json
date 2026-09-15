@@ -1,0 +1,183 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "C++ 笔记",
+    "section": "",
+    "text": "选择笔记内容\n先选择要阅读的部分。进入后，再按顺序阅读该部分中的页面。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 笔记</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#选择笔记内容",
+    "href": "index.html#选择笔记内容",
+    "title": "C++ 笔记",
+    "section": "",
+    "text": "配置环境\n安装 WSL2、Ubuntu 和 C++ 工具链，然后写出并运行第一个 C++ 程序。\n查看内容 →",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 笔记</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#后续内容",
+    "href": "index.html#后续内容",
+    "title": "C++ 笔记",
+    "section": "后续内容",
+    "text": "后续内容\n语言基础、标准库和工程实践正在编写。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 笔记</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/index.html",
+    "href": "content/getting-started/index.html",
+    "title": "配置环境",
+    "section": "",
+    "text": "本部分内容\n本部分共有两页。先配置 C++ 开发环境，再写出并运行第一个 C++ 程序。",
+    "crumbs": [
+      "配置环境"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/index.html#本部分内容",
+    "href": "content/getting-started/index.html#本部分内容",
+    "title": "配置环境",
+    "section": "",
+    "text": "准备 WSL2 和 Ubuntu\n安装 WSL2 和 Ubuntu，再准备编译、运行和调试 C++ 程序所需的工具。\n查看页面 →\n\n\n写出第一个 C++ 程序\n先直接使用 clang++ 编译，再让 CMake 生成构建规则，并由 Ninja 执行这些规则。\n查看页面 →",
+    "crumbs": [
+      "配置环境"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/index.html#完成后",
+    "href": "content/getting-started/index.html#完成后",
+    "title": "配置环境",
+    "section": "完成后",
+    "text": "完成后\n读完本部分后，你已经可以编译和运行第一个程序。后续内容正在编写。",
+    "crumbs": [
+      "配置环境"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html",
+    "href": "content/getting-started/setup-wsl2.html",
+    "title": "搭建 WSL2 开发环境",
+    "section": "",
+    "text": "准备 Linux 开发环境\n后续命令要在 Linux 中执行，Windows 不能直接运行它们。WSL2 让 Windows 可以使用 Linux 环境，Ubuntu 是这个环境里使用的 Linux 系统。本章安装 Ubuntu，并准备编译、运行和调试 C++ 程序所需的工具。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>搭建 WSL2 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#准备-linux-开发环境",
+    "href": "content/getting-started/setup-wsl2.html#准备-linux-开发环境",
+    "title": "搭建 WSL2 开发环境",
+    "section": "",
+    "text": "安装 WSL2 和 Ubuntu\n以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu。Linux 有多个发行版，发行版可以理解为包含系统和常用工具的完整版本。\n\n\nPowerShell（管理员）\n\n# 安装 WSL2 和默认的 Ubuntu 发行版\nwsl --install\n\n命令执行完成后，按提示重启 Windows，让新启用的 WSL2 组件生效。重启后首次启动 Ubuntu，按提示创建 Linux 用户名和密码。输入密码时不会显示字符，这是正常现象。\n创建账号后，终端会显示提示符。请对照下面的格式，确认是否已经进入 Ubuntu，并了解后续命令的执行位置。\n\n\n\n\n\n\n注意提示符与终端范围\n\n\n\n看到类似 user@host:~$ 的提示符，就说明已经进入 Ubuntu。后续 bash 命令都在这个终端中执行。\n\nuser 是用户名。\nhost 是电脑名称。\n~ 是当前用户的主目录。\n\n\n\n\n\n安装其他发行版\n本节只用于安装 Ubuntu 之外的 Linux 系统。继续使用默认 Ubuntu 时，可以跳过本节。\n要安装其他发行版时，先执行下面的命令查看 WSL 当前提供的名称。\n\n\nPowerShell\n\n# 查看可安装的发行版名称\nwsl --list --online\n\n从输出中复制目标发行版的名称，原样替换安装命令中的 &lt;发行版名称&gt;，再执行下面的命令。\n\n\nPowerShell\n\n# 安装指定发行版\nwsl --install -d &lt;发行版名称&gt;\n\n\n\n安装 C++ 工具链\n进入 Ubuntu 终端后，执行下面的命令。软件源是 Ubuntu 下载软件的位置，先更新软件包列表，再安装 C++ 工具链。工具链是编译器、构建工具、调试器和语言服务的统称。\n\n\nUbuntu Bash\n\n# 更新软件包索引\nsudo apt update\n\n# 升级已安装的软件包\nsudo apt upgrade -y\n\n# 安装 Clang/LLVM 编译、构建、调试和语言服务工具\nsudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build\n\n\n\n\n\n\n\n提示下载较慢时再更换软件源\n\n\n\n更换软件源只改变软件从哪里下载，不会改变 Ubuntu 版本。下载较慢时，按清华大学开源软件镜像站的 Ubuntu 软件源帮助完成配置，再重新执行本节命令。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>搭建 WSL2 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#常见错误",
+    "href": "content/getting-started/setup-wsl2.html#常见错误",
+    "title": "搭建 WSL2 开发环境",
+    "section": "常见错误",
+    "text": "常见错误\n\n虚拟机平台未启用\n执行 wsl --install 后提示“虚拟机平台未启用”，安装无法继续。\n\n定位缺失项\n在电脑启动设置中确认 CPU 虚拟化已经开启。再检查 Windows 功能列表中的“虚拟机平台”和“适用于 Linux 的 Windows 子系统”是否已经启用。\n启用缺失项并重启\n在“启用或关闭 Windows 功能”中启用缺少的项目。如果电脑启动设置中尚未开启 CPU 虚拟化，也先将其开启，再重启 Windows。\n重新安装并验证\n以管理员身份再次执行 wsl --install。首次启动 Ubuntu 后出现 Linux 提示符，就回到安装 WSL2 和 Ubuntu 继续完成账号创建。\n\n\n\n找不到命令\n在 Ubuntu 中运行某个 C++ 工具时提示 command not found。\n\n定位缺失工具\n执行下面的命令，查看哪些工具没有输出路径。\n\n\nUbuntu Bash\n\n# 检查工具是否已经安装\ncommand -v clang++ clangd lldb cmake ninja\n\n安装缺失工具\n缺少工具时，先执行 sudo apt update，再按安装 C++ 工具链 补齐对应软件包。\n验证安装\n再次执行定位命令，确认每个工具都输出路径。\n\n\nUbuntu Bash\n\n# 重新检查工具是否已经安装\ncommand -v clang++ clangd lldb cmake ninja\n\n\n\n\n软件源更新失败\n执行 sudo apt update 时出现下载失败或软件源不可用等错误。按下面的顺序找到失败来源，改用可用软件源，再重新验证。\n\n定位失败来源\n确认命令在 Ubuntu 终端中执行，并记录错误输出中的软件源地址和 Ubuntu 版本。\n配置可用软件源\n按清华大学 Ubuntu 镜像使用帮助为当前 Ubuntu 版本配置软件源。\n验证更新结果\n\n\nUbuntu Bash\n\nsudo apt update\n\n命令正常结束且不再出现软件源错误，说明软件源已经恢复。回到安装 C++ 工具链 继续操作。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>搭建 WSL2 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#本章回顾",
+    "href": "content/getting-started/setup-wsl2.html#本章回顾",
+    "title": "搭建 WSL2 开发环境",
+    "section": "本章回顾",
+    "text": "本章回顾\n本章已经准备好 Ubuntu 和 C++ 工具链。下一章从 Hello, World! 示例开始，先阅读源码，再用 clang++ 直接编译，最后用 CMake 和 Ninja 完成构建。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>搭建 WSL2 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html",
+    "href": "content/getting-started/first-program.html",
+    "title": "写出第一个 C++ 程序",
+    "section": "",
+    "text": "认识示例程序\n上一章已经准备好 Linux 开发环境。先打开完整示例工程 first-program，并进入工程根目录。\nHello, World! 是最小的 C++ 程序之一。它只做一件事，把一行文字输出到终端。下面先认识工程文件和源码，再分别用 clang++ 和 CMake 构建它。\n本章会用到下面三个文件。编辑器配置不会影响本章的构建过程，因此先不展开。\nmain.cpp 是程序入口，CMakeLists.txt 告诉 CMake 怎样构建程序。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#认识示例程序",
+    "href": "content/getting-started/first-program.html#认识示例程序",
+    "title": "写出第一个 C++ 程序",
+    "section": "",
+    "text": "工程目录\n\nfirst-program/\n├── CMakeLists.txt    # 构建规则\n├── main.cpp          # 程序源码\n└── build-and-run.sh  # 一键构建并运行\n\n\n\n\nmain.cpp\n\n// 引入标准输出流。\n#include &lt;iostream&gt;\n\nint main() {\n  // 输出程序运行结果。\n  std::cout &lt;&lt; \"Hello, World!\\n\";\n\n  // 返回 0 表示程序正常结束。\n  return 0;\n}",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#用-clang-构建",
+    "href": "content/getting-started/first-program.html#用-clang-构建",
+    "title": "写出第一个 C++ 程序",
+    "section": "用 clang++ 构建",
+    "text": "用 clang++ 构建\nclang++ 是编译器命令。它读取源码，生成可以直接运行的程序。在工程根目录执行下面的命令。\n\n\nUbuntu Bash（工程根目录）\n\n# 创建用于存放可执行文件的目录\nmkdir -p build/bin\n\n# 使用 libc++ 编译并链接 C++20 程序\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror main.cpp -o build/bin/app\n\n# 运行刚生成的可执行文件\n./build/bin/app\n\n程序输出如下。\n\n\n输出\n\nHello, World!\n\n看到 Hello, World!，说明程序已经运行。build/bin/app 是刚生成的可执行文件。\n\n\n\n\n\n\n注意关键选项\n\n\n\n\n-std=c++20 选择 C++20 语言标准。\n-stdlib=libc++ 选择 LLVM 提供的 C++ 标准库。\n-Wall -Wextra -Werror 打开常见警告，并让警告阻止构建。\n-o build/bin/app 指定可执行文件的位置。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#用-cmake-构建",
+    "href": "content/getting-started/first-program.html#用-cmake-构建",
+    "title": "写出第一个 C++ 程序",
+    "section": "用 CMake 构建",
+    "text": "用 CMake 构建\nCMake 读取 CMakeLists.txt，生成构建规则。Ninja 再执行这些规则，编译源码并生成程序。\n\n\nCMakeLists.txt\n\n# 低于此版本时配置阶段直接报错，不做兼容回退。\ncmake_minimum_required(VERSION 3.31)\n\n# 声明项目名称，并启用 C++ 语言支持。\nproject(first-program LANGUAGES CXX)\n\n# 与 clang++ 直编命令的 -std=c++20 保持一致。省略会回到编译器默认标准。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\n\n# 对应 clang++ 的 -o build/bin/app，统一把可执行文件放进 build/bin。\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n\n# 导出编译数据库，让 clangd 读到与实际构建一致的编译参数。\n# 开启后配置阶段会生成 build/compile_commands.json。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 从 main.cpp 构建名为 app 的可执行文件。\nadd_executable(app main.cpp)\n\n# -stdlib=libc++ 选择 LLVM C++ 标准库，-Wall -Wextra 打开常用警告，\n# -Werror 把警告升级为错误。链接阶段沿用同一个标准库。\n# 编译器没有输出表示编译和链接成功。出现 warning/error 时，\n# 先按文件名、行号和原因修复。编译通过不代表程序逻辑正确。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\n先让 CMake 在 build/ 中生成 Ninja 规则。\n\n\nUbuntu Bash（工程根目录）\n\n# 配置 CMake 工程并选择 clang++ 与 Ninja\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n\n配置成功后，用 CMake 调用 Ninja 完成构建。\n\n\nUbuntu Bash（工程根目录）\n\n# 按生成的规则编译并链接\ncmake --build build\n\n构建完成后，运行生成的程序。\n\n\nUbuntu Bash（工程根目录）\n\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n看到 Hello, World!，说明 CMake 配置、Ninja 构建和程序运行都已完成。\n\n使用一键脚本\nbuild-and-run.sh 把刚才的配置、构建和运行命令串在一起。\n\n\nbuild-and-run.sh\n\n#!/usr/bin/env bash\n# 一键配置、构建并运行当前 CMake 示例。\n# 在项目目录中运行 bash build-and-run.sh\n#\n# 脚本依次完成配置、构建和运行。\n# CMakeLists.txt 统一 C++ 标准、警告策略和可执行文件输出目录。\n\n# 命令失败、使用未定义变量或管道出错时停止脚本。\nset -euo pipefail\n\n# 无论从哪里调用，都先切换到脚本所在的项目目录。\nproject_dir=\"$(cd \"$(dirname \"$0\")\" && pwd)\"\ncd \"$project_dir\"\n\n# 构建目录与目标名与 CMakeLists.txt 保持一致。\nbuild_dir=\"build\"\ntarget=\"app\"\n\n# 配置 clang++ 与 Ninja Debug 构建\nprintf '\\n==&gt; 配置\\n\\n'\ncmake -S . -B \"$build_dir\" -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n\n# 构建 CMakeLists.txt 中声明的目标。\nprintf '\\n==&gt; 构建\\n\\n'\ncmake --build \"$build_dir\"\n\n# 运行构建结果\nprintf '\\n==&gt; 运行\\n\\n'\n\"$build_dir/bin/$target\"\n\n在工程根目录执行下面的命令。\n\n\nUbuntu Bash（工程根目录）\n\n# 一键完成配置、构建并运行\nbash build-and-run.sh\n\n脚本会依次完成配置、构建和运行。最后看到 Hello, World!，说明流程正常结束。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#选择构建方式",
+    "href": "content/getting-started/first-program.html#选择构建方式",
+    "title": "写出第一个 C++ 程序",
+    "section": "选择构建方式",
+    "text": "选择构建方式\n两条路径跑通后，可以按工程规模选择：\n\n单个源文件：用 clang++ 直接编译，命令最短，适合第一次验证。\n多文件或多目标工程：用 CMake 管理构建规则，让 Ninja 执行编译和链接。\n\n后续示例默认使用 CMake。build-and-run.sh 只是把前面的配置、构建和运行命令放在一起。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#常见错误",
+    "href": "content/getting-started/first-program.html#常见错误",
+    "title": "写出第一个 C++ 程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n缺少构建工具\n在工程根目录运行命令时提示找不到 clang++、cmake 或 ninja。\n\n定位缺失工具\n\n\nUbuntu Bash（工程根目录）\n\n# 检查编译器、CMake 和 Ninja 是否可用\ncommand -v clang++ cmake ninja\n\ncommand -v 为每个已安装的工具打印路径，缺失的名字不打印任何内容。\n安装缺失工具\n执行 sudo apt update，再按安装 C++ 工具链重新安装整套工具。\n验证安装\n再次执行定位命令，确认 clang++、cmake 和 ninja 都输出路径。\n\n\nUbuntu Bash（工程根目录）\n\n# 重新检查编译器、CMake 和 Ninja\ncommand -v clang++ cmake ninja",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#本章回顾",
+    "href": "content/getting-started/first-program.html#本章回顾",
+    "title": "写出第一个 C++ 程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n本章用同一个 Hello, World! 走通了直接编译和 CMake 构建两条路径。可以思考以下问题：\n\nmain.cpp 从源码到终端输出，中间经过哪些步骤？\n\n查看答案\n从 main.cpp 的源码到终端显示输出，整个过程依次经过以下四个步骤：\n\n在终端执行 clang++ 命令，启动编译器。\nclang++ 编译并链接 main.cpp，生成 build/bin/app。\n在终端运行 build/bin/app，操作系统加载并执行这个文件。\n程序把 Hello, World! 写入标准输出，终端显示这行文本。\n\n\n单个源文件为什么可以直接使用 clang++，代码变多后为什么要使用 CMake？\n\n查看答案\n单文件程序直接使用 clang++ 时，命令最短，适合快速验证。源文件和构建目标增多后，手写命令难以维护。此时，CMake 负责描述构建规则，Ninja 负责执行规则并支持增量构建。\n\n\n下一章会在此基础上介绍多文件和多目标工程的构建方式。",
+    "crumbs": [
+      "配置环境",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>写出第一个 C++ 程序</span>"
+    ]
+  }
+]
