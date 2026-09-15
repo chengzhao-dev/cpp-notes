@@ -3,11 +3,11 @@ kb_id: "cpp-quarto-landing-pattern-v1"
 title: "入口与卡片页的三层结构与卡片职责"
 domain: "quarto-docs"
 subdomain: "page_pattern"
-tags: [page, landing, card, hero, index, readme, wayfinding, grouping, promise_boundary, content_status]
+tags: [page, landing, card, hero, index, readme, wayfinding, grouping, promise_boundary, content_status, part_index, site_index, hierarchy]
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-10"
-updated: "2026-09-14"
+updated: "2026-09-15"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 1700
 ---
@@ -56,16 +56,24 @@ estimated_tokens: 1700
 
 | 位置 | 阅读现场 | 承担 |
 | --- | --- | --- |
-| README | 代码托管页面的仓库首屏 | 可达性入口、按 part 的学习路线、仓库结构、内容范围 |
+| README | 代码托管页面的仓库首屏 | 可达性入口、按 part 的内容路线、仓库结构、内容范围 |
 | 站点入口页 | 已打开文档站的读者 | 范围声明与卡片路线，不承担仓库级信息 |
 | part 封面 | 已选定某条路线的读者 | 该 part 内部顺序与下一步 |
 
 在线阅读地址在整个站点与仓库里只出现一次，固定放在 README。文档站在自身页面上重复指向自己，等于占掉首屏一个位置却不提供新信息。
 
-README 的学习路线按 part 分组、组内从一重新编号：读者关心「这条路线我读到第几步」，组间连续编号会让第 12 步看起来比第 1 步难得多，而它们往往只是不同 part。
+README 的内容路线按 part 分组、组内从一重新编号：读者关心「这条路线我读到第几步」，组间连续编号会让第 12 步看起来比第 1 步难得多，而它们往往只是不同 part。
 
 ## 页面角色不得互相代办
 
 前置页面不提前展开后续章节的命令，正文不重复索引给出的路线。三类页面各自只回答一个问题：入口回答这是什么与从哪开始，索引回答顺序与分组，正文回答一个可完成的任务。
 
 违反这条的最常见形态是入口页越写越长，最终变成没有细节的目录。识别方法：入口页里出现命令、代码块或参数表，就说明它侵入了正文的职责。
+
+## 根首页与部分首页各自完成一次选择
+
+站点入口和部分入口承担两个连续但不同的选择。站点入口让读者先判断要进入哪个部分，部分入口再让读者判断先读哪一页。两次选择分开后，读者每次只需要比较同一层的内容。
+
+根首页直接链接部分内的正文会绕过第二层。此时部分首页要么失去入口作用，要么只能重复根首页的链接。两者都会让依赖关系变模糊，也会让新增部分时同时修改多处导航。
+
+因此，根首页的部分卡只链接 `content/<part>/index.qmd`，部分首页只列出本部分已发布的正文页面。部分卡说明该部分解决什么问题，部分首页说明本部分的页面顺序，两者都不复制正文中的操作。

@@ -55,7 +55,7 @@ quarto render                     # 渲染当前项目全部内容
 quarto publish gh-pages           # 渲染并发布到 GitHub Pages
 ```
 
-## Quarto Book 项目（本书所用格式）
+## Quarto Book 项目（本项目所用格式）
 
 本备忘录使用 **Quarto Book**（`project: type: book`），适合章节化技术文档。核心配置（**已对齐仓库 `_quarto.yml`**，不要与真实配置冲突）：
 
@@ -83,9 +83,17 @@ format:
 - `book:` 下的 `title`、`author`、`date` 为书目信息，`chapters` 定义章节顺序。
 - **`index.qmd` 必须存在**，作为 Book 首页/入口。
 - 章节可放子目录（如 `content/getting-started/setup-wsl2.qmd`），在 `chapters` 写相对路径。
-- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本书在用），产生分卷/分部标题。索引页的 `.hero-eyebrow` 是可选视觉组件，只在正文真的写了该 div 时生效，与 `part:` 的写法无关，不构成索引页的硬性要求。
+- **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本项目在用），产生分卷/分部标题。索引页的 `.hero-eyebrow` 是可选视觉组件，只在正文真的写了该 div 时生效，与 `part:` 的写法无关，不构成索引页的硬性要求。
 - 章节间交叉引用用 `@sec-...`、`@tbl-...`、`@fig-...`。
 - 渲染：`quarto render`，Book **默认输出到 `_book/`**（区别于 website 的 `_site/`）。
+
+### 根首页与部分首页的链接边界
+
+根首页和部分首页分别完成一次选择，不能越过对方直接承担章节导航。
+
+- 根 `index.qmd` 只展示 `content/<part>/` 这一层的内容部分，每张卡说明该部分解决什么问题，并链接到对应的 `content/<part>/index.qmd`。
+- `content/<part>/index.qmd` 只展示本部分已经发布的正文页面，不含自己。它负责说明阅读顺序，不复制正文中的命令、参数或操作步骤。
+- 新增部分时先写部分首页，再在根首页增加部分卡。根首页不得直接链接部分内的正文页面，否则部分首页会被绕过，两层导航也会重复。
 
 ## 章节标题约定（规范，唯一出处）
 

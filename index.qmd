@@ -6,33 +6,22 @@ body-classes: homepage
 ---
 
 ::: {.hero-eyebrow}
-C++ Notes
+中文 C++ 笔记
 :::
 
-## 从这里开始
+## 选择笔记内容
 
-先完成开发环境和第一个程序，再选择后续学习路线。完成后，你可以编译并运行这份笔记当前已经提供的示例。
+先选择要阅读的部分。进入后，再按顺序阅读该部分中的页面。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [搭建开发环境](content/getting-started/index.qmd)
-在 Windows 上搭好 WSL2 与 Ubuntu，安装包含 Ninja 的 C++ 工具链，建立统一的 Linux 环境。
+### [配置环境](content/getting-started/index.qmd)
+安装 WSL2、Ubuntu 和 C++ 工具链，然后写出并运行第一个 C++ 程序。
 
-[开始学习 →](content/getting-started/index.qmd){.cta}
+[查看内容 →](content/getting-started/index.qmd){.cta}
 :::
-
-::: {.landing-card .coming-soon}
-### C++ 语言基础
-从变量、类型、函数和控制流开始，建立理解 C++ 程序所需的语言模型。
 :::
 
-::: {.landing-card .coming-soon}
-### 标准库与对象管理
-学习容器、算法和资源管理，理解对象生命周期与所有权。
-:::
+## 后续内容
 
-::: {.landing-card .coming-soon}
-### 调试与工程实践
-继续学习构建、调试、性能和多文件工程，把语言知识放进真实项目。
-:::
-:::
+语言基础、标准库和工程实践正在编写。
