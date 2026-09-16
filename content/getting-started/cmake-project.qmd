@@ -1,0 +1,123 @@
+---
+title: "用 CMake 构建程序"
+---
+
+上一章用 `clang++` 直接编译了单个源文件，每次修改都需要重新执行编译命令。本章使用 `CMake` 描述构建规则，再由 `Ninja` 执行编译和链接。完成后，同一组配置和构建命令可以重复使用。
+
+## 认识工程文件
+
+打开示例工程 [cmake-project](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/cmake-project)，目录如下：
+
+```{.text filename="工程目录"}
+cmake-project/
+├── CMakeLists.txt    # 构建规则
+├── build-and-run.sh  # 一键配置、构建并运行
+└── main.cpp          # 程序源码
+```
+
+`main.cpp` 与上一页相同，`CMakeLists.txt` 说明如何生成可执行文件。先阅读这两个文件，观察源码与构建规则如何对应。
+
+```{.cpp filename="main.cpp"}
+{{< include /code/getting-started/cmake-project/main.cpp >}}
+```
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/cmake-project/CMakeLists.txt >}}
+```
+
+`add_executable(app main.cpp)` 创建一个名为 `app` 的可执行目标。`target_compile_options()` 和 `target_link_options()` 为这个目标提供编译与链接选项。
+
+## 配置工程
+
+进入 `cmake-project` 目录，执行下面的命令，让 `CMake` 读取 `CMakeLists.txt` 并生成 `Ninja` 构建文件。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+```
+
+`-S .` 表示源码目录是当前目录，`-B build` 表示把生成文件放进 `build/`。配置只需在构建规则改变后重新执行，日常修改源码不需要重复配置。
+
+## 构建并运行
+
+执行下面的命令构建工程。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+cmake --build build
+```
+
+`CMake` 会调用 `Ninja` 编译并链接 `main.cpp`，生成 `build/bin/app`。运行下面的命令。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+./build/bin/app
+```
+
+程序输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+修改 `main.cpp` 后再次执行 `cmake --build build`，`Ninja` 只会重建受影响的部分。
+
+## 使用一键脚本
+
+工程中的 `build-and-run.sh` 把配置、构建和运行放在一起。执行下面的脚本。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+bash build-and-run.sh
+```
+
+脚本适合快速检查工程。理解每条命令后，再按需单独执行更方便排查问题。
+
+## 常见错误
+
+### 配置时找不到 Ninja
+
+配置工程时提示无法找到 `Ninja`，说明构建工具没有安装或当前终端无法调用。按下面的顺序恢复工具。
+
+1. **定位缺失工具**
+
+   执行下面的命令，查看工具是否都有输出路径。
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   command -v clang++ cmake ninja
+   ```
+
+2. **安装缺失工具**
+
+   回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，重新执行 C++ 工具链安装命令。
+
+3. **重新配置并验证**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+   ```
+
+   配置输出包含 `Build files have been written to`，说明 `Ninja` 已经可用。
+
+### 构建后找不到 app
+
+构建命令正常结束，但 `build/bin/app` 不存在时，说明配置目录或构建规则和当前命令不一致。按下面的顺序定位问题。
+
+1. **确认执行目录**
+
+   检查终端当前位于 `cmake-project` 工程根目录。目录不对时，先进入该目录。
+
+2. **查看第一条构建错误**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   cmake --build build --verbose
+   ```
+
+3. **验证产物并运行**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   ls -l build/bin/app
+   ./build/bin/app
+   ```
+
+   看到 `build/bin/app` 且程序输出 `Hello, World!`，说明工程已经构建成功。
+
+## 本章回顾
+
+你已经能用 `CMake` 配置单入口工程，再用 `cmake --build` 调用 `Ninja` 构建 `app`。修改源码后直接重新执行构建命令即可。下一章会把程序拆成多个源文件，让 `CMake` 同时编译并链接它们。

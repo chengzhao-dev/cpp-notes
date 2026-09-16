@@ -19,6 +19,10 @@ book:
       chapters:
         - content/getting-started/setup-wsl2.qmd
         - content/getting-started/first-program.qmd
+        - content/getting-started/cmake-project.qmd
+        - content/getting-started/multi-file-project.qmd
+        - content/getting-started/static-library.qmd
+        - content/getting-started/shared-library.qmd
 
 # Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
 language:
@@ -37,14 +41,14 @@ format:
     grid:
       # 三栏宽度预算：sidebar + body + margin + 两条 gutter 必须 <= 目标视口，
       # 否则 Quarto 按比例压缩正文列（body-width 只是上限声明，不是保证值）。
-      # 256 + 840 + 216 + 32 = 1344；正文目标宽度为 840px。
-      sidebar-width: 256px
-      body-width: 840px
-      margin-width: 216px
+      # 240 + 800 + 208 + 32 = 1280；正文目标宽度为 800px。
+      sidebar-width: 240px
+      body-width: 800px
+      margin-width: 208px
       gutter-width: 1rem
     respect-user-color-scheme: true
     toc: true
-    toc-depth: 4
+    toc-depth: 3
     toc-location: right
     anchor-sections: true
     code-copy: true

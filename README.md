@@ -3,23 +3,20 @@
 [![quarto build & deploy](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml/badge.svg)](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
 
-**C++ 笔记**是一份面向初学者的中文 C++ 笔记。它从可以运行的程序开始，逐步介绍 C++ 语言和工程构建方式。
+**C++ 笔记**是一份面向初学者的中文 C++ 笔记。它以 Linux 为运行环境，从可以运行的程序开始，逐步介绍 C++ 语言、工具链和工程构建。
 
 在线阅读：<https://chengzhao-dev.github.io/cpp-notes/>
 
-## 当前内容
-
-当前提供两章入门内容：
-
-- 在 Windows 上安装 WSL2 和 Ubuntu，准备 Clang/LLVM 编译与调试工具。
-- 写出并运行第一个 C++ 程序，再使用 CMake 管理构建过程。
-
-后面的语言基础、标准库和工程实践正在编写。
-
 ## 阅读顺序
+
+阅读入口为 [入门与构建](content/getting-started/index.qmd)。六个页面按下面的顺序逐页完成：
 
 1. [搭建 WSL2 开发环境](content/getting-started/setup-wsl2.qmd)
 2. [写出第一个 C++ 程序](content/getting-started/first-program.qmd)
+3. [用 CMake 构建程序](content/getting-started/cmake-project.qmd)
+4. [构建多文件 C++ 工程](content/getting-started/multi-file-project.qmd)
+5. [构建静态库](content/getting-started/static-library.qmd)
+6. [构建动态库](content/getting-started/shared-library.qmd)
 
 建议边读边输入命令。只阅读不运行，无法确认环境和程序是否正常。
 
@@ -29,7 +26,7 @@
 
 ## 运行示例
 
-示例源码位于 `code/getting-started/`。每章会给出完整的编译和运行命令，你可以直接跟着操作，也可以用 `build-and-run.sh` 一次完成配置、构建和运行。
+示例源码位于 `code/getting-started/`。需要编译运行的章节都提供 `build-and-run.sh`：首程序直接调用 `clang++`，CMake 与库工程依次完成配置、构建和运行。
 
 ## 仓库结构
 

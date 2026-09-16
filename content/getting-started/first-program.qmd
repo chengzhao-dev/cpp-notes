@@ -2,166 +2,131 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章已经准备好 Linux 开发环境。先打开完整示例工程 [first-program](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，并进入工程根目录。
+上一章已经在 Ubuntu 中准备好 C++ 工具链。本章只处理一个源文件，先用 `clang++` 直接生成并运行程序。完成后，你会看到源码经过编译和链接变成可执行文件，并在终端输出 `Hello, World!`。下一章再把同样的流程交给 `CMake`。
 
-`Hello, World!` 是最小的 C++ 程序之一。它只做一件事，把一行文字输出到终端。下面先认识工程文件和源码，再分别用 `clang++` 和 `CMake` 构建它。
+## 创建源文件
 
-## 认识示例程序
+`Hello, World!` 是大多数人的第一个 C++ 程序。它用最少代码走通“写出源码、编译、链接、运行、看到输出”这条流程，也能直接验证上一章工具链是否可用。程序没有输入、文件操作或复杂数据类型，出现问题时的范围更容易判断。
 
-本章会用到下面三个文件。编辑器配置不会影响本章的构建过程，因此先不展开。
+打开示例工程 [first-program](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，目录如下：
 
 ```{.text filename="工程目录"}
 first-program/
-├── CMakeLists.txt    # 构建规则
-├── main.cpp          # 程序源码
-└── build-and-run.sh  # 一键构建并运行
+├── build-and-run.sh  # 一键编译并运行
+└── first-program.cpp # 程序源码
 ```
 
-`main.cpp` 是程序入口，`CMakeLists.txt` 告诉 `CMake` 怎样构建程序。
+新建 `first-program.cpp`。完整源码如下：
 
-```{.cpp filename="main.cpp"}
-{{< include /code/getting-started/first-program/main.cpp >}}
+```{.cpp filename="first-program.cpp"}
+{{< include /code/getting-started/first-program/first-program.cpp >}}
 ```
 
-## 用 clang++ 构建
+`#include <iostream>` 引入标准输入输出支持，程序随后才能使用 `std::cout` 把文字写到终端。
 
-`clang++` 是编译器命令。它读取源码，生成可以直接运行的程序。在工程根目录执行下面的命令。
+`int main()` 是程序入口，返回类型是 `int`，空圆括号表示当前程序不接收命令行参数。`main()` 后面的 `{` 到匹配的 `}` 组成入口函数的函数体，程序启动后从函数体的第一条语句开始执行。
 
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-# 创建用于存放可执行文件的目录
-mkdir -p build/bin
+函数体中的 `std::cout << "Hello, World!\n";` 把文字和换行写入标准输出。最后一条语句 `return 0;` 表示程序正常结束。
 
-# 使用 libc++ 编译并链接 C++20 程序
-clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror main.cpp -o build/bin/app
+## 编译并运行
 
-# 运行刚生成的可执行文件
-./build/bin/app
+在 `first-program.cpp` 所在目录执行下面的命令。先把可执行文件放进 `build/`，避免生成物和源码混在一起。
+
+```{.bash filename="Ubuntu Bash"}
+# 创建构建产物目录
+mkdir -p build
+
+# 编译源文件并生成可执行文件
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+
+# 运行程序
+./build/first-program
 ```
 
-程序输出如下。
+程序输出如下：
 
 ```{.text filename="输出"}
 Hello, World!
 ```
 
-看到 `Hello, World!`，说明程序已经运行。`build/bin/app` 是刚生成的可执行文件。
+`clang++` 先编译源码，再把程序需要的运行代码链接起来。`-o build/first-program` 指定可执行文件的输出路径。`./` 表示运行当前目录中的文件。
 
-::: {.callout-note title="关键选项"}
-- `-std=c++20` 选择 C++20 语言标准。
-- `-stdlib=libc++` 选择 LLVM 提供的 C++ 标准库。
-- `-Wall -Wextra -Werror` 打开常见警告，并让警告阻止构建。
-- `-o build/bin/app` 指定可执行文件的位置。
+::: {.callout-note title="编译选项"}
+`-std=c++20` 选择语言标准，`-stdlib=libc++` 选择 C++ 标准库，`-Wall -Wextra -Werror` 打开常见警告并让警告阻止构建。
 :::
 
-## 用 CMake 构建
+## 使用一键脚本
 
-`CMake` 读取 `CMakeLists.txt`，生成构建规则。`Ninja` 再执行这些规则，编译源码并生成程序。
-
-```{.cmake filename="CMakeLists.txt"}
-{{< include /code/getting-started/first-program/CMakeLists.txt >}}
-```
-
-先让 `CMake` 在 `build/` 中生成 `Ninja` 规则。
-
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-# 配置 CMake 工程并选择 clang++ 与 Ninja
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
-```
-
-配置成功后，用 `CMake` 调用 `Ninja` 完成构建。
-
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-# 按生成的规则编译并链接
-cmake --build build
-```
-
-构建完成后，运行生成的程序。
-
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-./build/bin/app
-```
-
-输出如下：
-
-```{.text filename="输出"}
-Hello, World!
-```
-
-看到 `Hello, World!`，说明 `CMake` 配置、`Ninja` 构建和程序运行都已完成。
-
-### 使用一键脚本
-
-`build-and-run.sh` 把刚才的配置、构建和运行命令串在一起。
+工程中的 `build-and-run.sh` 把创建构建目录、编译和运行放在一起。脚本内容如下：
 
 ```{.bash filename="build-and-run.sh"}
 {{< include /code/getting-started/first-program/build-and-run.sh >}}
 ```
 
-在工程根目录执行下面的命令。
+执行下面的命令即可重新编译并运行：
 
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-# 一键完成配置、构建并运行
+```{.bash filename="Ubuntu Bash"}
 bash build-and-run.sh
 ```
 
-脚本会依次完成配置、构建和运行。最后看到 `Hello, World!`，说明流程正常结束。
+脚本与前面的手工命令等价，适合反复检查程序。理解每条命令后，再按需单独执行更方便排查问题。
 
-## 选择构建方式
+## 修改后再运行
 
-两条路径跑通后，可以按工程规模选择：
+把源码中的 `Hello, World!` 改成其他文字，再执行一次下面的命令。
 
-- 单个源文件：用 `clang++` 直接编译，命令最短，适合第一次验证。
-- 多文件或多目标工程：用 `CMake` 管理构建规则，让 `Ninja` 执行编译和链接。
+```{.bash filename="Ubuntu Bash"}
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+./build/first-program
+```
 
-后续示例默认使用 `CMake`。`build-and-run.sh` 只是把前面的配置、构建和运行命令放在一起。
+终端显示修改后的文字，说明源文件到可执行文件的完整过程已经跑通。源码改变后必须重新编译，旧文件不会自动更新。
 
 ## 常见错误
 
-### 缺少构建工具
+### 找不到 clang++
 
-在工程根目录运行命令时提示找不到 `clang++`、`cmake` 或 `ninja`。
+运行编译命令时提示 `command not found: clang++`，说明 Ubuntu 当前找不到编译器。按下面的顺序恢复工具链。
 
-1. **定位缺失工具**
+1. **定位错误来源**
 
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   # 检查编译器、CMake 和 Ninja 是否可用
-   command -v clang++ cmake ninja
+   执行下面的命令，检查 `clang++` 是否已经安装。
+
+   ```{.bash filename="Ubuntu Bash"}
+   command -v clang++
    ```
 
-   `command -v` 为每个已安装的工具打印路径，缺失的名字不打印任何内容。
+   命令没有输出时，说明工具确实缺失。
 
 2. **安装缺失工具**
 
-   执行 `sudo apt update`，再按[安装 C++ 工具链](setup-wsl2.qmd#安装-c-工具链)重新安装整套工具。
+   回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，重新执行 C++ 工具链安装命令。
 
-3. **验证安装**
+3. **验证安装结果**
 
-   再次执行定位命令，确认 `clang++`、`cmake` 和 `ninja` 都输出路径。
+   再次执行 `command -v clang++`。输出路径后，回到[编译并运行](#编译并运行)继续操作。
 
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   # 重新检查编译器、CMake 和 Ninja
-   command -v clang++ cmake ninja
+### 编译失败
+
+执行 `clang++` 时出现 `error:`，说明编译器已经启动，但源码没有通过检查。按下面的顺序修复源码，再回到主线编译。
+
+1. **定位第一条错误**
+
+   先看第一处 `error:`。终端通常会给出文件名、行号和出错内容。
+
+2. **修改对应源码**
+
+   打开报错指出的文件和行号，修正对应语句。
+
+3. **重新编译并运行**
+
+   ```{.bash filename="Ubuntu Bash"}
+   clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+   ./build/first-program
    ```
+
+   程序输出修改后的文字，说明源码已经重新编译并运行。
 
 ## 本章回顾
 
-本章用同一个 `Hello, World!` 走通了直接编译和 `CMake` 构建两条路径。可以思考以下问题：
-
-1. `main.cpp` 从源码到终端输出，中间经过哪些步骤？
-
-   ::: {.answer}
-   从 `main.cpp` 的源码到终端显示输出，整个过程依次经过以下四个步骤：
-
-   1. 在终端执行 `clang++` 命令，启动编译器。
-   2. `clang++` 编译并链接 `main.cpp`，生成 `build/bin/app`。
-   3. 在终端运行 `build/bin/app`，操作系统加载并执行这个文件。
-   4. 程序把 `Hello, World!` 写入标准输出，终端显示这行文本。
-   :::
-
-2. 单个源文件为什么可以直接使用 `clang++`，代码变多后为什么要使用 `CMake`？
-
-   ::: {.answer}
-  单文件程序直接使用 `clang++` 时，命令最短，适合快速验证。源文件和构建目标增多后，手写命令难以维护。此时，`CMake` 负责描述构建规则，`Ninja` 负责执行规则并支持增量构建。
-   :::
-
-下一章会在此基础上介绍多文件和多目标工程的构建方式。
+你已经能创建源文件，并用 `clang++` 完成编译、链接和运行。修改源码后必须重新编译。下一章会用 [CMake](cmake-project.qmd) 描述构建规则，让构建步骤可以重复执行。

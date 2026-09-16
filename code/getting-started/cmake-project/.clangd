@@ -2,6 +2,7 @@
 # 构建后，clangd 会从 build/compile_commands.json 读取真实编译参数；
 # 尚未构建时使用下面的兜底参数，保证编辑体验可用。
 CompileFlags:
+  CompilationDatabase: build
   Add:
     - -std=c++20
     - -stdlib=libc++

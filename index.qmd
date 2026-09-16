@@ -1,6 +1,6 @@
 ---
 title: "C++ 笔记"
-description: "面向初学者的中文 C++ 笔记：从可运行的程序出发，逐步连接语言基础、标准库和工程实践。"
+description: "从可运行的程序开始，逐步学习 C++ 语言、工具链和工程构建。"
 number-sections: false
 body-classes: homepage
 ---
@@ -15,8 +15,8 @@ body-classes: homepage
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [配置环境](content/getting-started/index.qmd)
-安装 WSL2、Ubuntu 和 C++ 工具链，然后写出并运行第一个 C++ 程序。
+### [入门与构建](content/getting-started/index.qmd)
+从环境准备开始，依次完成直接编译、CMake 构建、多文件工程和库链接。
 
 [查看内容 →](content/getting-started/index.qmd){.cta}
 :::

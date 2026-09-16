@@ -2,13 +2,15 @@
 title: "搭建 WSL2 开发环境"
 ---
 
-后续命令要在 Linux 中执行，Windows 不能直接运行它们。WSL2 让 Windows 可以使用 Linux 环境，Ubuntu 是这个环境里使用的 Linux 系统。本章安装 Ubuntu，并准备编译、运行和调试 C++ 程序所需的工具。
+这份笔记统一使用 Ubuntu 作为 Linux 环境。完成本章后，后续命令都在 Ubuntu 中执行。WSL2 让 Windows 可以运行 Linux 环境，本章只完成一件事：准备可以编译、运行和调试 C++ 程序的环境。
 
 ## 准备 Linux 开发环境
 
 ### 安装 WSL2 和 Ubuntu
 
-以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu。Linux 有多个发行版，发行版可以理解为包含系统和常用工具的完整版本。
+Linux 有多个发行版，这份笔记统一使用 Ubuntu。发行版可以理解为围绕 Linux 内核组合系统工具、软件包和管理方式的一套完整环境。
+
+以管理员身份打开 Windows PowerShell，执行下面的命令，安装 WSL2 和默认的 Ubuntu 发行版。
 
 ```{.powershell filename="PowerShell（管理员）"}
 # 安装 WSL2 和默认的 Ubuntu 发行版
@@ -27,27 +29,9 @@ wsl --install
 - `~` 是当前用户的主目录。
 :::
 
-### 安装其他发行版
-
-本节只用于安装 Ubuntu 之外的 Linux 系统。继续使用默认 Ubuntu 时，可以跳过本节。
-
-要安装其他发行版时，先执行下面的命令查看 WSL 当前提供的名称。
-
-```{.powershell filename="PowerShell"}
-# 查看可安装的发行版名称
-wsl --list --online
-```
-
-从输出中复制目标发行版的名称，原样替换安装命令中的 `<发行版名称>`，再执行下面的命令。
-
-```{.powershell filename="PowerShell"}
-# 安装指定发行版
-wsl --install -d <发行版名称>
-```
-
 ### 安装 C++ 工具链
 
-进入 Ubuntu 终端后，执行下面的命令。软件源是 Ubuntu 下载软件的位置，先更新软件包列表，再安装 C++ 工具链。工具链是编译器、构建工具、调试器和语言服务的统称。
+进入 Ubuntu 终端后执行下面的命令。先更新软件包列表，再安装编译器、构建工具、调试器和语言服务。
 
 ```{.bash filename="Ubuntu Bash"}
 # 更新软件包索引
@@ -97,7 +81,15 @@ sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-
 
 2. **安装缺失工具**
 
-   缺少工具时，先执行 `sudo apt update`，再按[安装 C++ 工具链](#安装-c-工具链) 补齐对应软件包。
+   执行下面的命令，刷新软件包索引并安装完整的 C++ 工具链：
+
+   ```{.bash filename="Ubuntu Bash"}
+   # 刷新软件包索引
+   sudo apt update
+
+   # 安装 C++ 编译、构建、调试和语言服务工具
+   sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build
+   ```
 
 3. **验证安装**
 
@@ -108,26 +100,6 @@ sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-
    command -v clang++ clangd lldb cmake ninja
    ```
 
-### 软件源更新失败
-
-执行 `sudo apt update` 时出现下载失败或软件源不可用等错误。按下面的顺序找到失败来源，改用可用软件源，再重新验证。
-
-1. **定位失败来源**
-
-   确认命令在 Ubuntu 终端中执行，并记录错误输出中的软件源地址和 Ubuntu 版本。
-
-2. **配置可用软件源**
-
-   按[清华大学 Ubuntu 镜像使用帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)为当前 Ubuntu 版本配置软件源。
-
-3. **验证更新结果**
-
-   ```{.bash filename="Ubuntu Bash"}
-   sudo apt update
-   ```
-
-   命令正常结束且不再出现软件源错误，说明软件源已经恢复。回到[安装 C++ 工具链](#安装-c-工具链) 继续操作。
-
 ## 本章回顾
 
-本章已经准备好 Ubuntu 和 C++ 工具链。下一章从 `Hello, World!` 示例开始，先阅读源码，再用 `clang++` 直接编译，最后用 `CMake` 和 `Ninja` 完成构建。
+在 Ubuntu 终端执行 `command -v clang++`。如果输出路径，说明编译、构建和调试工具已经准备好。下一章会创建第一个源文件，并直接编译运行它。

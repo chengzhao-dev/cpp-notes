@@ -1,0 +1,150 @@
+---
+title: "构建多文件 C++ 工程"
+---
+
+上一章用 `CMake` 构建了单入口工程，但所有代码仍集中在一个 `main.cpp` 中。程序变大后，接口、实现和入口混在一起会越来越难阅读。本章会把同一个 `Hello, World!` 程序拆成头文件和多个源文件，再让 `CMake` 把它们构建成一个可执行程序。
+
+先打开完整示例工程 [multi-file-project](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/multi-file-project)，并进入工程根目录。
+
+## 认识多文件工程
+
+### 查看工程结构
+
+下面的目录展示了本章用到的文件，所有命令都在工程根目录执行。
+
+```{.text filename="工程目录"}
+multi-file-project/
+├── CMakeLists.txt    # 构建规则
+├── build-and-run.sh  # 一键构建并运行
+├── include/
+│   └── greeting.h    # 接口声明
+└── src/
+    ├── greeting.cpp  # 接口实现
+    └── main.cpp      # 程序入口
+```
+
+`include/` 存放其他源码需要包含的头文件，`src/` 存放实现和程序入口。下面依次阅读三个源码文件，观察它们如何组成同一个程序。
+
+### 阅读源码文件
+
+`greeting.h` 声明 `makeGreeting()` 返回 `std::string`，但暂时不提供函数体。
+
+```{.cpp filename="include/greeting.h"}
+{{< include /code/getting-started/multi-file-project/include/greeting.h >}}
+```
+
+`#pragma once` 让同一份源码只处理这个头文件一次。`main.cpp` 包含它以后，就知道 `makeGreeting()` 的名称、参数和返回类型。
+
+`greeting.cpp` 包含自己的头文件，并定义 `makeGreeting()` 的行为。
+
+```{.cpp filename="src/greeting.cpp"}
+{{< include /code/getting-started/multi-file-project/src/greeting.cpp >}}
+```
+
+实现文件先包含 `greeting.h`，编译器才能核对声明与定义是否一致。函数返回字符串 `Hello, World!`，但还没有把结果写到终端。
+
+`main.cpp` 包含 `greeting.h`，调用其中声明的函数，再把结果输出到标准输出。
+
+```{.cpp filename="src/main.cpp"}
+{{< include /code/getting-started/multi-file-project/src/main.cpp >}}
+```
+
+编译 `main.cpp` 时，编译器只需要看到 `makeGreeting()` 的声明。链接阶段再找到 `greeting.cpp` 中的定义，组成完整的 `app` 程序。
+
+## 编写构建规则
+
+多个源文件需要分别编译，再链接成一个可执行程序。下面的 `CMakeLists.txt` 自动收集 `src/` 下的源文件，并把 `include/` 加入 `app` 的头文件搜索路径。
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/multi-file-project/CMakeLists.txt >}}
+```
+
+`project(MultiFileProject LANGUAGES CXX)` 设置 `CMake` 工程名，目录名仍使用 kebab-case。`file(GLOB APP_SOURCES CONFIGURE_DEPENDS "src/*.cpp")` 收集 `src/` 下的直属源文件，再交给 `add_executable(app ${APP_SOURCES})`。以后新增同目录下的 `.cpp` 文件时，Ninja 会在构建前重新配置并把文件纳入 `app`。
+
+`target_include_directories(app PRIVATE include)` 让 `app` 的源码可以从 `include/` 查找 `greeting.h`。`PRIVATE` 表示这条包含路径只服务 `app`，不会影响其他构建目标。这次仍只有一个可执行目标，库目标之间的依赖会在后续工程章节中展开。
+
+## 构建并运行程序
+
+### 配置并构建
+
+修改 `CMakeLists.txt` 后，先重新配置工程以生成新的构建规则。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置 CMake 工程
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+```
+
+配置成功后，执行下面的命令，让 `CMake` 构建全部源文件。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 编译并链接 app
+cmake --build build
+```
+
+### 运行并验证
+
+构建完成后，运行下面的命令。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+./build/bin/app
+```
+
+程序输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+看到相同输出，说明两个源文件已经编译并链接成一个程序。工程中的 `build-and-run.sh` 仍按相同顺序完成配置、构建和运行，需要时可以执行 `bash build-and-run.sh`。
+
+## 常见错误
+
+### 找不到 greeting.h
+
+构建 `src/main.cpp` 时提示 `fatal error: 'greeting.h' file not found`，说明编译器没有找到接口声明。按下面的顺序恢复包含路径。
+
+1. **确认包含路径**
+
+   检查 `CMakeLists.txt` 中是否存在 `target_include_directories(app PRIVATE include)`。
+
+2. **补充目标属性**
+
+   缺少时，在 `add_executable()` 后加入该行。`PRIVATE` 表示这个包含路径只服务 `app` 自身。
+
+3. **重新配置并构建**
+
+   构建规则已经变化，需要重新配置后再编译。
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 应用新的包含路径
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+   cmake --build build
+   ```
+
+   编译器不再报告找不到 `greeting.h`，说明包含路径已经生效。
+
+### 链接器找不到函数定义
+
+构建过程提示 `undefined reference to makeGreeting()`，说明编译器看到了声明，但没有找到函数定义。按下面的顺序检查实现文件。
+
+1. **确认实现位置**
+
+   检查 `greeting.cpp` 是否位于工程根目录的 `src/` 下，并定义 `makeGreeting()`。
+
+2. **恢复实现文件**
+
+   文件缺失或位置不对时，把实现文件放到 `src/` 下。当前 `CMake` 规则会自动收集该目录中的 `.cpp`，无需手改源文件列表。
+
+   ```{.text filename="工程目录"}
+   src/
+   ├── greeting.cpp
+   └── main.cpp
+   ```
+
+3. **重新配置并运行**
+
+   重新执行 `cmake -S . -B build ...` 和 `cmake --build build`，再运行 `./build/bin/app`。程序输出 `Hello, World!`，说明声明和定义已经链接到一起。
+
+## 本章回顾
+
+你已经能把接口、实现和程序入口拆到不同文件中，并让 `CMake` 同时编译和链接它们。多文件工程改变的是代码组织方式，构建和运行命令仍保持一致。下一章会把可复用的实现构建成静态库，并观察链接阶段如何处理 `.a` 文件。

@@ -1,0 +1,113 @@
+---
+title: "构建动态库"
+---
+
+上一章把 `greeting` 构建成了静态库，库代码会进入最终程序。动态库使用另一种链接方式，程序运行时仍要从外部查找库文件。本章使用 [shared-library](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/shared-library) 工程，继续使用相同的 `Hello, World!` 程序，只改变库的构建方式。
+
+## 认识动态库工程
+
+动态库在 Linux 上通常使用 `.so` 扩展名，文件类型是 Linux 共享库。链接 `app` 时，链接器主要记录程序对动态库的依赖，而不是把库代码复制进可执行文件。
+
+### 对比静态库工程
+
+动态库工程与静态库工程使用相同的目录结构和源码职责。`greeting/` 保存库的接口、实现和构建规则，根目录的 `main.cpp` 使用该库。`greeting.h`、`greeting.cpp` 和 `main.cpp` 都没有变化，只有库类型、输出目录和运行时查找方式不同。
+
+| 内容 | 静态库工程 | 动态库工程 |
+| --- | --- | --- |
+| 库文件 | `build/lib/libgreeting.a` | `build/lib/libgreeting.so` |
+| 链接结果 | 把需要的库代码合并进 `app` | 在 `app` 中记录对 `.so` 的依赖 |
+| 运行条件 | 不再需要 `.a` | 必须能找到匹配的 `.so` |
+
+### 查看构建规则
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/shared-library/CMakeLists.txt >}}
+```
+
+顶层文件用 `add_subdirectory(greeting)` 加载库目录，再创建 `app` 并记录对 `greeting` 的依赖。库自己的构建规则如下：
+
+```{.cmake filename="greeting/CMakeLists.txt"}
+{{< include /code/getting-started/shared-library/greeting/CMakeLists.txt >}}
+```
+
+`add_library(greeting SHARED ${LIBRARY_SOURCES})` 创建动态库目标，生成 `build/lib/libgreeting.so`。`target_link_libraries(app PRIVATE greeting)` 仍描述链接关系，但链接器记录的是对动态库的依赖。
+
+`BUILD_RPATH "$ORIGIN/../lib"` 会把库的查找位置写进 `app`。`$ORIGIN` 表示 `app` 所在目录，因此程序可以从 `build/bin/` 找到旁边的 `build/lib/`。没有它，程序可能构建成功，却无法在运行时找到 `libgreeting.so`。
+
+## 构建并运行动态库程序
+
+### 配置并构建
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置 CMake 工程并选择 clang++ 与 Ninja
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+
+# 构建 greeting 动态库和 app
+cmake --build build
+```
+
+构建完成后，`build/lib/libgreeting.so` 是可由多个程序在运行时加载的库文件，`build/bin/app` 保存了对它的依赖。
+
+### 运行程序
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+./build/bin/app
+```
+
+程序输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+`app` 已经正常运行，但 `libgreeting.so` 仍位于 `build/lib/`。如果运行前移走这个文件，程序将无法启动。这正是动态库与静态库的关键差异。
+
+### 检查运行依赖
+
+```{.bash filename="Ubuntu Bash（shared-library 工程根目录）"}
+# 查看 app 对 greeting 动态库的查找结果
+ldd build/bin/app | grep libgreeting
+```
+
+`ldd` 输出中会出现 `libgreeting.so =>`，后面的路径会经过 `build/bin/../lib/libgreeting.so`。
+
+## 理解动态库的查找路径
+
+`RPATH` 是程序内部记录库查找位置的一种方式。这里的路径相对于 `app`，不依赖启动程序时的当前工作目录。
+
+如果删除 `BUILD_RPATH`，动态库仍会参与构建，但 `app` 可能找不到它。此时需要重新构建，并再次用 `ldd` 检查运行依赖。
+
+## 选择动态库
+
+动态库适合多个程序共享同一份实现，或在接口兼容的前提下独立更新库。代价是运行时必须能找到匹配的 `.so`，部署时要同时管理程序文件和库文件。
+
+实际项目可以同时使用静态库和动态库。本章把两者拆成独立工程，是为了每次只观察一种链接关系，而不是限制生产工程的结构。
+
+## 常见错误
+
+### 动态库在运行时找不到
+
+运行动态库工程的 `app` 时提示 `error while loading shared libraries: libgreeting.so`，说明系统加载程序时没有找到动态库。按下面的顺序检查库文件和查找路径。
+
+1. **确认库文件**
+
+   检查 `build/lib/libgreeting.so` 是否存在。库没有生成时，先确认 `greeting/CMakeLists.txt` 中的 `add_library()` 使用的是 `SHARED`。
+
+2. **检查运行路径**
+
+   检查 `app` 是否设置 `BUILD_RPATH "$ORIGIN/../lib"`。缺少时，在创建 `app` 后补上该属性。
+
+3. **重新构建并验证**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 重新构建并检查 libgreeting 的运行依赖
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+   cmake --build build
+   ldd build/bin/app | grep libgreeting
+   ```
+
+   `ldd` 输出中再次出现 `libgreeting.so =>`，随后运行 `./build/bin/app` 能输出 `Hello, World!`。
+
+## 本章回顾
+
+你已经能构建动态库，并让 `app` 在运行时通过 `RPATH` 找到对应的 `.so`。到这里，六步入门路线已经完成。后续内容会进入 C++ 语言基础，并继续复用这些构建方式。

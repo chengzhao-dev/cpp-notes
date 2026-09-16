@@ -1,34 +1,40 @@
 ---
-title: "配置环境"
-description: "配置 WSL2 上的 Ubuntu 与 C++ 工具链，然后编译、运行和管理第一个程序。"
+title: "入门与构建"
+description: "从环境准备开始，依次完成直接编译、工程构建和库链接。"
 number-sections: false
 body-classes: index-page
 ---
 
-::: {.hero-eyebrow}
-环境与第一个程序
-:::
-
-## 本部分内容
-
-本部分共有两页。先配置 C++ 开发环境，再写出并运行第一个 C++ 程序。
+按顺序阅读即可。每页只完成一个目标，并为下一页准备好可继续使用的环境或工程文件。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [准备 WSL2 和 Ubuntu](setup-wsl2.qmd)
-安装 WSL2 和 Ubuntu，再准备编译、运行和调试 C++ 程序所需的工具。
-
-[查看页面 →](setup-wsl2.qmd){.cta}
+### [搭建 WSL2 开发环境](setup-wsl2.qmd)
+在 Ubuntu 中准备好 C++ 工具链。
 :::
 
 ::: {.landing-card}
 ### [写出第一个 C++ 程序](first-program.qmd)
-先直接使用 `clang++` 编译，再让 `CMake` 生成构建规则，并由 `Ninja` 执行这些规则。
-
-[查看页面 →](first-program.qmd){.cta}
-:::
+把一个源文件编译成可执行程序。
 :::
 
-## 完成后
+::: {.landing-card}
+### [用 CMake 构建程序](cmake-project.qmd)
+用构建规则重复生成可执行程序。
+:::
 
-读完本部分后，你已经可以编译和运行第一个程序。后续内容正在编写。
+::: {.landing-card}
+### [构建多文件工程](multi-file-project.qmd)
+把接口、实现和程序入口拆到不同文件中。
+:::
+
+::: {.landing-card}
+### [构建静态库](static-library.qmd)
+把可复用代码链接进最终程序。
+:::
+
+::: {.landing-card}
+### [构建动态库](shared-library.qmd)
+让程序在运行时查找对应的库文件。
+:::
+:::

@@ -1,0 +1,133 @@
+---
+title: "构建静态库"
+---
+
+上一章把多个源文件链接成了一个 `app`。当同一份实现要被多个程序复用时，继续把源码放进每个程序会重复编译。本章使用 [static-library](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/static-library) 工程，把 `greeting` 构建成静态库，再链接进 `app`。
+
+## 认识静态库工程
+
+静态库在 Linux 上通常使用 `.a` 扩展名。它把编译后的库代码集中保存起来，本身不能被操作系统直接运行。链接 `app` 时，链接器会取出程序实际使用的库代码，并合并进最终可执行文件。
+
+### 查看工程结构
+
+下面的目录把库接口、库实现和程序入口分开。所有命令都在该工程根目录执行。
+
+```{.text filename="工程目录"}
+static-library/
+├── CMakeLists.txt
+├── main.cpp
+└── greeting/
+    ├── CMakeLists.txt
+    ├── include/
+    │   └── greeting.h
+    └── src/
+        └── greeting.cpp
+```
+
+`greeting/` 把库的公开接口、实现和构建规则放在一起，根目录的 `main.cpp` 使用该库。这里只有一个库和一个 `app` 目标，便于观察静态链接的完整过程。
+
+### 阅读库代码
+
+`greeting.h` 声明库对外提供的 `makeGreeting()`，`greeting.cpp` 提供函数定义。
+
+```{.cpp filename="greeting/include/greeting.h"}
+{{< include /code/getting-started/static-library/greeting/include/greeting.h >}}
+```
+
+```{.cpp filename="greeting/src/greeting.cpp"}
+{{< include /code/getting-started/static-library/greeting/src/greeting.cpp >}}
+```
+
+`main.cpp` 包含 `greeting.h`，调用 `makeGreeting()`，再把结果输出到标准输出。
+
+```{.cpp filename="main.cpp"}
+{{< include /code/getting-started/static-library/main.cpp >}}
+```
+
+## 构建并运行静态库程序
+
+### 查看构建规则
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/static-library/CMakeLists.txt >}}
+```
+
+顶层文件先用 `add_subdirectory(greeting)` 加载库目录，再创建 `app` 并链接 `greeting` 目标。库自己的构建规则如下：
+
+```{.cmake filename="greeting/CMakeLists.txt"}
+{{< include /code/getting-started/static-library/greeting/CMakeLists.txt >}}
+```
+
+`add_library(greeting STATIC ${LIBRARY_SOURCES})` 创建静态库目标。`target_include_directories(greeting PUBLIC include)` 把库目录下的 `include/` 作为公开接口目录，因此链接该库的 `app` 也能找到 `greeting.h`。`target_link_libraries(app PRIVATE greeting)` 让链接器从 `.a` 中取出程序实际使用的库代码，并合并进最终程序。
+
+### 配置并构建
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置 CMake 工程并选择 clang++ 与 Ninja
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+
+# 构建 greeting 静态库和 app
+cmake --build build
+```
+
+构建完成后，`build/lib/libgreeting.a` 保存编译后的库代码，`build/bin/app` 是最终的应用程序。
+
+### 运行程序
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+./build/bin/app
+```
+
+程序输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+输出 `Hello, World!` 说明静态库已经参与链接，程序可以正常运行。
+
+## 检查静态库产物
+
+用 `ldd` 查看程序运行时需要哪些库。
+
+```{.bash filename="Ubuntu Bash（static-library 工程根目录）"}
+# 查看 app 的运行依赖
+ldd build/bin/app
+```
+
+输出中不会出现 `libgreeting.a`。静态库只在链接时参与构建，需要的库代码已经被放进 `app`，运行时不再读取 `.a` 文件。
+
+## 选择静态库
+
+静态库适合希望减少运行时库文件的程序。库代码已经进入每个使用它的 `app`，交付时可以少带一个库文件。代价是库发生变化后，所有使用它的程序都需要重新链接。
+
+动态库会在下一章单独构建，便于继续比较两种库在链接和运行阶段的不同依赖。
+
+## 常见错误
+
+### 链接器缺少函数定义
+
+构建 `app` 时提示 `undefined reference to makeGreeting()`，说明链接器没有收到 `greeting` 库目标。按下面的顺序恢复链接关系。
+
+1. **确认链接关系**
+
+   检查顶层 `CMakeLists.txt` 中是否存在 `target_link_libraries(app PRIVATE greeting)`。
+
+2. **补回链接关系**
+
+   缺少时，在创建 `app` 后加入该命令。它让 `app` 在链接阶段使用 `greeting` 静态库。
+
+3. **重新构建并验证**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   # 应用新的链接关系并运行程序
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+   cmake --build build
+   ./build/bin/app
+   ```
+
+   程序输出 `Hello, World!`，说明库已经正确链接。
+
+## 本章回顾
+
+你已经能把可复用实现构建成静态库，并把它链接进 `app`。静态库代码会进入最终程序，运行时不再读取对应的 `.a` 文件。下一章会构建动态库，并观察程序运行时如何查找 `.so` 文件。
