@@ -25,20 +25,19 @@ ROOT = Path(__file__).resolve().parents[5]
 TASKS = ROOT / ".agents" / "skills" / "cpp-content" / "references" / "tasks"
 SKILL_REFS = ".agents/skills/"
 
-# 所有 part 共用的写作规范必读（专项 ref 之外的最小公共集）
-EXTRA_COMMON = {
-    "getting-started": [SKILL_REFS + "quarto-docs/references/zh/cpp-chapter-writing.md"],
-}
-
 COMMON_BASE = [
     SKILL_REFS + "quarto-docs/references/quarto/authoring.md",
-    SKILL_REFS + "quarto-docs/references/zh/writing-style-core.md",
+    SKILL_REFS + "quarto-docs/references/zh/chapter-writing.md",
 ]
 PREFIX = {
-    "getting-started": "ENV", "core": "CORE", "stl": "STL", "memory": "MEM",
-    "performance": "PERF", "debugging": "DBG", "toolchain": "TOOL", "cheatsheet": "CS",
+    "getting-started": "ENV", "language-basics": "LANG", "standard-library": "STD",
+    "memory": "MEM", "performance": "PERF", "debugging": "DBG", "toolchain": "TOOL",
+    "reference": "REF",
 }
-ORDER = ["getting-started", "core", "stl", "memory", "performance", "debugging", "toolchain", "cheatsheet"]
+ORDER = [
+    "getting-started", "language-basics", "standard-library", "memory", "performance",
+    "debugging", "toolchain", "reference",
+]
 
 
 def cpp(name):
@@ -56,22 +55,29 @@ CHAPTERS = [
     ("getting-started", "install-toolchain", "merged", "TASK-ENV-001", None, None,
      "已并入 ENV-001 的「安装 C++ 构建工具链」一节，勿再新建同名 qmd"),
     ("getting-started", "first-program", "done", "TASK-ENV-001", "cpp.md",
-     "code/getting-started/first-program/", "先直接编译，再最小 CMakeLists。多文件与目标留给 cmake-intro"),
-    ("getting-started", "cmake-intro", "todo", "TASK-ENV-003", "engineering.md", None, "—"),
-    ("core", "intro", "todo", "TASK-ENV-003", "cpp.md", None, "—"),
-    ("core", "variables", "todo", "TASK-CORE-001", "cpp.md", None, "—"),
-    ("core", "operators", "todo", "TASK-CORE-002", "cpp.md", None, "—"),
-    ("core", "control-flow", "todo", "TASK-CORE-003", "cpp.md", None, "—"),
-    ("core", "functions", "todo", "TASK-CORE-004", "cpp.md", None, "—"),
-    ("core", "arrays-strings", "todo", "TASK-CORE-005", "cpp.md", None, "—"),
-    ("core", "structs-classes", "todo", "TASK-CORE-006", "cpp.md", None, "—"),
-    ("core", "references", "todo", "TASK-CORE-007", "cpp.md", None, "—"),
-    ("stl", "intro-stl", "todo", "TASK-CORE-005", "stl.md", None, "—"),
-    ("stl", "vector", "todo", "TASK-STL-001", "stl.md", None, "—"),
-    ("stl", "map-set", "todo", "TASK-STL-002", "stl.md", None, "—"),
-    ("stl", "iterators", "todo", "TASK-STL-002", "stl.md", None, "—"),
-    ("stl", "algorithms", "todo", "TASK-STL-004", "stl.md", None, "—"),
-    ("memory", "stack-heap", "todo", "TASK-CORE-007", "modern-cpp.md", None, "—"),
+     "code/getting-started/first-program/", "目录含源码和一键脚本。脚本只使用 clang++ 直接编译单文件，不引入工程构建"),
+    ("getting-started", "cmake-project", "done", "TASK-ENV-003", "cmake-teaching.md",
+     "code/getting-started/cmake-project/", "用 CMake 配置并构建单入口工程"),
+    ("getting-started", "multi-file-project", "done", "TASK-ENV-004", "engineering.md",
+     "code/getting-started/multi-file-project/", "单个 app 目标。使用 include/ 与 src/ 组织多文件工程"),
+    ("getting-started", "static-library", "done", "TASK-ENV-005", "engineering.md",
+     "code/getting-started/static-library/", "greeting/ 拥有静态库目标，根 main.cpp 构建消费它的 app"),
+    ("getting-started", "shared-library", "done", "TASK-ENV-006", "engineering.md",
+     "code/getting-started/shared-library/", "greeting/ 拥有动态库目标，根 main.cpp 构建消费它的 app"),
+    ("language-basics", "overview", "todo", "TASK-ENV-004", "cpp.md", None, "—"),
+    ("language-basics", "variables", "todo", "TASK-LANG-001", "cpp.md", None, "—"),
+    ("language-basics", "operators", "todo", "TASK-LANG-002", "cpp.md", None, "—"),
+    ("language-basics", "control-flow", "todo", "TASK-LANG-003", "cpp.md", None, "—"),
+    ("language-basics", "functions", "todo", "TASK-LANG-004", "cpp.md", None, "—"),
+    ("language-basics", "arrays-strings", "todo", "TASK-LANG-005", "cpp.md", None, "—"),
+    ("language-basics", "structs-classes", "todo", "TASK-LANG-006", "cpp.md", None, "—"),
+    ("language-basics", "references", "todo", "TASK-LANG-007", "cpp.md", None, "—"),
+    ("standard-library", "overview", "todo", "TASK-LANG-005", "stl.md", None, "—"),
+    ("standard-library", "vector", "todo", "TASK-STD-001", "stl.md", None, "—"),
+    ("standard-library", "map-set", "todo", "TASK-STD-002", "stl.md", None, "—"),
+    ("standard-library", "iterators", "todo", "TASK-STD-002", "stl.md", None, "—"),
+    ("standard-library", "algorithms", "todo", "TASK-STD-004", "stl.md", None, "—"),
+    ("memory", "stack-heap", "todo", "TASK-LANG-007", "modern-cpp.md", None, "—"),
     ("memory", "raii", "todo", "TASK-MEM-001", "modern-cpp.md", None, "—"),
     ("memory", "smart-pointers", "todo", "TASK-MEM-002", "modern-cpp.md", None, "—"),
     ("memory", "move-semantics", "todo", "TASK-MEM-003", "modern-cpp.md", None, "—"),
@@ -84,8 +90,8 @@ CHAPTERS = [
     ("toolchain", "cmake-targets", "todo", "TASK-ENV-004", "engineering.md", None, "—"),
     ("toolchain", "clang-tools", "todo", "TASK-TOOL-001", "code-style.md", None, "—"),
     ("toolchain", "project-layout", "todo", "TASK-TOOL-001", "engineering.md", None, "—"),
-    ("cheatsheet", "syntax-ref", "todo", "TASK-CORE-008", "cpp.md", None, "—"),
-    ("cheatsheet", "stl-ref", "todo", "TASK-STL-005", "stl.md", None, "—"),
+    ("reference", "syntax", "todo", "TASK-LANG-008", "cpp.md", None, "—"),
+    ("reference", "standard-library", "todo", "TASK-STD-005", "stl.md", None, "—"),
 ]
 
 
@@ -96,9 +102,18 @@ def task_id(part, chapter):
     return f"TASK-{PREFIX[part]}-{index:03d}"
 
 
+def render_code_cell(code):
+    """渲染一个或多个示例路径；多个路径用分号分隔。"""
+    if code is None:
+        return None
+    if code.startswith("—"):
+        return code
+    return "、".join(f"`{path.strip()}`" for path in code.split(";") if path.strip())
+
+
 def render(part, rows):
     """渲染一个 part 的矩阵文本。rows 已按 ID 升序。"""
-    reqs = [COMMON_BASE + EXTRA_COMMON.get(part_, []) + ([cpp(spec)] if spec and not _is_merged(status) else [])
+    reqs = [COMMON_BASE + ([cpp(spec)] if spec and not _is_merged(status) else [])
             for part_, chapter, status, dep, spec, code, note in rows]
     commons = sorted(set.intersection(*[set(r) for r in reqs]))
     lines = [
@@ -110,9 +125,11 @@ def render(part, rows):
         "- **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）",
         "- **禁止**: `.agents/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、"
         "示例目录下的 `build/`（CMake 产物）", "",
-        "示例默认单文件 `code/<part>/<chapter>.cpp`，需要构建工程时改用同名子目录，产物落其 `build/`。", "",
+        "示例默认单文件 `code/<part>/<chapter>.cpp`，需要构建工程时优先使用同名子目录。"
+        "单入口工程的 `main.cpp` 放工程根；消费端增长为多文件后再建带 `CMakeLists.txt` 的 `app/`。"
+        "一章需要多个独立工程时，在「示例」列登记全部路径，产物分别落各工程的 `build/`。", "",
         "## 统一验收（每章完成时逐项确认）", "",
-        "- [ ] 正文符合体量预算，`run.py check` 与 `run.py render` 通过",
+        "- [ ] 正文符合体量预算，`run.py check --profile fast` 与 `run.py render` 通过",
         "- [ ] 示例经 `run.py verify --changed` 编译通过，正文承诺的输出与实测一致",
         "- [ ] 本文件「状态」列已更新为 `done`", "",
         "## 任务矩阵", "",
@@ -127,7 +144,7 @@ def render(part, rows):
         else:
             body = f"`content/{part_}/{chapter}.qmd`"
             example = (f"`code/{part_}/{chapter}.cpp`" if code is None
-                       else code if code.startswith("—") else f"`{code}`")
+                       else render_code_cell(code))
             spec_cell = "、".join(f"`{p}`" for p in extra) or "—"
         lines.append("| `{}` | {} | {} | {} | {} | {} | {} | {} |".format(
             tid, chapter, status, f"`{dep}`" if dep else "—", body, example, spec_cell, note))

@@ -23,7 +23,12 @@
 | learncpp.com | 章节拆分粒度、渐进式披露 |
 | zh.cppreference.com | 译名、标准措辞、复杂度（`## 深入` 引标准时以此为准） |
 | CMake 官方文档 | 构建章节的 command/variable 语义与注释措辞 |
-| Google C++ Style Guide | 命名与排版。**例外：本仓库启用异常**，不用「不使用异常」条款 |
+| Google C++ Style Guide | include 顺序、排版与常量命名 |
+| Qt、WebKit Coding Style | 函数、变量、参数和成员使用小驼峰的依据 |
+
+本项目以 Google 的 include 顺序和 `clang-format` 为排版基底，把函数、变量、参数和成员调整为
+小驼峰，并保留 Google 的 `kPascalCase` 常量。**例外：本仓库启用异常**，不采用 Google
+的异常限制。完整取舍见标识 `cpp-naming-format-v1`。
 
 这些来源用于不同层次：Primer 和 LearnCpp 参考教学顺序，Stroustrup 参考语言整体观，Effective C++ 参考可执行规则，cppreference 负责标准精度，它们不是逐段翻译的材料。
 
@@ -35,7 +40,7 @@ Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/r
 
 | 主题 | 参考 |
 |---|---|
-| 变量、类型、函数、类、术语与译名 | 本文件（+ `core` 部分任务矩阵） |
+| 变量、类型、函数、类、术语与译名 | 本文件（+ `language-basics` 部分任务矩阵） |
 | 现代 C++：RAII、移动语义、智能指针、模板与泛型 | `modern-cpp.md` |
 | 容器、迭代器、算法 | `stl.md` |
 | 性能优化与未定义行为陷阱 | `performance-and-pitfalls.md` |
@@ -49,7 +54,8 @@ Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/r
 
 ## 命名
 
-文件/目录纯 ASCII，连字符用 `-`（U+002D）。C++ 标识符见 `code-style.md`。
+仓库路径和目录使用纯 ASCII kebab-case。C++ 文件使用 snake_case。标识符见
+`code-style.md`，目录与章节排序见标识 `cpp-agent-repository-navigation-v1`。
 
 ## C++ 标准术语与中文资料
 本文件规定中文 C++ 教程如何处理标准术语、版本和中文资料，避免译名漂亮但语义不准确。

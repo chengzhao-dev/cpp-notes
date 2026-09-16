@@ -1,0 +1,27 @@
+# standard-library 章节任务矩阵
+
+本文件是 standard-library 全部章节任务的唯一权威记录：一行一章，读写边界与验收在文件级统一，只有差异写进行内。改状态只改本表「状态」列，仓库内不存在其它 INDEX 文件。
+
+## 公共读写边界
+
+- **必读**: `AGENTS.md`、本文件、`.agents/skills/cpp-content/references/cpp/stl.md`、`.agents/skills/quarto-docs/references/quarto/authoring.md`、`.agents/skills/quarto-docs/references/zh/chapter-writing.md`
+- **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）
+- **禁止**: `.agents/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
+
+示例默认单文件 `code/<part>/<chapter>.cpp`，需要构建工程时优先使用同名子目录。单入口工程的 `main.cpp` 放工程根；消费端增长为多文件后再建带 `CMakeLists.txt` 的 `app/`。一章需要多个独立工程时，在「示例」列登记全部路径，产物分别落各工程的 `build/`。
+
+## 统一验收（每章完成时逐项确认）
+
+- [ ] 正文符合体量预算，`run.py check --profile fast` 与 `run.py render` 通过
+- [ ] 示例经 `run.py verify --changed` 编译通过，正文承诺的输出与实测一致
+- [ ] 本文件「状态」列已更新为 `done`
+
+## 任务矩阵
+
+| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `TASK-STD-001` | overview | todo | `TASK-LANG-005` | `content/standard-library/overview.qmd` | `code/standard-library/overview.cpp` | — | — |
+| `TASK-STD-002` | vector | todo | `TASK-STD-001` | `content/standard-library/vector.qmd` | `code/standard-library/vector.cpp` | — | — |
+| `TASK-STD-003` | map-set | todo | `TASK-STD-002` | `content/standard-library/map-set.qmd` | `code/standard-library/map-set.cpp` | — | — |
+| `TASK-STD-004` | iterators | todo | `TASK-STD-002` | `content/standard-library/iterators.qmd` | `code/standard-library/iterators.cpp` | — | — |
+| `TASK-STD-005` | algorithms | todo | `TASK-STD-004` | `content/standard-library/algorithms.qmd` | `code/standard-library/algorithms.cpp` | — | — |

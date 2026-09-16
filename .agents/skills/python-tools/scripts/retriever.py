@@ -83,9 +83,9 @@ NEXT_RE = re.compile('|'.join(["接下来", "下一节", "下一章", "下一段
 class TokenBudgetController:
     """按硬上限裁剪注入内容：优先给 Parent，Parent 放不下就降级给 Child。"""
 
-    MAX_CONTEXT_TOKENS = 6000
-    RESERVED_FOR_RESPONSE = 2000
-    AVAILABLE_FOR_RETRIEVAL = MAX_CONTEXT_TOKENS - RESERVED_FOR_RESPONSE
+    MAX_CONTEXT_TOKENS = kb.MAX_CONTEXT_TOKENS
+    RESERVED_FOR_RESPONSE = kb.RESERVED_FOR_RESPONSE
+    AVAILABLE_FOR_RETRIEVAL = kb.AVAILABLE_FOR_RETRIEVAL
 
     def __init__(self, budget: int | None = None):
         self.budget = self.AVAILABLE_FOR_RETRIEVAL if budget is None else budget

@@ -33,8 +33,11 @@ TASKS = ROOT / ".agents" / "skills" / "cpp-content" / "references" / "tasks"
 GEN = ROOT / ".agents" / "skills" / "python-tools" / "scripts" / "maintenance" / "generate_tasks.py"
 SCOPE = ROOT / ".agents" / "skills" / "agent-ops" / "scripts" / "scope.py"
 HEADER = "| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |"
-PREFIX = {"ENV": "getting-started", "CORE": "core", "STL": "stl", "MEM": "memory",
-          "PERF": "performance", "DBG": "debugging", "TOOL": "toolchain", "CS": "cheatsheet"}
+PREFIX = {
+    "ENV": "getting-started", "LANG": "language-basics", "STD": "standard-library",
+    "MEM": "memory", "PERF": "performance", "DBG": "debugging", "TOOL": "toolchain",
+    "REF": "reference",
+}
 ID_RE = re.compile(r"^\| `(TASK-([A-Z]+)-(\d{3}))` ")
 PATH_RE = re.compile(r"`([^`]+)`")
 BUILD_DIRS = ("build", ".cache")
@@ -147,6 +150,13 @@ def main():
                     target = ROOT / ref
                     if row["status"] == "done" and not target.exists():
                         bad.append(f"{where}: 示例路径不存在 {ref}")
+                    elif (
+                        row["status"] == "done"
+                        and target.is_dir()
+                        and any(path.suffix == ".cpp" for path in target.rglob("*.cpp"))
+                        and not (target / "build-and-run.sh").is_file()
+                    ):
+                        bad.append(f"{where}: 可编译示例缺少一键脚本 {ref}/build-and-run.sh")
         rows_by_part[part] = rows
         if args.verbose:
             done = sum(1 for r in rows if r["status"] == "done")

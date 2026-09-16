@@ -7,10 +7,10 @@
 调用（不经 PowerShell 解析），并对输出做截断与分级：成功只回一行，失败才展开。
 
 子命令：
-  check   一次跑完全部产物/源码校验（默认 terse；缺 _book 时产物项 SKIP，可 --require-book）
+  check   按 fast|book|knowledge|python|full profile 运行校验（默认 full；缺少 _book 时显示跳过）
   verify  编译校验 C++ 示例（Windows 自动经 WSL2，可 --changed 增量校验）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
-  scope   解析任务作用域，输出 UNIT/READ/DENY 清单
+  scope   解析任务作用域，输出范围、单元、读取和禁止清单
   build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
   status  精简 git 状态：默认折叠用户既有改动，只看本次相关
   kb-index  增量或全量重建知识库索引（knowledge/ -> temp/knowledge-index/）
@@ -95,7 +95,7 @@ def resolve_tool(name):
     candidates = [os.environ.get(env_name), config.get(Path(name).stem), shutil.which(name)]
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
-            # Windows 的 PATH 常先返回 .cmd 包装器；Quarto 的 .cmd 会把
+            # Windows 的 PATH 常先返回 .cmd 包装器。Quarto 的 .cmd 会把
             # Deno/Sass 相对路径解析到当前工作目录，优先同目录 .exe 可避免该问题。
             if Path(candidate).suffix.lower() == ".cmd":
                 executable = Path(candidate).with_suffix(".exe")
@@ -119,15 +119,74 @@ CHECKS = [
     ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False, ()),
     ("punctuation", ".agents/skills/agent-ops/scripts/check_punctuation.py", False, ()),
     ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False, ()),
+    ("scaffold", ".agents/skills/python-tools/scripts/test_scaffold_projects.py", False, ()),
     ("kb", ".agents/skills/python-tools/scripts/check_health.py", False, ("--gate",)),
+    ("kb-eval", ".agents/skills/python-tools/scripts/evaluator.py", False, ("--skip-latency",)),
     ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False, ()),
     ("vector-eq", ".agents/skills/python-tools/scripts/test_vector_index_equivalence.py", False, ()),
     ("vector-shard", ".agents/skills/python-tools/scripts/test_vector_sharding.py", False, ()),
 ]
 
+PROFILE_CHECKS = {
+    "fast": {
+        "empty", "encoding", "agent-controls", "size", "ascii", "links",
+        "inline-code", "docs", "punctuation", "tasks",
+    },
+    "book": {"layout", "callouts", "dom"},
+    "knowledge": {"kb", "kb-eval", "conflict", "vector-eq", "vector-shard"},
+    "python": {"scaffold"},
+}
+
 # 成功判据行：命中即认为该步通过，用于从大输出里挑出唯一有价值的一行
 PASS_HINTS = ("PASS", "All examples compiled", "All key tokens", "OK: all internal",
               "无阻塞", "DOM contracts")
+CHECK_LABELS = {
+    "empty": "空文件",
+    "encoding": "编码",
+    "agent-controls": "Agent 控制",
+    "layout": "布局",
+    "callouts": "提示框",
+    "dom": "页面结构",
+    "size": "上下文体量",
+    "ascii": "文件名",
+    "links": "链接",
+    "inline-code": "行内代码",
+    "docs": "文档",
+    "punctuation": "标点",
+    "tasks": "任务矩阵",
+    "scaffold": "脚手架",
+    "kb": "知识库",
+    "kb-eval": "知识库评测",
+    "conflict": "冲突检测",
+    "vector-eq": "向量等价",
+    "vector-shard": "向量分片",
+}
+COMMAND_LABELS = {
+    "kb-index": "知识库索引",
+    "kb-check": "知识库检查",
+    "kb-eval": "知识库评测",
+    "kb-scale": "规模基准",
+}
+
+
+def display_check(item):
+    """把内部检查名转换成中文状态文本。"""
+    name, separator, detail = item.partition(":")
+    label = CHECK_LABELS.get(name, name)
+    return f"{label}（{detail}）" if separator else label
+
+
+def display_command(label):
+    """把内部子命令名转换成中文状态文本。"""
+    return COMMAND_LABELS.get(label, label)
+
+
+def checks_for_profile(profile):
+    """返回指定 profile 的校验项；full 保持原有全部检查。"""
+    if profile == "full":
+        return CHECKS
+    names = PROFILE_CHECKS[profile]
+    return [item for item in CHECKS if item[0] in names]
 
 
 def to_wsl_path(win_path):
@@ -161,31 +220,30 @@ def interpret(rc, text, verbose, label):
         if verbose:
             print(text.rstrip())
         else:
-            key = next((ln for ln in reversed(text.splitlines())
-                        if any(h in ln for h in PASS_HINTS)), "done")
-            print(f"PASS  {label}  {key.strip()}")
+            print(f"通过  {display_command(label)}")
         return 0
-    print(f"FAIL  {label}  (exit={rc})")
+    print(f"失败  {display_command(label)}（退出码 {rc}）")
     for ln in tail(text, 60 if verbose else 12):
         print(f"      {ln}")
     return rc
 
 
 def cmd_check(args):
-    """一次跑完全部校验。默认只回一行总结。"""
+    """运行指定 profile 的校验。默认只回一行总结。"""
+    checks = checks_for_profile(args.profile)
     details, failed, reported, skipped = [], [], [], []
     kb_ready = True
-    if any(name == "kb" for name, *_rest in CHECKS):
+    if any(name in {"kb", "kb-eval"} for name, *_rest in checks):
         rc = ensure_kb_index()
         if rc != 0:
             failed.append("kb:index")
             kb_ready = False
-    for name, script, need_book, extra in CHECKS:
+    for name, script, need_book, extra in checks:
         path = ROOT / script
         if not path.is_file():
             failed.append(f"{name}:脚本缺失")
             continue
-        if name == "kb" and not kb_ready:
+        if name in {"kb", "kb-eval"} and not kb_ready:
             continue
         if need_book and not (ROOT / "_book").is_dir():
             if getattr(args, "require_book", False):
@@ -196,6 +254,8 @@ def cmd_check(args):
         argv = [PY, str(path), *extra]
         if need_book:
             argv += ["--book-dir", "_book"]
+        if name == "layout" and getattr(args, "require_browser", False):
+            argv.append("--browser")
         if getattr(args, "strict", False) and name in {"punctuation", "docs"}:
             argv.append("--strict")
         rc, text = run(argv)
@@ -213,9 +273,9 @@ def cmd_check(args):
             )
             if skip_line:
                 if name == "layout" and getattr(args, "require_browser", False):
-                    failed.append(f"{name}:{skip_line}")
+                    failed.append(f"{name}:{skip_line.removeprefix('SKIP ').strip()}")
                     continue
-                skipped.append(f"{name}:{skip_line}")
+                skipped.append(f"{CHECK_LABELS.get(name, name)}：{skip_line.removeprefix('SKIP ').strip()}")
             last = next((ln for ln in reversed(text.splitlines())
                          if any(h in ln for h in PASS_HINTS)), "")
             details.append(
@@ -223,17 +283,17 @@ def cmd_check(args):
             )
 
     if not failed:
-        suffix = f"；软报告={','.join(reported)}" if reported else ""
+        suffix = f"；软报告 {','.join(CHECK_LABELS.get(name, name) for name in reported)}" if reported else ""
         if skipped:
-            suffix += f"；SKIP={';'.join(skipped)}"
-            print(f"PASS  check {len(CHECKS)} 项已执行{suffix}")
+            suffix += f"；跳过 {len(skipped)} 项"
+            print(f"通过  检查（{args.profile}）：{len(checks)} 项已检查{suffix}")
         else:
-            print(f"PASS  check {len(CHECKS)} 项全通过{suffix}")
+            print(f"通过  检查（{args.profile}）：{len(checks)} 项全通过{suffix}")
         if args.verbose:
             for d in details:
                 print(f"      {d}")
         return 0
-    print(f"FAIL  check 未通过：{', '.join(failed)}")
+    print(f"失败  检查（{args.profile}）：{', '.join(display_check(item) for item in failed)}")
     if not args.verbose:
         print("      提示：加 --verbose 查看失败项详情")
     return 1
@@ -242,31 +302,32 @@ def cmd_check(args):
 def cmd_verify(args):
     """编译校验示例。Windows 自动调用 WSL，默认只回结论行以控制输出量。"""
     argv = [PY, str(ROOT / ".agents/skills/cpp-content/scripts/verify_examples.py")]
+    note = ""
     if args.style:
         argv.append("--style")
     if args.changed:
         changed = changed_paths()
         if changed is None:
-            print("INFO  verify --changed  检测到全局 C++ 配置或校验器改动，改为全量校验")
+            note = "（全局配置或校验器有改动，已改为全量）"
         else:
             paths = relevant_cpp_paths(changed)
             if not paths:
-                print("SKIP  verify --changed  没有修改的 C++ 源文件、QMD 或 reference 示例")
+                print("跳过  C++ 示例校验：没有相关改动")
                 return 0
             argv += ["--paths", *paths]
     rc, text = run(argv)
     if args.verbose:
         print(text.rstrip())
         return rc
-    # terse：保留失败行与最终结论，压掉逐个 compile 的流水
-    keep = [ln for ln in text.splitlines()
-            if ln.strip().startswith(("FAIL", "=== Phase", "All examples", "example(s) failed",
-                                      "skip", "MISS", "no ", "未检测", "Windows："))]
-    for ln in keep[-25:]:
-        print(ln.rstrip())
-    if rc == 0:
-        print("PASS  verify 示例全部编译通过")
-    return rc
+    if rc != 0:
+        print(f"失败  C++ 示例校验{note}（退出码 {rc}）")
+        keep = [ln for ln in text.splitlines()
+                if ln.strip() and not ln.lstrip().startswith("===")]
+        for ln in keep[-25:]:
+            print(f"      {ln.rstrip()}")
+        return rc
+    print(f"通过  C++ 示例校验{note}")
+    return 0
 
 
 def changed_paths():
@@ -298,6 +359,7 @@ def changed_paths():
 
     global_prefixes = (
         ".agents/skills/cpp-content/assets/config/",
+        ".agents/skills/cpp-content/templates/",
         ".agents/skills/python-tools/scripts/scaffold/",
         ".agents/skills/cpp-content/scripts/",
     )
@@ -311,10 +373,21 @@ def changed_paths():
 
 
 def relevant_cpp_paths(paths):
-    """筛出可交给 verify_examples.py 的 C++ 文件和 QMD 文件。"""
+    """筛出可交给 verify_examples.py 的 C++、CMake 和 QMD 文件。"""
     selected = []
     for path in paths:
-        if path.endswith(".cpp") and path.startswith("code/") and (ROOT / path).is_file():
+        suffix = Path(path).suffix.lower()
+        if (
+            path.startswith("code/")
+            and suffix in {".cpp", ".cc", ".cxx", ".h", ".hh", ".hpp"}
+            and (ROOT / path).is_file()
+        ):
+            selected.append(path)
+        elif (
+            path.startswith("code/")
+            and Path(path).name == "CMakeLists.txt"
+            and (ROOT / path).is_file()
+        ):
             selected.append(path)
         elif path.endswith(".qmd") and (ROOT / path).is_file():
             selected.append(path)
@@ -328,18 +401,17 @@ def relevant_cpp_paths(paths):
 
 
 def cmd_render(args):
-    """渲染 Book（改 .agents/skills/quarto-theme/assets/theme/ 或 _quarto.yml 会整本重渲染，故单独提示），成功后跑 check。"""
+    """渲染 Book 后运行 book profile；浏览器矩阵只在 --require-browser 时执行。"""
     rc, text = run(["quarto", "render"] + (["--no-quartoignore"] if args.no_ignore else []))
     if rc != 0:
-        print(f"FAIL  quarto render (exit={rc})")
+        print(f"失败  渲染（退出码 {rc}）")
         for ln in tail(text, 30):
             print(f"      {ln}")
         return rc
     err = [ln for ln in text.splitlines() if "WARNING" in ln or "ERROR" in ln]
-    print(f"PASS  render  警告/错误行数={len(err)}")
-    for ln in err[:10]:
-        print(f"      {ln}")
+    print(f"通过  渲染：警告或错误 {len(err)} 条")
     if not args.skip_check:
+        args.profile = "book"
         args.require_book = True
         return cmd_check(args)
     return 0
@@ -363,16 +435,16 @@ def cmd_build(args):
     target = args.target.strip("/\\")
     script = ROOT / "code" / target / "build-and-run.sh"
     if not script.is_file():
-        print(f"FAIL  build  找不到 {script.relative_to(ROOT)}")
+        print(f"失败  构建：找不到 {script.relative_to(ROOT)}")
         return 1
     env_path = to_wsl_path(script.parent)
     rc, text = run(["wsl.exe", "bash", "-lc", f"cd '{env_path}' && bash build-and-run.sh"])
     if rc != 0:
-        print(f"FAIL  build  {target} (exit={rc})")
+        print(f"失败  构建 {target}（退出码 {rc}）")
         for ln in tail(text, 20):
             print(f"      {ln}")
         return rc
-    print(f"PASS  build  {target}")
+    print(f"通过  构建 {target}")
     if args.verbose:
         for ln in tail(text, 8):
             print(f"      {ln}")
@@ -389,8 +461,9 @@ def cmd_status(args):
         body = ln[3:].split(" -> ")[-1].strip().strip('"')
         (maintenance if status_group(body) == "maintenance" else content).append(ln)
     print(f"维护域文件 {len(maintenance)} 项 / 内容与工程域 {len(content)} 项")
-    for ln in maintenance:
-        print(f"  {ln}")
+    if args.verbose or args.all:
+        for ln in maintenance:
+            print(f"  {ln}")
     if args.all:
         for ln in content:
             print(f"  (内容/工程) {ln}")
@@ -415,9 +488,13 @@ def ensure_kb_index():
     """索引产物不入库（见 .gitignore），缺失时先全量重建，避免子命令空跑。"""
     if (ROOT / KB_INDEX_DB).is_file():
         return 0
-    print("INFO  知识库索引缺失，先执行一次全量重建")
+    print("提示  知识库索引缺失，正在全量重建")
     rc, text = run([PY, kb_script("indexer.py"), "--rebuild"])
-    print(text.rstrip())
+    if rc != 0:
+        print(f"失败  知识库索引（退出码 {rc}）")
+        for ln in tail(text, 12):
+            print(f"      {ln}")
+        return rc
     return rc
 
 
@@ -483,17 +560,17 @@ def main():
         pass
 
     if PY is None:
-        print("FAIL  manifest 未提供可执行的 Python >= 3.12；请修复 .agents/manifest.json 的 mcp.command")
+        print("失败  manifest 未提供可执行的 Python >= 3.12；请修复 .agents/manifest.json 的 mcp.command")
         return 1
     if sys.version_info < MIN_PYTHON:
         required = ".".join(map(str, MIN_PYTHON))
-        print(f"FAIL  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")
+        print(f"失败  Python 需要 >= {required}，当前为 {sys.version.split()[0]}；请切换解释器")
         return 1
     configured = Path(PY).resolve()
     current = Path(sys.executable).resolve()
     if current != configured:
         print(
-            "FAIL  run.py 必须由 manifest.mcp.command 指定的解释器执行；"
+            "失败  run.py 必须由 manifest.mcp.command 指定的解释器执行；"
             f"当前={current}，配置={configured}"
         )
         return 1
@@ -509,9 +586,11 @@ def main():
     p.add_argument("--strict", action="store_true",
                    help="把正文分号、链接间距等软规则升级为失败（作用于 punctuation 与 docs）")
     p.add_argument("--require-book", action="store_true",
-                   help="缺少 _book/ 时让 layout/callouts/dom 失败，默认显示 SKIP")
+                   help="缺少 _book/ 时让 layout/callouts/dom 失败，默认显示跳过")
     p.add_argument("--require-browser", action="store_true",
-                   help="浏览器布局检查未执行时失败，默认显示 SKIP")
+                   help="浏览器布局检查未执行时失败，默认显示跳过")
+    p.add_argument("--profile", choices=("fast", "book", "knowledge", "python", "full"),
+                   default="full", help="校验范围，默认 full")
     p = subs.add_parser("verify", parents=[common], help="编译校验 C++ 示例")
     p.add_argument("--style", action="store_true", help="追加 clang-format / clang-tidy")
     p.add_argument("--changed", action="store_true", help="只校验相对 HEAD 修改的 C++ 内容")
@@ -556,7 +635,7 @@ def main():
     try:
         return handlers[args.cmd](args)
     except ToolNotFound as exc:
-        print(f"FAIL  {exc}")
+        print(f"失败  {exc}")
         return 1
 
 

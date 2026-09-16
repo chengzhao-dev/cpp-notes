@@ -28,9 +28,9 @@
   C7 代码块视觉契约：普通文本代码块与语言代码块必须共用 GitHub 代码背景、边框、
       字体和布局令牌，避免两套代码块样式分叉。
   C8 代码来源标题：QMD 代码块必须由 .code-with-filename 包裹，且主题必须提供
-      标题背景、文字和间距令牌；标题条不能退化为普通代码块。
-  C9 可折叠答案：产物中的 details.answer-disclosure 必须默认收起，
-      摘要必须包含“查看答案”，且答案区不得混入标题层级。
+      标题背景、文字和间距令牌。标题条不能退化为普通代码块。
+  C9 可折叠答案：产物中的 details.answer-disclosure 存在时，必须默认收起，
+      摘要必须等于“查看答案”，且答案区不得混入标题层级；没有答案块时为 N/A。
 
 用法：python check_dom_contracts.py [--book-dir _book] [--verbose]
 退出码：0 = 全部契约通过，1 = 有契约失败，2 = 产物目录不存在（需先 quarto render）。
@@ -419,8 +419,7 @@ def check_contracts(book_dir, htmls, css_pairs):
             if re.search(r"<h[1-6]\b", match.group("body"), flags=re.I):
                 answer_heading.append(rel)
     c9 = (
-        answer_total > 0
-        and not answer_open
+        not answer_open
         and not answer_summary
         and not answer_heading
     )
@@ -431,7 +430,7 @@ def check_contracts(book_dir, htmls, css_pairs):
         len(answer_heading),
     )
     results.append((
-        "C9", "可折叠答案默认收起且摘要与层级正确", c9, summary,
+        "C9", "可折叠答案默认收起且摘要与层级正确（无答案时 N/A）", c9, summary,
         [
             "站点 QMD 使用 {.answer} 组件，产物为 details.answer-disclosure 和固定摘要",
             "answer-disclosure 不得带 open 属性",

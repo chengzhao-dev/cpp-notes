@@ -7,7 +7,7 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py
   python verify_examples.py --compiler clang++
   python verify_examples.py --style        # 追加 clang-format / clang-tidy
-  python verify_examples.py --paths code/core/hello.cpp content/core/intro.qmd
+  python verify_examples.py --paths code/language-basics/overview.cpp content/language-basics/overview.qmd
 
 Windows 下使用仓库配置的 Python 3.12 运行：
   python .agents/skills/agent-ops/scripts/run.py verify
@@ -15,7 +15,7 @@ Windows 下使用仓库配置的 Python 3.12 运行：
 
 编译阶段：
   1. code/ 下书籍示例（规范见 references/cpp/engineering.md，-std=c++20 -Wall -Wextra）。
-     跳过 build/ 等构建目录，不校验 CMake 生成物
+     含 CMakeLists.txt 的目录按完整 CMake 工程构建，工程内源码不再逐个独立编译
   2. 本 skill references/cpp/*.md 内嵌完整示例（含 int main 的 ```cpp 块）
   3. content/**/*.qmd 内嵌完整示例
 风格阶段（仅 --style，规范见 references/cpp/code-style.md）：
@@ -29,6 +29,7 @@ import argparse
 import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,8 @@ from pathlib import Path
 BLOCK_RE = re.compile(r"`{3}(?:\{\.cpp[^`]*\}|cpp)\r?\n(.*?)`{3}", re.S)
 MAIN_RE = re.compile(r"int\s+main\s*\(")
 SKIP_RE = re.compile(r"//\s*verify-skip")
+CMAKE_RE = re.compile(r"^CMakeLists\.txt$")
+CPP_EXTENSIONS = {".cc", ".cpp", ".cxx"}
 # 构建产物目录：不属于书籍示例，一律不编译、不做风格检查
 SKIP_DIRS = {"build", ".git", "__pycache__", ".venv"}
 
@@ -58,19 +61,38 @@ def tool_major_version(tool):
 
 def to_env_path(native_path):
     """Windows 上把 D:\\dir\\f.cpp 转成 WSL 可见的 /mnt/d/dir/f.cpp，Linux 原样返回。"""
+    native_path = os.fspath(native_path)
     if not ON_WINDOWS:
         return native_path
     drive = native_path[0].lower()
     return "/mnt/" + drive + native_path[2:].replace("\\", "/")
 
 
+def tidy_diagnostics(text, repo_root):
+    """只保留仓库源码中的 clang-tidy 诊断，过滤 WSL 环境和汇总噪声。"""
+    marker = to_env_path(repo_root).replace("\\", "/").lower()
+    diagnostics = []
+    for raw in text.splitlines():
+        line = " ".join(raw.replace("\x00", "").split())
+        lower = line.lower()
+        if not line or marker not in lower:
+            continue
+        if "warning:" in lower or "error:" in lower or "note:" in lower:
+            diagnostics.append(line)
+    return diagnostics
+
+
 def sh(cmd, timeout=120):
     """在编译环境执行命令。Windows 经 WSL 按需启动 Ubuntu。"""
     argv = ["wsl", "bash", "-c", cmd] if ON_WINDOWS else ["bash", "-c", cmd]
+    env = None
+    if ON_WINDOWS:
+        env = os.environ.copy()
+        env["WSL_UTF8"] = "1"
     return subprocess.run(
         argv,
         capture_output=True, text=True, encoding="utf-8", errors="replace",
-        timeout=timeout,
+        timeout=timeout, env=env,
     )
 
 
@@ -87,6 +109,17 @@ def env_tool_exists(tool):
         return sh(f"command -v '{tool}' > /dev/null 2>&1").returncode == 0
     except (OSError, subprocess.SubprocessError):
         return False
+
+
+def compile_database(path):
+    """返回源文件所在 CMake 工程的构建目录。没有 compile_commands.json 时返回空。"""
+    current = Path(path).resolve().parent
+    while current != current.parent:
+        build_dir = current / "build"
+        if (build_dir / "compile_commands.json").is_file():
+            return build_dir
+        current = current.parent
+    return None
 
 
 def compile_source(compiler, standard, env_path, out_name):
@@ -126,6 +159,57 @@ def extract_full_blocks(path):
     return blocks
 
 
+def path_within(path, directory):
+    """判断 path 是否位于 directory 内，使用规范化绝对路径比较。"""
+    try:
+        return os.path.commonpath([path, directory]) == directory
+    except ValueError:
+        return False
+
+
+def find_cmake_projects(src_dir):
+    """返回每个 CMake 工程根目录，遇到工程根后不再进入其子目录。"""
+    projects = []
+    for dirpath, dirnames, filenames in os.walk(src_dir):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        if any(CMAKE_RE.match(name) for name in filenames):
+            projects.append(os.path.normpath(dirpath))
+            dirnames[:] = []
+    return sorted(projects)
+
+
+def cmake_project_cpp_files(project):
+    """返回工程内需要做风格检查的 C++ 源文件。"""
+    files = []
+    for dirpath, dirnames, filenames in os.walk(project):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        files.extend(
+            os.path.normpath(os.path.join(dirpath, name))
+            for name in filenames
+            if Path(name).suffix.lower() in CPP_EXTENSIONS
+        )
+    return sorted(files)
+
+
+def build_cmake_project(project, repo_root, compiler):
+    """在 temp/verify-build 下重新配置并构建一个 CMake 工程。"""
+    rel = os.path.relpath(project, repo_root)
+    slug = re.sub(r"[^A-Za-z0-9_.-]+", "-", rel).strip("-") or "project"
+    build_root = temp_dir("verify-build").resolve()
+    build_dir = (build_root / slug).resolve()
+    if build_root not in build_dir.parents:
+        raise RuntimeError(f"unexpected CMake build directory: {build_dir}")
+    if build_dir.is_dir():
+        shutil.rmtree(build_dir)
+
+    cmd = (
+        f"cmake -S '{to_env_path(project)}' -B '{to_env_path(build_dir)}' "
+        f"-G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER='{compiler}' && "
+        f"cmake --build '{to_env_path(build_dir)}'"
+    )
+    return sh(cmd, timeout=300)
+
+
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -159,30 +243,57 @@ def main():
     # ---------- 阶段 1：code/ 目录 ----------
     src_dir = os.path.join(repo_root, args.source_dir)
     cpp_files = []
+    cmake_projects = []
     if os.path.isdir(src_dir):
         for dirpath, dirnames, filenames in os.walk(src_dir):
             # 原地剪枝：不进入 build/ 等目录，避免把 CMake 生成物当示例校验
             dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
             cpp_files.extend(
-                os.path.join(dirpath, fn)
+                os.path.normpath(os.path.join(dirpath, fn))
                 for fn in filenames
-                if fn.endswith(".cpp")
+                if Path(fn).suffix.lower() in CPP_EXTENSIONS
                 and (not args.paths or os.path.normpath(os.path.join(dirpath, fn)) in selected_paths)
             )
-            consumed_paths.update(
-                os.path.normpath(path)
-                for path in (
-                    os.path.join(dirpath, fn)
-                    for fn in filenames
-                    if fn.endswith(".cpp")
-                    and os.path.normpath(os.path.join(dirpath, fn)) in selected_paths
-                )
-            )
         cpp_files.sort()
-    if cpp_files:
-        print(f"=== Phase 1: book examples under {args.source_dir} ({len(cpp_files)}) ===")
+        cmake_projects = find_cmake_projects(src_dir)
+
+    selected_projects = [
+        project for project in cmake_projects
+        if not args.paths or any(path_within(path, project) for path in selected_paths)
+    ]
+    all_project_cpp = {
+        project: cmake_project_cpp_files(project) for project in cmake_projects
+    }
+
+    if cpp_files or selected_projects:
+        print(
+            f"=== Phase 1: book examples under {args.source_dir} "
+            f"({len(cpp_files)} cpp, {len(selected_projects)} CMake project(s)) ==="
+        )
+        for project in selected_projects:
+            rel_project = os.path.relpath(project, repo_root)
+            print(f"cmake build: {rel_project}")
+            result = build_cmake_project(project, repo_root, args.compiler)
+            if result.returncode == 0:
+                print("  OK")
+            else:
+                fail += 1
+                out = "\n".join(
+                    (result.stdout or "").splitlines()
+                    + (result.stderr or "").splitlines()
+                )
+                for line in out.splitlines():
+                    print(f"    {line}")
+            style_targets.extend(all_project_cpp[project])
+            consumed_paths.update(
+                path for path in selected_paths if path_within(path, project)
+            )
+
         for f in cpp_files:
+            if any(path_within(f, project) for project in cmake_projects):
+                continue
             rel = os.path.relpath(f, repo_root)
+            consumed_paths.add(f)
             with open(f, encoding="utf-8", errors="replace") as fh:
                 src = fh.read()
             if SKIP_RE.search(src):
@@ -202,7 +313,7 @@ def main():
                 for line in out.splitlines():
                     print(f"    {line}")
     else:
-        print(f"Phase 1: no .cpp under {args.source_dir}, skipped.")
+        print(f"Phase 1: no C++ examples under {args.source_dir}, skipped.")
 
     # ---------- 阶段 2：skill references/cpp/*.md 内嵌完整示例 ----------
     ref_dir = str(SKILL_ROOT / "references" / "cpp")
@@ -294,13 +405,23 @@ def main():
             for f in style_targets:
                 rel = os.path.relpath(f, repo_root)
                 print(f"tidy: {rel} (informational)")
-                result = sh(f"clang-tidy --quiet {tidy_arg} '{to_env_path(f)}' "
-                            f"-- -std=c++20 -stdlib=libc++ 2>&1")
+                build_dir = compile_database(f)
+                if build_dir:
+                    result = sh(
+                        f"clang-tidy --quiet {tidy_arg} "
+                        f"-p '{to_env_path(build_dir)}' '{to_env_path(f)}' 2>&1"
+                    )
+                else:
+                    result = sh(f"clang-tidy --quiet {tidy_arg} '{to_env_path(f)}' "
+                                f"-- -std=c++20 -stdlib=libc++ 2>&1")
                 out = "\n".join((result.stdout or "").splitlines() + (result.stderr or "").splitlines())
-                for line in out.splitlines():
+                diagnostics = tidy_diagnostics(out, repo_root)
+                for line in diagnostics:
                     print(f"    {line}")
-                if not out.strip():
+                if not diagnostics and result.returncode == 0:
                     print("  clean")
+                elif not diagnostics:
+                    print("    tidy did not complete (informational)")
 
     # ---------- 汇总 ----------
     print()

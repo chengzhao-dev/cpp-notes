@@ -9,9 +9,10 @@
 | 孤立 Chunk | 0 | Child 找不到 Parent，Stage 5 回溯会静默降级 |
 | 重复 Chunk | 0 | 同一 hash 出现多次，检索结果互相挤占预算 |
 | 图谱断链 | 0 | 概念节点的 chunk_id 指向不存在的 Chunk |
+| Parent 超限 | 0 | 任一可检索 Parent 超过默认 4000 Token 预算 |
 | 检索 P95 | <= 200ms | 评测集上端到端延迟，超标即验收不通过 |
 | 陈旧条目 | 0 | 源码 hash 变了但索引还是旧的，说明增量没跑 |
-| 目录缺登记 | 0 | `knowledge/` 有文件但 `catalog.md` 知识表没有它，路由表与知识库漂移 |
+| 目录缺登记 | 0 | `knowledge/` 有文件但短路由或完整索引没有它，路由表与知识库漂移 |
 
 用法：
     python .agents/skills/python-tools/scripts/check_health.py            # 体检（有告警时退出码 1）
@@ -35,10 +36,14 @@ import kb_common as kb  # noqa: E402
 
 LIMITS = {
     "format": 0, "unindexed": 0, "orphan": 0, "duplicate": 0,
-    "graph_broken": 0, "stale": 0, "p95_ms": 200.0, "dangling": 0, "catalog": 0,
+    "graph_broken": 0, "oversized_parent": 0, "stale": 0, "p95_ms": 200.0,
+    "dangling": 0, "catalog": 0,
 }
 ROOT_PATH = kb.ROOT
 CATALOG_PATH = ROOT_PATH / ".agents" / "skills" / "catalog.md"
+REFERENCE_INDEX_PATH = (
+    ROOT_PATH / ".agents" / "skills" / "agent-ops" / "references" / "reference-index.md"
+)
 PATH_CELL = re.compile(r"`([^`]+\.md)`")
 
 
@@ -72,7 +77,10 @@ def check_index(paths: list[str], registry_out: list) -> tuple[dict, list[str]]:
     registry_out.append(registry)
     docs = registry.get("documents", {})
     chunks = registry.get("chunks", {})
-    counts = {"unindexed": 0, "stale": 0, "orphan": 0, "duplicate": 0, "graph_broken": 0}
+    counts = {
+        "unindexed": 0, "stale": 0, "orphan": 0, "duplicate": 0,
+        "graph_broken": 0, "oversized_parent": 0,
+    }
 
     indexed_paths = {row["path"] for row in docs.values()}
     for path in paths:
@@ -125,31 +133,46 @@ def check_index(paths: list[str], registry_out: list) -> tuple[dict, list[str]]:
         if broken:
             counts["graph_broken"] += 1
             details.append("概念 " + name + " 挂空 " + str(len(broken)) + " 处")
+    oversized = list(con.execute(
+        "SELECT chunk_id, heading_path, token_count FROM chunks "
+        "WHERE kind='parent' AND status='live' AND token_count>? "
+        "ORDER BY token_count DESC",
+        (kb.AVAILABLE_FOR_RETRIEVAL,),
+    ))
+    counts["oversized_parent"] = len(oversized)
+    for chunk_id, heading_path, token_count in oversized:
+        details.append(
+            "Parent 超过默认预算: " + chunk_id + " " + str(token_count)
+            + " Token > " + str(kb.AVAILABLE_FOR_RETRIEVAL)
+            + "（" + heading_path + "）"
+        )
     con.close()
     counts["live"] = live
     return counts, details
 
 
 def check_catalog() -> tuple[list[str], int]:
-    """断言 catalog.md 的 knowledge 表与磁盘上的知识文件一一对应。
+    """断言短路由或完整索引与磁盘上的知识文件一一对应。
 
-    catalog.md 是「谁该读哪份知识」的唯一路由表。`knowledge/` 下新增文件却不登记，
+    短路由负责日常选择，完整索引负责维护清单。`knowledge/` 下新增文件却不登记，
     等于写正文时没人会读到它——索引和召回都会绿，只有路由是瞎的。所以这条断言
     独立于索引，直接比对磁盘与表格。`knowledge/README.md` 是规范本身，不参与登记。
     """
-    if not CATALOG_PATH.is_file():
-        return ["catalog.md 缺失: " + kb.rel(CATALOG_PATH)], 0
+    registry_files = [path for path in (CATALOG_PATH, REFERENCE_INDEX_PATH) if path.is_file()]
+    if not registry_files:
+        return ["skill 路由与完整索引均缺失"], 0
     listed: set[str] = set()
     section = False
-    for line in CATALOG_PATH.read_text(encoding="utf-8").splitlines():
-        if line.startswith("## "):
-            section = line.strip().startswith("## knowledge")
-            continue
-        if not section or not line.strip().startswith("|"):
-            continue
-        cell = PATH_CELL.search(line)
-        if cell and cell.group(1).startswith("knowledge/"):
-            listed.add(cell.group(1))
+    for registry in registry_files:
+        for line in registry.read_text(encoding="utf-8").splitlines():
+            if line.startswith("## "):
+                section = line.strip().lower().startswith("## knowledge")
+                continue
+            if not section or not line.strip().startswith("|"):
+                continue
+            cell = PATH_CELL.search(line)
+            if cell and cell.group(1).startswith("knowledge/"):
+                listed.add(cell.group(1))
     problems = []
     on_disk = 0
     for path in kb.list_knowledge_files():
@@ -159,10 +182,10 @@ def check_catalog() -> tuple[list[str], int]:
         on_disk += 1
         relative = kb.rel(path)
         if relative not in listed:
-            problems.append("catalog 知识表缺登记: " + relative)
+            problems.append("技能路由缺登记: " + relative)
     for relative in sorted(listed):
         if not (ROOT_PATH / relative).is_file():
-            problems.append("catalog 知识表指向不存在的文件: " + relative)
+            problems.append("技能路由指向不存在的知识文件: " + relative)
     return problems, on_disk
 
 
@@ -243,7 +266,7 @@ def run(gate: bool, verbose: bool, samples: int) -> int:
     counts["p95_ms"] = p95
 
     order = ["format", "unindexed", "stale", "orphan", "duplicate", "graph_broken",
-             "dangling", "catalog"]
+             "oversized_parent", "dangling", "catalog"]
     version_problems, conflicts = ([], 0)
     if holder and kb.DB_PATH.is_file():
         probe = sqlite3.connect(kb.DB_PATH)
@@ -270,6 +293,7 @@ def run(gate: bool, verbose: bool, samples: int) -> int:
           + "  孤立=" + str(counts["orphan"])
           + "  重复=" + str(counts["duplicate"])
           + "  图谱断链=" + str(counts["graph_broken"])
+          + "  Parent超限=" + str(counts["oversized_parent"])
           + "  悬空supersedes=" + str(counts["dangling"])
           + "  冲突候选=" + str(conflicts)
           + "  知识文件=" + str(catalog_total)

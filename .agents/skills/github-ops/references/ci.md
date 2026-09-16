@@ -43,5 +43,5 @@
 
 ### 调试与排错
 
-- 当 CI 失败时，先在本地通过 .agents/skills/agent-ops/scripts/run.py check 与 .agents/skills/agent-ops/scripts/run.py verify 进行复现，禁止盲目推 commit 试错。
+- CI 失败时先在本地用 `run.py check --profile full` 与 `run.py verify` 复现，禁止盲目推 commit 试错。
 - 每个 workflow 显式声明最小 `permissions`。新增步骤只申请实际需要的权限，并为部署步骤单独说明写权限来源。

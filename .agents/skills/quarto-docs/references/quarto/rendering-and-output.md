@@ -2,7 +2,7 @@
 
 ## HTML 输出配置
 
-> 速查：外观选项集中在根目录配置的格式块下 · 目录收四级标题放右侧 · 本仓库不用行号、长行换行、代码块不折叠；回顾答案使用 `.answer` 并渲染为原生 details
+> 速查：外观选项集中在根目录配置的格式块下 · 目录收至三级标题放右侧 · 本仓库不用行号、长行换行、代码块不折叠。回顾答案使用 `.answer` 并渲染为原生 details
 
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
@@ -20,15 +20,15 @@
 | `theme` | `light: [cosmo, .agents/skills/quarto-theme/assets/theme/scss/theme-light.scss]` + `dark: [darkly, …]` | 内置主题与项目样式叠加，顺序决定覆盖关系 |
 | `highlight-style` | `light: github-light` + `dark: github-dark` | 明暗分别指定，语义颜色交给引擎 |
 | `filters` | `.agents/skills/quarto-docs/scripts/answer-disclosure.lua` | 将正文 `.answer` 转为默认收起的原生 `details` |
-| `toc` / `toc-depth` / `toc-location` | `true` / `4` / `right` | 右侧目录，窄屏会折叠，不作唯一定位手段 |
+| `toc` / `toc-depth` / `toc-location` | `true` / `3` / `right` | 右侧目录最多到 H3，窄屏会折叠，不作唯一定位手段 |
 | `number-sections` | `false` | 因此标题不手填序号，见 `basics.md` |
 | `code-copy` / `code-overflow` | `true` / `wrap` | 长行换行，不让读者横向拖动 |
-| `grid` | sidebar 256 / body 840 / margin 216 / gutter 1rem | 页面栅格 |
+| `grid` | sidebar 240 / body 800 / margin 208 / gutter 1rem | 页面栅格 |
 | `lang` | `zh` | 影响部分 HTML 行为与提示框默认词 |
 
 本仓库**不开启**代码行号（`code-line-numbers`）与代码折叠（`code-fold`）：取舍依据见 `cpp-tooling-quarto-html-v2` 的知识文件。
 
-站点 QMD 代码块使用 `{.语言 filename="标题"}`。Quarto 会把标题渲染为 `.code-with-filename-file`，外观与复制按钮位置由主题统一控制；标题缺失由 `check_docs.py` 拦截。
+站点 QMD 代码块使用 `{.语言 filename="标题"}`。Quarto 会把标题渲染为 `.code-with-filename-file`，外观与复制按钮位置由主题统一控制。标题缺失由 `check_docs.py` 拦截。
 
 ### 改动约定
 
@@ -73,9 +73,9 @@
 ### 5. 中文乱码/编码
 
 - **症状**：中文变成「锟/鐜/绔」类字串，或文件带 BOM、行尾变 CRLF。
-- **处置**：改 `.qmd` 或 Skill 文档后先跑 `& .agents/skills/agent-ops/scripts/run.ps1 check`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
+- **处置**：改 `.qmd` 或 Skill 文档后先跑 `run.ps1 check --profile fast`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
 - **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入，不要让系统代码页参与中文读写。
-- **自检**：`& .agents/skills/agent-ops/scripts/run.ps1 check` 的 encoding 项已覆盖 BOM、行尾与乱码特征。
+- **自检**：`run.ps1 check --profile fast` 的 `encoding` 项已覆盖 BOM、行尾与乱码特征。
 
 ### 6. 渲染失败排查顺序
 
@@ -120,7 +120,7 @@ $d = Get-ChildItem -LiteralPath "D:\Github" -Force
 
 - **症状**：源文件写了 `::: {.callout-best-practice}`，渲染后没有左色条提示框，且块内 `## 标题` 混进右侧目录。
 - **处置**：只用内置 `note`/`tip`/`warning`/`important`/`caution` 五类，标题写在块内首行 `## …`，并保留全局中文类型标题。「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring.md`「Callout 提示框」。
-- **自检**：渲染后跑 `& .agents/skills/agent-ops/scripts/run.ps1 check`，`callouts` 项会扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
+- **自检**：渲染后跑 `run.ps1 check --profile book`，`callouts` 项会扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
 
 ### 13. `{{< include >}}` 引用代码文件未加属性围栏 → 乱码式排版、目录被污染
 

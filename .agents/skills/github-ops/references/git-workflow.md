@@ -1,6 +1,6 @@
 # git 工作流（操作清单）
 
-通用 git 操作规范。默认环境：Windows + PowerShell。**只在用户明确要求时才提交/推送/建 PR。**
+通用 git 操作规范。默认环境：Windows + PowerShell。**只在用户明确要求，或最终批准计划包含 `### 交付收口` 时才提交/推送/建 PR。**
 
 为什么这样归一化行尾、为什么远端只留两个分支、提交按什么边界切分，都在知识库，一条命令取用：
 
@@ -10,7 +10,8 @@
 
 ## 硬约束
 
-- 未明确要求时不 commit、push、创建 PR。不 force-push main。不建空 commit。
+- 未明确要求且批准计划没有交付收口时不 commit、push、创建 PR。不 force-push main。不建空 commit。
+- 批准计划中的交付收口只授权该节列出的路径组、提交和推送；不扩展到未列改动、`git add -A`、amend、改 remote 或额外分支。
 - 不用 `git commit --amend`（除非修复刚失败且未推送的 commit）。不用 `-i` 交互式。不跳过 hooks。不更新 `git config`（除非明确要求）。
 - 只 `git add` 显式路径，禁止 `git add -A` 裹挟用户既有未提交改动。
 - 提交信息使用中文分类前缀，例如“文档：”“修复：”“维护：”，让读者不看 diff 就能判断影响面与是否需要跑检查。整句保持中文，只有没有合适中文译名时才保留 `CMake`、`Ninja`、`clangd` 等技术标识。
@@ -63,8 +64,10 @@ git log --oneline -10
 
 以上检查仅适用于确实涉及提交、变更总结、审查、冲突解决或发布说明的任务。普通文档、资料、分析和问答不需要例行运行。
 
-再按改动范围跑检查：`& .agents/skills/agent-ops/scripts/run.ps1 verify --changed`、`& .agents/skills/agent-ops/scripts/run.ps1 check`、`git diff --check`。
+再按改动范围跑检查：`run.ps1 verify --changed`、`run.ps1 check --profile ...`、`git diff --check`。
 只有改主题或 Quarto 全局配置才整本渲染。只有改 C++ 全局配置或校验器才全量验证。不要让 `build/`、`.cache/`、`.tmp/` 触发校验。
+
+`check`、`verify`、`build` 和 `render` 只证明本地改动可用，不是上传完成。批准计划含交付收口时，必须继续完成显式暂存、提交、`git fetch`、必要 rebase、推送、远端 SHA 和 CI/Pages 核对；其中任一项失败都不得报告任务完成。
 
 ## 大更新怎么分组
 

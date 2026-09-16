@@ -26,7 +26,7 @@ metadata:
 
 ## P0 硬约束
 
-1. 用户未明确要求时不 commit、不 push、不建 PR。不对 `main` force-push。
+1. 仅在用户明确要求，或最终批准计划含 `### 交付收口` 时 commit、push；批准范围只覆盖计划列出的路径组与目标分支。不对 `main` force-push。
 2. 只 `git add` 显式路径，禁止 `git add -A` 裹挟用户既有未提交改动。
 3. 远端只维护 `main` 与 `gh-pages`。Actions 用 peaceiris 把 `_book/` 以 `force_orphan` 推到 `gh-pages`。
 4. 行尾 LF、UTF-8 无 BOM，忽略规则集中在根 `.gitignore`。

@@ -308,6 +308,13 @@ def check_answer_disclosures(rel, lines):
             for candidate, line in enumerate(lines[index + 1:closing], index + 1)
             if line.strip()
         ]
+        for content_index, content_line in content:
+            if len(content_line[: len(content_line) - len(content_line.lstrip())]
+                   .expandtabs(4)) < 3:
+                errors.append(
+                    f"{rel}:{content_index + 1}: DOC-E18 "
+                    "可折叠答案正文必须与 ::: 保持相同缩进"
+                )
         if not content:
             errors.append(f"{rel}:{line_number}: DOC-E18 可折叠答案不能为空")
         elif ORDERED_LIST.match(content[0][1]):
@@ -316,6 +323,28 @@ def check_answer_disclosures(rel, lines):
                 "先说明对象、起止范围或顺序"
             )
         index = closing + 1
+    return errors
+
+
+def heading_level_errors(rel, headings):
+    """检查标题是否超过三级。headings 每项为 (行号, 层级, 标题)。"""
+    return [
+        f"{rel}:{number}: DOC-E21 文档标题最多到三级标题，禁止 H4 及更深标题"
+        for number, level, _title in headings
+        if level >= 4
+    ]
+
+
+def frontmatter_title_errors(rel, lines):
+    """检查 YAML front matter 的 title 是否使用反引号。"""
+    if not lines or lines[0].strip() != "---":
+        return []
+    errors = []
+    for number, line in enumerate(lines[1:], 2):
+        if line.strip() == "---":
+            break
+        if re.match(r"^title\s*:", line) and "`" in line:
+            errors.append(f"{rel}:{number}: DOC-E2 标题不应使用反引号")
     return errors
 
 
@@ -374,6 +403,8 @@ def check(path):
                     errors.append(f"{rel}:{number}: DOC-E16 同一任务最多保留一个 Callout")
     if in_fence:
         errors.append(f"{rel}:{fence_start}: DOC-E4 代码围栏未闭合")
+    errors.extend(frontmatter_title_errors(rel, lines))
+    errors.extend(heading_level_errors(rel, headings))
     if kind == "qmd" and rel.startswith("content/"):
         errors.extend(check_answer_disclosures(rel, lines))
         errors.extend(check_callout_placement(rel, lines))
@@ -458,14 +489,32 @@ def check(path):
     return errors, notices
 
 
+def has_purpose_comment(path, lines):
+    """检查首个有效行是否用原生注释说明文件用途。"""
+    suffix = path.suffix.lower()
+    start = 1 if suffix in {".sh", ".bash"} and lines and lines[0].startswith("#!") else 0
+    for line in lines[start:]:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if suffix in {".cpp", ".cc", ".cxx", ".h", ".hpp"}:
+            return stripped.startswith("//")
+        if suffix in {".sh", ".bash", ".cmake"} or path.name == "CMakeLists.txt":
+            return stripped.startswith("#")
+        return True
+    return False
+
+
 def check_source(path):
-    """检查会被 include 的源文件，重点发现行尾注释和过长解释。"""
+    """检查会被 include 的源文件，重点发现缺少用途注释和过长解释。"""
     rel = path.relative_to(ROOT).as_posix()
     errors, notices = [], []
     try:
         lines = path.read_text(encoding="utf-8").splitlines()
     except UnicodeDecodeError:
         return [f"{rel}: DOC-E1 非 UTF-8"], []
+    if not has_purpose_comment(path, lines):
+        errors.append(f"{rel}: DOC-E20 首个有效行需用原生注释说明文件用途")
     for number, line in enumerate(lines, 1):
         if re.search(r"\S\s+#\s+[^#]", line) and path.suffix.lower() in {".sh", ".bash"}:
             notices.append(f"{rel}:{number}: DOC-N7 行尾 Shell 注释请移到被说明代码的上一行")
@@ -495,7 +544,7 @@ def main():
     source_paths = sorted(
         p for base in (
             ROOT / "code",
-            ROOT / ".agents" / "skills" / "python-tools" / "scripts" / "scaffold" / "templates",
+            ROOT / ".agents" / "skills" / "cpp-content" / "templates" / "projects",
         )
         if base.is_dir() for p in base.rglob("*")
         if p.is_file() and (p.suffix.lower() in CODE_EXTENSIONS or p.name in CODE_NAMES)

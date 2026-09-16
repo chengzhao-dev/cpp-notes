@@ -229,58 +229,79 @@ def tool_result(value: Any, is_error: bool = False) -> dict[str, Any]:
 TOOLS = [
     {
         "name": "project_review",
-        "description": "Run the repository preflight checks before a defect-first review.",
+        "description": "Execution mode only; never call in Plan Mode. Run the repository preflight checks before a defect-first review.",
         "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_status",
         "description": "Return concise git status for the repository.",
         "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_diff",
         "description": "Return a bounded git diff, optionally limited to one repository path.",
         "inputSchema": {"type": "object", "properties": {"path": {"type": "string"}}},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_scope",
         "description": "Resolve the repository's minimal task scope using .agents/skills/agent-ops/scripts/run.py.",
         "inputSchema": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_read",
         "description": "Read one UTF-8 repository file within the safety boundary.",
         "inputSchema": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "maxBytes": {"type": "integer", "minimum": 1, "maximum": MAX_READ_BYTES}, "startLine": {"type": "integer", "minimum": 1}, "endLine": {"type": "integer", "minimum": 1}}},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_search",
         "description": "Search UTF-8 project files while skipping generated output and caches.",
         "inputSchema": {"type": "object", "required": ["query"], "properties": {"query": {"type": "string"}, "path": {"type": "string"}, "maxResults": {"type": "integer", "minimum": 1, "maximum": 200}, "contextLines": {"type": "integer", "minimum": 0, "maximum": MAX_CONTEXT_LINES}}},
+        "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_edit",
-        "description": "Replace one exact text occurrence after checking the expected SHA-256.",
+        "description": "Execution mode only; never call in Plan Mode. Replace one exact text occurrence after checking the expected SHA-256.",
         "inputSchema": {"type": "object", "required": ["path", "oldText", "newText", "expectedSha256"], "properties": {"path": {"type": "string"}, "oldText": {"type": "string"}, "newText": {"type": "string"}, "expectedSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}}},
+        "annotations": {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": False, "openWorldHint": False},
     },
     {
         "name": "project_check",
-        "description": "Run the repository's standard check command.",
-        "inputSchema": {"type": "object", "properties": {"verbose": {"type": "boolean"}}},
+        "description": "Execution mode only; never call in Plan Mode. Run the repository's standard check command.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "profile": {
+                    "type": "string",
+                    "enum": ["fast", "book", "knowledge", "python", "full"],
+                    "default": "full",
+                },
+                "verbose": {"type": "boolean"},
+            },
+        },
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_verify",
-        "description": "Run C++ example verification, optionally changed-only.",
+        "description": "Execution mode only; never call in Plan Mode. Run C++ example verification, optionally changed-only.",
         "inputSchema": {"type": "object", "properties": {"changedOnly": {"type": "boolean"}, "verbose": {"type": "boolean"}}},
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_render",
-        "description": "Render the Quarto Book and run its checks.",
+        "description": "Execution mode only; never call in Plan Mode. Render the Quarto Book and run its checks.",
         "inputSchema": {"type": "object", "properties": {"verbose": {"type": "boolean"}}},
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
     {
         "name": "project_build",
-        "description": "Build one content/code chapter through the repository wrapper.",
+        "description": "Execution mode only; never call in Plan Mode. Build one content/code chapter through the repository wrapper.",
         "inputSchema": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string", "pattern": "^[A-Za-z0-9_-]+/[A-Za-z0-9_-]+$"}, "verbose": {"type": "boolean"}}},
+        "annotations": {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
 ]
 
@@ -359,14 +380,17 @@ def handle_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
         path.write_text(updated, encoding="utf-8", newline="\n")
         return tool_result({"path": args["path"], "sha256": sha256_text(updated), "changed": True})
     if name == "project_review":
-        check_res = run_agent("check")
+        check_res = run_agent("check", "--profile", "full")
         verify_res = run_agent("verify", "--changed")
         output = f"Review Summary:\n- Check Suite: exit {check_res['exitCode']}\n{check_res['output']}\n- C++ Verify: exit {verify_res['exitCode']}\n{verify_res['output']}"
         return tool_result(output)
     if name in {"project_check", "project_verify", "project_render", "project_build"}:
         verbose = bool(args.get("verbose", False))
         if name == "project_check":
-            command = ["check"]
+            profile = args.get("profile", "full")
+            if profile not in {"fast", "book", "knowledge", "python", "full"}:
+                raise MCPError("profile must be one of: fast, book, knowledge, python, full")
+            command = ["check", "--profile", profile]
         elif name == "project_verify":
             command = ["verify"] + (["--changed"] if args.get("changedOnly", True) else [])
         elif name == "project_render":

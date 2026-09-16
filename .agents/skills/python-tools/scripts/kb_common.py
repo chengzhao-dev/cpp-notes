@@ -27,6 +27,9 @@ KB_ROOT = ROOT / "knowledge"
 INDEX_DIR = ROOT / "temp" / "knowledge-index"
 REGISTRY_PATH = INDEX_DIR / "chunk_registry.json"
 DB_PATH = INDEX_DIR / "kb_index.sqlite"
+MAX_CONTEXT_TOKENS = 6000
+RESERVED_FOR_RESPONSE = 2000
+AVAILABLE_FOR_RETRIEVAL = MAX_CONTEXT_TOKENS - RESERVED_FOR_RESPONSE
 
 NL = chr(10)
 SPACES = " " + chr(9)

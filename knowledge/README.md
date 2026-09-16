@@ -49,6 +49,12 @@ frontmatter 字段：
 4. 中文分词取二元组，ASCII 标识符整体保留并拆下划线，**语言关键字永不作为停用词**。
 5. 冲突候选按全库文档级概念集合（`tags` ∪ 反引号内的严格标识符）的 Jaccard 判定，并跳过已被 `supersedes` 关联的一对。
 
+## Token 预算与增长
+
+知识文件不设整文件大小上限，避免把内聚主题机械拆散。实际约束放在检索单元：默认单次检索最多使用 4000 Token，上下文硬上限为 6000 Token，任一 live Parent Chunk 不得超过 4000 Token。
+
+新增或扩容前先更新已有知识。同一主题需要更多细节时，按 `##` 的独立概念边界扩容；一个父块超过 4000 Token 时，先压缩重复表述，再按可独立检索的概念拆分。每次新增 `kb_id` 都要在 `eval_set.py` 补查询，让召回率与注入预算接受自动评测。
+
 ## 索引与验证
 
 ```powershell
@@ -62,11 +68,11 @@ frontmatter 字段：
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/python-tools/scripts/`：
 `kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
 `retriever.py` 五阶段检索、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
-`test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `run.py check`）。
+`test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `check --profile knowledge`）。
 
 ## 新增知识的最小闭环
 
-1. 建文件 → `kb-index` → `kb-check`（重复必须为 0）。
+1. 建文件或更新唯一权威 → `kb-index` → `kb-check`（重复与 Parent 超限必须为 0）。
 2. 在 `.agents/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
-3. 精简对应的 skill reference，只留怎么做加一行 `kb-search` 入口。
-4. 更新 `.agents/skills/catalog.md` 路由，最后跑 `run.py check`。
+3. 精简对应的 skill reference，只留怎么做和一行 `kb-search` 入口；详细取舍依据留在 knowledge。
+4. 更新 `.agents/skills/catalog.md` 短路由和 `.agents/skills/agent-ops/references/reference-index.md` 完整清单，最后按改动域运行 `run.py check --profile ...`。

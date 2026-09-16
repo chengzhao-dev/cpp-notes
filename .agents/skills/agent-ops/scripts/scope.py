@@ -2,9 +2,9 @@
 """解析任务作用域，输出本次任务「该读什么 / 不该读什么」的最小清单。
 
 为什么需要它：上下文的量不是靠自觉控制，而是由构造封顶。本脚本按仓库既有的
-目录命名约定（content/<part>/<chapter>.qmd <-> code/<part>/<chapter>[/]）反查出
-当前任务的最小文件集，并把构建产物、渲染产物、其它章节一律列入 DENY。
-调用方只需读 UNIT+READ 所列文件，其余不碰——省掉「整包多读」与「反复枚举目录」。
+目录命名约定和任务矩阵登记的示例路径反查出当前任务的最小文件集，并把构建产物、
+渲染产物、其它章节一律列入禁止清单。
+调用方只需读「单元」与「读取」所列文件，其余不碰——省掉「整包多读」与「反复枚举目录」。
 
 零新增元数据：路由表就是 .agents/skills/cpp-content/references/tasks/<part>.md 任务矩阵。
 「公共必读」行给出该 part 每章共用的 reference，矩阵行的「专项必读」列给出该章独有的部分，
@@ -34,12 +34,13 @@ ALWAYS_DENY = [
     "**/.tmp/**（临时文件）",
     "temp/**（统一临时产物目录）",
     # 宿主六项原则文件：只服务个性化设置，永不作为任务阅读项
-    "宿主个性化说明（六项原则，来自用户全局配置）：不列入 UNIT/READ",
+    "宿主个性化说明（六项原则，来自用户全局配置）：不列入单元与读取",
 ]
 # 单个单元的代码文件上限：超出则只报计数，避免清单本身膨胀
 MAX_UNIT_FILES = 12
 TASKS_DIR = ".agents/skills/cpp-content/references/tasks"
 MERGED = "merged"
+STATUS_LABELS = {"todo": "待办", "done": "完成", "merged": "已合并"}
 # 反查单元时用来剥离文件后缀（章节名与 chapter 同名，含连字符与 .cpp/.qmd/.txt）
 STEM_RE = re.compile(r"\.(qmd|cpp|cc|cxx|h|hpp|txt|sh|json|py)$")
 
@@ -53,6 +54,11 @@ def repo_root():
 
 def rel(path, root):
     return path.relative_to(root).as_posix()
+
+
+def status_label(value):
+    """把任务矩阵状态转成用户可读的中文。"""
+    return STATUS_LABELS.get(value, value)
 
 
 def is_code_dir(entry):
@@ -113,6 +119,7 @@ def parse_matrix(path):
             "dep": cells[3].strip("`"),
             "qmd": first_path(cells[4]),
             "code": first_path(cells[5]),
+            "code_paths": repo_paths(cells[5]),
             "spec": [p for p in repo_paths(cells[6]) if p not in common],
             "note": "" if cells[7] in ("—", "-") else cells[7],
             "common": common,
@@ -140,11 +147,34 @@ def find_chapter(target, root):
             "qmd": qmd if qmd.is_file() else None, "matrix": matrix_file, "row": row}
 
 
+def find_chapter_by_code_path(path, root):
+    """由示例目录反查章节；支持同一章节登记多个独立工程。"""
+    for matrix in sorted((root / TASKS_DIR).glob("*.md")):
+        part = matrix.stem
+        for chapter, row in parse_matrix(matrix).items():
+            for code_path in row.get("code_paths", []):
+                code_root = (root / code_path).resolve()
+                try:
+                    path.relative_to(code_root)
+                except ValueError:
+                    continue
+                qmd = root / "content" / part / f"{chapter}.qmd"
+                return {
+                    "kind": "chapter",
+                    "part": part,
+                    "chapter": chapter,
+                    "qmd": qmd if qmd.is_file() else None,
+                    "matrix": matrix,
+                    "row": row,
+                }
+    return None
+
+
 def resolve_path(target, root):
     """由任意仓库内路径反查所属章节单元。
 
-    `content/<part>/<chapter>.qmd` 与 `code/<part>/<chapter>.cpp` 取文件主名，
-    `code/<part>/<chapter>/...` 取第三段目录名。两者都要求章节已在矩阵登记。
+    `content/<part>/<chapter>.qmd` 与默认示例路径按章节名反查。矩阵登记了多个
+    示例目录时，按路径前缀匹配对应章节。两者都要求章节已在矩阵登记。
     """
     path = (root / target).resolve()
     try:
@@ -157,7 +187,7 @@ def resolve_path(target, root):
     chapter = parts[2] if len(parts) > 3 else STEM_RE.sub("", parts[2])
     if not chapter or chapter == "index" or chapter == ".gitkeep":
         return None
-    return find_chapter(f"{part}/{chapter}", root)
+    return find_chapter(f"{part}/{chapter}", root) or find_chapter_by_code_path(path, root)
 
 
 DOMAIN_READ = {
@@ -186,11 +216,24 @@ def resolve_repo_domain(target, root):
                 "reads": [".agents/skills/catalog.md"],
             }
         skill = parts[2]
-        reads = [".agents/skills/catalog.md", f".agents/skills/{skill}/SKILL.md"]
+        reads = [f".agents/skills/{skill}/SKILL.md"]
         if len(parts) > 3 and path.is_file():
-            reads.append(rel_path)
+            if rel_path not in reads:
+                reads.append(rel_path)
         elif len(parts) > 3 and path.is_dir():
-            reads.append(rel_path + "/")
+            if rel_path + "/" not in reads:
+                reads.append(rel_path + "/")
+        maintenance_paths = {
+            ".agents/skills/catalog.md",
+            ".agents/skills/agent-ops/references/reference-index.md",
+            ".agents/skills/agent-ops/references/refactor-guidelines.md",
+            ".agents/skills/agent-ops/scripts/check_skill_size.py",
+        }
+        if rel_path in maintenance_paths:
+            reads.insert(0, ".agents/skills/catalog.md")
+            index = ".agents/skills/agent-ops/references/reference-index.md"
+            if index not in reads:
+                reads.append(index)
         return {"kind": "repo", "label": f"skill {skill}", "reads": reads}
     if parts[:2] == [".agents", "mcp"]:
         return {
@@ -211,55 +254,57 @@ def resolve_repo_domain(target, root):
 
 
 def emit(unit, root, out, verbose=False):
-    """按固定格式打印 UNIT/READ/DENY 三段。"""
+    """按固定格式打印范围、单元、读取和禁止清单。"""
     lines = out
 
     if unit["kind"] == "chapter":
         part, chapter, row = unit["part"], unit["chapter"], unit["row"]
-        lines.append(f"SCOPE chapter {part}/{chapter}")
-        lines.append(f"TASK  {row['tid']} 状态={row['status']} 前置={row['dep'] or '—'}")
+        lines.append(f"范围  章节 {part}/{chapter}")
+        lines.append(f"任务  {row['tid']} 状态={status_label(row['status'])} 前置={row['dep'] or '—'}")
         if row["status"].startswith(MERGED):
-            lines.append(f"HOLD  本章已并入 {row['dep'] or '前置章节'}，不新建正文；{row['note']}")
-            lines.append("RULE  只读 UNIT+READ；确需越界先一句声明理由（诊断逃生舱）")
+            lines.append(f"暂停  本章已并入 {row['dep'] or '前置章节'}，不新建正文；{row['note']}")
+            lines.append("规则  只读单元与读取项；确需越界先一句声明理由（诊断逃生舱）")
             return
         if unit["qmd"]:
-            lines.append(f"UNIT  {rel(unit['qmd'], root)}")
+            lines.append(f"单元  {rel(unit['qmd'], root)}")
         else:
-            lines.append(f"UNIT  content/{part}/{chapter}.qmd（待新建）")
-        single = root / "code" / part / f"{chapter}.cpp"
-        code_dir = root / "code" / part / chapter
-        if single.is_file():
-            lines.append(f"UNIT  {rel(single, root)}")
-        elif code_dir.is_dir():
-            files = unit_files(code_dir, root)
-            shown = files if verbose else files[:MAX_UNIT_FILES]
-            for item in shown:
-                lines.append(f"UNIT  {item}")
-            if not verbose and len(files) > MAX_UNIT_FILES:
-                lines.append(f"UNIT  …共 {len(files)} 个源文件（已截断，--verbose 看全量）")
-            if is_code_dir(code_dir):
-                lines.append(f"HOLD  code/{part}/{chapter}/build/ 存在构建产物：已排除，勿读")
-        lines.append(f"UNIT  {rel(unit['matrix'], root)}（任务矩阵：读写边界、状态与验收）")
+            lines.append(f"单元  content/{part}/{chapter}.qmd（待新建）")
+        code_paths = row.get("code_paths") or [f"code/{part}/{chapter}.cpp"]
+        code_files = []
+        for code_path in code_paths:
+            candidate = (root / code_path).resolve()
+            if candidate.is_file():
+                code_files.append(rel(candidate, root))
+            elif candidate.is_dir():
+                code_files.extend(unit_files(candidate, root))
+                if is_code_dir(candidate):
+                    lines.append(f"暂停  {code_path.rstrip('/')}/build/ 存在构建产物：已排除，勿读")
+        for item in code_files if verbose else code_files[:MAX_UNIT_FILES]:
+            lines.append(f"单元  {item}")
+        if not verbose and len(code_files) > MAX_UNIT_FILES:
+            lines.append(f"单元  …共 {len(code_files)} 个源文件（已截断，--verbose 看全量）")
+        lines.append(f"单元  {rel(unit['matrix'], root)}（任务矩阵：读写边界、状态与验收）")
         for ref in row["common"]:
             mark = "" if (root / ref).is_file() else "  ← 文件不存在，请核对"
-            lines.append(f"READ  {ref}{mark}")
+            lines.append(f"读取  {ref}{mark}")
         for ref in row["spec"]:
             mark = "" if (root / ref).is_file() else "  ← 文件不存在，请核对"
-            lines.append(f"READ  {ref}{mark}（本章专项）")
-        lines.append("DENY  其它 content/** 与 code/** 单元（跨章只按 @sec- 引用，不读正文）")
+            lines.append(f"读取  {ref}{mark}（本章专项）")
+        lines.append("禁止  其它 content/** 与 code/** 单元（跨章只按 @sec- 引用，不读正文）")
     else:
         label = unit.get("label", unit["kind"])
-        lines.append(f"SCOPE {unit['kind']} {label}".rstrip())
+        kind = {"theme": "主题", "dev": "开发", "repo": "仓库"}.get(unit["kind"], unit["kind"])
+        lines.append(f"范围  {kind} {label}".rstrip())
         refs = unit.get("reads") or DOMAIN_READ[unit["kind"]]
         for ref in refs:
-            lines.append(f"READ  {ref}")
+            lines.append(f"读取  {ref}")
         if unit["kind"] == "theme":
-            lines.append("RULE  只读取与当前任务直接相关的那一个主题资源或 CSS，禁止通读整个 css/。")
-        lines.append("DENY  content/** 与 code/**（本域任务不改正文与示例）")
+            lines.append("规则  只读取与当前任务直接相关的那一个主题资源或 CSS，禁止通读整个 css/。")
+        lines.append("禁止  content/** 与 code/**（本域任务不改正文与示例）")
 
     for deny in ALWAYS_DENY:
-        lines.append(f"DENY  {deny}")
-    lines.append("RULE  只读 UNIT+READ；确需越界先一句声明理由（诊断逃生舱）")
+        lines.append(f"禁止  {deny}")
+    lines.append("规则  只读单元与读取项；确需越界先一句声明理由（诊断逃生舱）")
     return lines
 
 
@@ -278,10 +323,10 @@ def main():
     except Exception:
         pass
 
-    parser = argparse.ArgumentParser(description="解析任务作用域（UNIT/READ/DENY 清单）")
+    parser = argparse.ArgumentParser(description="解析任务作用域（单元、读取、禁止清单）")
     parser.add_argument("target", nargs="?", help="章节 <part>/<chapter>、skill/knowledge/MCP/仓库内路径，或 theme/dev/repo")
     parser.add_argument("--list", action="store_true", help="列出任务矩阵登记的全部章节单元")
-    parser.add_argument("--verbose", action="store_true", help="展开被截断的 UNIT 文件")
+    parser.add_argument("--verbose", action="store_true", help="展开被截断的单元文件")
     args = parser.parse_args()
 
     root = repo_root()
@@ -289,9 +334,9 @@ def main():
     if args.list:
         units = all_units(root)
         for unit, tid, status in units:
-            print(f"{unit}\t{tid}\t{status}")
+            print(f"{unit}\t{tid}\t{status_label(status)}")
         todo = sum(1 for _u, _t, s in units if s == "todo")
-        print(f"（共 {len(units)} 个章节单元：todo {todo}，其余 done/merged）")
+        print(f"（共 {len(units)} 个章节单元：待办 {todo}，其余已完成或已合并）")
         return 0
 
     if not args.target:

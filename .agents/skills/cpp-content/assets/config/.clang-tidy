@@ -20,13 +20,13 @@ CheckOptions:
   - key: readability-identifier-naming.StructCase
     value: CamelCase
   - key: readability-identifier-naming.FunctionCase
-    value: CamelCase
+    value: camelBack
   - key: readability-identifier-naming.VariableCase
-    value: lower_case
+    value: camelBack
   - key: readability-identifier-naming.ParameterCase
-    value: lower_case
+    value: camelBack
   - key: readability-identifier-naming.MemberCase
-    value: lower_case
+    value: camelBack
   - key: readability-identifier-naming.PrivateMemberSuffix
     value: _
   - key: readability-identifier-naming.ConstantCase

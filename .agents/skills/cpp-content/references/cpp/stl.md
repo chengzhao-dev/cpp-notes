@@ -25,4 +25,4 @@
 
 ## 章节落点
 
-- `content/stl/intro-stl.qmd` 起逐章展开
+- `content/standard-library/overview.qmd` 起逐章展开

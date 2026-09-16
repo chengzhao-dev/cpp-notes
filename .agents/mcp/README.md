@@ -25,6 +25,8 @@ skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用 `.
 
 `project_review` 是标准检查组合入口，会运行仓库检查和改动示例校验。它不替代宿主侧的人工缺陷审查。工具名称、参数和副作用以 `tools/list` 返回的 schema 为准。
 
+所有可能写入、构建或渲染的工具描述都带有“仅执行阶段调用”约束，并通过 `annotations` 标记只读与破坏性属性。Plan Mode 只能调用只读工具，不能把这些工具的返回结果当成执行批准。
+
 | 工具 | 用途 | 是否写入 |
 |---|---|---|
 | `project_status` | 获取精简 Git 状态 | 否 |
@@ -33,7 +35,7 @@ skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用 `.
 | `project_read` | 读取仓库内文本文件 | 否 |
 | `project_search` | 在允许的源码、文档和配置中检索 | 否 |
 | `project_edit` | 对单个文件执行精确文本替换 | 是 |
-| `project_check` | 运行 `run.py check` | 可能生成检查缓存 |
+| `project_check` | 运行 `run.py check --profile <fast|book|knowledge|python|full>` | 可能生成检查缓存 |
 | `project_verify` | 运行 C++ 示例校验 | 可能生成构建产物 |
 | `project_render` | 渲染 Quarto Book 并校验 | 是，生成 `_book/` |
 | `project_build` | 构建指定章节示例 | 是，生成 `build/` |
@@ -52,7 +54,7 @@ skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用 `.
 ## 安全边界
 
 - 所有路径必须位于仓库根目录内，拒绝路径穿越和越界符号链接。
-- 工具描述和注解不能替代宿主的用户授权。写入、渲染和构建工具须在宿主确认后调用。
+- 工具描述和注解不能替代宿主的用户授权。`project_edit`、`project_check`、`project_verify`、`project_render`、`project_build` 和 `project_review` 只应在用户明确批准后调用，Plan Mode 不得调用。
 - 永不读取或写入 `.git/`、`_book/`、`.quarto/`、`code/**/build/`、依赖缓存和密钥文件。
 - `project_search` 自动跳过构建产物、缓存和二进制文件。
 - `project_search` 跳过 `.env`、私钥和其他敏感文件。工具输出会对常见凭据键值脱敏。

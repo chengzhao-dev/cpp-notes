@@ -11,7 +11,15 @@ TOKEN_RE = re.compile(r"(?<![A-Za-z0-9_+.-])(%s)(?![A-Za-z0-9_+.-])" % "|".join(
 
 def prose_lines(text: str):
     in_fence = False
+    in_frontmatter = False
     for line_no, line in enumerate(text.splitlines(), 1):
+        if line_no == 1 and line.strip() == "---":
+            in_frontmatter = True
+            continue
+        if in_frontmatter:
+            if line.strip() == "---":
+                in_frontmatter = False
+            continue
         if line.lstrip().startswith("```") or line.lstrip().startswith("~~~"):
             in_fence = not in_fence
             continue

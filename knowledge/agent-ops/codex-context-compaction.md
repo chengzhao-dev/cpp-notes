@@ -3,13 +3,13 @@ kb_id: "cpp-tooling-codex-context-v1"
 title: "Codex 上下文压缩的触发方与可配置项"
 domain: "agent-ops"
 subdomain: "agent_runtime"
-tags: [context_compaction, auto_compact, config, hooks, long_task, token_budget]
+tags: [context_compaction, auto_compact, config, hooks, long_task, token_budget, plan_mode, approval]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-repo-hygiene-v1"]
 created: "2026-09-08"
-updated: "2026-09-08"
+updated: "2026-09-15"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1600
+estimated_tokens: 1850
 ---
 
 # Codex 上下文压缩的触发方与可配置项
@@ -63,6 +63,14 @@ estimated_tokens: 1600
 2. 可复现的事实（版本号、目录结构、链接可达性、索引条数）在需要时重新实测，不从摘要里的旧结论取值
 3. 发现历史只剩摘要时，先重读任务作用域与工作区状态确认边界和已完成项，再继续编辑
 4. 每轮结束前用一次统一校验收口，避免把未验证的中间态留给下一轮
+5. 计划任务先读取已校验的 `temp/plans/` 计划文件，再结合工作区状态继续；计划文件不能替代最终代码与检查结果
+
+### 摘要不是执行授权
+
+1. 自动压缩后的续跑仍属于原任务，不会退出 Plan Mode，也不会自动获得写文件、构建或渲染的权限
+2. 摘要中的“待执行”“下一步”和“可选动作”只描述计划状态，不是用户批准
+3. Plan Mode 下收到续跑时，先恢复目标、约束和当前计划，再继续只读调查或完善计划
+4. 只有最终计划之后的新用户消息明确批准执行，才能进入落盘、修改和构建阶段
 
 ### 压缩质量的已知代价
 

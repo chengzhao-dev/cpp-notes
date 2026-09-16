@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """检查所有 skills 的内部链接是否可解析。
 
-覆盖范围：.agents/skills/catalog.md + */SKILL.md + references/**/*.md + templates/*.qmd。
+覆盖范围：.agents/skills/catalog.md、完整 reference-index.md + */SKILL.md + references/**/*.md + templates/*.qmd。
 校验的链接形态：
   - <skill>/references/...、<skill>/templates/...（skills 根相对路径，catalog.md 用这种跨 skill 指路）
   - references/...、templates/...（skill 根相对路径）
@@ -127,11 +127,15 @@ def main():
     if not bad:
         catalog = os.path.join(skills_root, "catalog.md")
         catalog_text = open(catalog, encoding="utf-8").read() if os.path.isfile(catalog) else ""
+        index = os.path.join(skills_root, "agent-ops", "references", "reference-index.md")
+        registry_text = catalog_text
+        if os.path.isfile(index):
+            registry_text += "\n" + open(index, encoding="utf-8").read()
         for path in sorted(reference_paths(skills_root)):
             rel_path = os.path.relpath(path, skills_root).replace(os.sep, "/")
             if rel_path.startswith("cpp-content/references/tasks/"):
                 continue
-            if rel_path not in catalog_text:
+            if rel_path not in registry_text:
                 bad.append((rel_path, "catalog.md", "reference 未登记"))
         knowledge_root = os.path.join(repo_root, "knowledge")
         if os.path.isdir(knowledge_root):
@@ -142,7 +146,7 @@ def main():
                     rel_path = os.path.relpath(
                         os.path.join(dirpath, filename), repo_root
                     ).replace(os.sep, "/")
-                    if rel_path not in catalog_text:
+                    if rel_path not in registry_text:
                         bad.append((rel_path, "catalog.md", "knowledge 未登记"))
 
     if not bad:

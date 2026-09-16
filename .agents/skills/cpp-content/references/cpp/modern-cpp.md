@@ -51,4 +51,4 @@
 
 ### 章节落点
 
-- core 卷 `references` 后或 toolchain 卷按需
+- language-basics 卷 `references` 后或 toolchain 卷按需

@@ -2,23 +2,34 @@
 """生成 C++ 项目骨架。
 
 布局（--layout，默认 auto）：
-  bare   仅 main.cpp，适合 code/<part>/ 单文件校验。
-  simple main.cpp + CMakeLists.txt。
-  complete 完整工程文件，适合需要直接构建的章节示例。
-  auto   目标在仓库 code/ 下 -> complete，否则 -> simple。
+  bare    仅 main.cpp，适合 code/<part>/ 单文件校验。
+  simple  main.cpp + CMakeLists.txt，不生成一键脚本。
+  single  main.cpp + CMakeLists.txt + build-and-run.sh。
+  multi   include/ + src/ + CMakeLists.txt + build-and-run.sh。
+  static-library  greeting/ + 根 main.cpp + 静态库 CMake 工程。
+  shared-library  greeting/ + 根 main.cpp + 动态库 CMake 工程。
+  complete  single 的兼容别名。
+  auto    目标在仓库 code/ 下 -> single，否则 -> simple。
 
 标准用法（使用仓库配置的 Python 3.12）：
   python .agents/skills/python-tools/scripts/scaffold/init_project.py `
-    --name first-program `
-    --dir code/getting-started
-上例会自动创建 code/getting-started/first-program。
+    --name cmake-project `
+    --dir code/getting-started `
+    --layout single
+上例会自动创建 code/getting-started/cmake-project。
 随后在 WSL2 Ubuntu 中进入项目目录并运行：
   bash build-and-run.sh
 
 仓库根目录已配置好 Python 时，也可以使用：
-  python .agents/skills/python-tools/scripts/scaffold/init_project.py --name first-program --dir code/getting-started
+  python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+    --name multi-file-project --dir code/getting-started --layout multi
 
-用法：python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> [--dir code/<part>]
+库工程示例：
+  python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+    --name static-library --dir code/getting-started --layout static-library
+
+用法：python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+  --name <name> [--dir code/<part>] [--layout single|multi|static-library|shared-library]
 退出码：0 成功，1 参数/路径错误。
 """
 
@@ -29,14 +40,26 @@ import sys
 from pathlib import Path
 
 NAME_RE = re.compile(r"^[A-Za-z0-9_-]+$")
-PLACEHOLDER = "{{PROJECT_NAME}}"
-LAYOUTS = ("auto", "bare", "simple", "complete")
+CMAKE_PROJECT_NAME_PLACEHOLDER = "{{CMAKE_PROJECT_NAME}}"
+LAYOUTS = (
+    "auto",
+    "bare",
+    "simple",
+    "single",
+    "complete",
+    "multi",
+    "static-library",
+    "shared-library",
+)
+LIBRARY_LAYOUTS = {"static-library", "shared-library"}
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-TEMPLATE_DIR = SCRIPT_DIR / "templates"
 REPO_ROOT = SCRIPT_DIR.parents[4]
 CPP_CONFIG_DIR = (
     REPO_ROOT / ".agents" / "skills" / "cpp-content" / "assets" / "config"
+)
+PROJECT_TEMPLATE_DIR = (
+    REPO_ROOT / ".agents" / "skills" / "cpp-content" / "templates" / "projects"
 )
 
 
@@ -46,9 +69,25 @@ def write(path, text):
     print(f"  create {path}")
 
 
-def render(template_path, target_path, name):
+def to_cmake_project_name(name):
+    """把目录名转换为 CMake 常用的 PascalCase 工程名。"""
+    return "".join(part[:1].upper() + part[1:] for part in re.split(r"[-_]+", name))
+
+
+def render(template_path, target_path, cmake_project_name):
     text = template_path.read_text(encoding="utf-8")
-    write(target_path, text.replace(PLACEHOLDER, name))
+    text = text.replace(CMAKE_PROJECT_NAME_PLACEHOLDER, cmake_project_name)
+    write(target_path, text)
+
+
+def render_tree(template_dir, target_dir, cmake_project_name):
+    for template_path in sorted(template_dir.rglob("*")):
+        if template_path.is_file():
+            render(
+                template_path,
+                target_dir / template_path.relative_to(template_dir),
+                cmake_project_name,
+            )
 
 
 def setup_development_configs(target_dir, no_clang):
@@ -82,6 +121,30 @@ def readme_text(name, layout):
             "# 验证 C++ 示例",
             "$ & .agents/skills/agent-ops/scripts/run.ps1 verify",
             "```",
+        ]
+    elif layout in LIBRARY_LAYOUTS:
+        library_file = (
+            "libgreeting.a" if layout == "static-library" else "libgreeting.so"
+        )
+        lines += [
+            "这是一个使用 CMake 管理的 C++20 库工程。",
+            "",
+            "构建与运行：",
+            "",
+            "```bash",
+            "# 配置 clang++ 与 Ninja Debug 构建",
+            "cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++",
+            "",
+            "# 构建库和 app",
+            "cmake --build build",
+            "",
+            "# 运行 app",
+            "./build/bin/app",
+            "```",
+            "",
+            f"库文件生成在 `build/lib/{library_file}`，`app` 生成在 `build/bin/app`。",
+            "",
+            "配置阶段会生成 `build/compile_commands.json`，供 clangd 提供与实际构建一致的补全、跳转和诊断。",
         ]
     else:
         lines += [
@@ -119,7 +182,7 @@ def main():
         "--layout",
         choices=LAYOUTS,
         default="auto",
-        help="项目布局：code/ 下默认 complete，其余路径默认 simple；Windows 请使用配置的 Python 3.12",
+        help="项目布局：single、multi、static-library 或 shared-library；另保留 bare/simple/complete 兼容用法",
     )
     parser.add_argument("--readme", action="store_true")
     parser.add_argument(
@@ -141,19 +204,62 @@ def main():
     if layout == "auto":
         try:
             target.resolve().relative_to(REPO_ROOT / "code")
-            layout = "complete"
+            layout = "single"
         except ValueError:
             layout = "simple"
+    elif layout == "complete":
+        layout = "single"
     print(f"布局：{layout}（目标：{target}）")
 
     name = args.name
+    cmake_project_name = to_cmake_project_name(name)
     if layout == "bare":
-        write(target / "main.cpp", (TEMPLATE_DIR / "main.cpp").read_text(encoding="utf-8"))
+        write(
+            target / "main.cpp",
+            (PROJECT_TEMPLATE_DIR / "single" / "main.cpp").read_text(encoding="utf-8"),
+        )
+    elif layout == "simple":
+        render(
+            PROJECT_TEMPLATE_DIR / "single" / "main.cpp",
+            target / "main.cpp",
+            cmake_project_name,
+        )
+        render(
+            PROJECT_TEMPLATE_DIR / "single" / "CMakeLists.txt",
+            target / "CMakeLists.txt",
+            cmake_project_name,
+        )
+    elif layout == "single":
+        render(
+            PROJECT_TEMPLATE_DIR / "single" / "main.cpp",
+            target / "main.cpp",
+            cmake_project_name,
+        )
+        render(
+            PROJECT_TEMPLATE_DIR / "single" / "CMakeLists.txt",
+            target / "CMakeLists.txt",
+            cmake_project_name,
+        )
+        render(
+            PROJECT_TEMPLATE_DIR / "common" / "build-and-run.sh",
+            target / "build-and-run.sh",
+            cmake_project_name,
+        )
+    elif layout == "multi":
+        render_tree(PROJECT_TEMPLATE_DIR / "multi", target, cmake_project_name)
+        render(
+            PROJECT_TEMPLATE_DIR / "common" / "build-and-run.sh",
+            target / "build-and-run.sh",
+            cmake_project_name,
+        )
     else:
-        render(TEMPLATE_DIR / "main.cpp", target / "main.cpp", name)
-        render(TEMPLATE_DIR / "CMakeLists.txt", target / "CMakeLists.txt", name)
-        if layout == "complete":
-            render(TEMPLATE_DIR / "build-and-run.sh", target / "build-and-run.sh", name)
+        render_tree(PROJECT_TEMPLATE_DIR / "library", target, cmake_project_name)
+        render_tree(PROJECT_TEMPLATE_DIR / layout, target, cmake_project_name)
+        render(
+            PROJECT_TEMPLATE_DIR / "common" / "build-and-run.sh",
+            target / "build-and-run.sh",
+            cmake_project_name,
+        )
 
     try:
         setup_development_configs(target, args.no_clang)
@@ -165,7 +271,7 @@ def main():
 
     if layout == "bare":
         print("\n下一步：编辑源码并运行 verify_examples.py。")
-    elif layout == "complete":
+    elif layout in {"single", "multi"} | LIBRARY_LAYOUTS:
         print("\n下一步：编辑源码并运行 bash build-and-run.sh。")
     else:
         print("\n下一步：编辑源码并运行 cmake -S . -B build -G Ninja "

@@ -1,16 +1,39 @@
 # C++ 代码风格
 
-> LLVM 排版 · Google 命名 · C++20 · 2 空格缩进 · 配置源见 `.agents/skills/cpp-content/assets/config/`
+> Google 排版与 include 顺序 · 项目小驼峰命名 · C++20 · 2 空格缩进
+> 配置源见 `.agents/skills/cpp-content/assets/config/`
 
 ## 命名
 
 | 实体 | 规则 | 示例 |
 |---|---|---|
-| 类型/函数 | 大驼峰 | `HttpRequest`、`AddEntry()` |
-| 变量/参数 | snake_case | `entry_count` |
-| 类私有成员 | snake_case + `_` | `width_` |
+| 类型 | 大驼峰 | `HttpRequest`、`UrlTable` |
+| 函数/方法 | 小驼峰 | `addEntry()`、`makeGreeting()` |
+| 变量/参数/成员 | 小驼峰 | `entryCount`、`maxRetries` |
+| 类私有成员 | 小驼峰 + `_` | `width_`、`entryCount_` |
 | 常量 | `k` + 大驼峰 | `kMaxRetries` |
-| 文件 | snake_case.cpp | `url_table.cpp` |
+| 命名空间 | `lower_case` | `url_table` |
+| C++ 文件 | snake_case | `url_table.cpp` |
+
+这套命名以 Google C++ Style Guide 的结构和常量约定为底，只把函数、变量、参数和成员改为
+Qt、WebKit 常用的小驼峰。Google 原规则对函数使用大驼峰，对变量和成员使用 snake_case。
+这里不把两种规则混写成“Google 默认小驼峰”。命名依据见标识 `cpp-naming-format-v1`。
+
+## Include 顺序
+
+源文件按下面的顺序包含头文件，各组之间保留一个空行，组内按字母排序：
+
+1. 对应实现文件自身的头文件。
+2. C 系统头文件。
+3. C++ 标准库头文件。
+4. 其他库头文件。
+5. 本项目头文件。
+
+`BasedOnStyle: Google` 负责排序和分组。项目保留 `.cpp`、`.h`、`#pragma once` 和异常，
+不跟随 Google 的 `.cc`、include guard 和禁用异常规则。
+
+源文件直接使用某个标准库类型时，必须包含对应头文件，不能依赖其他头文件的传递包含。
+实现文件包含自身接口后，仍应直接包含它使用的标准库头文件。
 
 ## 工具
 
@@ -31,6 +54,7 @@
 ```
 
 clang 配置源位于 `.agents/skills/cpp-content/assets/config/`，由 `.agents/skills/python-tools/scripts/scaffold/init_project.py` 复制到独立工程根目录。
+`single` 与 `multi` 工程模板位于 `.agents/skills/cpp-content/templates/projects/`，示例工程应与模板结构保持一致。
 
 Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `& .agents/skills/agent-ops/scripts/run.ps1 verify`。单章节构建使用 `& .agents/skills/agent-ops/scripts/run.ps1 build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
 
@@ -42,19 +66,25 @@ Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一
 
 教程代码先展示能运行的最小版本，再按一个变化点逐步扩展。每次扩展都说明行为变化和验证方式，不把最终工程一次性倾倒给初学者。
 
-## 重要代码行的注释
+## 源码注释合同
 
-注释只说明当前代码块的学习重点。不要引入正文尚未出现的比较对象，也不要解释本节没有展开的语言原理。如果代码块只用于展示操作，使用简短的中性注释即可。
+`code/**` 与 `cpp-content/templates/projects/**` 中的完整 `.h`、`.cpp`、`.sh` 和
+`CMakeLists.txt` 使用“用途 + 重点”注释。首个有效行必须用语言原生注释说明文件职责。
+Shell 首行是 shebang 时，用途注释紧随其后。文件要能脱离正文独立读懂，但不逐行翻译代码。
 
-注释服务于本节的学习目标，不是逐行翻译代码。某个标识符、语句或配置第一次出现且需要读者记住时，在对应代码行正上方使用语言原生注释。背景代码不重复注释，复杂原理放在代码块外的正文中。
+- C++ 头文件先说明接口职责。实现文件先说明它实现哪项声明。程序入口先说明程序做什么。
+- C++ 只为接口契约、实现关系、首次出现的语言重点或非显然行为增加注释。不要重复注释
+  `#include`、`main`、赋值和 `return`，也不要在文件用途注释之外再逐行解释入口。
+- CMake 首行说明当前文件要构建的目标。顶层文件写工程组成，库子目录文件只写库自身。编译数据库注释说明生成的文件和实际用途，源文件收集注释说明收集范围与新增文件后的结果。每条注释只表达一个动作或因果关系，不把独立事实拼成两句。
+- Shell 首行说明脚本用途，并为 `set -euo pipefail` 等停止条件写短注释。
+- 讲 `vector` 时只注释 `std::vector`、元素访问和迭代器等当前学习重点，不重复解释
+  `iostream` 或 `std::cout`。CMake 命令和变量优先采用 CMake 官方中文文档术语。
 
-第一次展示 `CMakeLists.txt` 或 Shell 脚本时，为版本要求、目标、输出目录和脚本控制语句提供足够的职责注释。`set -euo pipefail` 等组合选项要用简短准确的注释说明停止条件，后续示例不重复相同解释。版本要求只写需要的版本号，不写宿主发行版名与其版本。
-
-- 第一个 C++ 程序可注释 `#include <iostream>`、`main` 和 `std::cout`。
-- 讲 `vector` 时只注释 `std::vector`、元素访问和迭代器等 vector 重点，不重复注释 `iostream` 或 `std::cout`。
-- CMake 命令和变量优先采用 CMake 官方中文文档术语。C++ 语言和标准库优先参考主流中文教材与 [cppreference 中文站](https://zh.cppreference.com/)。
-
-一个代码块只承担一个主要学习目标。`cpp`、`bash`、`powershell` 和 `cmake` 围栏都在代码内部写注释，注释放在被说明代码的上一行，不加行尾长注释，命令块不加 `$ ` 与 `PS>` 提示符。多行原理说明留在正文，正文只做详细说明。命令块的总注释、子注释和中文标点细则以 `quarto-docs` 的 `terminal-validation.md` 为准。`{{< include /code/... >}}` 引用的真实源码文件使用常规简洁注释，命令输出使用紧随其后的 `text` 块。各代码块内部的逻辑块之间留一个空行。
+inline `cpp`、`bash`、`powershell` 和 `cmake` 代码块仍按 `quarto-docs` 的
+`terminal-validation.md` 控制总注释与子注释，不为满足文件合同机械增加注释。
+`{{< include /code/... >}}` 引用的真实文件则按本节的独立阅读标准维护。注释只解释学习重点，
+不引入正文尚未出现的比较对象。复杂原理、参数边界和背景放到正文或标识
+`cpp-teaching-source-comments-v1` 的知识文件。
 
 代码和终端输出左对齐，保留必要缩进，字段名与说明的对齐交给表格。Shell、CMake 和 C++ 示例禁止把长解释写成行尾注释。中文说明使用完整句子，代码语法中的标点不受正文标点规则影响。
 

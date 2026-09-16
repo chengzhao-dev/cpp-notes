@@ -3,13 +3,13 @@ kb_id: "cpp-quarto-inline-code-boundaries-v1"
 title: "技术文档行内代码标记边界"
 domain: "quarto-docs"
 subdomain: "writing"
-tags: [inline-code, backticks, commands, identifiers, consistency, link, spacing]
+tags: [inline-code, backticks, commands, identifiers, consistency, link, spacing, heading, navigation, font_consistency]
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chinese-style-v1"]
 created: "2026-09-11"
-updated: "2026-09-12"
+updated: "2026-09-16"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 950
+estimated_tokens: 1050
 ---
 
 # 技术文档行内代码标记边界
@@ -21,6 +21,10 @@ estimated_tokens: 950
 ## 普通名称不自动标记
 
 Ubuntu、Windows 和 VS Code 作为平台或产品名称时属于自然语言，不必加反引号。当它们出现在命令、路径或精确标识中时再标记。链接文本直接使用链接，不用反引号包住链接地址。
+
+## 标题与导航保持单一字体
+
+标题和导航文本属于连续扫读区域。若其中混用反引号，渲染器会把个别词切换成等宽代码字体，同一层级的中英文和工具名就会出现不同的字面、字重与节奏，侧边栏尤其容易显得断裂。标题中的技术名词直接写普通文字，例如“用 CMake 构建程序”，正文再用反引号标记需要逐字识别的 `CMake`。这样保留正文的技术精度，也不让导航承担代码标记职责。
 
 ## 行内标记与链接两侧的间距
 
