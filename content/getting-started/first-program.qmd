@@ -2,41 +2,27 @@
 title: "写出第一个 C++ 程序"
 ---
 
-上一章已经在 Ubuntu 中准备好 C++ 工具链。本章只处理一个源文件，先用 `clang++` 直接生成并运行程序。完成后，你会看到源码经过编译和链接变成可执行文件，并在终端输出 `Hello, World!`。下一章再把同样的流程交给 `CMake`。
+本章用一个源文件走通“写代码、编译、链接、运行”这条最短路径。完成后，终端会输出 `Hello, World!`。
 
 ## 创建源文件
 
-`Hello, World!` 是大多数人的第一个 C++ 程序。它用最少代码走通“写出源码、编译、链接、运行、看到输出”这条流程，也能直接验证上一章工具链是否可用。程序没有输入、文件操作或复杂数据类型，出现问题时的范围更容易判断。
-
-打开示例工程 [first-program](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)，目录如下：
-
-```{.text filename="工程目录"}
-first-program/
-├── build-and-run.sh  # 一键编译并运行
-└── first-program.cpp # 程序源码
-```
-
-新建 `first-program.cpp`。完整源码如下：
+新建 `first-program.cpp`，输入下面的代码。
 
 ```{.cpp filename="first-program.cpp"}
 {{< include /code/getting-started/first-program/first-program.cpp >}}
 ```
 
-`#include <iostream>` 引入标准输入输出支持，程序随后才能使用 `std::cout` 把文字写到终端。
-
-`int main()` 是程序入口，返回类型是 `int`，空圆括号表示当前程序不接收命令行参数。`main()` 后面的 `{` 到匹配的 `}` 组成入口函数的函数体，程序启动后从函数体的第一条语句开始执行。
-
-函数体中的 `std::cout << "Hello, World!\n";` 把文字和换行写入标准输出。最后一条语句 `return 0;` 表示程序正常结束。
+`#include <iostream>` 引入输入输出功能。`int main()` 是程序入口，花括号中的语句会按顺序执行。`std::cout` 把文字写到终端，`return 0` 表示程序正常结束。
 
 ## 编译并运行
 
-在 `first-program.cpp` 所在目录执行下面的命令。先把可执行文件放进 `build/`，避免生成物和源码混在一起。
+执行下面的命令。`clang++` 先把源码编译成机器指令，再链接程序启动所需的代码。
 
 ```{.bash filename="Ubuntu Bash"}
-# 创建构建产物目录
+# 创建构建目录
 mkdir -p build
 
-# 编译源文件并生成可执行文件
+# 编译源文件
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
 
 # 运行程序
@@ -49,84 +35,37 @@ clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o bui
 Hello, World!
 ```
 
-`clang++` 先编译源码，再把程序需要的运行代码链接起来。`-o build/first-program` 指定可执行文件的输出路径。`./` 表示运行当前目录中的文件。
+`-std=c++20` 选择 C++ 标准，`-stdlib=libc++` 选择标准库，`-Wall -Wextra -Werror` 打开常见警告并阻止有警告的构建。`-o build/first-program` 指定输出文件。
 
-::: {.callout-note title="编译选项"}
-`-std=c++20` 选择语言标准，`-stdlib=libc++` 选择 C++ 标准库，`-Wall -Wextra -Werror` 打开常见警告并让警告阻止构建。
-:::
+## 修改后重新编译
 
-## 使用一键脚本
-
-工程中的 `build-and-run.sh` 把创建构建目录、编译和运行放在一起。脚本内容如下：
-
-```{.bash filename="build-and-run.sh"}
-{{< include /code/getting-started/first-program/build-and-run.sh >}}
-```
-
-执行下面的命令即可重新编译并运行：
-
-```{.bash filename="Ubuntu Bash"}
-bash build-and-run.sh
-```
-
-脚本与前面的手工命令等价，适合反复检查程序。理解每条命令后，再按需单独执行更方便排查问题。
-
-## 修改后再运行
-
-把源码中的 `Hello, World!` 改成其他文字，再执行一次下面的命令。
+把源码中的 `Hello, World!` 改成其他文字，再执行下面的命令。
 
 ```{.bash filename="Ubuntu Bash"}
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
 ./build/first-program
 ```
 
-终端显示修改后的文字，说明源文件到可执行文件的完整过程已经跑通。源码改变后必须重新编译，旧文件不会自动更新。
+终端显示修改后的文字，说明源码到程序的完整过程已经跑通。源码改变后必须重新编译。
+
+## 使用脚本
+
+示例目录中的 `build-and-run.sh` 会依次执行创建目录、编译和运行。可以直接执行：
+
+```{.bash filename="Ubuntu Bash"}
+bash build-and-run.sh
+```
 
 ## 常见错误
 
 ### 找不到 clang++
 
-运行编译命令时提示 `command not found: clang++`，说明 Ubuntu 当前找不到编译器。按下面的顺序恢复工具链。
-
-1. **定位错误来源**
-
-   执行下面的命令，检查 `clang++` 是否已经安装。
-
-   ```{.bash filename="Ubuntu Bash"}
-   command -v clang++
-   ```
-
-   命令没有输出时，说明工具确实缺失。
-
-2. **安装缺失工具**
-
-   回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，重新执行 C++ 工具链安装命令。
-
-3. **验证安装结果**
-
-   再次执行 `command -v clang++`。输出路径后，回到[编译并运行](#编译并运行)继续操作。
+如果提示 `command not found: clang++`，先执行 `command -v clang++`。没有输出时，回到上一章重新安装工具。
 
 ### 编译失败
 
-执行 `clang++` 时出现 `error:`，说明编译器已经启动，但源码没有通过检查。按下面的顺序修复源码，再回到主线编译。
-
-1. **定位第一条错误**
-
-   先看第一处 `error:`。终端通常会给出文件名、行号和出错内容。
-
-2. **修改对应源码**
-
-   打开报错指出的文件和行号，修正对应语句。
-
-3. **重新编译并运行**
-
-   ```{.bash filename="Ubuntu Bash"}
-   clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
-   ./build/first-program
-   ```
-
-   程序输出修改后的文字，说明源码已经重新编译并运行。
+如果出现 `error:`，先查看第一条错误给出的文件和行号，修改对应源码，再重新编译。修正后仍应输出程序中的文字。
 
 ## 本章回顾
 
-你已经能创建源文件，并用 `clang++` 完成编译、链接和运行。修改源码后必须重新编译。下一章会用 [CMake](cmake-project.qmd) 描述构建规则，让构建步骤可以重复执行。
+你已经能把一个源文件编译成可执行程序。下一章会用 [CMake](cmake-project.qmd) 保存构建规则，重复执行同一套构建步骤。

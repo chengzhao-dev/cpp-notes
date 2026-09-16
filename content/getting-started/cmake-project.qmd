@@ -2,11 +2,11 @@
 title: "用 CMake 构建程序"
 ---
 
-上一章用 `clang++` 直接编译了单个源文件，每次修改都需要重新执行编译命令。本章使用 `CMake` 描述构建规则，再由 `Ninja` 执行编译和链接。完成后，同一组配置和构建命令可以重复使用。
+上一章每次修改后都要手动执行编译命令。本章把编译参数写进 `CMakeLists.txt`，再用 `CMake` 和 `Ninja` 重复构建。
 
-## 认识工程文件
+## 查看工程文件
 
-打开示例工程 [cmake-project](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/cmake-project)，目录如下：
+示例工程包含三个文件：
 
 ```{.text filename="工程目录"}
 cmake-project/
@@ -15,119 +15,78 @@ cmake-project/
 └── main.cpp          # 程序源码
 ```
 
-`main.cpp` 与上一页相同，`CMakeLists.txt` 说明如何生成可执行文件。先阅读这两个文件，观察源码与构建规则如何对应。
+程序源码与上一章相同。
 
 ```{.cpp filename="main.cpp"}
 {{< include /code/getting-started/cmake-project/main.cpp >}}
 ```
 
+构建规则如下：
+
 ```{.cmake filename="CMakeLists.txt"}
 {{< include /code/getting-started/cmake-project/CMakeLists.txt >}}
 ```
 
-`add_executable(app main.cpp)` 创建一个名为 `app` 的可执行目标。`target_compile_options()` 和 `target_link_options()` 为这个目标提供编译与链接选项。
+`project()` 设置工程名。`set()` 选择 C++20、输出目录和编译数据库。`add_executable()` 创建名为 `app` 的可执行目标，后面的 `target_compile_options()` 和 `target_link_options()` 为它设置编译与链接参数。
 
 ## 配置工程
 
-进入 `cmake-project` 目录，执行下面的命令，让 `CMake` 读取 `CMakeLists.txt` 并生成 `Ninja` 构建文件。
+在工程根目录执行下面的命令。`CMake` 会读取构建规则，并生成 `Ninja` 使用的文件。
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
 ```
 
-`-S .` 表示源码目录是当前目录，`-B build` 表示把生成文件放进 `build/`。配置只需在构建规则改变后重新执行，日常修改源码不需要重复配置。
+`-S .` 指定源码目录，`-B build` 指定构建目录，`-G Ninja` 选择 Ninja。只有构建规则改变时才需要重新配置。
 
 ## 构建并运行
 
-执行下面的命令构建工程。
-
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
 cmake --build build
-```
-
-`CMake` 会调用 `Ninja` 编译并链接 `main.cpp`，生成 `build/bin/app`。运行下面的命令。
-
-```{.bash filename="Ubuntu Bash（工程根目录）"}
 ./build/bin/app
 ```
 
-程序输出如下：
+输出如下：
 
 ```{.text filename="输出"}
 Hello, World!
 ```
 
-修改 `main.cpp` 后再次执行 `cmake --build build`，`Ninja` 只会重建受影响的部分。
+`CMake` 生成 `build/bin/app`，`Ninja` 负责实际编译和链接。修改 `main.cpp` 后再次执行 `cmake --build build` 即可。
 
-## 使用一键脚本
+也可以直接运行 `bash build-and-run.sh`，依次完成配置、构建和运行。
 
-工程中的 `build-and-run.sh` 把配置、构建和运行放在一起。执行下面的脚本。
+## Android 手机影像里的可执行文件
 
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-bash build-and-run.sh
-```
+### 为什么仿真程序不上线
 
-脚本适合快速检查工程。理解每条命令后，再按需单独执行更方便排查问题。
+Android 手机影像算法常用 C++ 编写。开发阶段会先把核心算法编译成可执行程序，在 PC 或手机上读取 YUV、RAW、RGBA 等图像数据或图片序列，用来检查算法结果、对比效果、调整参数和做回归测试。
 
-## Android 影像算法仿真
-
-### 仿真验证为什么不上线
-
-在 Android 手机影像算法开发中，C++ 核心常由 NDK 编译为可执行文件，作为仿真程序读取 YUV、RAW、RGBA 或图片序列，并输出处理结果、日志和耗时。它用于验证算法正确性、对比效果、调试参数、评估性能和执行回归测试。
-
-仿真程序直接运行 native 代码，不依赖 JNI 和 App 集成，因此便于定位问题。设备端运行时，可以用 `adb push` 将程序和测试数据放入 `/data/local/tmp`，再通过 shell 执行；PC 端也适合做早期快速仿真。
-
-验证通过后，算法再封装为 `.so` 动态库 SDK。可执行文件用于开发、测试和集成前的验证，通常不作为最终 App 交付物，也不随应用上线。
+设备端常见做法是用 `adb push` 把程序和测试数据放进 `/data/local/tmp`，再从 shell 运行。这个程序直接调用算法，不需要接入 App，所以问题更容易定位。验证完成后，算法才会封装成动态库 SDK（开发工具包）供 App 集成，仿真程序通常不作为最终交付物。
 
 ## 常见错误
 
 ### 配置时找不到 Ninja
 
-配置工程时提示无法找到 `Ninja`，说明构建工具没有安装或当前终端无法调用。按下面的顺序恢复工具。
+先检查命令是否安装：
 
-1. **定位缺失工具**
+```{.bash filename="Ubuntu Bash"}
+command -v cmake ninja clang++
+```
 
-   执行下面的命令，查看工具是否都有输出路径。
-
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   command -v clang++ cmake ninja
-   ```
-
-2. **安装缺失工具**
-
-   回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具链)，重新执行 C++ 工具链安装命令。
-
-3. **重新配置并验证**
-
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
-   ```
-
-   配置输出包含 `Build files have been written to`，说明 `Ninja` 已经可用。
+缺少工具时，回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具)重新安装。
 
 ### 构建后找不到 app
 
-构建命令正常结束，但 `build/bin/app` 不存在时，说明配置目录或构建规则和当前命令不一致。按下面的顺序定位问题。
+先确认当前目录是工程根目录，再查看构建输出：
 
-1. **确认执行目录**
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+cmake --build build --verbose
+ls -l build/bin/app
+```
 
-   检查终端当前位于 `cmake-project` 工程根目录。目录不对时，先进入该目录。
-
-2. **查看第一条构建错误**
-
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   cmake --build build --verbose
-   ```
-
-3. **验证产物并运行**
-
-   ```{.bash filename="Ubuntu Bash（工程根目录）"}
-   ls -l build/bin/app
-   ./build/bin/app
-   ```
-
-   看到 `build/bin/app` 且程序输出 `Hello, World!`，说明工程已经构建成功。
+错误通常来自第一条编译信息。修正后重新构建，并运行 `./build/bin/app`。
 
 ## 本章回顾
 
-你已经能用 `CMake` 配置单入口工程，再用 `cmake --build` 调用 `Ninja` 构建 `app`。修改源码后直接重新执行构建命令即可。下一章会把程序拆成多个源文件，让 `CMake` 同时编译并链接它们。
+你已经能用 `CMake` 保存构建规则，并通过 `cmake --build` 构建 `app`。下一章会把代码拆成多个文件。

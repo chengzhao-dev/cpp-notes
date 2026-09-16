@@ -1,6 +1,6 @@
 ---
 title: "C++ 学习轨迹笔记"
-description: "从可运行的程序开始，逐步学习 C++ 语言、工具链和工程构建。"
+description: "记录从 Linux 环境到 C++ 工程构建的学习过程。"
 number-sections: false
 body-classes: homepage
 ---
@@ -9,14 +9,14 @@ body-classes: homepage
 记录 C++ 学习轨迹
 :::
 
-## 选择笔记内容
+## 开始阅读
 
-先选择要阅读的部分。进入后，再按顺序阅读该部分中的页面。
+先进入“入门与构建”，再按页面顺序完成六个小目标。每页只增加一个概念，并留下可以继续使用的工程。
 
 ::: {.feature-grid}
 ::: {.landing-card}
 ### [入门与构建](content/getting-started/index.qmd)
-从环境准备开始，依次完成直接编译、CMake 构建、多文件工程和库链接。
+从 WSL2 开始，经过直接编译、CMake、多文件工程，最后完成静态库和动态库。
 
 [查看内容 →](content/getting-started/index.qmd){.cta}
 :::
@@ -24,4 +24,4 @@ body-classes: homepage
 
 ## 后续内容
 
-语言基础、标准库和工程实践正在编写。
+语言基础、标准库和工程实践还在整理。

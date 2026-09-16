@@ -1,40 +1,40 @@
 ---
 title: "入门与构建"
-description: "从环境准备开始，依次完成直接编译、工程构建和库链接。"
+description: "从开发环境开始，逐步完成单文件程序、CMake 工程和库。"
 number-sections: false
 body-classes: index-page
 ---
 
-按顺序阅读即可。每页只完成一个目标，并为下一页准备好可继续使用的环境或工程文件。
+按顺序阅读即可。每页只完成一个目标，并为下一页留下可以继续使用的文件。
 
 ::: {.feature-grid}
 ::: {.landing-card}
 ### [搭建 WSL2 开发环境](setup-wsl2.qmd)
-在 Ubuntu 中准备好 C++ 工具链。
+在 Windows 上准备 Ubuntu 和 C++ 工具。
 :::
 
 ::: {.landing-card}
 ### [写出第一个 C++ 程序](first-program.qmd)
-把一个源文件编译成可执行程序。
+直接编译一个源文件并运行。
 :::
 
 ::: {.landing-card}
 ### [用 CMake 构建程序](cmake-project.qmd)
-用构建规则重复生成可执行程序。
+用构建规则重复生成程序。
 :::
 
 ::: {.landing-card}
 ### [构建多文件工程](multi-file-project.qmd)
-把接口、实现和程序入口拆到不同文件中。
+把接口、实现和程序入口拆开。
 :::
 
 ::: {.landing-card}
 ### [构建静态库](static-library.qmd)
-把可复用代码链接进最终程序。
+把库代码链接进最终程序。
 :::
 
 ::: {.landing-card}
 ### [构建动态库](shared-library.qmd)
-让程序在运行时查找对应的库文件。
+让程序在运行时查找库文件。
 :::
 :::
