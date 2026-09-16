@@ -12,17 +12,17 @@ title: "写出第一个 C++ 程序"
 {{< include /code/getting-started/first-program/first-program.cpp >}}
 ```
 
-`#include <iostream>` 引入输入输出功能。`int main()` 是程序入口，花括号中的语句会按顺序执行。`std::cout` 把文字写到终端，`return 0` 表示程序正常结束。
+不必现在记住每一行。先按下面的步骤得到结果，下一章再把 `main`、`#include`、编译和链接拆开说明。
 
 ## 编译并运行
 
-执行下面的命令。`clang++` 先把源码编译成机器指令，再链接程序启动所需的代码。
+在源码所在目录执行下面的命令。
 
-```{.bash filename="Ubuntu Bash"}
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
 # 创建构建目录
 mkdir -p build
 
-# 编译源文件
+# 编译并链接源文件
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
 
 # 运行程序
@@ -35,24 +35,22 @@ clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o bui
 Hello, World!
 ```
 
-`-std=c++20` 选择 C++ 标准，`-stdlib=libc++` 选择标准库，`-Wall -Wextra -Werror` 打开常见警告并阻止有警告的构建。`-o build/first-program` 指定输出文件。
+`clang++` 把源码变成程序；`-std=c++20` 选择语言标准，`-stdlib=libc++` 选择标准库，`-Wall -Wextra -Werror` 打开常见警告并阻止有警告的构建。`-o build/first-program` 指定输出文件。
 
 ## 修改后重新编译
 
 把源码中的 `Hello, World!` 改成其他文字，再执行下面的命令。
 
-```{.bash filename="Ubuntu Bash"}
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
 ./build/first-program
 ```
 
 终端显示修改后的文字，说明源码到程序的完整过程已经跑通。源码改变后必须重新编译。
 
-## 使用脚本
+示例目录中的 `build-and-run.sh` 会依次完成创建目录、编译和运行：
 
-示例目录中的 `build-and-run.sh` 会依次执行创建目录、编译和运行。可以直接执行：
-
-```{.bash filename="Ubuntu Bash"}
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
 bash build-and-run.sh
 ```
 
@@ -68,4 +66,4 @@ bash build-and-run.sh
 
 ## 本章回顾
 
-你已经能把一个源文件编译成可执行程序。下一章会用 [CMake](cmake-project.qmd) 保存构建规则，重复执行同一套构建步骤。
+你已经能把一个源文件编译成可执行程序。下一章会拆开这个最小程序，说明每个部分为什么存在。

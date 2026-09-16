@@ -20,7 +20,7 @@
 
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-MEM-001` | stack-heap | todo | `TASK-LANG-007` | `content/memory/stack-heap.qmd` | `code/memory/stack-heap.cpp` | — | — |
+| `TASK-MEM-001` | stack-heap | todo | `TASK-LANG-008` | `content/memory/stack-heap.qmd` | `code/memory/stack-heap.cpp` | — | — |
 | `TASK-MEM-002` | raii | todo | `TASK-MEM-001` | `content/memory/raii.qmd` | `code/memory/raii.cpp` | — | — |
 | `TASK-MEM-003` | smart-pointers | todo | `TASK-MEM-002` | `content/memory/smart-pointers.qmd` | `code/memory/smart-pointers.cpp` | — | — |
 | `TASK-MEM-004` | move-semantics | todo | `TASK-MEM-003` | `content/memory/move-semantics.qmd` | `code/memory/move-semantics.cpp` | — | — |

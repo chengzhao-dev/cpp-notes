@@ -15,7 +15,7 @@ cmake-project/
 └── main.cpp          # 程序源码
 ```
 
-程序源码与上一章相同。
+程序入口仍然只负责输出问候句，避免把语言细节和构建工具混在一起。
 
 ```{.cpp filename="main.cpp"}
 {{< include /code/getting-started/cmake-project/main.cpp >}}

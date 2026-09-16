@@ -4,7 +4,7 @@
 
 ## 公共读写边界
 
-- **必读**: `AGENTS.md`、本文件、`.agents/skills/cpp-content/references/cpp/cpp.md`、`.agents/skills/quarto-docs/references/quarto/authoring.md`、`.agents/skills/quarto-docs/references/zh/chapter-writing.md`
+- **必读**: `AGENTS.md`、本文件、`.agents/skills/cpp-content/references/cpp/cpp.md`、`.agents/skills/cpp-content/references/cpp/language-basics.md`、`.agents/skills/quarto-docs/references/quarto/authoring.md`、`.agents/skills/quarto-docs/references/zh/chapter-writing.md`
 - **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）
 - **禁止**: `.agents/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
 
@@ -20,8 +20,8 @@
 
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-LANG-001` | overview | todo | `TASK-ENV-004` | `content/language-basics/overview.qmd` | `code/language-basics/overview.cpp` | — | — |
-| `TASK-LANG-002` | variables | todo | `TASK-LANG-001` | `content/language-basics/variables.qmd` | `code/language-basics/variables.cpp` | — | — |
+| `TASK-LANG-001` | types-and-variables | done | `TASK-ENV-004` | `content/language-basics/types-and-variables.qmd` | `code/language-basics/types-and-variables.cpp` | `.agents/skills/cpp-content/references/cpp/language-basics.md` | 先讲基础类型、初始化、赋值、作用域和 auto 入门 |
+| `TASK-LANG-002` | constants | done | `TASK-LANG-001` | `content/language-basics/constants.qmd` | `code/language-basics/constants.cpp` | `.agents/skills/cpp-content/references/cpp/language-basics.md` | 讲 const 的初始化与不可修改，并简要引入 constexpr |
 | `TASK-LANG-003` | operators | todo | `TASK-LANG-002` | `content/language-basics/operators.qmd` | `code/language-basics/operators.cpp` | — | — |
 | `TASK-LANG-004` | control-flow | todo | `TASK-LANG-003` | `content/language-basics/control-flow.qmd` | `code/language-basics/control-flow.cpp` | — | — |
 | `TASK-LANG-005` | functions | todo | `TASK-LANG-004` | `content/language-basics/functions.qmd` | `code/language-basics/functions.cpp` | — | — |

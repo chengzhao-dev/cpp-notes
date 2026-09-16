@@ -20,7 +20,7 @@
 
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-STD-001` | overview | todo | `TASK-LANG-005` | `content/standard-library/overview.qmd` | `code/standard-library/overview.cpp` | — | — |
+| `TASK-STD-001` | overview | todo | `TASK-LANG-008` | `content/standard-library/overview.qmd` | `code/standard-library/overview.cpp` | — | — |
 | `TASK-STD-002` | vector | todo | `TASK-STD-001` | `content/standard-library/vector.qmd` | `code/standard-library/vector.cpp` | — | — |
 | `TASK-STD-003` | map-set | todo | `TASK-STD-002` | `content/standard-library/map-set.qmd` | `code/standard-library/map-set.cpp` | — | — |
 | `TASK-STD-004` | iterators | todo | `TASK-STD-002` | `content/standard-library/iterators.qmd` | `code/standard-library/iterators.cpp` | — | — |

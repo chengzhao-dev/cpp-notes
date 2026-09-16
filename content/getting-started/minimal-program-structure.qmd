@@ -1,0 +1,79 @@
+---
+title: "拆开最小程序结构"
+---
+
+上一章的程序只有几行。本章不增加新功能，而是分清程序入口、声明、实现、编译和链接，为后面的多文件工程打基础。
+
+## 先认识 main
+
+`main()` 是程序入口。操作系统启动程序后，从 `main()` 的第一条语句开始执行；花括号 `{}` 之间是函数体。
+
+```{.cpp filename="main.cpp"}
+{{< include /code/getting-started/minimal-program-structure/main.cpp >}}
+```
+
+`main()` 最后返回 `0`，表示程序正常结束。`std::cout` 是标准输出流，字符串末尾的 `\n` 表示换行。
+
+## 理解 include
+
+`#include <iostream>` 在编译前把 `iostream` 中的声明放进当前源文件，让编译器知道 `std::cout` 是什么。
+
+`#include "greeting.h"` 使用引号，表示优先从当前源码附近查找项目头文件。标准库头文件使用尖括号 `<...>`。
+
+`#include` 不会复制库的实现，也不会自动链接库。它只提供声明，真正实现仍要在编译或链接阶段找到。
+
+## 分开声明与实现
+
+`greeting.h` 声明函数，告诉编译器“有一个 `makeGreeting()` 可以调用”。
+
+```{.cpp filename="greeting.h"}
+{{< include /code/getting-started/minimal-program-structure/greeting.h >}}
+```
+
+`greeting.cpp` 提供实现，告诉链接器这个函数具体做什么。
+
+```{.cpp filename="greeting.cpp"}
+{{< include /code/getting-started/minimal-program-structure/greeting.cpp >}}
+```
+
+头文件让多个源文件共享同一份声明；实现只在一个源文件中出现，避免重复定义。
+
+## 看见编译和链接
+
+先把两个源文件分别编译成目标文件，再把目标文件链接成可执行程序。
+
+```{.bash filename="Ubuntu Bash（minimal-program-structure 目录）"}
+mkdir -p build
+
+# 编译：每个源文件生成一个目标文件
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c main.cpp -o build/main.o
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build/greeting.o
+
+# 链接：合并目标文件，生成可执行程序
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \
+  build/main.o build/greeting.o -o build/minimal-program-structure
+
+./build/minimal-program-structure
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+也可以运行 `bash build-and-run.sh`，让脚本一次完成原文件编译和链接。
+
+## 常见错误
+
+### undefined reference to makeGreeting
+
+这说明编译器看到了声明，但链接器没有找到实现。确认 `greeting.cpp` 已加入链接命令，然后重新构建。
+
+### 找不到 greeting.h
+
+确认当前目录包含 `main.cpp`、`greeting.cpp` 和 `greeting.h`，并且命令从示例目录执行。文件在其他目录时，需要用 `-I` 告诉编译器头文件路径。
+
+## 本章回顾
+
+你已经能区分程序入口、声明、实现、编译和链接。下一章用 `CMake` 把这套命令保存成可重复的工程规则。

@@ -19,10 +19,15 @@ book:
       chapters:
         - content/getting-started/setup-wsl2.qmd
         - content/getting-started/first-program.qmd
+        - content/getting-started/minimal-program-structure.qmd
         - content/getting-started/cmake-project.qmd
         - content/getting-started/multi-file-project.qmd
         - content/getting-started/static-library.qmd
         - content/getting-started/shared-library.qmd
+    - part: content/language-basics/index.qmd
+      chapters:
+        - content/language-basics/types-and-variables.qmd
+        - content/language-basics/constants.qmd
 
 # Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
 language:

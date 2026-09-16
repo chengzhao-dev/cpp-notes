@@ -20,6 +20,6 @@
 
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TASK-TOOL-001` | cmake-targets | todo | `TASK-ENV-004` | `content/toolchain/cmake-targets.qmd` | `code/toolchain/cmake-targets.cpp` | `.agents/skills/cpp-content/references/cpp/engineering.md` | — |
+| `TASK-TOOL-001` | cmake-targets | todo | `TASK-ENV-005` | `content/toolchain/cmake-targets.qmd` | `code/toolchain/cmake-targets.cpp` | `.agents/skills/cpp-content/references/cpp/engineering.md` | — |
 | `TASK-TOOL-002` | clang-tools | todo | `TASK-TOOL-001` | `content/toolchain/clang-tools.qmd` | `code/toolchain/clang-tools.cpp` | `.agents/skills/cpp-content/references/cpp/code-style.md` | — |
 | `TASK-TOOL-003` | project-layout | todo | `TASK-TOOL-001` | `content/toolchain/project-layout.qmd` | `code/toolchain/project-layout.cpp` | `.agents/skills/cpp-content/references/cpp/engineering.md` | — |
