@@ -7,7 +7,7 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py
   python verify_examples.py --compiler clang++
   python verify_examples.py --style        # 追加 clang-format / clang-tidy
-  python verify_examples.py --paths code/language-basics/overview.cpp content/language-basics/overview.qmd
+  python verify_examples.py --paths code/language-basics/types-and-variables.cpp content/language-basics/types-and-variables.qmd
 
 Windows 下使用仓库配置的 Python 3.12 运行：
   python .agents/skills/agent-ops/scripts/run.py verify

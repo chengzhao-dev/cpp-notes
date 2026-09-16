@@ -14,8 +14,7 @@ reference 路径一旦与磁盘脱节，agent 就会按失效路由去读不存�
   5. 正文：列内容必须是 `content/<part>/<chapter>.qmd`，done 必须存在且已在 `_quarto.yml`
      注册，todo 与 merged 必须不存在。
   6. 示例：merged 不留路径，done 指向的示例必须存在。
-  7. 生成脚本：`generate_tasks.py` 的章节表与磁盘逐字节一致（防再次脱节）。
-  8. 可路由：每章都能被 `scope.py` 解析，且 `all_units` 数量与矩阵行数相同。
+  7. 可路由：每章都能被 `scope.py` 解析，且 `all_units` 数量与矩阵行数相同。
 
 用法：python check_task_matrix.py [--verbose]
 退出码：0 = 一致，1 = 存在漂移。
@@ -30,7 +29,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 TASKS = ROOT / ".agents" / "skills" / "cpp-content" / "references" / "tasks"
-GEN = ROOT / ".agents" / "skills" / "python-tools" / "scripts" / "maintenance" / "generate_tasks.py"
 SCOPE = ROOT / ".agents" / "skills" / "agent-ops" / "scripts" / "scope.py"
 HEADER = "| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |"
 PREFIX = {
@@ -182,22 +180,13 @@ def main():
     except Exception as exc:
         bad.append(f"scope 校验不可用：{exc}")
 
-    try:
-        gen = load("generate_tasks", GEN)
-        for part, expected in gen.build().items():
-            disk = TASKS / f"{part}.md"
-            if not disk.is_file() or text(disk) != expected:
-                bad.append(f"{part}.md 与 generate_tasks.py 章节表不一致（跑 --write 或修 CHAPTERS）")
-    except Exception as exc:
-        bad.append(f"生成脚本比对不可用：{exc}")
-
     if bad:
         print(f"FAIL  tasks 矩阵漂移 {len(bad)} 处：")
         for item in bad:
             print(f"      {item}")
         return 1
     print(f"PASS  tasks 矩阵一致：{len(matrices)} 个 part / {total} 章，"
-          "无幽灵依赖、无失效读取项、与生成脚本同步")
+          "无幽灵依赖、无失效读取项、与磁盘和 scope 同步")
     return 0
 
 

@@ -40,7 +40,7 @@ Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/r
 
 | 主题 | 参考 |
 |---|---|
-| 变量、类型、函数、类、术语与译名 | 本文件（+ `language-basics` 部分任务矩阵） |
+| 变量、类型、函数、类、术语与译名 | `language-basics.md`（章节顺序）；本文件（术语、版本与资料边界） |
 | 现代 C++：RAII、移动语义、智能指针、模板与泛型 | `modern-cpp.md` |
 | 容器、迭代器、算法 | `stl.md` |
 | 性能优化与未定义行为陷阱 | `performance-and-pitfalls.md` |

@@ -6,7 +6,6 @@ metadata:
 ---
 
 # Skill: cpp-content
-
 面向初学者编写 C++20 教程，保留标准术语与行为边界。内容以读者任务为中心，不以语法清单为中心。页面结构交给 `quarto-docs`，样式交给 `quarto-theme`。
 
 ## 适用场景
@@ -21,6 +20,7 @@ metadata:
 | 开工前定位作用域 | `& .agents/skills/agent-ops/scripts/run.ps1 scope <part>/<chapter>` |
 | 章节设计与示例递进 | `references/cpp/teaching-method.md` |
 | 语言 / 标准库 / 内存与模板要点 | `references/cpp/cpp.md`、`references/cpp/stl.md`、`references/cpp/modern-cpp.md`（按主题只读一个） |
+| 语言基础章节顺序、类型与常量边界 | `references/cpp/language-basics.md` |
 | 术语核对、规则型内容、示例练习与代码风格 | `references/cpp/cpp.md`、`references/cpp/teaching-method.md`、`references/cpp/code-style.md` |
 | 工程、CMake、工具链章写作与依据 | `references/cpp/engineering.md`、`references/cpp/cmake-teaching.md`。决策依据用 `run.py kb-search "<查询>" --domain cpp-content` |
 

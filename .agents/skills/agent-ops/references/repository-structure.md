@@ -22,3 +22,9 @@
 统一入口是 `.agents/skills/agent-ops/scripts/run.py`。先用 `scope` 确定读取边界，再按改动域运行 `check --profile fast|book|knowledge|python`，跨域或发布时运行 `full`。`render` 默认只跑 `book` profile，需要完整浏览器矩阵时加 `--require-browser`。
 
 `_book/`、`.quarto/`、`code/**/build/`、`.cache/`、`.tmp/` 和 `temp/` 是生成物或缓存。不要手动编辑、读取或提交。新的项目中间文件统一写入 `temp/<用途>/`，例如计划写入 `temp/plans/`，重构报告写入 `temp/refactor/`，知识库索引写入 `temp/knowledge-index/`。`.tmp/` 仅作为历史残留兼容忽略目录，不再生成。
+
+## 课程增长边界
+
+任务矩阵直接维护章节状态、前置、正文、示例和专项读取，不再维护第二份生成脚本。新增章节时先改矩阵，再同步 `_quarto.yml`、part 索引、正文和示例；`scope` 与 `tasks` 校验以矩阵为输入。
+
+普通章节变更只运行内容、示例、文档和知识域检查；浏览器布局按入口、各 part 代表页和关键构建页抽样。主题、字体、布局令牌或 `_quarto.yml` 变化时切回全量页面矩阵。抽样名单必须覆盖 part 入口和仍在使用的主要页面类型，不能把抽样结果写成全量验证。

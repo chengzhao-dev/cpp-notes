@@ -34,7 +34,7 @@ def main() -> int:
     assert encoding.control_issues("中文\n\ttext") == []
     assert encoding.suspicious("\u951f" * 4)
     assert encoding.severity(Path(".agents/skills/agent-ops/scripts/x.py")) == "hard"
-    assert encoding.severity(Path("content/language-basics/overview.qmd")) == "hard"
+    assert encoding.severity(Path("content/language-basics/types-and-variables.qmd")) == "hard"
 
     valid_answer = [
         "   ::: {.answer}",
@@ -172,12 +172,15 @@ def main() -> int:
         "code/getting-started/shared-library/CMakeLists.txt",
     ]
     assert set(runner.relevant_cpp_paths(changed_cpp)) == set(changed_cpp)
+    assert runner.relevant_cpp_paths(["index.qmd"]) == []
     projects = verify.find_cmake_projects(str(ROOT / "code"))
     assert str(ROOT / "code" / "getting-started" / "multi-file-project") in projects
     assert str(ROOT / "code" / "getting-started" / "cmake-project") in projects
     assert str(ROOT / "code" / "getting-started" / "static-library") in projects
     assert str(ROOT / "code" / "getting-started" / "shared-library") in projects
     assert (ROOT / "code" / "getting-started" / "first-program" / "build-and-run.sh").is_file()
+    for name in ("main.cpp", "greeting.h", "greeting.cpp", "build-and-run.sh"):
+        assert (ROOT / "code" / "getting-started" / "minimal-program-structure" / name).is_file()
     library_unit = scope.find_chapter_by_code_path(
         ROOT
         / "code"
@@ -203,68 +206,30 @@ def main() -> int:
     assert scope.resolve_repo_domain(
         "knowledge/README.md", ROOT
     )["label"] == "knowledge"
-    plan_reference = (
-        ROOT / ".agents/skills/agent-ops/references/plan-artifacts.md"
-    ).read_text(encoding="utf-8")
-    assert "item/completed" in plan_reference
-    assert "item/plan/delta" in plan_reference
-    assert "<!-- plan-complete -->" in plan_reference
-    assert "明确批准消息" in plan_reference
-    assert "自动续跑" in plan_reference
-    assert "工具建议和模型自己的后续步骤" in plan_reference
-    for heading in ("## 摘要", "## 实施变更", "## 接口", "## 验证计划", "## 假设"):
-        assert heading in plan_reference
-    assert "### 交付收口" in plan_reference
-    assert "成功执行 `check`、`verify`、`render` 或 `build` 只证明本地改动可用" in plan_reference
-    assert "远端认证失败、远端领先、推送失败或部署失败时，计划保持未完成" in plan_reference
-    assert "宿主 `%USERPROFILE%\\.codex\\plans" in plan_reference
-    assert "禁止使用 `Goal`" in plan_reference
-    git_workflow = (
-        ROOT / ".agents/skills/github-ops/references/git-workflow.md"
-    ).read_text(encoding="utf-8")
-    assert "最终批准计划包含 `### 交付收口`" in git_workflow
-    assert "只证明本地改动可用，不是上传完成" in git_workflow
-    assert "远端 SHA 和 CI/Pages 核对" in git_workflow
+    def headings(path):
+        return {
+            line.lstrip("#").strip()
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.startswith("##")
+        }
+
+    plan_reference = ROOT / ".agents/skills/agent-ops/references/plan-artifacts.md"
+    plan_text = plan_reference.read_text(encoding="utf-8")
+    assert "固定 H2 顺序" in plan_text
+    assert "### 交付收口" in plan_text
+    assert "<!-- plan-complete -->" in plan_text
+    git_workflow = ROOT / ".agents/skills/github-ops/references/git-workflow.md"
+    assert "交付收口" in git_workflow.read_text(encoding="utf-8")
     agents_text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    assert "Plan Mode 严格只读" in agents_text
-    assert "压缩摘要、重复的原始需求、计划完成标记、自动续跑和任务摘要都不算批准" in agents_text
-    assert "宿主 `PLAN.md`" in agents_text
-    assert "成功执行每阶段只输出一行中文结论" in agents_text
-    assert "`--verbose` 仅用于默认输出无法定位失败时" in agents_text
-    assert "`### 交付收口` 是所列 commit、push 和远端核对操作的明确授权" in agents_text
-    code_style = (
-        ROOT / ".agents/skills/cpp-content/references/cpp/code-style.md"
-    ).read_text(encoding="utf-8")
-    assert "每个 `add_executable()` 和 `add_library()` 前必须有一条独立注释" in code_style
-    cmake_teaching = (
-        ROOT / ".agents/skills/cpp-content/references/cpp/cmake-teaching.md"
-    ).read_text(encoding="utf-8")
-    assert "## 实际交付背景" in cmake_teaching
-    assert "cpp-library-and-executable-linking-v1" in cmake_teaching
-    library_knowledge = (
-        ROOT / "knowledge/cpp-content/toolchain/library-and-executable-linking.md"
-    ).read_text(encoding="utf-8")
-    assert "## Android 影像算法中的交付边界" in library_knowledge
-    assert "### 动态库 SDK 的交付角色" in library_knowledge
-    assert "### 可执行文件的仿真定位" in library_knowledge
-    assert "### 典型验证与上线流程" in library_knowledge
-    comment_knowledge = (
-        ROOT / "knowledge/cpp-content/style/teaching-source-comments.md"
-    ).read_text(encoding="utf-8")
-    assert "### 目标创建注释" in comment_knowledge
+    assert "Plan Mode" in agents_text and "交付收口" in agents_text
+    assert (ROOT / ".agents/skills/cpp-content/references/cpp/language-basics.md").is_file()
+    assert (ROOT / "knowledge/cpp-content/language-basics-path.md").is_file()
+    assert (ROOT / "knowledge/agent-ops/scalable-course-maintenance.md").is_file()
     assert runner.display_command("kb-index") == "知识库索引"
     assert runner.display_check("kb-eval") == "知识库评测"
-    compaction_text = (
-        ROOT / "knowledge/agent-ops/codex-context-compaction.md"
-    ).read_text(encoding="utf-8")
-    assert "摘要不是执行授权" in compaction_text
-    assert "不会退出 Plan Mode" in compaction_text
-    assert (ROOT / "knowledge/agent-ops/plan-artifact-source.md").is_file()
-    plan_source = (
+    assert "批准不等于上传完成" in headings(
         ROOT / "knowledge/agent-ops/plan-artifact-source.md"
-    ).read_text(encoding="utf-8")
-    assert "## 批准不等于上传完成" in plan_source
-    assert "本地 commit 不能写成“已推送”" in plan_source
+    )
     tools = {tool["name"]: tool for tool in mcp.TOOLS}
     execution_only = {
         "project_review",

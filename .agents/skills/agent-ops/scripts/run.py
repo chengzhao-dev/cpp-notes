@@ -376,7 +376,11 @@ def relevant_cpp_paths(paths):
             and (ROOT / path).is_file()
         ):
             selected.append(path)
-        elif path.endswith(".qmd") and (ROOT / path).is_file():
+        elif (
+            path.startswith("content/")
+            and path.endswith(".qmd")
+            and (ROOT / path).is_file()
+        ):
             selected.append(path)
         elif (
             path.startswith(".agents/skills/cpp-content/references/cpp/")

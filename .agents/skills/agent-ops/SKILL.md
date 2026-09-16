@@ -29,7 +29,7 @@ metadata:
 1. 每条规则只有一个权威出处，禁止把同一条规则复制进两个文件。
 2. L1 只保留路由与硬约束，L2 只承载单一主题的按需知识。越界先瘦身再合并，不得放宽 `check_skill_size.py` 的预算常量。
 3. 目录、文件名、命令、版本和路径以磁盘实测为准。确认不了就不写、不伪造。重构默认局部进行，除非原结构无法安全修复。
-5. 任务矩阵、`scope.py` 与 `generate_tasks.py` 三者同格式。改任一处必须跑 `run.py check --profile fast`（含 `tasks` 一致性检查）。
+5. 任务矩阵是章节状态、读写边界和示例路径的唯一事实源；`scope.py` 与 `check_task_matrix.py` 必须解析同一格式。改矩阵后必须跑 `run.py check --profile fast`（含 `tasks` 一致性检查）。
 6. 计划和回复的语言与结构见 `references/plan-artifacts.md`；计划 Markdown 只能从最终计划项生成，不得用流式 delta、reasoning 或摘要重建。
 
 ## 工作流程

@@ -21,7 +21,6 @@ metadata:
 | 知识库管道（分块 / 索引 / 检索 / 评测 / 体检） | `scripts/`，规范见 `../../../knowledge/README.md` |
 | Python 版本与格式化配置 | `assets/config/pyproject.toml` |
 | 新建章节工程脚手架（目录名派生 PascalCase CMake 工程名） | `scripts/scaffold/init_project.py --layout single|multi|static-library|shared-library` |
-| 重建或校验章节任务矩阵 | `scripts/maintenance/generate_tasks.py --check`（漂移时 `--write`） |
 
 ## P0 硬约束
 

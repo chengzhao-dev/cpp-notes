@@ -6,6 +6,7 @@
 """
 
 import argparse
+import os
 from pathlib import Path
 import re
 import shlex
@@ -553,17 +554,31 @@ def check_source(path):
 
 
 def empty_path_errors():
-    """返回受管目录中的空文件和空目录。"""
+    """返回受管目录中的空文件和空目录。
+
+    只遍历内容、代码、skills 和 knowledge 四个受管根，避免把 temp、构建缓存
+    或宿主工具目录混进文档校验。每个根都原地跳过产物目录，成本随受管文件数增长。
+    """
     skip = {".git", "_book", ".quarto", ".cache", ".tmp", "build", "temp"}
     rows = []
-    for path in ROOT.rglob("*"):
-        rel = path.relative_to(ROOT)
-        if any(part in skip for part in rel.parts):
+    roots = (
+        ROOT / "content",
+        ROOT / "code",
+        ROOT / ".agents" / "skills",
+        ROOT / "knowledge",
+    )
+    for managed in roots:
+        if not managed.is_dir():
             continue
-        if path.is_file() and path.stat().st_size == 0:
-            rows.append(f"{rel.as_posix()}: DOC-E23 空文件")
-        elif path.is_dir() and not any(path.iterdir()):
-            rows.append(f"{rel.as_posix()}: DOC-E23 空目录")
+        for dirpath, dirnames, filenames in os.walk(managed):
+            dirnames[:] = [name for name in dirnames if name not in skip]
+            current = Path(dirpath)
+            if current != managed and not dirnames and not filenames:
+                rows.append(f"{current.relative_to(ROOT).as_posix()}: DOC-E23 空目录")
+            for name in filenames:
+                path = current / name
+                if path.stat().st_size == 0:
+                    rows.append(f"{path.relative_to(ROOT).as_posix()}: DOC-E23 空文件")
     return rows
 
 
