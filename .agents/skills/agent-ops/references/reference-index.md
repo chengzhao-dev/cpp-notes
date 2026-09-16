@@ -18,7 +18,7 @@
 | `.agents/skills/cpp-content/references/cpp/performance-and-pitfalls.md` | 性能、剖析、常见 bug 与 UB | performance 和 debugging |
 | `.agents/skills/cpp-content/references/cpp/engineering.md` | 工程、构建和项目布局 | 工具链与工程章节 |
 | `.agents/skills/cpp-content/references/cpp/cmake-teaching.md` | CMake 目标导向的教学顺序 | CMake 与工程章节 |
-| `.agents/skills/cpp-content/references/cpp/code-style.md` | 命名、文件用途、注释和格式工具 | 写示例或运行风格检查 |
+| `.agents/skills/cpp-content/references/cpp/code-style.md` | 命名、文件与目标注释、格式工具 | 写示例或运行风格检查 |
 | `.agents/skills/cpp-content/references/cpp/effective-rules.md` | 规则建议、理由和边界 | 写设计建议 |
 | `.agents/skills/cpp-content/references/cpp/examples-practice.md` | 示例、错误对照和练习 | 添加示例或练习 |
 | `.agents/skills/cpp-content/references/tasks/getting-started.md` | 章节任务、读写边界和验收 | 写任一章前 |
@@ -27,7 +27,7 @@
 | `.agents/skills/github-ops/references/ci.md` | Actions 工作流 | 修改 `.github/workflows/*` |
 | `.agents/skills/github-ops/references/pr-and-cli.md` | gh、PR 和 Issue 流程 | 建 PR 或发版 |
 | `.agents/skills/quarto-docs/references/zh/writing-principles.md` | 中文技术文档九项原则 | 所有中文文档任务 |
-| `.agents/skills/quarto-docs/references/zh/chapter-writing.md` | C++ Notes 页面骨架、术语和新手路径 | 写改正文 |
+| `.agents/skills/quarto-docs/references/zh/chapter-writing.md` | C++ 学习轨迹笔记页面骨架、术语和新手路径 | 写改正文 |
 | `.agents/skills/quarto-docs/references/zh/writing-style-core.md` | 旧链接兼容，内容已合并 | 仅旧引用 |
 | `.agents/skills/quarto-docs/references/zh/cpp-chapter-writing.md` | 旧链接兼容，内容已合并 | 仅旧引用 |
 | `.agents/skills/quarto-docs/references/zh/cpp-notes-writing.md` | 旧链接兼容，内容已合并 | 仅旧引用 |
@@ -49,9 +49,9 @@
 | `knowledge/agent-ops/plan-artifact-source.md` | 计划来源 |
 | `knowledge/agent-ops/repository-navigation.md` | 仓库导航 |
 | `knowledge/cpp-content/style/naming-format.md` | 命名格式 |
-| `knowledge/cpp-content/style/teaching-source-comments.md` | 源码注释 |
+| `knowledge/cpp-content/style/teaching-source-comments.md` | 源码与目标注释 |
 | `knowledge/cpp-content/toolchain/build-toolchain.md` | 构建链 |
-| `knowledge/cpp-content/toolchain/library-and-executable-linking.md` | 库链接 |
+| `knowledge/cpp-content/toolchain/library-and-executable-linking.md` | 库链接与 Android 交付背景 |
 | `knowledge/github-ops/github-pages-deployment.md` | Pages 部署 |
 | `knowledge/github-ops/repository-hygiene.md` | 仓库卫生 |
 | `knowledge/quarto-docs/output/html-output.md` | HTML 输出 |

@@ -1,4 +1,4 @@
-# C++ Notes 章节写作
+# C++ 学习轨迹笔记章节写作
 
 先遵循 `writing-principles.md`。本文件只规定本项目的页面组织和 C++ 教学写法，Quarto 元素细节见 `references/quarto/authoring.md` 与 `references/quarto/terminal-validation.md`。
 

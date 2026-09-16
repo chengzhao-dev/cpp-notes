@@ -1,6 +1,6 @@
-# C++ Notes Agent 工作标准
+# C++ 学习轨迹笔记 Agent 工作标准
 
-本文件是 C++ Notes 的唯一项目级 Agent 入口。它先规定所有 Codex 和通用 Coding Agent 必须遵守的工作标准，再把这些标准落到本仓库的内容、代码、工具和验收边界。
+本文件是 C++ 学习轨迹笔记的唯一项目级 Agent 入口。它先规定所有 Codex 和通用 Coding Agent 必须遵守的工作标准，再把这些标准落到本仓库的内容、代码、工具和验收边界。
 
 ## 工作标准
 
@@ -14,7 +14,7 @@
 - 维护仓库规范时保持单一权威出处。流程和格式放 skill/reference，领域原因放 `knowledge/`。
 - 构建配置和脚本的版本规则见 `cpp-content` 的代码风格 reference。QMD 代码块、`include` 文件和正文标点规则见 `quarto-docs` 对应 reference。
 
-## C++ Notes 项目
+## C++ 学习轨迹笔记项目
 
 这是面向初学者的中文 Linux C++ Quarto Book。正文在 `content/`，与章节对应的 C++ 示例和工程在 `code/`，领域依据在 `knowledge/`，Agent skills、脚本、主题资源和项目 MCP 在 `.agents/`。
 

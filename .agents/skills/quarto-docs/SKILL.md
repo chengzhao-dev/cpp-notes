@@ -21,7 +21,7 @@ metadata:
 | 章节组织 / C++ 页面骨架 | `references/zh/chapter-writing.md` |
 | 小节主线、父级标题、长段合并/拆分、正文与 Callout 重量平衡、结果型 Callout 及预告接力、诊断步骤标签与验证回流、代码块前标点与信息密度 | `references/zh/section-focus-and-density.md`、`references/quarto/terminal-validation.md` |
 | 工程目录树与正式 C++ 章节主线 | `references/zh/project-tree-and-diagram-focus.md` |
-| C++ Notes 项目写作边界 | `references/zh/chapter-writing.md` |
+| C++ 学习轨迹笔记项目写作边界 | `references/zh/chapter-writing.md` |
 | Book 结构、front matter、标题层级与 H2/H3 判定 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
 | 措辞、案例与页面组织依据（为什么这么排） | `run.py kb-search "块序列"`、`"卡片"`、`"措辞"`，均加 `--domain quarto-docs` |
