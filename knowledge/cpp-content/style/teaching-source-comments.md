@@ -3,12 +3,12 @@ kb_id: "cpp-teaching-source-comments-v1"
 title: "教程源码注释决策依据"
 domain: "cpp-content"
 subdomain: "style"
-tags: [cpp, comments, file_purpose, beginner_friendly, teaching_code, source_file, include, cmake, shell, comment_density]
+tags: [cpp, comments, file_purpose, beginner_friendly, teaching_code, source_file, include, cmake, shell, comment_density, target_comment, add_executable, add_library]
 level_range: [0, 9]
 created: "2026-09-15"
 updated: "2026-09-15"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 560
+estimated_tokens: 650
 ---
 
 # 教程源码注释决策依据
@@ -54,6 +54,14 @@ CMake 首行说明要构建的目标，后续只给标准与输出、编译数�
 
 顶层 CMake 和库子目录 CMake 的文件用途注释分别描述自己的职责。顶层说明怎样组合应用与库，
 库文件说明构建哪个库目标，两者不互相复述，也不让读者从两个文件拼出一个不完整的职责边界。
+
+### 目标创建注释
+
+`add_executable()` 和 `add_library()` 定义工程中的目标边界。读者阅读 CMake 时，需要先知道当前
+命令创建什么目标、它在工程中承担什么职责，才能理解后续包含路径、选项和链接关系属于谁。
+
+目标命令名只表达语法，目标职责来自项目设计，因此创建命令前需要一条独立注释。这一步不同于
+`#include`、`main` 和 `return`：后者可由代码本身直接表达，前者建立的是文件和目标之间的关系。
 
 Shell 首行说明脚本用途，并为 `set -euo pipefail` 这类会改变执行语义的设置写短注释。配置、构建
 和运行命令保持原样，除非某个选项会影响理解或容易误用，否则不逐条解释。

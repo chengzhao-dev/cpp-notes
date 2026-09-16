@@ -14,7 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 加载 greeting/CMakeLists.txt 中的静态库目标。
 add_subdirectory(greeting)
 
-# 构建 app，并在链接阶段使用 greeting 静态库。
+# 创建 app 可执行目标，并在链接阶段使用 greeting 静态库。
 add_executable(app main.cpp)
 target_link_libraries(app PRIVATE greeting)
 target_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)

@@ -12,6 +12,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # 收集程序源文件，新增 .cpp 后 CMake 会自动重新配置。
 file(GLOB APP_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+# 创建 app 可执行目标。
 add_executable(app ${APP_SOURCES})
 
 # 让 app 找到 include/ 中的头文件。

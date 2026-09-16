@@ -14,7 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 加载 greeting/CMakeLists.txt 中的动态库目标。
 add_subdirectory(greeting)
 
-# 构建 app，并在链接阶段记录对 greeting 动态库的依赖。
+# 创建 app 可执行目标，并在链接阶段记录对 greeting 动态库的依赖。
 add_executable(app main.cpp)
 target_link_libraries(app PRIVATE greeting)
 target_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)

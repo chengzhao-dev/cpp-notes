@@ -44,6 +44,13 @@ def create_project(module, case_root, name, layout):
         return module.main()
 
 
+def assert_target_comment(text, command, comment):
+    lines = text.splitlines()
+    assert command in lines
+    index = lines.index(command)
+    assert lines[index - 1] == comment
+
+
 def main():
     module = load_scaffold()
     assert module.to_cmake_project_name("multi_file-project") == "MultiFileProject"
@@ -72,6 +79,11 @@ def main():
     assert "{{CMAKE_PROJECT_NAME}}" not in single_cmake
     assert "project(SingleProject LANGUAGES CXX)" in single_cmake
     assert single_cmake.splitlines()[0] == "# 构建 SingleProject 可执行目标。"
+    assert_target_comment(
+        single_cmake,
+        "add_executable(app main.cpp)",
+        "# 创建 app 可执行目标。",
+    )
     assert (single / "main.cpp").read_text(encoding="utf-8").splitlines()[0] == (
         "// 程序入口：向标准输出打印问候。"
     )
@@ -101,6 +113,11 @@ def main():
         '"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")'
     ) in cmake
     assert "add_executable(app ${APP_SOURCES})" in cmake
+    assert_target_comment(
+        cmake,
+        "add_executable(app ${APP_SOURCES})",
+        "# 创建 app 可执行目标。",
+    )
     assert "target_include_directories(app PRIVATE include)" in cmake
     assert (multi / "include/greeting.h").read_text(
         encoding="utf-8"
@@ -146,6 +163,15 @@ def main():
         assert f"project({project_name} LANGUAGES CXX)" in library_cmake
         assert "add_subdirectory(greeting)" in library_cmake
         assert "add_executable(app main.cpp)" in library_cmake
+        assert_target_comment(
+            library_cmake,
+            "add_executable(app main.cpp)",
+            (
+                "# 创建 app 可执行目标，并在链接阶段使用 greeting 静态库。"
+                if library_type == "STATIC"
+                else "# 创建 app 可执行目标，并在链接阶段记录对 greeting 动态库的依赖。"
+            ),
+        )
         assert "add_library(greeting" not in library_cmake
         assert f"add_library(greeting {library_type} ${{LIBRARY_SOURCES}})" in module_cmake
         assert "target_include_directories(greeting PUBLIC include)" in module_cmake

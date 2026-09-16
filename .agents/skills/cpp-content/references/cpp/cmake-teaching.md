@@ -26,6 +26,8 @@ CMake 工程名与仓库目录名承担不同职责：目录用 kebab-case，工
 
 ```cmake
 file(GLOB APP_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+# 创建 app 可执行目标，并收集 src/ 下的直属源文件。
 add_executable(app ${APP_SOURCES})
 ```
 
@@ -44,6 +46,10 @@ add_executable(app ${APP_SOURCES})
 静态工程在 `greeting/CMakeLists.txt` 使用 `add_library(greeting STATIC ${LIBRARY_SOURCES})`。库的公共头文件目录使用 `target_include_directories(greeting PUBLIC include)`，让消费者通过目标依赖获得接口目录。顶层 `CMakeLists.txt` 用 `add_subdirectory(greeting)` 加载库，再创建 `app` 并调用 `target_link_libraries(app PRIVATE greeting)`。动态工程使用 `SHARED`，并为构建树中的 `app` 设置 `BUILD_RPATH "$ORIGIN/../lib"`。教学时先展示顶层如何组合项目，再展示库文件如何定义自身目标。
 
 可执行文件输出到 `build/bin/`。静态库和动态库输出到 `build/lib/`，分别使用 `CMAKE_ARCHIVE_OUTPUT_DIRECTORY` 与 `CMAKE_LIBRARY_OUTPUT_DIRECTORY`。需要解释原因、选择边界和验收观察点时，检索 `cpp-library-and-executable-linking-v1`。
+
+## 实际交付背景
+
+可执行文件和动态库主线跑通后，可各追加一个精简 `##`，用一个 `###` 说明可执行文件用于仿真验证、动态库用于上线 SDK 交付。正文只保留用途、典型流程和关键限制；ABI、JNI、SDK 组成和收益的系统依据检索 `cpp-library-and-executable-linking-v1`，不复制完整段落。
 
 ## Clang/LLVM 工具链一致性
 

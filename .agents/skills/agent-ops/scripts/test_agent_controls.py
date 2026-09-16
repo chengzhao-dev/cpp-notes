@@ -126,6 +126,17 @@ def main() -> int:
         Path("code/sample/CMakeLists.txt"),
         ["cmake_minimum_required(VERSION 3.31)"],
     )
+    assert docs.cmake_target_comment_errors(
+        ROOT / "code/sample/CMakeLists.txt",
+        ["# 创建 app 可执行目标。", "add_executable(app main.cpp)"],
+    ) == []
+    assert any(
+        "DOC-E22" in error
+        for error in docs.cmake_target_comment_errors(
+            ROOT / "code/sample/CMakeLists.txt",
+            ["add_executable(app main.cpp)"],
+        )
+    )
 
     assert mcp.redact("API_KEY=secret-value") == "API_KEY=[REDACTED]"
     assert "abc.def-123" not in mcp.redact("Authorization: Bearer abc.def-123")
@@ -222,6 +233,26 @@ def main() -> int:
     assert "成功执行每阶段只输出一行中文结论" in agents_text
     assert "`--verbose` 仅用于默认输出无法定位失败时" in agents_text
     assert "`### 交付收口` 是所列 commit、push 和远端核对操作的明确授权" in agents_text
+    code_style = (
+        ROOT / ".agents/skills/cpp-content/references/cpp/code-style.md"
+    ).read_text(encoding="utf-8")
+    assert "每个 `add_executable()` 和 `add_library()` 前必须有一条独立注释" in code_style
+    cmake_teaching = (
+        ROOT / ".agents/skills/cpp-content/references/cpp/cmake-teaching.md"
+    ).read_text(encoding="utf-8")
+    assert "## 实际交付背景" in cmake_teaching
+    assert "cpp-library-and-executable-linking-v1" in cmake_teaching
+    library_knowledge = (
+        ROOT / "knowledge/cpp-content/toolchain/library-and-executable-linking.md"
+    ).read_text(encoding="utf-8")
+    assert "## Android 影像算法中的交付边界" in library_knowledge
+    assert "### 动态库 SDK 的交付角色" in library_knowledge
+    assert "### 可执行文件的仿真定位" in library_knowledge
+    assert "### 典型验证与上线流程" in library_knowledge
+    comment_knowledge = (
+        ROOT / "knowledge/cpp-content/style/teaching-source-comments.md"
+    ).read_text(encoding="utf-8")
+    assert "### 目标创建注释" in comment_knowledge
     assert runner.display_command("kb-index") == "知识库索引"
     assert runner.display_check("kb-eval") == "知识库评测"
     compaction_text = (

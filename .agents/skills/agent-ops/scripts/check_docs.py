@@ -39,6 +39,7 @@ CODE_NAMES = {"CMakeLists.txt"}
 CODE_LANGUAGES = {"cpp", "c", "bash", "sh", "shell", "powershell", "ps1", "cmake", "text", "markdown", "yaml", "json", "toml", "mermaid"}
 SHELL_LANGUAGES = {"bash", "sh", "shell"}
 POWERSHELL_LANGUAGES = {"powershell", "ps1"}
+TARGET_CREATION = re.compile(r"^\s*(add_executable|add_library)\s*\(")
 
 
 def parse_fence_info(info):
@@ -505,6 +506,21 @@ def has_purpose_comment(path, lines):
     return False
 
 
+def cmake_target_comment_errors(path, lines):
+    """检查 CMake 目标创建命令是否紧邻一条职责注释。"""
+    rel = path.relative_to(ROOT).as_posix()
+    errors = []
+    for index, line in enumerate(lines):
+        if not TARGET_CREATION.match(line):
+            continue
+        previous = index - 1
+        if previous < 0 or not lines[previous].lstrip().startswith("#"):
+            errors.append(
+                f"{rel}:{index + 1}: DOC-E22 创建目标前必须用独立注释说明目标职责"
+            )
+    return errors
+
+
 def check_source(path):
     """检查会被 include 的源文件，重点发现缺少用途注释和过长解释。"""
     rel = path.relative_to(ROOT).as_posix()
@@ -515,6 +531,8 @@ def check_source(path):
         return [f"{rel}: DOC-E1 非 UTF-8"], []
     if not has_purpose_comment(path, lines):
         errors.append(f"{rel}: DOC-E20 首个有效行需用原生注释说明文件用途")
+    if path.name == "CMakeLists.txt":
+        errors.extend(cmake_target_comment_errors(path, lines))
     for number, line in enumerate(lines, 1):
         if re.search(r"\S\s+#\s+[^#]", line) and path.suffix.lower() in {".sh", ".bash"}:
             notices.append(f"{rel}:{number}: DOC-N7 行尾 Shell 注释请移到被说明代码的上一行")
