@@ -50,7 +50,7 @@
 - Sans：`Fixel Text` → `LXGW WenKai Screen` → 系统中西文回退（`theme-*.scss`、`tokens.css --ui-font`）。
 - Mono：`LXGW Bright Code` → `LXGW WenKai Screen` → ui-monospace 回退。代码主题使用 GitHub Light / GitHub Dark。
 
-Fixel 使用 500/600/700。LXGW Screen v1.522 与 Bright Code v2.922 Regular 使用同一套按真实页面命中记录和体积均衡生成的 16 路 `unicode-range` 分包，合并后的字形轮廓与旧 45 分片保持一致。Bright Code 的拉丁来自 Monaspace Argon，中文来自霞鹜文楷，缺字回退 WenKai Screen。网页子集由临时 pyftsubset 生成。变更需同步 SCSS、tokens、fonts、OFL、资产文件与 `check_layout.py`。单页预算为最多 16 个字体文件、2.1 MB。当前最重页面实测约 1.95 MB。字体资产由检查器核对 URL、数量、范围分区、签名和孤儿文件，数值间距以 `tokens.css` 为准。
+Fixel 使用 500/600/700。LXGW Screen v1.522 与 Bright Code v2.922 Regular 各打包为一个常用字符集 WOFF2，覆盖当前公开内容与一级常用汉字；未覆盖字符回退系统字体。Bright Code 的拉丁来自 Monaspace Argon，中文来自霞鹜文楷，缺字回退 WenKai Screen。网页子集由临时 fontTools 生成。变更需同步 SCSS、tokens、fonts、OFL、资产文件与 `check_layout.py`。单页最多请求 5 个字体文件，预算为 1.6 MB。字体资产由检查器核对 URL、数量、签名和孤儿文件，数值间距以 `tokens.css` 为准。
 
 ### 正文字号
 
@@ -103,7 +103,7 @@ Fixel 使用 500/600/700。LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 ### 校验
 
 用 `scripts/check_layout.py` 校验令牌、资产和可用的浏览器几何。发布验收覆盖
-`1280/1100/768/390` 的明暗两态和触屏复制按钮。需要刷新编译缓存时执行一次完整渲染。
+`1280/768/390` 的明暗两态和触屏复制按钮。需要刷新编译缓存时执行一次完整渲染。
 
 ### 代码高亮契约
 

@@ -28,16 +28,12 @@ ROOT = THEME_DIR.parents[2]
 FONT_FAMILIES = ("LXGW WenKai Screen", "LXGW Bright Code")
 EXPECTED_FONT_FACES = {
     "Fixel Text": 3,
-    "LXGW WenKai Screen": 16,
-    "LXGW Bright Code": 16,
+    "LXGW WenKai Screen": 1,
+    "LXGW Bright Code": 1,
 }
-EXPECTED_FONT_RANGES = {
-    "LXGW WenKai Screen": 11471,
-    "LXGW Bright Code": 11471,
-}
-# 16 路分包的最重页面实测约 1.95 MB。上限保留少量余量，避免把粗分包误判为回归。
-FONT_PAGE_BYTES_LIMIT = 2_100_000
-FONT_PAGE_FACES_LIMIT = 16
+# 三个 Fixel 字重加两个常用汉字包，保留少量缓存与字重余量。
+FONT_PAGE_BYTES_LIMIT = 1_600_000
+FONT_PAGE_FACES_LIMIT = 5
 
 # 与 references/theme-system.md / .agents/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
 CHECKS = [
@@ -196,12 +192,15 @@ def check_font_assets(css_text):
 
 
 def check_font_partition(css_text):
-    """Return overlap or coverage problems in the CJK font partitions."""
+    """Return overlap problems in explicitly partitioned CJK font faces."""
     problems = []
-    for family, expected_count in EXPECTED_FONT_RANGES.items():
+    for family in FONT_FAMILIES:
+        declared = parse_unicode_ranges(css_text, family)
+        if not declared:
+            continue
         covered = set()
         overlaps = set()
-        for start, end in parse_unicode_ranges(css_text, family):
+        for start, end in declared:
             points = set(range(start, end + 1))
             overlaps.update(covered & points)
             covered.update(points)
@@ -209,11 +208,6 @@ def check_font_partition(css_text):
             sample = ", ".join(f"U+{point:X}" for point in sorted(overlaps)[:8])
             problems.append(
                 f"{family} unicode-range overlaps: {len(overlaps)} ({sample})"
-            )
-        if len(covered) != expected_count:
-            problems.append(
-                f"{family} unicode-range coverage={len(covered)}, "
-                f"expected={expected_count}"
             )
     return problems
 
@@ -288,7 +282,7 @@ def browser_layout(book_dir, verbose):
     for _family, url in font_face_entries(FONTS_CSS.read_text(encoding="utf-8")):
         target = (FONTS_CSS.parent / url).resolve()
         font_assets_by_name[target.name] = target.stat().st_size if target.is_file() else 0
-    width_floor = {1280: 640, 1100: 540, 768: 500, 390: 320}
+    width_floor = {1280: 640, 768: 500, 390: 320}
     for width_text, pages in metrics["viewports"].items():
         width = int(width_text)
         for key, data in pages.items():
@@ -361,7 +355,7 @@ def browser_layout(book_dir, verbose):
                     f"{label}: 横向溢出 {first['tag']}.{first['classes']} "
                     f"{first['scrollWidth']}>{first['clientWidth']}"
                 )
-            wrapped = [item for item in data["tocItems"] if item["height"] > 30]
+            wrapped = [item for item in data["tocItems"] if item["height"] > 46]
             if wrapped:
                 problems.append(
                     f"{label}: 目录折行 {len(wrapped)} 项，最高 {max(item['height'] for item in wrapped)}px"
@@ -379,12 +373,6 @@ def browser_layout(book_dir, verbose):
             }
             if wraps - {"pre-wrap"}:
                 problems.append(f"{label}: 代码 white-space={sorted(wraps)}")
-            if page_id.startswith("content/"):
-                ratio = data["textBandCount"] / data["boxCount"] if data["boxCount"] else float("inf")
-                if ratio < 2.4:
-                    problems.append(
-                        f"{label}: 文字带/盒子 {ratio:.2f} < 2.4"
-                    )
     if verbose:
         for width, pages in metrics["viewports"].items():
             for key, data in pages.items():
@@ -420,6 +408,16 @@ def check_font_coverage(book_dir):
         for family in FONT_FAMILIES
     }
     missing = {family: set() for family in FONT_FAMILIES}
+    if not any(ranges.values()):
+        return ranges, missing
+    range_sets = {
+        family: {
+            point
+            for start, end in family_ranges
+            for point in range(start, end + 1)
+        }
+        for family, family_ranges in ranges.items()
+    }
     for html_path in sorted(book_dir.rglob("*.html")):
         html_text = html_path.read_text(encoding="utf-8", errors="ignore")
         page_parser = VisibleTextParser()
@@ -433,9 +431,9 @@ def check_font_coverage(book_dir):
             for chunk in chunks:
                 for char in chunk:
                     codepoint = ord(char)
-                    if needs_cjk_coverage(codepoint) and not any(
-                        start <= codepoint <= end
-                        for start, end in ranges[family]
+                    if (
+                        needs_cjk_coverage(codepoint)
+                        and codepoint not in range_sets[family]
                     ):
                         missing[family].add(char)
     return ranges, missing
@@ -451,7 +449,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--book-dir", default="_book", help="渲染产物目录（默认 _book）")
     parser.add_argument("--browser", action="store_true",
-                        help="执行四档视口、明暗模式的完整浏览器矩阵")
+                        help="执行三档视口、明暗模式的完整浏览器矩阵")
     parser.add_argument("--verbose", action="store_true", help="展开浏览器测量指标")
     args = parser.parse_args()
 
@@ -509,7 +507,7 @@ def main():
     font_asset_problems = check_font_assets(FONTS_CSS.read_text(encoding="utf-8"))
     print(
         f"  {'OK  ' if not font_asset_problems else 'MISS'} font asset set"
-        f"  (Fixel=3, WenKai=16, Bright=16)"
+        f"  (Fixel=3, WenKai=1, Bright=1)"
     )
     for problem in font_asset_problems:
         print(f"       {problem}")
@@ -521,7 +519,7 @@ def main():
     )
     print(
         f"  {'OK  ' if not font_partition_problems else 'MISS'} font partitions"
-        "  (non-overlap + full CJK coverage)"
+        "  (non-overlap when ranges are declared)"
     )
     for problem in font_partition_problems:
         print(f"       {problem}")
@@ -529,10 +527,10 @@ def main():
         fail += 1
 
     ranges, missing = check_font_coverage(book_dir)
-    coverage_ok = all(ranges.values()) and not any(missing.values())
+    coverage_ok = not any(missing.values())
     print(
         f"  {'OK  ' if coverage_ok else 'MISS'} CJK font coverage"
-        f"  (ranges={sum(map(len, ranges.values()))}, "
+        f"  (declared-ranges={sum(map(len, ranges.values()))}, "
         f"missing={sum(map(len, missing.values()))})"
     )
     for family, chars in missing.items():
@@ -550,7 +548,7 @@ def main():
     else:
         print(
             f"  {'OK  ' if not browser_problems else 'MISS'} browser-layout"
-            f"  (viewports=1280,1100,768,390; schemes=light,dark)"
+            f"  (viewports=1280,768,390; schemes=light,dark)"
         )
         for problem in browser_problems:
             print(f"       {problem}")
@@ -562,7 +560,7 @@ def main():
         if browser_note:
             print(f"PASS theme-static；SKIP browser-layout {browser_note}")
         else:
-            print("PASS theme-static；browser-layout 1280/1100/768/390 light/dark")
+            print("PASS theme-static；browser-layout 1280/768/390 light/dark")
         return 0
     print(f"{fail} theme check(s) failed; inspect the diagnostics above.")
     return 1

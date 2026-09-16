@@ -30,7 +30,7 @@ metadata:
 2. 改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 前确认整本重渲染代价，改后跑 `run.py render`。
 3. 代码标题、令牌语义、复制按钮作用域、`@media print`、触屏兜底与 Mermaid SVG 由 `check_dom_contracts.py` 断言，改前后各跑一次。
 4. 不按字符内容、DOM 位置或命令名覆盖高亮颜色，语义色交给 Pandoc/Quarto token。
-5. 正文使用自托管 `Fixel Text`、`LXGW WenKai Screen`，代码使用 `LXGW Bright Code`，中文回退仍为 `LXGW WenKai Screen`。改字体前必须同步 16 个 WenKai 与 16 个 Bright Code 分包、`fonts.css`、SCSS 字体栈、CSS 令牌、OFL 说明和覆盖检查。
+5. 正文使用自托管 `Fixel Text`、`LXGW WenKai Screen`，代码使用 `LXGW Bright Code`，中文回退仍为 `LXGW WenKai Screen`。改字体前必须同步 3 个 Fixel 字重、2 个 common 汉字包、`fonts.css`、SCSS 字体栈、CSS 令牌、OFL 说明和覆盖检查。
 
 ## 工作流程
 
@@ -41,5 +41,5 @@ metadata:
 ## 完成判据
 
 - [ ] 发布验收用 `render --require-browser`，`layout`、`dom`、`callouts` 必须实际执行且通过。
-- [ ] `layout` 覆盖 `1280/1100/768/390` 的明暗两态，并确认触屏复制按钮可见。不可用时明确显示 SKIP，不宣称已验证。
+- [ ] `layout` 覆盖 `1280/768/390` 的明暗两态，并确认触屏复制按钮可见。不可用时明确显示 SKIP，不宣称已验证。
 - [ ] 新增令牌已写回 `references/theme-system.md`。

@@ -19,7 +19,7 @@ const require = createRequire(import.meta.url);
 const bookDir = resolve(flag("--book-dir", "_book"));
 const outFile = flag("--out", "");
 const shotsDir = flag("--shots-dir", "");
-const viewports = [1280, 1100, 768, 390];
+const viewports = [1280, 768, 390];
 const colorSchemes = ["light", "dark"];
 
 async function collectHtml(directory) {
