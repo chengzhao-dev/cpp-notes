@@ -298,9 +298,12 @@ def build_summaries(con: sqlite3.Connection, registry: dict) -> tuple[int, int]:
     """
     con.execute("DELETE FROM summary")
     counters = defaultdict(int)
+    children_by_doc = defaultdict(list)
+    for chunk in registry["chunks"].values():
+        if chunk["kind"] == "child":
+            children_by_doc[chunk["doc_id"]].append(chunk)
     for doc_id, doc in registry["documents"].items():
-        kids = [c for c in registry["chunks"].values()
-                if c["doc_id"] == doc_id and c["kind"] == "child"]
+        kids = children_by_doc.get(doc_id, [])
         topics = []
         for kid in sorted(kids, key=lambda c: c.get("order", 0)):
             topic = kid["heading_path"].split(" > ")[-1]

@@ -147,6 +147,9 @@ def build(all_files: bool = False, verbose: bool = False) -> dict:
     old_docs = previous.get("documents", {})
     old_chunks = previous.get("chunks", {})
     by_path = {row["path"]: row for row in old_docs.values()}
+    old_chunks_by_doc = {}
+    for chunk_id, chunk in old_chunks.items():
+        old_chunks_by_doc.setdefault(chunk.get("doc_id"), []).append((chunk_id, chunk))
 
     documents: dict[str, dict] = {}
     chunks: dict[str, dict] = {}
@@ -158,9 +161,8 @@ def build(all_files: bool = False, verbose: bool = False) -> dict:
         stale = by_path.get(kb.rel(path))
         if stale and not all_files and stale["source_hash"] == digest:
             documents[stale["doc_id"]] = stale
-            for cid, chunk in old_chunks.items():
-                if chunk.get("doc_id") == stale["doc_id"]:
-                    chunks[cid] = chunk
+            for chunk_id, chunk in old_chunks_by_doc.get(stale["doc_id"], []):
+                chunks[chunk_id] = chunk
             reused += 1
             continue
         try:

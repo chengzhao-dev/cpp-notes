@@ -240,31 +240,54 @@ def resolve_playwright_root():
     return None
 
 
+def full_layout_required():
+    """主题或 Book 配置变化时跑全量页面矩阵，普通内容改动只跑代表页。"""
+    result = subprocess.run(
+        [
+            "git",
+            "diff",
+            "--quiet",
+            "HEAD",
+            "--",
+            ".agents/skills/quarto-theme/assets/theme",
+            "_quarto.yml",
+        ],
+        cwd=str(ROOT),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return result.returncode == 1
+
+
 def browser_layout(book_dir, verbose):
-    """Measure rendered pages and return (problems, skipped_reason)."""
+    """Measure rendered pages and return (problems, skipped_reason, info)."""
     node = resolve_node()
     playwright_root = resolve_playwright_root()
     if not node or not playwright_root or not MEASURE_SCRIPT.is_file():
         return [], (
             "Node/Playwright/Edge 运行时不可用"
             f" (node={node or '无'}, NODE_PATH={playwright_root or '无'})"
-        )
+        ), {}
 
     shots_dir = ROOT / "temp" / "theme-regression"
     out_file = shots_dir / "measure.json"
     shots_dir.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, NODE_PATH=playwright_root, PYTHONIOENCODING="utf-8")
+    command = [
+        node,
+        str(MEASURE_SCRIPT),
+        "--book-dir",
+        str(book_dir),
+        "--out",
+        str(out_file),
+        "--shots-dir",
+        str(shots_dir),
+    ]
+    if full_layout_required():
+        command.append("--all-pages")
     proc = subprocess.run(
-        [
-            node,
-            str(MEASURE_SCRIPT),
-            "--book-dir",
-            str(book_dir),
-            "--out",
-            str(out_file),
-            "--shots-dir",
-            str(shots_dir),
-        ],
+        command,
         cwd=str(ROOT),
         env=env,
         stdout=subprocess.PIPE,
@@ -272,11 +295,15 @@ def browser_layout(book_dir, verbose):
     )
     output = proc.stdout.decode("utf-8", errors="replace")
     if proc.returncode == 2:
-        return [], output.strip()
+        return [], output.strip(), {}
     if proc.returncode != 0 or not out_file.is_file():
-        return [f"browser measurement failed (exit={proc.returncode})"], output.strip()
+        return [f"browser measurement failed (exit={proc.returncode})"], output.strip(), {}
 
     metrics = json.loads(out_file.read_text(encoding="utf-8"))
+    info = {
+        "mode": metrics.get("mode", "full"),
+        "pages": len(metrics.get("selectedPages", metrics.get("pages", []))),
+    }
     problems = []
     font_assets_by_name = {}
     for _family, url in font_face_entries(FONTS_CSS.read_text(encoding="utf-8")):
@@ -386,7 +413,7 @@ def browser_layout(book_dir, verbose):
                     f"复制钮={data.get('copyButtonOpacities', [])} "
                     f"溢出={len(data['overflow'])}"
                 )
-    return problems, None
+    return problems, None, info
 
 
 def needs_cjk_coverage(codepoint):
@@ -540,15 +567,17 @@ def main():
         fail += 1
 
     if args.browser:
-        browser_problems, browser_note = browser_layout(book_dir, args.verbose)
+        browser_problems, browser_note, browser_info = browser_layout(book_dir, args.verbose)
     else:
-        browser_problems, browser_note = [], "未请求浏览器矩阵（加 --browser 执行）"
+        browser_problems, browser_note, browser_info = [], "未请求浏览器矩阵（加 --browser 执行）", {}
     if browser_note and not browser_problems:
         print(f"  SKIP browser-layout  {browser_note}")
     else:
         print(
             f"  {'OK  ' if not browser_problems else 'MISS'} browser-layout"
-            f"  (viewports=1280,768,390; schemes=light,dark)"
+            f"  (viewports=1280,768,390; schemes=light,dark; "
+            f"mode={browser_info.get('mode', 'n/a')}; "
+            f"pages={browser_info.get('pages', 0)})"
         )
         for problem in browser_problems:
             print(f"       {problem}")
@@ -560,7 +589,11 @@ def main():
         if browser_note:
             print(f"PASS theme-static；SKIP browser-layout {browser_note}")
         else:
-            print("PASS theme-static；browser-layout 1280/768/390 light/dark")
+            print(
+                "PASS theme-static；browser-layout "
+                f"{browser_info.get('mode', 'full')} "
+                f"{browser_info.get('pages', 0)} pages × 1280/768/390 × light/dark"
+            )
         return 0
     print(f"{fail} theme check(s) failed; inspect the diagnostics above.")
     return 1

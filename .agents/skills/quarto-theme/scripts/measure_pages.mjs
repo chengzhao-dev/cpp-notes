@@ -1,6 +1,6 @@
 // 从渲染产物读取真实浏览器几何与计算样式，供 check_layout.py 做布局回归断言。
 //
-// 用法：node measure_pages.mjs --book-dir _book --out out.json [--shots-dir DIR]
+// 用法：node measure_pages.mjs --book-dir _book --out out.json [--shots-dir DIR] [--all-pages]
 // 退出码：0 = 测量成功；2 = Node/Playwright/Edge 或渲染产物不可用。
 
 import { mkdir, readdir, writeFile } from "node:fs/promises";
@@ -19,6 +19,7 @@ const require = createRequire(import.meta.url);
 const bookDir = resolve(flag("--book-dir", "_book"));
 const outFile = flag("--out", "");
 const shotsDir = flag("--shots-dir", "");
+const allPages = argv.includes("--all-pages");
 const viewports = [1280, 768, 390];
 const colorSchemes = ["light", "dark"];
 
@@ -34,6 +35,41 @@ async function collectHtml(directory) {
     }
   }
   return files;
+}
+
+function sampleHtml(files, root) {
+  const relativeFiles = files
+    .map((file) => relative(root, file).split(sep).join("/"))
+    .sort();
+  const selected = new Set();
+  const add = (relativePath) => {
+    if (relativePath) {
+      selected.add(relativePath);
+    }
+  };
+
+  add("index.html");
+  const contentFiles = relativeFiles.filter((file) => file.startsWith("content/"));
+  const byPart = new Map();
+  for (const file of contentFiles) {
+    const part = file.split("/")[1];
+    const bucket = byPart.get(part) || [];
+    bucket.push(file);
+    byPart.set(part, bucket);
+  }
+  for (const [part, bucket] of [...byPart.entries()].sort()) {
+    add(`content/${part}/index.html`);
+    const chapters = bucket.filter((file) => !file.endsWith("/index.html"));
+    add(chapters[0]);
+    add(chapters.at(-1));
+  }
+  const representative = /(?:library|cmake|first-program|minimal-program-structure|types-and-variables|constants)/;
+  for (const file of contentFiles) {
+    if (representative.test(file)) {
+      add(file);
+    }
+  }
+  return files.filter((file) => selected.has(relative(root, file).split(sep).join("/")));
 }
 
 function loadPlaywright() {
@@ -175,14 +211,21 @@ async function main() {
   if (!htmlFiles.length) {
     throw new Error(`no rendered HTML under ${bookDir}`);
   }
+  const selectedFiles = allPages ? htmlFiles : sampleHtml(htmlFiles, bookDir);
   const { chromium } = loadPlaywright();
   const browser = await chromium.launch({ channel: "msedge", headless: true });
-  const result = { viewports: {}, colorSchemes, pages: [] };
+  const result = {
+    viewports: {},
+    colorSchemes,
+    pages: [],
+    mode: allPages ? "full" : "sample",
+    selectedPages: selectedFiles.map((file) => relative(bookDir, file).split(sep).join("/")),
+  };
   try {
     for (const width of viewports) {
       result.viewports[width] = {};
       for (const scheme of colorSchemes) {
-        for (const file of htmlFiles) {
+        for (const file of selectedFiles) {
           const pageId = relative(bookDir, file).split(sep).join("/");
           const touch = width <= 768;
           const context = await browser.newContext({
