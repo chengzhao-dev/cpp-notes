@@ -225,15 +225,11 @@ def resolve_repo_domain(target, root):
                 reads.append(rel_path + "/")
         maintenance_paths = {
             ".agents/skills/catalog.md",
-            ".agents/skills/agent-ops/references/reference-index.md",
             ".agents/skills/agent-ops/references/refactor-guidelines.md",
             ".agents/skills/agent-ops/scripts/check_skill_size.py",
         }
         if rel_path in maintenance_paths:
             reads.insert(0, ".agents/skills/catalog.md")
-            index = ".agents/skills/agent-ops/references/reference-index.md"
-            if index not in reads:
-                reads.append(index)
         return {"kind": "repo", "label": f"skill {skill}", "reads": reads}
     if parts[:2] == [".agents", "mcp"]:
         return {

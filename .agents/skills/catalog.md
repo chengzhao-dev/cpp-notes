@@ -24,10 +24,9 @@
 
 ## 详细路由
 
-- `agent-ops/references/reference-index.md`：完整 L2 与 knowledge 清单，只在维护 skills、合并 reference 或检查覆盖时读取。
 - `.agents/skills/cpp-content/references/tasks/<part>.md`：章节状态、读写边界和验收的唯一出处，由 `scope` 自动选中。
 - `knowledge/README.md`：知识库规范和新增流程。新增或迁移知识后运行 `kb-index`、`kb-check` 和 `kb-eval`。
 - `quarto-docs/references/zh/writing-principles.md`：所有中文文档任务的最高优先规则。
 - `quarto-docs/references/zh/chapter-writing.md`：C++ 学习轨迹笔记页面骨架、术语门槛和新手成功路径。
 
-普通任务只读取命中的 `SKILL.md`、目标文件和其中明确要求的 reference，不读取完整索引。维护 skills 结构或修改路由时才加载 `reference-index.md`。
+普通任务只读取命中的 `SKILL.md`、目标文件和其中明确要求的 reference。需要了解知识文件规范时读取 `knowledge/README.md`，不维护第二份手工目录。

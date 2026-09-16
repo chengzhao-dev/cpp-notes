@@ -2,7 +2,7 @@
 """按文档类型检查仓库 Markdown 与 QMD 的基础结构。
 
 链接标签两侧空格（DOC-N10）与标签内反引号（DOC-E12）默认记为 NOTICE，
-`--strict` 下升级为失败，与 check_punctuation.py 的分级一致。
+`--strict` 下升级为失败。空文件、空目录与关键工具标记始终作为错误。
 """
 
 import argparse
@@ -40,6 +40,11 @@ CODE_LANGUAGES = {"cpp", "c", "bash", "sh", "shell", "powershell", "ps1", "cmake
 SHELL_LANGUAGES = {"bash", "sh", "shell"}
 POWERSHELL_LANGUAGES = {"powershell", "ps1"}
 TARGET_CREATION = re.compile(r"^\s*(add_executable|add_library)\s*\(")
+INLINE_TOOLS = ("clang++", "clangd", "lldb", "CMake")
+TOOL_TOKEN = re.compile(
+    r"(?<![A-Za-z0-9_+.-])(%s)(?![A-Za-z0-9_+.-])"
+    % "|".join(map(re.escape, INLINE_TOOLS))
+)
 
 
 def parse_fence_info(info):
@@ -547,6 +552,48 @@ def check_source(path):
     return errors, notices
 
 
+def empty_path_errors():
+    """返回受管目录中的空文件和空目录。"""
+    skip = {".git", "_book", ".quarto", ".cache", ".tmp", "build", "temp"}
+    rows = []
+    for path in ROOT.rglob("*"):
+        rel = path.relative_to(ROOT)
+        if any(part in skip for part in rel.parts):
+            continue
+        if path.is_file() and path.stat().st_size == 0:
+            rows.append(f"{rel.as_posix()}: DOC-E23 空文件")
+        elif path.is_dir() and not any(path.iterdir()):
+            rows.append(f"{rel.as_posix()}: DOC-E23 空目录")
+    return rows
+
+
+def inline_code_errors():
+    """检查教学正文中的关键工具是否使用行内代码。"""
+    rows = []
+    for path in sorted((ROOT / "content").rglob("*.qmd")):
+        rel = path.relative_to(ROOT).as_posix()
+        in_fence = False
+        in_frontmatter = False
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if number == 1 and line.strip() == "---":
+                in_frontmatter = True
+                continue
+            if in_frontmatter:
+                if line.strip() == "---":
+                    in_frontmatter = False
+                continue
+            if FENCE.match(line):
+                in_fence = not in_fence
+                continue
+            if in_fence or line.lstrip().startswith("#"):
+                continue
+            clean = re.sub(r"`[^`]*`", "", line)
+            clean = re.sub(r"\[[^\]]*\]\([^)]*\)", "", clean)
+            for token in TOOL_TOKEN.findall(clean):
+                rows.append(f"{rel}:{number}: DOC-E24 {token} 应使用反引号")
+    return rows
+
+
 def main():
     parser = argparse.ArgumentParser(description="文档结构检查")
     parser.add_argument("--strict", action="store_true",
@@ -572,6 +619,8 @@ def main():
         found_errors, found_notices = check_source(path)
         errors.extend(found_errors)
         notices.extend(found_notices)
+    errors.extend(empty_path_errors())
+    errors.extend(inline_code_errors())
     if args.strict:
         soft = [n for n in notices if "DOC-N10" in n]
         notices = [n for n in notices if "DOC-N10" not in n]
@@ -583,7 +632,7 @@ def main():
         for error in errors:
             print("  " + error)
         return 1
-    print(f"PASS docs 分层检查（{len(paths)} 个文档）")
+    print(f"PASS docs 结构、空路径与关键工具标记（{len(paths)} 个文档）")
     return 0
 
 

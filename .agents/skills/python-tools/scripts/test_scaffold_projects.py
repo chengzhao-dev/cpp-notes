@@ -108,15 +108,11 @@ def main():
     assert "{{CMAKE_PROJECT_NAME}}" not in cmake
     assert "project(MultiProject LANGUAGES CXX)" in cmake
     assert cmake.splitlines()[0] == "# 构建 MultiProject 可执行目标。"
-    assert (
-        'file(GLOB APP_SOURCES CONFIGURE_DEPENDS '
-        '"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")'
-    ) in cmake
-    assert "add_executable(app ${APP_SOURCES})" in cmake
+    assert "add_executable(app src/main.cpp src/greeting.cpp)" in cmake
     assert_target_comment(
         cmake,
-        "add_executable(app ${APP_SOURCES})",
-        "# 创建 app 可执行目标。",
+        "add_executable(app src/main.cpp src/greeting.cpp)",
+        "# 创建 app 可执行目标，并列出参与构建的源文件。",
     )
     assert "target_include_directories(app PRIVATE include)" in cmake
     assert (multi / "include/greeting.h").read_text(
@@ -173,12 +169,8 @@ def main():
             ),
         )
         assert "add_library(greeting" not in library_cmake
-        assert f"add_library(greeting {library_type} ${{LIBRARY_SOURCES}})" in module_cmake
+        assert f"add_library(greeting {library_type} src/greeting.cpp)" in module_cmake
         assert "target_include_directories(greeting PUBLIC include)" in module_cmake
-        assert (
-            'file(GLOB LIBRARY_SOURCES CONFIGURE_DEPENDS '
-            '"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")'
-        ) in module_cmake
         assert "target_link_libraries(app PRIVATE greeting)" in library_cmake
         assert f"CMAKE_{output_kind}_OUTPUT_DIRECTORY ${{CMAKE_BINARY_DIR}}/lib" in library_cmake
         assert "CompilationDatabase: build" in (library / ".clangd").read_text(

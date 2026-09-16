@@ -19,7 +19,7 @@ metadata:
 
 | 任务 | 读取 |
 | --- | --- |
-| 改 skill 结构、上下文预算、任务矩阵格式与 ID 规则 | `references/refactor-guidelines.md`、`references/reference-index.md` |
+| 改 skill 结构、上下文预算、任务矩阵格式与 ID 规则 | `references/refactor-guidelines.md` |
 | 目录关系、章节路线图、运行边界与诊断逃生舱 | `references/repository-structure.md` |
 | 计划产物落盘、来源选择和完整性校验 | `references/plan-artifacts.md` |
 | skill 短路由与领域分工 | `../catalog.md` |
@@ -34,7 +34,7 @@ metadata:
 
 ## 工作流程
 
-1. 先读目标 skill、结构性 reference 和 `check_skill_size.py --verbose`，量清当前余量；只有维护完整索引时才读 `reference-index.md`。
+1. 先读目标 skill、结构性 reference 和 `check_skill_size.py --verbose`，量清当前余量。
 2. 搜索相近规则，优先并入职责最接近的现有文件，同时删除重复表述。
 3. 超预算时按序处理：压缩措辞 → 合并相近主题 → 移除一次性案例 → 新增 L2 → 新增 L1。
 4. 同步更新父级 `SKILL.md`、`../catalog.md` 与必要路由说明。删文件后移除随之变空的目录。

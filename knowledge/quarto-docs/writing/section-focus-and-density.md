@@ -3,13 +3,13 @@ kb_id: "cpp-quarto-section-focus-density-v1"
 title: "教学小节的主线收束与信息分层"
 domain: "quarto-docs"
 subdomain: "writing"
-tags: [section, focus, mainline, density, progressive_disclosure, command, output, validation, parameter, filename, box_ratio, long_paragraph, paragraph_merge, parent_heading, callout, callout_weight, result_callout, callout_transition, visual_hierarchy, font_scale]
+tags: [section, focus, mainline, density, progressive_disclosure, command, output, validation, parameter, filename, box_ratio, long_paragraph, paragraph_merge, parent_heading, callout, callout_weight, result_callout, callout_transition, visual_hierarchy, font_scale, project_tree, inline_code, backticks, diagram]
 level_range: [0, 5]
 dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-11"
-updated: "2026-09-14"
+updated: "2026-09-16"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 2600
+estimated_tokens: 3200
 ---
 
 # 教学小节的主线收束与信息分层
@@ -62,7 +62,7 @@ estimated_tokens: 2600
 
 ## 元素边界
 
-细节只有拥有独立输入、动作和验收结果时才升级为标题，否则留在当前小节的延伸区域。常见错误使用三级结构，是因为目录负责导航、具体症状负责识别、有序步骤负责操作。命令格式和三步写法见 `cpp-quarto-troubleshooting-flow-v1` 引用的写作规则。
+细节只有拥有独立输入、动作和验收结果时才升级为标题，否则留在当前小节的延伸区域。常见错误使用三级结构，是因为目录负责导航、具体症状负责识别、有序步骤负责操作。具体写法见 `cpp-quarto-chapter-pattern-v1` 和 `quarto-docs` 的章节写作 reference。
 
 这种分层与页面整体的五段块序列并不冲突：它只收束任务段内部的阅读路径，不重新定义引言、任务序列、排查和回顾的页面职责。
 
@@ -71,3 +71,19 @@ estimated_tokens: 2600
 Callout 是视觉上独立的盒子。把它插在段落、命令或输出之间，会让读者误以为提示框也是必经步骤，主线因此被切断。可跳过内容在成功路径闭合后再出现。影响当前操作的内容不能靠提示框隐藏。
 
 “目标 → 动作 → 结果 → 补充”能同时照顾首次执行和回看细节的读者。它把必须完成的内容放在主线，把可选解释放在尾部，也避免在开头只有一句目标、末尾却集中堆叠参数和手册链接。
+
+## 目录树只展示当前任务需要的文件
+
+目录树先尊重磁盘事实，再删除不影响当前任务的缓存和构建产物。`build/` 是否展开取决于它是否正在承担验收作用。
+
+正文只强调读者当前需要识别的文件。目录树后的说明不复述每一行注释。展示顺序按工程理解推进：构建规则、源码、接口、实现和运行产物。
+
+正式 C++ 入门页不用 Mermaid 表达线性构建流程，改用标题和文字连接。复杂数据流确实难以文字说明时，才使用独立图表并给出一句结论。
+
+## 行内代码只标记需要逐字识别的对象
+
+命令、参数、文件名、路径、配置键、API 和标识符使用行内代码。Ubuntu、Windows 和 VS Code 作为普通平台名称时不加反引号。标题与导航不使用行内代码。
+
+同一对象在同一页保持一种标记方式。链接标签内不再嵌套行内代码。行内标记连续出现时，改用完整句子减少读者来回切换字体。
+
+标记边界和链接空格由 `quarto-docs` 的 `authoring.md` 维护，本文件只解释为什么需要克制。

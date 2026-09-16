@@ -13,7 +13,7 @@
 | --- | --- | --- | --- |
 | L0 `AGENTS.md` | 项目结构、命令、硬约束 | ≤65536 字节 | `check_skill_size.py` |
 | L1 `*/SKILL.md` | 职责、适用场景、路由、P0、流程、判据 | ≤45 行且 ≤3000 字符 | 同上 |
-| L2 `*/references/**/*.md` | 单一主题的 P1/P2 细则与按需知识 | ≤160 行且 ≤6000 字符 | 同上；完整索引只在维护时读取 |
+| L2 `*/references/**/*.md` | 单一主题的 P1/P2 细则与按需知识 | ≤160 行且 ≤6000 字符 | 同上；route 由 L1 和各目录就近维护 |
 | L3 教学 QMD | 单一读者任务、直接可读的叙述与指令 | ≤150 行且 ≤5000 有效字符 | 同上；代码围栏与 include 行不计字符 |
 
 `name` ≤64 字符、`description` ≤1024 字符、全部 skill 的 `name + description` ≤8000 字符。预算按字符为主、字节为次级护栏，理由见脚本头部说明。
@@ -52,7 +52,7 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `knowledge/`。
 - 修改前先检索入口、引用和测试，理解文件职责后再迁移或删除。
 - 需要改名、提取或拆分时，先比较新旧职责，保留有效信息，完成后从整体复核术语、链接、顺序和重复内容。
 - 相同职责只保留一个权威实现。公共逻辑放入对应 skill 的 `scripts/` 或 `references/`。
-- 删除文件后移除空目录（`check_empty.py` 对空文件与空目录都判 FAIL）。
+- 删除文件后移除空目录（`check --profile fast` 会把空文件与空目录判为错误）。
 - Skill 目录与文件名使用 kebab-case 与 ASCII。`agents/openai.yaml` 是宿主 UI 元数据，不参与任务路由。
 - 完成后按改动域运行 `check --profile fast|book|knowledge|python`。涉及知识库再跑 `kb-index`、`kb-check` 和 `kb-eval`。
 
@@ -60,5 +60,5 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `knowledge/`。
 
 1. 先更新已有的 skill reference、knowledge 文件或任务矩阵；没有独立读者任务或独立结论时不得新增第二份权威。
 2. 超出 L1–L3 或 Parent 预算时，依次压缩措辞、合并相近主题、删除一次性案例，再按读者任务拆页或按概念边界拆知识。
-3. 新增 QMD 时同步更新 `_quarto.yml`、part 索引和任务矩阵；新增 knowledge 时同步更新 `reference-index.md` 与 `eval_set.py`。
+3. 新增 QMD 时同步更新 `_quarto.yml`、part 索引和任务矩阵；新增 knowledge 时同步更新 `knowledge/README.md` 与 `eval_set.py`。
 4. 收口按改动域运行 `run.py check --profile ...`；跨域或发布运行 `full`，知识内容变更先重建索引，再检查 Parent 预算、召回率和注入峰值。

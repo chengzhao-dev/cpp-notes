@@ -57,14 +57,14 @@ quarto publish gh-pages           # 渲染并发布到 GitHub Pages
 
 ## Quarto Book 项目（本项目所用格式）
 
-本备忘录使用 **Quarto Book**（`project: type: book`），适合章节化技术文档。核心配置（**已对齐仓库 `_quarto.yml`**，不要与真实配置冲突）：
+本项目使用 **Quarto Book**（`project: type: book`），适合章节化技术文档。核心配置（**已对齐仓库 `_quarto.yml`**，不要与真实配置冲突）：
 
 ```yaml
 project:
   type: book
 
 book:
-  title: "cpp-notes"
+  title: "C++ 学习轨迹笔记"
   chapters:
     - index.qmd
     - part: "准备开发环境与工具链"

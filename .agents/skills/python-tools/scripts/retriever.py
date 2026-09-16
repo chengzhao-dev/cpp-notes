@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""检索管道：查询改写 -> 元数据预过滤 -> BM25 + 向量双路 -> RRF 融合 -> 精排 -> Parent 扩展。
+"""检索管道：查询改写 -> 元数据预过滤 -> BM25 + 图谱 -> RRF 融合 -> 精排 -> Parent 扩展。
 
 对应知识库四大原则：
   不读全量：Child 命中后回溯替换成 Parent，并按令牌预算裁剪，永不返回整篇文档。
   不乱读：先按 domain/tags/level 预过滤缩小候选集，再双路召回与精排。
   不阻塞增长：只查索引，索引由 indexer.py 增量维护。
-  不信任单一检索：BM25 抓精确符号、向量抓语义意图、RRF(k=60) 融合、最后精排。
+  不信任单一检索：BM25 抓精确词面、图谱补充概念关联、RRF(k=60) 融合、最后精排。
 
 回退实现必须说清楚，别当成真实模型：
   Stage 1 查询改写 = 规则改写（去口语前缀、抽符号、拆并列项），不调用 LLM。
-  Stage 2/4 向量与精排 = hashing 向量与词面重合度打分，可插拔点是 embed() 与
-             rerank_score()，接上真实模型即可替换，管道其余部分不动。
-  Stage 3 的向量路按「维度 到 块」倒排打分（vector_shard），等价于逐块 cosine，
-             是精确检索。分片按 meta.build_seq 缓存，重建索引即失效，不是 ANN。
+  Stage 2/4 精排 = 词面重合度打分，可插拔点是 rerank_score()。
   Stage 3 的 BM25 是 SQLite FTS5 的真实 bm25()，不是近似实现。
 
 版本与冲突（§3.6）：supersedes 指向的旧版命中乘 0.35 惩罚，冲突表里较旧的一方
@@ -25,7 +22,7 @@
     python .agents/skills/python-tools/scripts/retriever.py "shared_ptr 循环引用怎么打破"
     python .agents/skills/python-tools/scripts/retriever.py --explain "std::span 和裸指针加长度比有什么好处"
     python .agents/skills/python-tools/scripts/retriever.py --domain cpp_core --level 5 --budget 2500 "所有权转移"
-    python .agents/skills/python-tools/scripts/retriever.py --rounds 2 --json "vector 为什么比 list 快"
+    python .agents/skills/python-tools/scripts/retriever.py --rounds 2 --json "动态库为什么需要 RPATH"
 退出码：0 = 有注入结果，2 = 无结果（便于上层脚本判断）。
 """
 
@@ -37,24 +34,18 @@ import re
 import sqlite3
 import sys
 import time
-from array import array
-import collections
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kb_common as kb  # noqa: E402
-from indexer import CONFLICT_MAX_PENALTY, embed, tokens  # noqa: E402  分词口径必须与索引一致
+from indexer import CONFLICT_MAX_PENALTY, tokens  # noqa: E402  分词口径必须与索引一致
 
 RRF_K = 60
 # 精排候选池：RRF 只负责排序，没有否决权。单路强命中（名次在前 5）即使融合分被
 # 噪声向量挤到 20 名之外，也必须进精排，否则 `侵入式` 这种稀有精确词会被静默丢弃。
 RESCUE_RANK = 5
 CANDIDATE_POOL = 20
-# 融合分进精排时的权重，按量纲推导而不是试出来的：rerank_score 的取值区间是
-# 0~2（覆盖率 1 + 符号奖励 0.25*4），三路都排第一时的融合分最大，为
-# (1+3+0.6)/(60+1)≈0.075。0.075 * 8 ≈ 0.6，即融合项最多占精排区间的三分之一，
-# 「精排主导、RRF 次之」才是真的。原来写死的 30 会让融合项达到 2.3，
-# 直接把哈希向量的噪声前几名盖在词面命中的正文上面。
+# 融合分只作为精排之后的补充信号，不让检索名次盖过正文词面命中。
 RRF_SCORE_WEIGHT = 8.0
 QUOTE = chr(34)
 SYMBOL_PATTERN = r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z0-9_~]+)+"
@@ -113,7 +104,7 @@ class TokenBudgetController:
 
 
 def classify(query: str) -> dict:
-    """意图分类（轻量规则，不用 LLM）：决定 BM25 / 向量 / 图谱三路的相对权重。"""
+    """意图分类（轻量规则，不用 LLM）：决定 BM25 与图谱两路的相对权重。"""
     symbols = SYMBOL_RE.findall(query)
     if NAV_RE.search(query):
         kind = "navigation"
@@ -126,11 +117,11 @@ def classify(query: str) -> dict:
     else:
         kind = "concept"
     weights = {
-        "symbol": (3.0, 1.0, 0.2),
-        "concept": (1.0, 3.0, 0.6),
-        "contrast": (1.2, 2.0, 2.0),
-        "code": (2.2, 1.6, 0.4),
-        "navigation": (1.5, 1.0, 0.2),
+        "symbol": (3.0, 0.2),
+        "concept": (1.0, 0.6),
+        "contrast": (1.2, 2.0),
+        "code": (2.2, 0.4),
+        "navigation": (1.5, 0.2),
     }
     return {"kind": kind, "symbols": symbols, "weights": weights[kind]}
 
@@ -343,109 +334,6 @@ def bm25_search(con: sqlite3.Connection, query: str, allow, limit: int) -> list[
     return [r for r in rows if r in allow][:limit]
 
 
-# §3.2 分片策略：postings 按 domain 切开，内存里最多驻留
-# RESIDENT_SHARD_LIMIT 个分片（OrderedDict 的末尾 = 最近用过）。
-# 驻留且在末尾 = hot，驻留但被挤到前面 = warm，被淘汰 = cold（下次用到
-# 时从 SQLite 重新读，索引文件本身就是磁盘层）。分库不得改变结果，
-# 那条等价性由 test_vector_sharding.py 锁住。
-# 缓存对象不能挂在连接上（sqlite3.Connection 既不能挂属性也不能弱引用），
-# 所以 key 用 (id(con), build_seq, domain) 并在取用时比对 `is`：地址被复用
-# 只会重建分片，不会返回错误结果。
-RESIDENT_SHARD_LIMIT = 6
-VECTOR_SHARDS: "collections.OrderedDict[tuple, list]" = collections.OrderedDict()
-VECTOR_SHARD_BUILDS = 0
-
-
-def vector_shard(con: sqlite3.Connection, domain: str = "") -> dict:
-    """取（或按需建）某个 domain 的「维度 到 块」倒排分片（Layer 2 的规模侧）。
-
-    每个块的向量约 188/512 维非零，倒排后查询只需遍厇自己的非零维取候选，
-    打分次数从 N 次 512 维点积降到「命中维的 posting 长度之和」，结果与逐块
-    cosine 完全一致（等价性由 test_vector_index_equivalence.py 断言），所以
-    这是精确检索而不是 ANN 近似。meta.build_seq 每次成功索引都递增，序号一变
-    就重建分片，因此增量更新与 --rebuild 都不会读到旧内存。
-
-    domain 为空表示全库分片（未带 domain 过滤时的唯一入口）。带 domain 时只读
-    该分片，候选规模不再随全集增长——这是分片唯一能给的延迟好处，没带过滤
-    就不得不遍历全部分片，精确检索本身要求每个 live 块至少被碰一次。
-    """
-    global VECTOR_SHARD_BUILDS
-    seq_row = con.execute("SELECT value FROM meta WHERE key='build_seq'").fetchone()
-    seq = seq_row[0] if seq_row else ""
-    key = (id(con), seq, domain)
-    entry = VECTOR_SHARDS.get(key)
-    if entry is not None and entry[0] is con:
-        VECTOR_SHARDS.move_to_end(key)          # 命中即升格，hot 总在队尾
-        _trim_shards()                          # 上限在每次访问后都成立
-        return entry[1]
-    stale = [k for k in VECTOR_SHARDS if k[0] == id(con) and k[1] != seq]
-    for old_key in stale:                        # 重建后旧序号的分片全部作废
-        VECTOR_SHARDS.pop(old_key, None)
-    sql = ("SELECT rowid, chunk_id, vector FROM chunks "
-           "WHERE kind='child' AND status='live' AND vector IS NOT NULL")
-    args: list[object] = []
-    if domain:
-        sql += " AND domain=?"
-        args.append(domain)
-    buckets: dict[int, tuple[list, list]] = {}
-    ids: dict[int, str] = {}
-    for rowid, chunk_id, blob in con.execute(sql, args):
-        vector = array("f")
-        vector.frombytes(blob)
-        ids[rowid] = chunk_id
-        for slot, value in enumerate(vector):
-            if not value:
-                continue
-            bucket = buckets.get(slot)
-            if bucket is None:
-                bucket = buckets[slot] = ([], [])
-            bucket[0].append(rowid)
-            bucket[1].append(value)
-    shard = {
-        "postings": {slot: (array("I", rows), array("f", values))
-                     for slot, (rows, values) in buckets.items()},
-        "ids": ids,
-        "chunks": len(ids),
-    }
-    VECTOR_SHARDS[key] = [con, shard]
-    VECTOR_SHARD_BUILDS += 1
-    _trim_shards()
-    return shard
-
-
-def _trim_shards() -> None:
-    """按 LRU 把驻留分片数压回上限。被淘汰的分片落回 cold，下次用到重建。"""
-    while len(VECTOR_SHARDS) > RESIDENT_SHARD_LIMIT:
-        VECTOR_SHARDS.popitem(last=False)        # 队首总是最久未用的
-
-
-def vector_search(con: sqlite3.Connection, query: str, allow, limit: int,
-                  domain: str = "") -> list[str]:
-    """向量路：维度倒排 + 累加器，与全表扫 cosine 同分同序。"""
-    shard = vector_shard(con, domain)
-    postings = shard["postings"]
-    ids = shard["ids"]
-    vector = array("f")
-    vector.frombytes(embed(query))
-    scores: dict[int, float] = {}
-    for slot, value in enumerate(vector):
-        if not value:
-            continue
-        bucket = postings.get(slot)
-        if bucket is None:
-            continue
-        rows, values = bucket
-        for index in range(len(rows)):
-            rowid = rows[index]
-            scores[rowid] = scores.get(rowid, 0.0) + value * values[index]
-    # 与全扫同口径：分数降序，同分按 chunk_id 降序，最后才按预算挑前 limit 个
-    scored = sorted(((score, ids[rowid]) for rowid, score in scores.items()),
-                    reverse=True)
-    if allow is not None:
-        scored = [row for row in scored if row[1] in allow]
-    return [chunk_id for _score, chunk_id in scored[:limit]]
-
-
 def graph_search(con: sqlite3.Connection, query: str, allow, limit: int) -> list[str]:
     """图谱侧召回：查询命中的概念节点，取其挂载的 Chunk（对比类查询主要靠这条）。"""
     names = {n.lower() for n in LOOSE_SYMBOL_RE.findall(query)} | {n.lower() for n in BARE_WORD_RE.findall(query)}
@@ -532,14 +420,13 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
         allow = None  # 过滤后为空时放宽而不是直接失败，体检会报告过窄的过滤
 
     bm25 = merge_lists([bm25_search(con, q, allow, 20) for q in subqueries])
-    vector = merge_lists([vector_search(con, q, allow, 20, domain) for q in subqueries])
     graph = graph_search(con, query, allow, 20)
-    scores = rrf_fusion([bm25, vector, graph], intent["weights"])
+    scores = rrf_fusion([bm25, graph], intent["weights"])
     penalties = stale_factors(con, registry)
 
     pool = sorted(scores.items(), key=lambda kv: -kv[1])[:CANDIDATE_POOL]
     picked = {chunk_id for chunk_id, _f in pool}
-    for listing in (bm25, vector):
+    for listing in (bm25,):
         for rank, chunk_id in enumerate(listing[:RESCUE_RANK], start=1):
             if chunk_id in scores and chunk_id not in picked:
                 picked.add(chunk_id)
@@ -556,7 +443,6 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
             "rerank": rerank_score(query, child["content"]),
             "penalty": penalty,
             "bm25_rank": index_of(bm25, chunk_id),
-            "vector_rank": index_of(vector, chunk_id),
             "graph_hit": chunk_id in graph,
         })
     # 精排主导、RRF 次之，再乘版本惩罚。同分时优先更短的 Parent 以省预算
@@ -614,8 +500,6 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
         "prefilter": {"domain": domain, "subdomain": subdomain, "level": level,
                       "tags": tags,
                       "candidates": len(allow) if allow is not None else "all"},
-        "shards": {"resident": len(VECTOR_SHARDS), "limit": RESIDENT_SHARD_LIMIT,
-                   "built": VECTOR_SHARD_BUILDS, "domain": domain or "all"},
         "penalties": penalties,
         "window": window,
         "budget": {"max_context": controller.MAX_CONTEXT_TOKENS,
@@ -633,8 +517,7 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
              "heading_path": row["child"]["heading_path"],
              "rrf": round(row["rrf"], 5), "rerank": round(row["rerank"], 3),
              "penalty": row["penalty"], "score": round(row["score"], 4),
-             "bm25_rank": row["bm25_rank"], "vector_rank": row["vector_rank"],
-             "graph_hit": row["graph_hit"],
+             "bm25_rank": row["bm25_rank"], "graph_hit": row["graph_hit"],
              "parent_tokens": row["parent"]["token_count"] if row["parent"] else None}
             for row in candidates[:8]
         ],
@@ -739,7 +622,7 @@ def main() -> int:
         print("  " + str(position) + ". " + row["heading_path"]
               + "  rrf=" + str(row["rrf"]) + " rerank=" + str(row["rerank"])
               + " penalty=" + str(row["penalty"])
-              + " bm25#" + str(row["bm25_rank"]) + " vec#" + str(row["vector_rank"])
+              + " bm25#" + str(row["bm25_rank"])
               + (" graph" if row["graph_hit"] else "")
               + "  Parent=" + str(row["parent_tokens"]) + "令牌")
     return 0

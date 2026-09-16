@@ -3,13 +3,13 @@ kb_id: "cpp-quarto-chapter-pattern-v1"
 title: "教学正文的页面块序列与职责边界"
 domain: "quarto-docs"
 subdomain: "page_pattern"
-tags: [page, block, sequence, preface, task, granularity, recap, ordering, checklist, answer_disclosure, answer_intro, list_answer, details, self_check, heading_hierarchy, h3_granularity, beginner_scan]
+tags: [page, block, sequence, preface, task, granularity, recap, ordering, answer_disclosure, heading_hierarchy, h3_granularity, beginner_scan, landing, card, index, readme, troubleshooting, diagnosis, validation]
 level_range: [0, 9]
-dependencies: ["cpp-quarto-chapter-environment-v1"]
+dependencies: []
 created: "2026-09-10"
-updated: "2026-09-15"
+updated: "2026-09-16"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1900
+estimated_tokens: 2600
 ---
 
 # 教学正文的页面块序列与职责边界
@@ -82,7 +82,7 @@ estimated_tokens: 1900
 - 常见错误服务失败后回来的读者：每个症状使用 `###`，给定位命令和回到成功路径的动作。
 - 本章回顾服务已经成功的读者：总结获得的能力、提出关键问题并给出下一入口。
 
-常见错误与回顾服务不同状态的读者，因此顺序不能互换。具体故障结构和回顾格式分别归 `cpp-quarto-troubleshooting-flow-v1` 与 `quarto-docs` 的章节写作 reference。
+常见错误与回顾服务不同状态的读者，因此顺序不能互换。具体故障结构和回顾格式归 `quarto-docs` 的章节写作 reference。
 
 ## 回顾答案为什么就地折叠
 
@@ -104,10 +104,34 @@ estimated_tokens: 1900
 
 ## 块序列跨多个页面时如何连接
 
-块序列描述单页内部的顺序，不能整条套到章节集合上：教程集合里排第一的页面承担的是入口职责而不是概述职责，它的页面形状由标识 `cpp-quarto-landing-pattern-v1` 的知识文件决定。
+块序列描述单页内部的顺序，不能整条套到章节集合上：教程集合里排第一的页面承担入口职责而不是概述职责，页面形状由本文件的入口页规则决定。
 
 判断依据是读者当前要做的动作。需要他先做选择时用入口与卡片页，他已经确定要完成某个任务时用教学正文。同一份内容出现在两类页面上时，只有正文那一处承担可验证任务，入口那一处退化成定位与下一步。
 
+## 入口页只服务选择
+
+入口页让读者完成三个判断：内容是否匹配、应该进入哪一组、先读哪一页。页面通常按“范围句 → 分组引导 → 卡片网格”排列。卡片只说明范围与结果，不复制正文命令、参数或小节提纲。
+
+README、站点入口和 part 首页分工不同。README 服务仓库首屏，保留在线阅读地址、阅读顺序和仓库结构。站点入口让读者选择 part。part 首页安排本部分页面顺序。在线阅读地址只在 README 保留一次。
+
+尚未完成的主题可以标注状态，但不提供失效链接。不要把后续计划写成现有能力。
+
+## 环境、构建与库页面的边界
+
+环境页从上一页可观察状态开始，只安装后续需要的工具，并给出检查命令。Windows 与 WSL2 的关系在第一页解释一次，后续直接使用 Ubuntu。
+
+构建页先给最小源码和构建规则，再配置、构建、运行。直接编译与 CMake 分成不同页面。首个程序说明 `main()` 后的花括号组成函数体。
+
+工程页先说明多文件解决什么问题，再展示接口、实现和入口。库页把静态库和动态库拆开，复用同一组源码，只比较链接与运行方式。
+
+## 常见错误只保留恢复路径
+
+每个故障用 `###` 写症状，标题后的第一句写触发条件和可观察现象。正文给出定位、修复和验证三个动作，最后把读者送回主线。
+
+常见错误不是完整 FAQ，也不是第二个 API 手册。入门页只保留读者最可能遇到的两三项。能通过一句检查命令恢复的问题，不再拆成长表。
+
+多文件、CMake 和动态库排错仍遵循同一条规则：先确认对象是否存在，再修正构建规则，最后重新构建并运行。删除与当前成功路径无关的历史兼容说明。
+
 ## 与其他知识文件的分界
 
-本文件只回答页面由哪些块组成、每块的职责边界和顺序依据。段落、句式与措辞案例见标识 `cpp-quarto-chinese-style-v1` 的知识文件。环境、命令与工程展示案例见标识 `cpp-quarto-chapter-environment-v1` 的知识文件。渲染与输出取值见标识 `cpp-tooling-quarto-render-v2` 与 `cpp-tooling-quarto-html-v2` 的知识文件。入口与卡片页的组织见标识 `cpp-quarto-landing-pattern-v1` 的知识文件。
+本文件回答页面块序列、入口结构、环境页面和常见错误边界。段落、句式与措辞案例见标识 `cpp-quarto-chinese-style-v1`。渲染与输出取值见 `cpp-tooling-quarto-render-v2` 与 `cpp-tooling-quarto-html-v2`。

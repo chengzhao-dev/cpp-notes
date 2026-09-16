@@ -66,8 +66,8 @@ frontmatter 字段：
 ```
 
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/python-tools/scripts/`：
-`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` 双层索引与图谱、
-`retriever.py` 五阶段检索、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
+`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` FTS5 与图谱索引、
+`retriever.py` 检索与 Parent 回溯、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `check --profile knowledge`）。
 
 ## 新增知识的最小闭环
@@ -75,4 +75,4 @@ frontmatter 字段：
 1. 建文件或更新唯一权威 → `kb-index` → `kb-check`（重复与 Parent 超限必须为 0）。
 2. 在 `.agents/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做和一行 `kb-search` 入口；详细取舍依据留在 knowledge。
-4. 更新 `.agents/skills/catalog.md` 短路由和 `.agents/skills/agent-ops/references/reference-index.md` 完整清单，最后按改动域运行 `run.py check --profile ...`。
+4. 更新 `.agents/skills/catalog.md` 短路由，最后按改动域运行 `run.py check --profile ...`。

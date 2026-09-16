@@ -17,14 +17,12 @@ metadata:
 | 要做的事 | 读取 |
 | --- | --- |
 | 所有中文文档任务（最高优先） | `references/zh/writing-principles.md` |
+| 章节组织、页面骨架与新手术语门槛 | `references/zh/chapter-writing.md` |
 | 正文结构、文档元素与终端命令块 | `references/quarto/authoring.md`、`references/quarto/terminal-validation.md` |
-| 章节组织 / C++ 页面骨架 | `references/zh/chapter-writing.md` |
-| 小节主线、父级标题、长段合并/拆分、正文与 Callout 重量平衡、结果型 Callout 及预告接力、诊断步骤标签与验证回流、代码块前标点与信息密度 | `references/zh/section-focus-and-density.md`、`references/quarto/terminal-validation.md` |
-| 工程目录树与正式 C++ 章节主线 | `references/zh/project-tree-and-diagram-focus.md` |
-| C++ 学习轨迹笔记项目写作边界 | `references/zh/chapter-writing.md` |
+| 小节密度、Callout 和排错结构 | `references/zh/section-focus-and-density.md` |
 | Book 结构、front matter、标题层级与 H2/H3 判定 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
-| 措辞、案例与页面组织依据（为什么这么排） | `run.py kb-search "块序列"`、`"卡片"`、`"措辞"`，均加 `--domain quarto-docs` |
+| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain quarto-docs` |
 
 ## P0 硬约束
 1. 标题只由 YAML `title:` 提供，页面内不再写同文本 `# H1`。小节从 `##` 开始，不手填序号，`##`/`###` 前不写 `---` 水平线。

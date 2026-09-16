@@ -196,11 +196,10 @@ def main() -> int:
         ".agents/skills/cpp-content/SKILL.md", ROOT
     )["reads"]
     assert skill_reads == [".agents/skills/cpp-content/SKILL.md"]
-    index_reads = scope.resolve_repo_domain(
-        ".agents/skills/agent-ops/references/reference-index.md", ROOT
+    maintenance_reads = scope.resolve_repo_domain(
+        ".agents/skills/agent-ops/references/refactor-guidelines.md", ROOT
     )["reads"]
-    assert ".agents/skills/agent-ops/references/reference-index.md" in index_reads
-    assert ".agents/skills/catalog.md" in index_reads
+    assert ".agents/skills/catalog.md" in maintenance_reads
     assert scope.resolve_repo_domain(
         "knowledge/README.md", ROOT
     )["label"] == "knowledge"

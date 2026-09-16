@@ -12,7 +12,6 @@
 | Parent 超限 | 0 | 任一可检索 Parent 超过默认 4000 Token 预算 |
 | 检索 P95 | <= 200ms | 评测集上端到端延迟，超标即验收不通过 |
 | 陈旧条目 | 0 | 源码 hash 变了但索引还是旧的，说明增量没跑 |
-| 目录缺登记 | 0 | `knowledge/` 有文件但短路由或完整索引没有它，路由表与知识库漂移 |
 
 用法：
     python .agents/skills/python-tools/scripts/check_health.py            # 体检（有告警时退出码 1）
@@ -37,14 +36,9 @@ import kb_common as kb  # noqa: E402
 LIMITS = {
     "format": 0, "unindexed": 0, "orphan": 0, "duplicate": 0,
     "graph_broken": 0, "oversized_parent": 0, "stale": 0, "p95_ms": 200.0,
-    "dangling": 0, "catalog": 0,
+    "dangling": 0,
 }
 ROOT_PATH = kb.ROOT
-CATALOG_PATH = ROOT_PATH / ".agents" / "skills" / "catalog.md"
-REFERENCE_INDEX_PATH = (
-    ROOT_PATH / ".agents" / "skills" / "agent-ops" / "references" / "reference-index.md"
-)
-PATH_CELL = re.compile(r"`([^`]+\.md)`")
 
 
 def check_format() -> tuple[list[str], list[str]]:
@@ -151,44 +145,6 @@ def check_index(paths: list[str], registry_out: list) -> tuple[dict, list[str]]:
     return counts, details
 
 
-def check_catalog() -> tuple[list[str], int]:
-    """断言短路由或完整索引与磁盘上的知识文件一一对应。
-
-    短路由负责日常选择，完整索引负责维护清单。`knowledge/` 下新增文件却不登记，
-    等于写正文时没人会读到它——索引和召回都会绿，只有路由是瞎的。所以这条断言
-    独立于索引，直接比对磁盘与表格。`knowledge/README.md` 是规范本身，不参与登记。
-    """
-    registry_files = [path for path in (CATALOG_PATH, REFERENCE_INDEX_PATH) if path.is_file()]
-    if not registry_files:
-        return ["skill 路由与完整索引均缺失"], 0
-    listed: set[str] = set()
-    section = False
-    for registry in registry_files:
-        for line in registry.read_text(encoding="utf-8").splitlines():
-            if line.startswith("## "):
-                section = line.strip().lower().startswith("## knowledge")
-                continue
-            if not section or not line.strip().startswith("|"):
-                continue
-            cell = PATH_CELL.search(line)
-            if cell and cell.group(1).startswith("knowledge/"):
-                listed.add(cell.group(1))
-    problems = []
-    on_disk = 0
-    for path in kb.list_knowledge_files():
-        name = path.name
-        if name == "README.md":
-            continue
-        on_disk += 1
-        relative = kb.rel(path)
-        if relative not in listed:
-            problems.append("技能路由缺登记: " + relative)
-    for relative in sorted(listed):
-        if not (ROOT_PATH / relative).is_file():
-            problems.append("技能路由指向不存在的知识文件: " + relative)
-    return problems, on_disk
-
-
 def check_version(registry: dict, con) -> tuple[list[str], int]:
     """检查 supersedes 是否指向存在的文档，并数出冲突候选。
 
@@ -266,7 +222,7 @@ def run(gate: bool, verbose: bool, samples: int) -> int:
     counts["p95_ms"] = p95
 
     order = ["format", "unindexed", "stale", "orphan", "duplicate", "graph_broken",
-             "oversized_parent", "dangling", "catalog"]
+             "oversized_parent", "dangling"]
     version_problems, conflicts = ([], 0)
     if holder and kb.DB_PATH.is_file():
         probe = sqlite3.connect(kb.DB_PATH)
@@ -274,10 +230,6 @@ def run(gate: bool, verbose: bool, samples: int) -> int:
         probe.close()
     counts["dangling"] = len(version_problems)
     problems = problems + version_problems
-    catalog_problems, catalog_total = check_catalog()
-    counts["catalog"] = len(catalog_problems)
-    problems = problems + catalog_problems
-
     degraded = p95 > LIMITS["p95_ms"]
     failed = [k for k in order if counts[k] > LIMITS[k]]
     if degraded and not gate:
@@ -296,7 +248,6 @@ def run(gate: bool, verbose: bool, samples: int) -> int:
           + "  Parent超限=" + str(counts["oversized_parent"])
           + "  悬空supersedes=" + str(counts["dangling"])
           + "  冲突候选=" + str(conflicts)
-          + "  知识文件=" + str(catalog_total)
           + "  P50=" + format(p50, ".1f") + "ms P95=" + format(p95, ".1f") + "ms")
     if failed:
         print("      超阈值项: " + ", ".join(failed))

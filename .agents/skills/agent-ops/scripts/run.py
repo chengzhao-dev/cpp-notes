@@ -17,7 +17,6 @@
   kb-search  知识库单次检索（透传 retriever 参数，如 --toc/--parent/--explain）
   kb-check  知识库健康度与检索延迟测量
   kb-eval   标注集召回率与 Token 预算验收（延迟由 kb-check 负责）
-  kb-scale  三层索引的规模基准（P95 拐点，验证 100MB–1GB 目标）
 通用参数：
   --verbose  展开全部原始输出（仅失败排查时使用）
   --strict   仅 check：把正文分号、链接间距等软规则升级为失败
@@ -106,7 +105,6 @@ def resolve_tool(name):
 
 # 校验项：(名称, 脚本相对路径, 需要 _book 产物, 固定参数)
 CHECKS = [
-    ("empty", ".agents/skills/agent-ops/scripts/check_empty.py", False, ()),
     ("encoding", ".agents/skills/agent-ops/scripts/check_encoding.py", False, ()),
     ("agent-controls", ".agents/skills/agent-ops/scripts/test_agent_controls.py", False, ()),
     ("layout", ".agents/skills/quarto-theme/scripts/check_layout.py", True, ()),
@@ -115,25 +113,20 @@ CHECKS = [
     ("size", ".agents/skills/agent-ops/scripts/check_skill_size.py", False, ()),
     ("ascii", ".agents/skills/quarto-docs/scripts/check_ascii_names.py", False, ()),
     ("links", ".agents/skills/quarto-docs/scripts/check_skill_links.py", False, ()),
-    ("inline-code", ".agents/skills/agent-ops/scripts/check_inline_code.py", False, ()),
     ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False, ()),
-    ("punctuation", ".agents/skills/agent-ops/scripts/check_punctuation.py", False, ()),
     ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False, ()),
     ("scaffold", ".agents/skills/python-tools/scripts/test_scaffold_projects.py", False, ()),
     ("kb", ".agents/skills/python-tools/scripts/check_health.py", False, ("--gate",)),
     ("kb-eval", ".agents/skills/python-tools/scripts/evaluator.py", False, ("--skip-latency",)),
     ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False, ()),
-    ("vector-eq", ".agents/skills/python-tools/scripts/test_vector_index_equivalence.py", False, ()),
-    ("vector-shard", ".agents/skills/python-tools/scripts/test_vector_sharding.py", False, ()),
 ]
 
 PROFILE_CHECKS = {
     "fast": {
-        "empty", "encoding", "agent-controls", "size", "ascii", "links",
-        "inline-code", "docs", "punctuation", "tasks",
+        "encoding", "agent-controls", "size", "ascii", "links", "docs", "tasks",
     },
     "book": {"layout", "callouts", "dom"},
-    "knowledge": {"kb", "kb-eval", "conflict", "vector-eq", "vector-shard"},
+    "knowledge": {"kb", "kb-eval", "conflict"},
     "python": {"scaffold"},
 }
 
@@ -141,7 +134,6 @@ PROFILE_CHECKS = {
 PASS_HINTS = ("PASS", "All examples compiled", "All key tokens", "OK: all internal",
               "无阻塞", "DOM contracts")
 CHECK_LABELS = {
-    "empty": "空文件",
     "encoding": "编码",
     "agent-controls": "Agent 控制",
     "layout": "布局",
@@ -150,22 +142,17 @@ CHECK_LABELS = {
     "size": "上下文体量",
     "ascii": "文件名",
     "links": "链接",
-    "inline-code": "行内代码",
     "docs": "文档",
-    "punctuation": "标点",
     "tasks": "任务矩阵",
     "scaffold": "脚手架",
     "kb": "知识库",
     "kb-eval": "知识库评测",
     "conflict": "冲突检测",
-    "vector-eq": "向量等价",
-    "vector-shard": "向量分片",
 }
 COMMAND_LABELS = {
     "kb-index": "知识库索引",
     "kb-check": "知识库检查",
     "kb-eval": "知识库评测",
-    "kb-scale": "规模基准",
 }
 
 
@@ -256,7 +243,7 @@ def cmd_check(args):
             argv += ["--book-dir", "_book"]
         if name == "layout" and getattr(args, "require_browser", False):
             argv.append("--browser")
-        if getattr(args, "strict", False) and name in {"punctuation", "docs"}:
+        if getattr(args, "strict", False) and name == "docs":
             argv.append("--strict")
         rc, text = run(argv)
         if rc != 0:
@@ -543,16 +530,6 @@ def cmd_kb_eval(args):
     return interpret(rc, text, args.verbose, "kb-eval")
 
 
-def cmd_kb_scale(args):
-    """规模基准：合成 Chunk 逐级测 P95，给出当前实现的可撑体量拐点。"""
-    argv = [PY, kb_script("benchmark_scale.py"), "--sizes", args.sizes,
-            "--repeats", str(args.repeats)]
-    if args.verbose:
-        argv.append("--verbose")
-    rc, text = run(argv)
-    return interpret(rc, text, args.verbose, "kb-scale")
-
-
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -584,7 +561,7 @@ def main():
 
     p = subs.add_parser("check", parents=[common], help="一次跑完全部校验")
     p.add_argument("--strict", action="store_true",
-                   help="把正文分号、链接间距等软规则升级为失败（作用于 punctuation 与 docs）")
+                   help="把链接间距等软规则升级为失败（作用于 docs）")
     p.add_argument("--require-book", action="store_true",
                    help="缺少 _book/ 时让 layout/callouts/dom 失败，默认显示跳过")
     p.add_argument("--require-browser", action="store_true",
@@ -614,9 +591,6 @@ def main():
     p.add_argument("--gate", action="store_true", help="只把结构性问题视为失败")
     p = subs.add_parser("kb-eval", parents=[common], help="标注集召回率与预算验收")
     p.add_argument("--topk", type=int, default=5, help="召回评价的 K，默认 5")
-    p = subs.add_parser("kb-scale", parents=[common], help="三层索引规模基准与 P95 拐点")
-    p.add_argument("--sizes", default="1000,10000,50000,100000", help="逗号分隔的 Chunk 数")
-    p.add_argument("--repeats", type=int, default=3, help="每级重复次数")
 
     args, extra = parser.parse_known_args()
     if args.cmd == "kb-search":
@@ -630,8 +604,7 @@ def main():
     handlers = {"check": cmd_check, "verify": cmd_verify, "render": cmd_render,
                 "scope": cmd_scope, "build": cmd_build, "status": cmd_status,
                 "kb-index": cmd_kb_index, "kb-search": cmd_kb_search,
-                "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval,
-                "kb-scale": cmd_kb_scale}
+                "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval}
     try:
         return handlers[args.cmd](args)
     except ToolNotFound as exc:

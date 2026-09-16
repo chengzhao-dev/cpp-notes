@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
-"""双层索引构建器：从 chunk_registry.json 增量构建 SQLite 索引（关键词 + 向量 + 图谱）。
+"""知识库索引构建器：从 chunk_registry.json 增量构建 FTS5 与知识图谱。
 
 为什么用 SQLite 而不是 FAISS / Tantivy：本机没有第三方包，且知识库要能在 CI 与
 WSL 之间用同一个文件跑。SQLite 自带 FTS5 与 bm25()，单文件、支持增量删改，
 把「装不上的依赖」换成「已经存在的依赖」。
 
-三层索引的实际落地：
-  Layer 1 关键词：FTS5 虚表（CJK 二元组 + ASCII 标识符），bm25() 排序 —— 完整可用。
-  Layer 2 向量：chunks.vector 存定长 packed-float 数组，向量由本文件的 embed()
-               生成，无外部模型时是 hashing trick 的词分布向量，不是神经嵌入。
-               接真实模型只需替换 embed()。规模侧由 retriever.vector_chard 建成
-               「维度 到 块」的倒排分片，仍是精确余弦检索（不是 goal 3.2 点名的
-               HNSW/FAISS 那类 ANN：本机无第三方包且禁网，无法安装），代价见
-               scale_benchmark.py 的实测曲线。本文件的 cosine() 只作参考实现，
-               给等价性回归当对照。
-  Layer 3 图谱：concept / edge / community 三张表，节点来自 Chunk 里的 C++ 标识符与
-               标签，边是同块共现，社区是连通分量摘要。
+检索由两层互补：
+  FTS5：CJK 二元组与 ASCII 标识符，bm25() 负责精确召回。
+  图谱：concept / edge / community 三张表，补充符号与概念关联。
 
-增量策略：以 content_hash 为准，未变的 Chunk 不重新 embed、不重建 FTS 行。
+增量策略：以 content_hash 为准，未变的 Chunk 不重建 FTS 行。
 删除的文件与消失的 Chunk 标 deprecated 而不是物理删除，支持回溯。
 
 用法：
@@ -30,13 +22,10 @@ WSL 之间用同一个文件跑。SQLite 自带 FTS5 与 bm25()，单文件、�
 from __future__ import annotations
 
 import argparse
-import math
 import re
 import sqlite3
-import struct
 import sys
 import time
-from array import array
 from collections import defaultdict
 from pathlib import Path
 
@@ -44,7 +33,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kb_common as kb  # noqa: E402
 from chunker import build as build_registry  # noqa: E402
 
-VECTOR_DIM = 512
 IDENT_RE = re.compile(r"[A-Za-z][A-Za-z0-9_]{1,63}")
 # 冲突检测专用的严格标识符：只认反引号片段内的完整符号名，不吃路径与散文词。
 IDENT_STRICT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{2,63}$")
@@ -55,9 +43,6 @@ CONFLICT_MIN_SHARED = 1
 CONFLICT_MAX_PENALTY = 0.5
 # FTS 布局标记：chunks_fts.rowid 与 chunks.rowid 对齐，删改走 rowid 而不是按值全表扫。
 FTS_LAYOUT = "rowid-v1"
-# 构建序号：每次成功索引都 +1，检索侧用它判定向量分片缓存是否失效。
-# built_at 只有秒级粒度，同一秒内的两次重建不能当版本用。
-BUILD_SEQ_KEY = "euild_ceq"
 ASCII_RUN = re.compile(r"[A-Za-z0-9_]+")
 CJK_RUN = re.compile(r"[一-鿿]{1,}")
 # 停用词只放没有检索信号的英文虚词。C++ 关键字（this / int / const / std …）在
@@ -76,8 +61,7 @@ SCHEMA = (
         content_hash TEXT NOT NULL,
         token_count INTEGER NOT NULL,
         domain     TEXT, subdomain TEXT, updated TEXT,
-        tags       TEXT, levels TEXT, status TEXT NOT NULL DEFAULT 'live',
-        vector     BLOB
+        tags       TEXT, levels TEXT, status TEXT NOT NULL DEFAULT 'live'
     );
     CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
     CREATE TABLE IF NOT EXISTS concept (
@@ -140,44 +124,6 @@ def tokens(text: str) -> list[str]:
     return out
 
 
-def embed(text: str) -> bytes:
-    """哈希技巧词分布向量（确定性、无需模型），带子串标识符加权。
-
-    这是回退实现，不是语义模型。可插拔点就在这里：接入真实 embedding 后
-    只需返回同维度的 packed float32，索引与检索都不用改。
-    """
-    bag = defaultdict(int)
-    for index, token in enumerate(tokens(text)):
-        bag[token] += 1
-        bag["#" + token] += 2
-    vector = array("f", [0.0] * VECTOR_DIM)
-    norm = 0.0
-    for token, weight in bag.items():
-        slot = hash64(token) % VECTOR_DIM
-        sign = 1.0 if (hash64(token) >> 63) & 1 else -1.0
-        value = sign * (1.0 + math.log(weight))
-        vector[slot] += value
-        norm += value * value
-    if norm:
-        scale = 1.0 / math.sqrt(norm)
-        for i in range(VECTOR_DIM):
-            vector[i] *= scale
-    return vector.tobytes()
-
-
-def hash64(text: str) -> int:
-    """自带 64 位哈希：内置 hash() 每进程加盐，会让向量在两次运行间漂移。"""
-    digest = kb.content_hash("ve:" + text)
-    return int(digest.split(":")[1][:16], 16)
-
-
-def cosine(a: bytes, b: bytes) -> float:
-    va, vb = array("f"), array("f")
-    va.frombytes(a)
-    vb.frombytes(b)
-    return sum(x * y for x, y in zip(va, vb))
-
-
 def align_fts_rowids(con: sqlite3.Connection) -> int:
     """把 chunks_fts 的 rowid 对齐到主表，返回重建的行数。
 
@@ -237,17 +183,16 @@ def upsert(con: sqlite3.Connection, chunk: dict, doc: dict, previous: dict) -> s
         chunk["heading_path"], chunk["content"], chunk["content_hash"],
         chunk["token_count"], doc["domain"], doc["subdomain"], doc["updated"],
         ",".join(doc["tags"]), ",".join(map(str, doc["levels"])), "live",
-        embed(chunk["content"]),
     )
     columns = ("chunk_id, parent_id, doc_id, kind, heading_path, content, content_hash,"
-               " token_count, domain, subdomain, updated, tags, levels, status, vector")
-    marks = ", ".join(["?"] * 15)
+               " token_count, domain, subdomain, updated, tags, levels, status")
+    marks = ", ".join(["?"] * 14)
     con.execute(
         "INSERT INTO chunks (" + columns + ") VALUES (" + marks + ") "
         "ON CONFLICT(chunk_id) DO UPDATE SET content=excluded.content,"
         "content_hash=excluded.content_hash,token_count=excluded.token_count,"
         "heading_path=excluded.heading_path,updated=excluded.updated,"
-        "vector=excluded.vector,status=excluded.status",
+        "status=excluded.status",
         payload,
     )
     rowid = con.execute("SELECT rowid FROM chunks WHERE chunk_id=?",
@@ -500,13 +445,6 @@ def main() -> int:
     conflicts = detect_conflicts(con, registry)
     con.execute("INSERT INTO meta VALUES ('built_at', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
                 (time.strftime("%Y-%m-%dT%H:%M:%S"),))
-    con.execute("INSERT INTO meta VALUES ('vector_dim', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
-                (str(VECTOR_DIM),))
-    seq = con.execute("SELECT value FROM meta WHERE key=?",
-                   (BUILD_SEQ_KEY,)).fetchone()
-    seq = int(seq[0]) + 1 if seq and seq[0].isdigit() else 1
-    con.execute("INSERT INTO meta VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",
-                (BUILD_SEQ_KEY, str(seq)))
     con.commit()
 
     live = con.execute("SELECT count(*) FROM chunks WHERE status='live'").fetchone()[0]

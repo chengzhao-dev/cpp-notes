@@ -61,13 +61,13 @@ estimated_tokens: 1400
 
 ## 术语节奏案例
 
-首次出现时给中文名称与英文检索词，后续固定一种称呼。普通概念不加行内代码，命令、路径、文件名、关键字、API 和配置键使用行内代码。标记边界见 `cpp-quarto-inline-code-boundaries-v1`。
+首次出现时给中文名称与英文检索词，后续固定一种称呼。普通概念不加行内代码，命令、路径、文件名、关键字、API 和配置键使用行内代码。标记边界见 `cpp-quarto-section-focus-density-v1`。
 
 ## 读者引导与维护信息分开案例
 
 作者如何检查磁盘、筛选目录树或安排写作不属于读者路径。把“根据实际目录筛选出的教学视图”写进章节，会让读者误以为需要理解作者的整理过程。正文用一句话同时交代对象和动作，例如“下面的目录是本章示例的文件清单，所有命令都在该工程根目录执行”，不把两个短句拆开连续堆放。
 
-目录树行尾注释已经给出文件职责，树后再逐项说明维护归属只是换一种形式重复。若当前操作需要判断“哪些能改、哪些由工具生成”，保留一张归属表，其余情况删除。目录树依据见 `cpp-quarto-project-tree-diagram-focus-v1`。
+目录树行尾注释已经给出文件职责，树后再逐项说明维护归属只是换一种形式重复。若当前操作需要判断“哪些能改、哪些由工具生成”，保留一张归属表，其余情况删除。目录树依据见 `cpp-quarto-section-focus-density-v1`。
 
 ## 连续短句与注释职责案例
 
@@ -131,4 +131,4 @@ estimated_tokens: 1400
 
 ## 与其他知识条目的分界
 
-章节导语和任务序列见 `cpp-quarto-chapter-pattern-v1`，目录树边界见 `cpp-quarto-project-tree-diagram-focus-v1`，行内代码边界见 `cpp-quarto-inline-code-boundaries-v1`。
+章节导语和任务序列见 `cpp-quarto-chapter-pattern-v1`，目录树与行内代码边界见 `cpp-quarto-section-focus-density-v1`。

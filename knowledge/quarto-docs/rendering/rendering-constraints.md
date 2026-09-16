@@ -32,7 +32,7 @@ Quarto 的 `body-width` 是上限声明，不是保证值。`sidebar-width + bod
 
 ## 字体与正文测量
 
-正文的拉丁字符使用 Fixel Text 的 500/600/700，界面中文使用 `LXGW WenKai Screen`，代码使用 `LXGW Bright Code`。三者均为 SIL OFL 1.1，适合自托管的个人和商业项目。LXGW Screen 的网页包共有 244 个 `unicode-range` 分包，约 12.53MiB。项目按真实页面命中记录和体积均衡归并为 16 路 WenKai 分包与 16 路 Bright Code 分包，合并后的字形轮廓与旧 45 分片保持一致。Bright Code 的拉丁部分来自 Monaspace Argon，中文部分来自霞鹜文楷，既让代码标识保持等宽和清晰，也与界面中文的笔画气质相容。代码栈仍保留 `LXGW WenKai Screen` 作为缺字回退，避免扩展区字符或下载失败时掉到系统衬线字体。浏览器只下载实际用字命中的分包。单页预算为最多 16 个字体文件、2.1 MB，当前最重页面实测约 1.95 MB。
+正文的拉丁字符使用 Fixel Text 的 500/600/700，界面中文使用 `LXGW WenKai Screen`，代码使用 `LXGW Bright Code`。三者均为 SIL OFL 1.1，适合自托管的个人和商业项目。中文与代码字体各使用一个常用字符集 WOFF2，覆盖当前公开内容和一级常用汉字。每个包只有一个请求，单页最多请求 5 个字体文件，体积预算为 1.6 MB。Bright Code 的拉丁部分来自 Monaspace Argon，中文部分来自霞鹜文楷。代码栈保留 `LXGW WenKai Screen` 作为缺字回退，避免扩展区字符或下载失败时掉到系统衬线字体。
 
 参考站点承担不同任务：Quarto 教程在 1280px 下正文约 616px，采用 17px / 1.5。GitHub Markdown 约 823px，采用 16px / 1.5。gitcn 的主内容区约 1024px，但说明文字会缩到约 672px。根首页的文字密度和卡片布局服务于快速浏览，不能直接当作连续正文的基准。教程正文保留 16px / 1.65，并把上限收至 800px，兼顾中文字形、代码宽度与连续阅读。
 
