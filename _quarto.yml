@@ -2,7 +2,7 @@ project:
   type: book
 
 book:
-  title: "C++ 笔记"
+  title: "C++ 学习轨迹笔记"
   # 站点级（GitHub Pages / 社交分享）：Book 的站点工具选项归 book: 键（Quarto 官方约定），
   # 放在顶层不会被识别（sitemap 等据此生成）
   site-url: "https://chengzhao-dev.github.io/cpp-notes"
@@ -11,7 +11,7 @@ book:
   favicon: ".agents/skills/quarto-theme/assets/theme/assets/favicon.svg"
   page-navigation: true
   navbar:
-    title: "C++ 笔记"
+    title: "C++ 学习轨迹笔记"
     search: true
   chapters:
     - index.qmd

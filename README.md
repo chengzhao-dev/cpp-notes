@@ -1,9 +1,9 @@
-# C++ 笔记
+# C++ 学习轨迹笔记
 
 [![quarto build & deploy](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml/badge.svg)](https://github.com/chengzhao-dev/cpp-notes/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-informational.svg)](LICENSE)
 
-**C++ 笔记**是一份面向初学者的中文 C++ 笔记。它以 Linux 为运行环境，从可以运行的程序开始，逐步介绍 C++ 语言、工具链和工程构建。
+**C++ 学习轨迹笔记**用于记录中文 C++ 学习过程。它以 Linux 为运行环境，从可以运行的程序开始，逐步整理 C++ 语言、工具链和工程构建。
 
 在线阅读：<https://chengzhao-dev.github.io/cpp-notes/>
 
