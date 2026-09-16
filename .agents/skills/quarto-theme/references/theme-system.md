@@ -26,21 +26,21 @@
 
 ### 组件约定
 
-- **代码块**：弱底 + 细边；有 `filename` 时使用标题条，无交通灯，复制钮右上角。
-- **Callout**：左 3px 色条 + 浅底 + `border-radius: 6px`，标题在上、内容在下。正文与页面正文同为 16px，标题为 15px；可选内容靠容器区分，不靠缩小字号。
+- **代码块**：弱底 + 细边。有 `filename` 时使用标题条，无交通灯，复制钮右上角。
+- **Callout**：左 3px 色条 + 浅底 + `border-radius: 6px`，标题在上、内容在下。正文与页面正文同为 16px，标题为 15px。可选内容靠容器区分，不靠缩小字号。
 - **侧栏 active**：浅底高亮 + GitHub 蓝色左轨（`--accent`）。
-- **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影，网格一行最多两列；根首页 Hero 无框左对齐。
+- **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影，网格一行最多两列。根首页 Hero 无框左对齐。
 - **首页与组件**：采用 GitHub 文档式细边框、冷灰分隔线和轻背景，卡片 hover 只改变边框或背景，不改变尺寸。
 - **顶栏品牌标**：与 `.agents/skills/quarto-theme/assets/theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
 - **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角，`text` 内容不启用语言 token。
 - **`.code-caption`**：图或代码块的一句附属说明，`--text-secondary` 次要文字色、字号略小，紧贴所描述对象（`base.css` 已压缩其与代码块的间距），写作侧规则见 quarto-docs `authoring.md`。
-- **可折叠答案**：`details.answer-disclosure` 使用原生 `summary` 展开，默认收起，边框和圆角与卡片一致；`summary` 直接承载固定摘要文本，明暗两态共用令牌。
+- **可折叠答案**：`details.answer-disclosure` 使用原生 `summary` 展开，默认收起，边框和圆角与卡片一致。`summary` 直接承载固定摘要文本，明暗两态共用令牌。
 
 ### 页面列宽与正文宽度
 
-- Quarto `grid.body-width` 是正文列的上限；sidebar、body、margin 与两条 gutter 的合计超过视口时，浏览器会压缩正文列。当前取值只在 `_quarto.yml` 维护。
+- Quarto `grid.body-width` 是正文列的上限。sidebar、body、margin 与两条 gutter 的合计超过视口时，浏览器会压缩正文列。当前取值只在 `_quarto.yml` 维护。
 - `--content-width` 只限制正文容器的最大宽度，不代表每个段落都必须再按字符数收窄。
-- 普通段落、列表、代码块、表格和 callout 使用实际正文列宽；首页标题描述可以单独使用 `ch` 控制导语长度。
+- 普通段落、列表、代码块、表格和 callout 使用实际正文列宽。首页标题描述可以单独使用 `ch` 控制导语长度。
 - 主题 CSS 不得用 `75ch` 等第二层限制覆盖正文列。窄屏由父容器缩放，内容保持 `max-width: 100%` 并避免横向溢出。
 
 ### 字体栈（三处同步）
@@ -48,9 +48,9 @@
 自托管 OFL 字体（`assets/fonts/` + `css/fonts.css`），无第三方 CDN：
 
 - Sans：`Fixel Text` → `LXGW WenKai Screen` → 系统中西文回退（`theme-*.scss`、`tokens.css --ui-font`）。
-- Mono：`LXGW Bright Code` → `LXGW WenKai Screen` → ui-monospace 回退；代码主题使用 GitHub Light / GitHub Dark。
+- Mono：`LXGW Bright Code` → `LXGW WenKai Screen` → ui-monospace 回退。代码主题使用 GitHub Light / GitHub Dark。
 
-Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使用同一套按真实页面命中记录和体积均衡生成的 16 路 `unicode-range` 分包，合并后的字形轮廓与旧 45 分片保持一致。Bright Code 的拉丁来自 Monaspace Argon，中文来自霞鹜文楷，缺字回退 WenKai Screen。网页子集由临时 pyftsubset 生成；变更需同步 SCSS、tokens、fonts、OFL、资产文件与 `check_layout.py`。单页预算为最多 16 个字体文件、2.1 MB；当前最重页面实测约 1.95 MB。字体资产由检查器核对 URL、数量、范围分区、签名和孤儿文件，数值间距以 `tokens.css` 为准。
+Fixel 使用 500/600/700。LXGW Screen v1.522 与 Bright Code v2.922 Regular 使用同一套按真实页面命中记录和体积均衡生成的 16 路 `unicode-range` 分包，合并后的字形轮廓与旧 45 分片保持一致。Bright Code 的拉丁来自 Monaspace Argon，中文来自霞鹜文楷，缺字回退 WenKai Screen。网页子集由临时 pyftsubset 生成。变更需同步 SCSS、tokens、fonts、OFL、资产文件与 `check_layout.py`。单页预算为最多 16 个字体文件、2.1 MB。当前最重页面实测约 1.95 MB。字体资产由检查器核对 URL、数量、范围分区、签名和孤儿文件，数值间距以 `tokens.css` 为准。
 
 ### 正文字号
 
@@ -60,6 +60,8 @@ Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 | H1（title） | 32px / w600 |
 | H2 | 24px / w600 / mt 2.75rem mb 0.9rem |
 | H3 | 20px / w600 / mt 2rem |
+| 代码块 | 15px / lh 1.65 |
+| 行内代码 | 0.875em |
 | Callout 正文 | 16px / lh 1.65 |
 | Callout 标题 | 15px / w600 |
 
@@ -67,7 +69,7 @@ Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 
 ### 设计来源
 
-布局采用 Quarto Book 三栏，页面色彩和组件规则参考 GitHub 文档，阅读体例参考渐进式教程；实现为 Bootstrap cosmo/darkly 与主题 CSS 覆盖。
+布局采用 Quarto Book 三栏，页面色彩和组件规则参考 GitHub 文档，阅读体例参考渐进式教程。实现为 Bootstrap cosmo/darkly 与主题 CSS 覆盖。
 
 ## 主题结构与组件规则（scss 变量 / css 组件）
 官方字段依据 Quarto [HTML format reference](https://quarto.org/docs/reference/formats/html.html)；以下 CSS/SCSS 选择器、令牌和装配顺序是本项目契约，不是 Quarto 内置 API。
@@ -100,7 +102,7 @@ Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 
 ### 校验
 
-用 `scripts/check_layout.py` 校验令牌、资产和可用的浏览器几何；发布验收覆盖
+用 `scripts/check_layout.py` 校验令牌、资产和可用的浏览器几何。发布验收覆盖
 `1280/1100/768/390` 的明暗两态和触屏复制按钮。需要刷新编译缓存时执行一次完整渲染。
 
 ### 代码高亮契约
@@ -109,14 +111,14 @@ Fixel 使用 500/600/700；LXGW Screen v1.522 与 Bright Code v2.922 Regular 使
 - 语义颜色由 Pandoc/Quarto 的 token 提供，CSS 只负责背景、布局、字体和稳定的基础色。
 - 括号、标点、`$`、版本号和普通输出必须保持连续的基础色，不按命令名或字符内容覆盖。
 - `text` 代码块用于命令输出和纯文本演示，不启用语言高亮，但与 `cpp`、`cmake`、`bash`、`powershell` 共用字体、字号、行高和字重。
-- 三类代码块（`text`、语言代码块、`include` 代码）共用 `--code-*` 与 `--code-title-*` 令牌；有标题时由 `.code-with-filename` 统一顶部圆角和分隔线。
+- 三类代码块（`text`、语言代码块、`include` 代码）共用 `--code-*` 与 `--code-title-*` 令牌。有标题时由 `.code-with-filename` 统一顶部圆角和分隔线。
 
 ### 产物契约断言
 
 `.agents/skills/agent-ops/scripts/check_dom_contracts.py` 断言以下项，改 DOM 相关样式前后各跑一次：
 
 - GitHub 明暗高亮主题与代码 token 不得被组件选择器覆盖。
-- 语言代码块与纯文本代码块共享背景、边框、字体和圆角；代码块本身不出现框中框。
+- 语言代码块与纯文本代码块共享背景、边框、字体和圆角。代码块本身不出现框中框。
 - 复制按钮 hover 作用域限定在 `.code-copy-outer-scaffold`（Quarto 1.10 起按钮与 `div.sourceCode` 是兄弟）。
 - `@media print` 不得隐藏 scaffold 本身。`@media (hover: none)` 提供触屏兜底。
 - 有 `filename` 的代码块生成来源标题，复制按钮不遮挡标题。

@@ -9,7 +9,7 @@ metadata:
 
 明暗双主题采用 GitHub Light / GitHub Dark 色板，保留适合教程阅读的三栏布局。只负责样式与令牌，页面结构交给 `quarto-docs`。
 
-正文列宽由 `_quarto.yml` 的 Quarto grid 与 `tokens.css` 的 `--content-width` 共同决定。普通段落和列表应占满实际正文列，不能在组件 CSS 中再次用 `ch` 限宽；只有首页标题描述等明确的短导语才保留独立的阅读宽度。
+正文列宽由 `_quarto.yml` 的 Quarto grid 与 `tokens.css` 的 `--content-width` 共同决定。普通段落和列表应占满实际正文列，不能在组件 CSS 中再次用 `ch` 限宽。只有首页标题描述等明确的短导语才保留独立的阅读宽度。
 ## 适用场景
 
 - 改 `scss/` 变量、`css/` 组件规则、`tokens.css` 令牌、`includes/` 与字体图标资源。
@@ -26,7 +26,7 @@ metadata:
 禁止通读整个 `.agents/skills/quarto-theme/assets/theme/css/`，禁止为「看一下」加载无关 css。
 ## P0 硬约束
 
-1. 页面语义颜色和跨组件共享尺度只从 `tokens.css` 引用；组件 css 不写十六进制或 `rgb()` 色值，一次性几何值可以保留在组件内。
+1. 页面语义颜色和跨组件共享尺度只从 `tokens.css` 引用。组件 css 不写十六进制或 `rgb()` 色值，一次性几何值可以保留在组件内。
 2. 改 `.agents/skills/quarto-theme/assets/theme/**` 或 `_quarto.yml` 前确认整本重渲染代价，改后跑 `run.py render`。
 3. 代码标题、令牌语义、复制按钮作用域、`@media print`、触屏兜底与 Mermaid SVG 由 `check_dom_contracts.py` 断言，改前后各跑一次。
 4. 不按字符内容、DOM 位置或命令名覆盖高亮颜色，语义色交给 Pandoc/Quarto token。
@@ -41,5 +41,5 @@ metadata:
 ## 完成判据
 
 - [ ] 发布验收用 `render --require-browser`，`layout`、`dom`、`callouts` 必须实际执行且通过。
-- [ ] `layout` 覆盖 `1280/1100/768/390` 的明暗两态，并确认触屏复制按钮可见；不可用时明确显示 SKIP，不宣称已验证。
+- [ ] `layout` 覆盖 `1280/1100/768/390` 的明暗两态，并确认触屏复制按钮可见。不可用时明确显示 SKIP，不宣称已验证。
 - [ ] 新增令牌已写回 `references/theme-system.md`。

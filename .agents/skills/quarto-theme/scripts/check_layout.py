@@ -2,11 +2,11 @@
 """校验关键设计令牌、字体资产与可用的浏览器布局指标。
 
 静态阶段用单次字面匹配（子串查找）+ 计数，不对压缩后大 CSS 做宽模式扫描。
-Node、Playwright 与 Edge 可用时，调用 measure_pages.mjs 验证真实几何；不可用时
+Node、Playwright 与 Edge 可用时，调用 measure_pages.mjs 验证真实几何。不可用时
 输出明确 SKIP，不把静态断言冒充布局验收。
 规范出处：.agents/skills/quarto-theme/references/theme-system.md。
 
-用法：python check_layout.py [--book-dir _book]
+用法：python check_layout.py [--book-dir _book] [--browser]
 退出码：0 = 关键令牌全部存在，1 = 有缺失。
 """
 
@@ -35,7 +35,7 @@ EXPECTED_FONT_RANGES = {
     "LXGW WenKai Screen": 11471,
     "LXGW Bright Code": 11471,
 }
-# 16 路分包的最重页面实测约 1.95 MB；上限保留少量余量，避免把粗分包误判为回归。
+# 16 路分包的最重页面实测约 1.95 MB。上限保留少量余量，避免把粗分包误判为回归。
 FONT_PAGE_BYTES_LIMIT = 2_100_000
 FONT_PAGE_FACES_LIMIT = 16
 
@@ -46,7 +46,9 @@ CHECKS = [
     ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
     ("dark navbar page-bg token", "--navbar-bg: #0D1117"),
     ("body line-height 1.65", "line-height: 1.65"),
-    ("GitHub content width", "--content-width: 840px"),
+    ("GitHub content width", "--content-width: 800px"),
+    ("code font 15px", "--code-font-size: 0.9375rem"),
+    ("code line-height 1.65", "--code-line-height: 1.65"),
     ("code title background", "--code-title-bg"),
     ("code title foreground", "--code-title-fg"),
     ("code title padding", "--code-title-padding"),
@@ -448,6 +450,8 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--book-dir", default="_book", help="渲染产物目录（默认 _book）")
+    parser.add_argument("--browser", action="store_true",
+                        help="执行四档视口、明暗模式的完整浏览器矩阵")
     parser.add_argument("--verbose", action="store_true", help="展开浏览器测量指标")
     args = parser.parse_args()
 
@@ -537,7 +541,10 @@ def main():
     if not coverage_ok:
         fail += 1
 
-    browser_problems, browser_note = browser_layout(book_dir, args.verbose)
+    if args.browser:
+        browser_problems, browser_note = browser_layout(book_dir, args.verbose)
+    else:
+        browser_problems, browser_note = [], "未请求浏览器矩阵（加 --browser 执行）"
     if browser_note and not browser_problems:
         print(f"  SKIP browser-layout  {browser_note}")
     else:

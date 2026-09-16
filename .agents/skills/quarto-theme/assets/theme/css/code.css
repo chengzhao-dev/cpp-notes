@@ -48,7 +48,7 @@ pre:not(.sourceCode) code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-pre.sourceCode code > span { line-height: 1.6; }
+pre.sourceCode code > span { line-height: var(--code-line-height); }
 
 /* GitHub 风格高亮只区分颜色，不用额外字重强调命令名或输出 token。 */
 pre.sourceCode code span { font-weight: 400; }
@@ -164,7 +164,7 @@ pre.sourceCode code > span:hover { background-color: var(--line-hover-bg); }
   color: var(--inline-code-fg);
   border-radius: var(--radius-sm);
   padding: 0.15em 0.4em;
-  font-size: 0.85em;
+  font-size: 0.875em;
   font-family: var(--mono-font);
 }
 
