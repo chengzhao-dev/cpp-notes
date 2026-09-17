@@ -24,6 +24,9 @@ book:
         - content/getting-started/multi-file-project.qmd
         - content/getting-started/static-library.qmd
         - content/getting-started/shared-library.qmd
+    - part: content/practice/index.qmd
+      chapters:
+        - content/practice/android-imaging.qmd
     - part: content/language-basics/index.qmd
       chapters:
         - content/language-basics/types-and-variables.qmd

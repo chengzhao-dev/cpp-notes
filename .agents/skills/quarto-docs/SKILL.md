@@ -10,6 +10,7 @@ metadata:
 ## 适用场景
 
 - 新写或润色 `.qmd` 正文、标题、代码块、终端命令、图表与 Callout，以及 `README.md`、`AGENTS.md` 体例。
+- 分册首页承载全局环境约定（例如 WSL2 Ubuntu），章节正文只承载当前任务；回顾题答案统一使用 `.answer`，由 Lua filter 默认收起。
 - **不适用**：渲染参数取值与设计令牌（转 `quarto-theme`）、C++ 语义正确性（转 `cpp-content`）。
 
 ## 任务路由

@@ -64,6 +64,7 @@ static-library/
 - 单文件、多文件和库工程分别用 `init_project.py --layout single|multi|static-library|shared-library` 生成。库工程生成根 `main.cpp` 与 `greeting/`，模板源在 `cpp-content/templates/projects/`。
 - 一个教学工程只突出一个中心。需要同时讲静态库和动态库时，使用两个独立工程，而不是在同一工程并列两种库目标。
 - part 目录和章节文件使用 ASCII kebab-case，章节名不复述 part 名，也不加顺序数字。顺序只在 `_quarto.yml` 与索引页维护。
+- part 目录名不复述书名已经表达的主题。书名含 C++，工程背景分册因此用 `practice`，读者可见标题为“工程应用”，不写 `cpp-in-practice` 或与入门内容边界重叠的 `engineering-practice`。命名依据检索 `cpp-agent-repository-navigation-v1`。
 - C++ 文件名使用 snake_case。完整源码文件的用途注释与重点注释以 `code-style.md` 为准，逻辑块之间留空行。
 - 环境与工程章节只保留当前任务的最小成功路径。平台差异、命令案例与诊断依据从知识库检索。
 - 改主题、全局配置或页面结构时再渲染整本 Book，日常改动只用 `run.py verify --changed`。

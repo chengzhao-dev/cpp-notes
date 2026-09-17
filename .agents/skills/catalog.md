@@ -24,6 +24,8 @@
 
 ## 详细路由
 
+- 工程背景分册使用短路径 `practice`、读者可见标题“工程应用”；目录名不复述书名已表达的 C++，也不要创建 `cpp-in-practice` 或 `engineering-practice` 同义目录。
+
 - `.agents/skills/cpp-content/references/tasks/<part>.md`：章节状态、读写边界和验收的唯一出处，由 `scope` 自动选中。
 - `knowledge/README.md`：知识库规范和新增流程。新增或迁移知识后运行 `kb-index`、`kb-check` 和 `kb-eval`。
 - `quarto-docs/references/zh/writing-principles.md`：所有中文文档任务的最高优先规则。

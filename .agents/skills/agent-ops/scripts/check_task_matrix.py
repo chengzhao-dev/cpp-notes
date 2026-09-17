@@ -34,7 +34,7 @@ HEADER = "| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备
 PREFIX = {
     "ENV": "getting-started", "LANG": "language-basics", "STD": "standard-library",
     "MEM": "memory", "PERF": "performance", "DBG": "debugging", "TOOL": "toolchain",
-    "REF": "reference",
+    "REF": "reference", "APP": "practice",
 }
 ID_RE = re.compile(r"^\| `(TASK-([A-Z]+)-(\d{3}))` ")
 PATH_RE = re.compile(r"`([^`]+)`")

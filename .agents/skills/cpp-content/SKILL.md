@@ -22,7 +22,7 @@ metadata:
 | 语言 / 标准库 / 内存与模板要点 | `references/cpp/cpp.md`、`references/cpp/stl.md`、`references/cpp/modern-cpp.md`（按主题只读一个） |
 | 语言基础章节顺序、类型与常量边界 | `references/cpp/language-basics.md` |
 | 术语核对、规则型内容、示例练习与代码风格 | `references/cpp/cpp.md`、`references/cpp/teaching-method.md`、`references/cpp/code-style.md` |
-| 工程、CMake、工具链章写作与依据 | `references/cpp/engineering.md`、`references/cpp/cmake-teaching.md`。决策依据用 `run.py kb-search "<查询>" --domain cpp-content` |
+| 工程、CMake、工具链与 `practice` 背景章 | `references/cpp/engineering.md`、`references/cpp/cmake-teaching.md`。Android 交付依据用 `run.py kb-search "<查询>" --domain cpp-content` |
 
 ## P0 硬约束
 

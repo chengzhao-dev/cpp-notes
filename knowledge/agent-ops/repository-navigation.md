@@ -6,7 +6,7 @@ subdomain: "repository"
 tags: [repository, navigation, part, chapter, filename, naming, ordering, quarto, yaml, kebab_case, semantic_name, display_title, stable_slug]
 level_range: [0, 9]
 created: "2026-09-15"
-updated: "2026-09-15"
+updated: "2026-09-16"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 460
 ---
@@ -15,7 +15,9 @@ estimated_tokens: 460
 
 ## Part 名称
 
-顶层 part 使用描述性英文目录，依次为 `getting-started`、`language-basics`、`standard-library`、`memory`、`performance`、`debugging`、`toolchain` 和 `reference`。名称表达读者获得的知识范围，不复述站点的写作规范，也不使用 `core` 这类离开上下文后含义不稳定的短词。
+顶层 part 使用描述性英文目录，依次为 `getting-started`、`practice`、`language-basics`、`standard-library`、`memory`、`performance`、`debugging`、`toolchain` 和 `reference`。名称表达读者获得的知识范围，不复述站点的写作规范，也不使用 `core` 这类离开上下文后含义不稳定的短词。
+
+目录名不必复述书名已经表达的主题。书名已经写明 C++ 学习笔记，工程背景分册因此取 `practice`，读者可见标题为“工程应用”，读者从路径和标题各自获得信息。`cpp-in-practice` 把书名里的 C++ 又写了一遍，`engineering-practice` 则和入门分册已有的构建练习边界重叠，两者都会让目录名偏离它真正承担的职责。中文标题负责说明这一分册回答什么问题，英文 slug 负责稳定 URL、代码路径与任务矩阵。
 
 目录名全部使用 ASCII kebab-case。`getting-started` 保留为已经公开的稳定入口。`core`、`stl` 和 `cheatsheet` 在内容尚未发布前分别迁移为 `language-basics`、`standard-library` 和 `reference`，把重命名成本限制在任务矩阵和生成脚本。
 
