@@ -66,11 +66,20 @@ auto score = 95.5;
 
 ## 验证结果
 
-执行示例后，应输出变量名称和对应值。重点观察 `age` 从 `18` 变成 `19`，以及局部变量只在花括号内有效。
+在仓库根目录编译并运行示例：
 
 ```{.bash filename="Ubuntu Bash（仓库根目录）"}
-& .agents/skills/agent-ops/scripts/run.ps1 verify --changed
+# 创建存放可执行文件的目录
+mkdir -p build
+
+# 编译示例
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror code/language-basics/types-and-variables.cpp -o build/types-and-variables
+
+# 运行程序
+./build/types-and-variables
 ```
+
+输出会列出局部变量以及各个变量保存的值。重点观察 `age` 从 `18` 变成 `19`，以及局部变量只在花括号内有效。
 
 ## 常见错误
 

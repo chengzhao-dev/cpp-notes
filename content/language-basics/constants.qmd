@@ -35,7 +35,17 @@ const double kInitialScale = 1.0;
 
 ## 验证结果
 
-运行示例后，应看到重试次数和圆周率近似值。尝试注释掉 `const` 后重新赋值，编译器应给出错误；恢复代码后再次运行即可验证成功路径。
+在仓库根目录编译并运行示例：
+
+```{.bash filename="Ubuntu Bash（仓库根目录）"}
+# 编译示例
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror code/language-basics/constants.cpp -o build/constants
+
+# 运行程序
+./build/constants
+```
+
+输出会显示最大重试次数和圆周率近似值。尝试去掉 `const` 后重新赋值，编译器应给出错误；恢复代码后重新运行即可验证成功路径。
 
 ## 常见错误
 

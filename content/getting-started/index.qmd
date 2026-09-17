@@ -12,34 +12,32 @@ body-classes: index-page
 ### [搭建 WSL2 开发环境](setup-wsl2.qmd)
 在 Windows 上准备 Ubuntu 和 C++ 工具。
 :::
-
 ::: {.landing-card}
 ### [写出第一个 C++ 程序](first-program.qmd)
 直接编译一个源文件并运行。
 :::
-
 ::: {.landing-card}
 ### [拆开最小程序结构](minimal-program-structure.qmd)
 分清入口、声明、实现、编译和链接。
 :::
-
 ::: {.landing-card}
 ### [用 CMake 构建程序](cmake-project.qmd)
 用构建规则重复生成程序。
 :::
-
 ::: {.landing-card}
 ### [构建多文件工程](multi-file-project.qmd)
 把接口、实现和程序入口拆开。
 :::
-
 ::: {.landing-card}
 ### [构建静态库](static-library.qmd)
 把库代码链接进最终程序。
 :::
-
 ::: {.landing-card}
 ### [构建动态库](shared-library.qmd)
 让程序在运行时查找库文件。
 :::
+:::
+
+::: {.callout-note title="统一开发环境"}
+本笔记的命令默认在 WSL2 Ubuntu 中执行。先完成[搭建 WSL2 开发环境](setup-wsl2.qmd)，再按页面顺序继续学习。
 :::

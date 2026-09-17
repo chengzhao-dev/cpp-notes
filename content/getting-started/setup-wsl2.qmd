@@ -6,7 +6,7 @@ title: "搭建 WSL2 开发环境"
 
 ## 安装 WSL2 和 Ubuntu
 
-WSL2 让 Windows 可以运行 Linux。Linux 发行版可以理解为一套包含系统工具和软件包管理方式的完整环境，这份笔记统一使用 Ubuntu。
+WSL2 让 Windows 可以运行 Linux。Linux 发行版可以理解为一套包含系统工具和软件包管理方式的完整环境。本章先安装并检查 Ubuntu。
 
 以管理员身份打开 Windows PowerShell，执行下面的命令。
 
@@ -18,6 +18,10 @@ wsl --install
 按提示重启 Windows。首次启动 Ubuntu 时，创建 Linux 用户名和密码。输入密码时终端不会显示字符，这是正常现象。
 
 看到类似 `user@host:~$` 的提示符，说明已经进入 Ubuntu。后续命令都在这里执行。
+
+::: {.callout-note title="提示符与终端范围"}
+`user@host:~$` 中的 `user` 是 Linux 用户名，`host` 是计算机名，`~` 表示当前用户的主目录，末尾的 `$` 表示普通用户提示符。后面的 Bash 命令都应在这个 Ubuntu 终端中执行。
+:::
 
 ## 安装 C++ 工具
 
@@ -31,7 +35,11 @@ sudo apt update
 sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build
 ```
 
-`clang` 提供编译器，`CMake` 和 `Ninja` 负责构建，`clangd` 和 `lldb` 分别用于代码提示与调试。下载较慢时，可以按[清华软件源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)更换 Ubuntu 软件源。
+`clang` 提供编译器，`CMake` 和 `Ninja` 负责构建，`clangd` 和 `lldb` 分别用于代码提示与调试。
+
+::: {.callout-tip title="下载较慢时再更换软件源"}
+只有默认软件源下载明显过慢时才需要更换来源；更换软件源只影响软件下载位置，不改变编译器和构建工具。可以参考[清华 Ubuntu 软件源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)。
+:::
 
 ## 检查环境
 
