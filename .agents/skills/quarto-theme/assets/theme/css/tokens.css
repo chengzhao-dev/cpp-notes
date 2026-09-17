@@ -88,6 +88,9 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   text-wrap: pretty;
+  /* 显式声明浅色，使内嵌 SVG（顶栏品牌徽标）与原生控件跟随页面明暗，
+     而不是跟随系统偏好；深色由 body.quarto-dark 覆盖。 */
+  color-scheme: light;
 }
 
 body.quarto-dark {

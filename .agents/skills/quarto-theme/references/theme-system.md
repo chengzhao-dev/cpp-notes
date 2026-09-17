@@ -31,7 +31,9 @@
 - **侧栏 active**：浅底高亮 + GitHub 蓝色左轨（`--accent`）。
 - **首页卡片**：平边框，轻 hover 变边框色，无抬升阴影，网格一行最多两列。根首页 Hero 无框左对齐。
 - **首页与组件**：采用 GitHub 文档式细边框、冷灰分隔线和轻背景，卡片 hover 只改变边框或背景，不改变尺寸。
-- **顶栏品牌标**：与 `.agents/skills/quarto-theme/assets/theme/assets/favicon.svg` 同源，标签页图标与导航品牌一致。
+- **顶栏品牌标**：用 `brand-mark.svg` 作 `mask`、以 `--navbar-fg` 上色；标签页继续用 `favicon.svg` 的 C++ 标记。两者画布同为 64×64 且墨迹居中，合起来是一个品牌。不直接引用 favicon 做顶栏图标：SVG 图片内部的 `prefers-color-scheme` 跟随运行环境，系统偏好与站点主题不一致时会出现徽标与顶栏底色同色的反转。
+- **顶栏品牌验收**：图标元素高度 1.5rem（标题字号 1.125rem 的 1.33 倍），墨迹高度约等于汉字字面高度的 1.06 倍；`margin-bottom: 0.375rem` 抵消 CJK 字形墨迹中心比行框中心高约 0.17rem 的偏移，使图标墨迹底边与标题基线对齐。墨迹用 `--navbar-fg`，明暗两态与 `--navbar-bg` 的对比度实测量得 15.8:1 与 16.0:1。窄屏先压缩搜索框，再省略标题，不能让搜索、主题切换和侧栏按钮重叠。
+- **内嵌资源与原生控件**：浅色令牌必须声明 `color-scheme: light`（深色由 `body.quarto-dark` 覆盖），否则系统深色偏好会渗入滚动条、表单控件和内嵌 SVG，与站点主题不一致。
 - **纯文本代码块**：使用与语言代码块相同的 `--code-bg`、`--code-fg`、`--code-border`、字体、内边距和圆角，`text` 内容不启用语言 token。
 - **`.code-caption`**：图或代码块的一句附属说明，`--text-secondary` 次要文字色、字号略小，紧贴所描述对象（`base.css` 已压缩其与代码块的间距），写作侧规则见 quarto-docs `authoring.md`。
 - **可折叠答案**：`details.answer-disclosure` 使用原生 `summary` 展开，默认收起，边框和圆角与卡片一致。`summary` 直接承载固定摘要文本，明暗两态共用令牌。
