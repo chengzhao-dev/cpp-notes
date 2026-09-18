@@ -1,30 +1,19 @@
 ---
 kb_id: "cpp-quarto-chinese-style-v1"
-title: "中文技术写作的段落与措辞案例"
+title: "中文技术写作的句段与措辞案例"
 domain: "quarto-docs"
 subdomain: "writing"
-tags: [chinese, paragraph, long_paragraph, paragraph_merge, callout, callout_weight, result_callout, callout_transition, visual_hierarchy, sentence, punctuation, semicolon, terminology, wording, direct_compilation, command, filename, code_title, density, heading_lead, block_punctuation]
+tags: [chinese, paragraph, long_paragraph, paragraph_merge, sentence, punctuation, semicolon, terminology, wording, direct_compilation, referent, validation, tone]
 level_range: [0, 9]
 created: "2026-09-09"
-updated: "2026-09-16"
+updated: "2026-09-18"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1400
+estimated_tokens: 1100
 ---
 
-# 中文技术写作的段落与措辞案例
+# 中文技术写作的句段与措辞案例
 
-本文件保存不佳表达与改写对照。可执行规则见 `quarto-docs` 的 `writing-principles` reference，本文件不维护第二套规范。
-
-## 段落与代码块闭环案例
-
-一个段落只推进一个对象：说明条件、执行动作、给出结果，再进入下一步。代码块前说明为什么执行，代码块后说明看到什么算成功。
-
-```text
-代码块前：进入示例目录，准备编译 main.cpp。
-代码块后：成功后生成可执行文件，下一步运行它。
-```
-
-环境描述不要在一句话中同时引入 Windows、WSL2、Ubuntu、编辑器和构建工具。先说明宿主与 Linux 环境的关系，再介绍当前步骤需要的工具。
+本文件保存段落、句子和措辞不佳时的改写对照。可执行规则见 `quarto-docs` 的 `writing-principles` reference，本文件不维护第二套规范。标题、代码块、Callout 和文件名密度案例见标识 `cpp-quarto-qmd-element-cases-v1`。
 
 ## 长句与连接关系案例
 
@@ -75,60 +64,12 @@ estimated_tokens: 1400
 
 安装命令逐包展开职责会把操作埋在说明里，因此本案例只保留“代码块负责动作、正文负责当前目标”的职责判断。格式细则见 `terminal-validation` reference。
 
-## 长段拆分与 Callout 下沉案例
-
-一个段落同时交代多个动作、验收结果和可跳过说明时，先保留完成当前任务所需的信息，再把不影响继续操作的细节放到末尾 Callout。判断依据是职责是否混杂，不是字数。提示符之后没有必经动作时，可以把精确判据放到 Callout；如果读者还要据此继续操作，判据应留在正文。完整边界检索 `cpp-quarto-section-focus-density-v1`。
-
-## 标题导语与代码块前标点案例
-
-`##` 下不强制写导语。标题已经说明任务时可以立刻给出动作，也可以直接进入第一个 `###`。只有导语补充任务顺序、前置条件、范围或标题没有表达的结果时才保留，不能只把标题换一种说法。
-
-```text
-重复：
-## 建立 Linux 开发环境
-本节安装 WSL2、Ubuntu 和 C++ 工具链，得到后续示例使用的 Linux 开发环境。
-
-改写：
-## 安装 WSL2 和 Ubuntu
-以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu 发行版。
-```
-
-代码块前不固定使用冒号。完整动作句仍是句子，用句号收束。只有“如下、以下、例如”已经明确把代码或输出作为后续内容时才用全角冒号。
-
-```text
-动作句：
-在 Ubuntu 终端执行下面的命令，更新软件包索引并安装工具链。
-
-结果引导：
-程序输出如下：
-```
-
-## 代码标题与正文分工案例
-
-代码块标题已经写明运行环境或文件来源后，正文再写“下面是一段 Bash 命令”只会重复视觉上已经存在的信息。正文应直接说明当前动作和观察目标，例如“在工程根目录配置并构建示例”或“运行程序后应看到下列输出”。若需要说明权限、目录和安全边界，应在正文中写清，不能用标题替代。
-
-```text
-重复：下面是一段 Bash 命令，用来配置 CMake 工程。
-改写：在工程根目录配置 CMake 工程。
-
-重复：下面是 main.cpp 的完整源码。
-改写：先通读源码，再让编译器把它变成可执行程序。
-```
-
-标题负责“来自哪里”，正文负责“现在做什么、怎样算成功”。两者各有一个权威位置，读者既不用从上下文猜环境，也不会读到两遍相同的定位信息。
-
 ## 项目自称与中性称谓案例
 
 “本书”把个人维护的笔记误写成正式出版物，也与仓库实际形态不符。项目自称统一为“这份笔记”，公开导航统一使用“笔记、内容、部分、页面、阅读顺序”。
 
 “学习笔记”“选择学习内容”“学习路线”“分册”等词会把项目描述成有完整进度的课程或教材。项目实际服务作者查阅和新人阅读，读者只需先选择要阅读的部分，再选择要打开的页面。中性词能准确表达这两层选择，避免对课程完整度和学习顺序产生错误预期。
 
-## 文件名密度案例
-
-读者已经知道被处理的是生成物目录时，逐个说明“不会影响 `main.cpp`、`CMakeLists.txt` 和 `build-and-run.sh`”没有增加可执行信息。一个段落只保留影响当前决策的一两个标识，其余换成“源码和构建配置”“其他脚本文件”这类集合称呼。
-
-判断方法：读者不需要这个名字也能完成当前步骤时，名字就是噪声。目录树已经逐项交代过职责的，正文不再重复点名。
-
 ## 与其他知识条目的分界
 
-章节导语和任务序列见 `cpp-quarto-chapter-pattern-v1`，目录树与行内代码边界见 `cpp-quarto-section-focus-density-v1`。
+章节导语和任务序列见 `cpp-quarto-chapter-pattern-v1`，标题、代码块、Callout、文件名密度和源码阅读顺序见 `cpp-quarto-qmd-element-cases-v1`。

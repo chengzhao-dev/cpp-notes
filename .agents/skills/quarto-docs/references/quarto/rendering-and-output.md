@@ -119,7 +119,7 @@ $d = Get-ChildItem -LiteralPath "D:\Github" -Force
 ### 12. 自定义 `.callout-*` 类被静默丢弃 → 提示框退化成普通小节
 
 - **症状**：源文件写了 `::: {.callout-best-practice}`，渲染后没有左色条提示框，且块内 `## 标题` 混进右侧目录。
-- **处置**：只用内置 `note`/`tip`/`warning`/`important`/`caution` 五类，标题写在块内首行 `## …`，并保留全局中文类型标题。「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring.md`「Callout 提示框」。
+- **处置**：只用内置 `note`/`tip`/`warning`/`important`/`caution` 五类，标题写成 `::: {.callout-note title="中文标题"}`，块内不再写 `##` 标题。「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring.md`「Callout 提示框」。
 - **自检**：渲染后跑 `run.ps1 check --profile book`，`callouts` 项会扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
 
 ### 13. `{{< include >}}` 引用代码文件未加属性围栏 → 乱码式排版、目录被污染

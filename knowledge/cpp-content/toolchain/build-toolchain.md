@@ -6,7 +6,7 @@ subdomain: "toolchain"
 tags: [toolchain, clang, llvm, libcxx, lldb, cmake, ninja, ninja-build, generator, compiler_flags, sanitizer, warnings, optimization, header, translation_unit, include_path, include_directories, target_include_directories, source_glob, configure_depends, project_name, multi_file, clangd, compile_commands, verification]
 level_range: [0, 9]
 created: "2026-09-09"
-updated: "2026-09-15"
+updated: "2026-09-18"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 680
 ---
@@ -17,7 +17,9 @@ estimated_tokens: 680
 
 本项目在 Windows 的 WSL2 Linux 环境中使用 Clang/LLVM、libc++、CMake 与 Ninja。先让最小程序编译和运行，再把命令固化为 CMake 目标。MSVC 仅作为对照，不是主线前置条件。
 
-入门环境按“编译器 → CMake + Ninja → 调试器 → 语言服务”建立依赖层次。编译器把源码变成可执行文件，CMake 描述工程并生成构建规则，Ninja 执行这些规则，调试器服务运行期排查。`CMAKE_EXPORT_COMPILE_COMMANDS` 让配置阶段生成 `compile_commands.json`，记录每个源文件的实际编译参数。`.clangd` 的 `CompilationDatabase: build` 指向构建目录，语言服务据此提供代码提示与诊断。Ubuntu 环境安装 `clang`、`clangd`、`llvm`、`lldb`、`libc++-dev` 和 `libc++abi-dev`，分别提供编译器、语言服务、LLVM 工具、调试器和 libc++ 的编译与链接支持。Ubuntu 中的 Ninja 软件包名为 `ninja-build`，安装后执行命令为 `ninja`。默认 Ubuntu 是当前教程为降低选择成本采用的教学路径，不代表发行版优劣。
+入门环境按“编译器 → CMake + Ninja → 调试器 → 语言服务”建立依赖层次。编译器把源码变成可执行文件，CMake 描述工程并生成构建规则，Ninja 执行这些规则，调试器服务运行期排查。`CMAKE_EXPORT_COMPILE_COMMANDS` 让配置阶段生成 `compile_commands.json`，记录每个源文件的实际编译参数。`.clangd` 的 `CompilationDatabase: build` 指向构建目录，语言服务据此提供代码提示与诊断。Ubuntu 环境安装 `clang`、`clangd`、`llvm`、`lldb`、`libc++-dev` 和 `libc++abi-dev`，分别提供编译器、语言服务、LLVM 工具、调试器和 libc++ 的编译与链接支持。Ubuntu 中的 Ninja 软件包名为 `ninja-build`，安装后执行命令为 `ninja`。默认 Ubuntu 是当前教程为降低选择成本采用的教学路径，不代表发行版优劣。安装步骤的标题和注释只描述工具类别与当前动作。未限定发行版版本或验证标准库能力时，不把安装动作命名为某个具体 C++ 标准版本的工具链，以免把包管理结果误读为语言标准保证。
+
+验证工具链时要区分证据层级。`command -v` 只说明 Shell 能在当前 `PATH` 中定位命令，版本查询只说明命令可以启动；Hello World 的编译和运行才是对最小编译链的实际验证。CMake、Ninja、调试器和 `clangd` 也应由与其职责对应的配置、构建、调试或语言服务任务验证，不能用安装路径替代功能测试。
 
 ## 编译与诊断
 

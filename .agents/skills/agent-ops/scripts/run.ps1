@@ -31,7 +31,7 @@ if ([string]::IsNullOrWhiteSpace($python) -or -not (Test-Path -LiteralPath $pyth
     exit 1
 }
 
-$versionText = & $python -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>$null
+$versionText = & $python -c 'import sys; print(sys.version_info[0], sys.version_info[1], sep=chr(46))' 2>$null
 if ($LASTEXITCODE -ne 0 -or $versionText -notmatch '^3\.(\d+)$' -or [int]$Matches[1] -lt 12) {
     Write-Error "manifest.mcp.command 必须指向 Python >= 3.12：$python"
     exit 1
