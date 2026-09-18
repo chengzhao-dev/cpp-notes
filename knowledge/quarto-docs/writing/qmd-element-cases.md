@@ -3,13 +3,13 @@ kb_id: "cpp-quarto-qmd-element-cases-v1"
 title: "Quarto 教学元素与衔接案例"
 domain: "quarto-docs"
 subdomain: "writing"
-tags: [heading_lead, block_punctuation, code_title, code_block, paragraph, filename_density, callout, callout_transition, source_reading, directory_tree, h3_granularity]
+tags: [heading_lead, block_punctuation, code_title, code_block, paragraph, filename_density, callout, callout_transition, source_reading, directory_tree, h3_granularity, multi_command_block, subcomment, working_directory, execution_location, diagnosis]
 level_range: [0, 9]
 dependencies: ["cpp-quarto-chinese-style-v1", "cpp-quarto-section-focus-density-v1"]
 created: "2026-09-18"
 updated: "2026-09-18"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1000
+estimated_tokens: 1300
 ---
 
 # Quarto 教学元素与衔接案例
@@ -83,6 +83,33 @@ Callout 只解释新信息，不重复紧邻正文的命令、重启动作或成
 
 多个源码文件属于同一个可验证任务时应放在同一父级下，而不是拆成三个并列页面段。只有文件之间出现独立动作或独立验收结果，才升级为新的 `##`。
 
+## 多命令块与执行位置确认案例
+
+一个代码块内的多条命令各自职责不同时，读者分不清“这条在做什么”和“我该跑哪条”。逐条子注释说明用途不是装饰：新手把诊断命令当成修复命令重复执行，会把排错变成试错。
+
+```text
+模糊：
+cmake --build build --verbose
+ls -l build/bin/app
+
+逐条说明：
+# 重新构建并显示每条实际执行的编译命令
+cmake --build build --verbose
+# 确认可执行文件是否已经生成
+ls -l build/bin/app
+```
+
+读者只需要执行其中一条命令时，拆成独立代码块，并用正文写明先执行哪条、什么情况下改用另一条。取舍时机是正文信息，子注释只回答“这条命令做什么”，两者不互相替代。
+
+故障定位的第一步不是检查故障本身，而是确认执行位置和前置状态：命令在错误目录中执行，后续所有观察都会失真。给出一条可观察的判据，比让读者“确认当前目录是工程根目录”更可执行。
+
+```text
+模糊：先确认当前目录是工程根目录，再查看构建输出。
+改写：先用 ls CMakeLists.txt 确认当前位于工程根目录，再重新构建。
+```
+
+判据选择与任务匹配：Shell 场景用 `pwd` 观察当前路径结尾，工程场景用特征文件（如 `CMakeLists.txt`）存在性判断位置。判据本身也要能判断成功与否，否则只是把模糊要求换了个说法。
+
 ## 与其他知识条目的分界
 
-本文件回答标题、代码块、Callout、文件名密度和源码阅读顺序，不保存中文句长、措辞和标点案例。后者见 `cpp-quarto-chinese-style-v1`，页面块序列见 `cpp-quarto-chapter-pattern-v1`。
+本文件回答标题、代码块、Callout、文件名密度、源码阅读顺序、多命令块说明和执行位置确认，不保存中文句长、措辞和标点案例。后者见 `cpp-quarto-chinese-style-v1`，页面块序列见 `cpp-quarto-chapter-pattern-v1`。
