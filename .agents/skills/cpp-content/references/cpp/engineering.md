@@ -48,11 +48,7 @@ static-library/
 
 - target-based：`target_link_libraries`、`target_compile_features`。
 - CMake 工程名使用从目录名派生的 PascalCase，例如 `multi-file-project` 对应 `MultiFileProject`。
-- 多文件入门用 `file(GLOB APP_SOURCES CONFIGURE_DEPENDS "src/*.cpp")` 收集直属源文件，再交给 `add_executable(app ${APP_SOURCES})`。新增 `.cpp` 后重新配置即可进入目标。
-- 库入门在 `greeting/CMakeLists.txt` 用 `add_library(greeting STATIC|SHARED ...)` 和 `target_include_directories(greeting PUBLIC include)` 定义库目标，顶层用 `add_executable(app main.cpp)`、`add_subdirectory(greeting)` 与 `target_link_libraries(app PRIVATE greeting)` 表达消费者关系。
-- 可执行文件输出到 `build/bin/`，库输出到 `build/lib/`。动态库工程的构建树运行依赖用 `BUILD_RPATH "$ORIGIN/../lib"` 绑定。
-- GLOB 只用于教学模板。目录分层或目标增多后改用显式 `target_sources`，让依赖和源文件边界可见。
-- 头文件目录用 `target_include_directories(app PRIVATE include)` 声明。不要退回目录级的 `include_directories`。
+- 源文件收集方式、GLOB 适用分界、库目标写法、产物输出目录和 `target_include_directories` 的用法以 `cmake-teaching.md` 为准，本文件不重复命令级细节。
 - 默认 CMake + Ninja 构建链的决策依据用 `run.ps1 kb-search "CMake Ninja 构建链" --domain cpp-content` 取用。库与运行期查找依据检索 `cpp-library-and-executable-linking-v1`。
 
 ## 示例与章节落点
@@ -63,7 +59,7 @@ static-library/
 - 工程章示例至少包含 `CMakeLists.txt` 与一个可运行目标，禁止只给伪配置。
 - 单文件、多文件和库工程分别用 `init_project.py --layout single|multi|static-library|shared-library` 生成。库工程生成根 `main.cpp` 与 `greeting/`，模板源在 `cpp-content/templates/projects/`。
 - 一个教学工程只突出一个中心。需要同时讲静态库和动态库时，使用两个独立工程，而不是在同一工程并列两种库目标。
-- part 目录和章节文件使用 ASCII kebab-case，章节名不复述 part 名，也不加顺序数字。顺序只在 `_quarto.yml` 与索引页维护。
+- part 目录和章节文件使用 ASCII kebab-case，语义化命名，章节名不复述 part 名，也不加顺序数字。顺序只在 `_quarto.yml` 与索引页维护。文件名与 YAML `title` 各司其职：`title` 用中文短任务句并保持单行，不与文件名互相直译，路径由文件名承担。
 - part 目录名不复述书名已经表达的主题。书名含 C++，工程背景分册因此用 `practice`，读者可见标题为“工程应用”，不写 `cpp-in-practice` 或与入门内容边界重叠的 `engineering-practice`。命名依据检索 `cpp-agent-repository-navigation-v1`。
 - C++ 文件名使用 snake_case。完整源码文件的用途注释与重点注释以 `code-style.md` 为准，逻辑块之间留空行。
 - 环境与工程章节只保留当前任务的最小成功路径。平台差异、命令案例与诊断依据从知识库检索。

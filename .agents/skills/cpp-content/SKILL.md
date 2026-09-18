@@ -29,7 +29,7 @@ metadata:
 1. 写章前先读对应任务单，每章只解决一个读者任务。不整包读取 `references/`。
 2. 示例必须可编译可运行：`-std=c++20 -Wall -Wextra`，完整示例带 `int main`，片段首行标 `// 片段`。代码命名、include 顺序和文件用途注释以 `references/cpp/code-style.md` 为准。
 3. 正文里的输出必须来自实测。拿不到结果就不写、不伪造。
-4. 示例路径与章节对齐：需要重复编译运行的章节使用 `code/<part>/<chapter>/`，至少提供源码和一个 `build-and-run.sh`。直接编译脚本调用 `clang++`，CMake 工程脚本依次配置、构建和运行。只有不进入重复构建流程的片段或无工程文件可省略脚本。单入口工程的 `main.cpp` 放工程根；消费端增长为多文件后再建带 `CMakeLists.txt` 的 `app/`。一章可登记多个独立工程，但每个工程只突出一个教学中心。模板在 `templates/projects/`，`build/` 不入库、不读、不校验。
+4. 示例路径与章节对齐：需要重复编译运行的章节使用 `code/<part>/<chapter>/`，至少提供源码和一个 `build-and-run.sh`。直接编译脚本调用 `clang++`，CMake 工程脚本依次配置、构建和运行。只有不进入重复构建流程的片段或无工程文件可省略脚本。工程布局边界（单入口 `main.cpp` 位置、`app/` 与库目录分工、一工程一教学中心）以 `references/cpp/engineering.md` 为准。模板在 `templates/projects/`，`build/` 不入库、不读、不校验。
 5. 标注 C++ 版本并用 `cpp.md` 核对译名。正文按正确流程展开，warning/error 仅放 `常见错误`，具体排错格式交给 `quarto-docs`。构建章以 CMake 配置和 `cmake --build <dir>` 为读者动作，后端工具只有直接执行时才进入正文。
 
 ## 工作流程
