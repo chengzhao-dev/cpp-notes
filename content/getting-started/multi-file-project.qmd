@@ -47,13 +47,18 @@ multi-file-project/
 {{< include /code/getting-started/multi-file-project/CMakeLists.txt >}}
 ```
 
-`add_executable()` 明确列出两个源文件。`target_include_directories()` 让 `app` 能从 `include/` 找到 `greeting.h`。新增源文件时，要把它加入列表，这样工程关系不会被隐藏。
+`file(GLOB ...)` 收集 `src/` 下的源文件，`add_executable()` 用收集结果创建 `app`。`CONFIGURE_DEPENDS` 让 `Ninja` 在构建前检查目录变化：新增 `.cpp` 后不必修改 `CMakeLists.txt`，直接重新构建就会进入目标。`target_include_directories()` 让 `app` 能从 `include/` 找到 `greeting.h`。
+
+收集规则只覆盖 `src/` 直属的 `.cpp`。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。
 
 ## 构建并运行
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译并链接 app
 cmake --build build
+# 运行程序
 ./build/bin/app
 ```
 
@@ -73,10 +78,12 @@ Hello, World!
 
 ### 链接器找不到 makeGreeting()
 
-确认 `src/greeting.cpp` 存在，并且已经写入 `add_executable()` 的源文件列表。修改后重新配置：
+确认 `src/greeting.cpp` 存在，且文件后缀是 `.cpp`，因为收集规则只包含 `src/` 直属的 `.cpp` 文件。修正后重新配置并构建：
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让收集规则重新读取 src/ 下的源文件
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译并链接 app
 cmake --build build
 ```
 

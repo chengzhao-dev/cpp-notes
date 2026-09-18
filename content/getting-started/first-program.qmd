@@ -48,8 +48,9 @@ Hello, World!
 把源码中的 `Hello, World!` 改成其他文字，再执行下面的命令。
 
 ```{.bash filename="Ubuntu Bash（first-program 目录）"}
-# 重新编译并运行
+# 重新编译
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+# 运行程序
 ./build/first-program
 ```
 

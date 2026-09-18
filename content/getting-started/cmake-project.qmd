@@ -42,7 +42,9 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang
 ## 构建并运行
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 编译并链接 app
 cmake --build build
+# 运行程序
 ./build/bin/app
 ```
 
@@ -70,14 +72,35 @@ command -v cmake ninja clang++
 
 ### 构建后找不到 app
 
-先确认当前目录是工程根目录，再查看构建输出：
+执行 `./build/bin/app` 时提示文件不存在，或构建结束后 `build/bin/app` 仍未生成。按下面的顺序定位，再重新构建并运行。
 
-```{.bash filename="Ubuntu Bash（工程根目录）"}
-cmake --build build --verbose
-ls -l build/bin/app
-```
+1. **确认执行位置**
 
-错误通常来自第一条编译信息。修正后重新构建，并运行 `./build/bin/app`。
+   当前目录不是工程根目录时，`build/` 会指向错误位置。用根目录特征文件确认位置：
+
+   ```{.bash filename="Ubuntu Bash"}
+   ls CMakeLists.txt
+   ```
+
+   输出包含 `CMakeLists.txt`，说明当前位于工程根目录；否则先用 `cd` 进入示例工程目录。
+
+2. **重新构建并定位失败来源**
+
+   重新构建并显示每条实际执行的编译命令：
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   cmake --build build --verbose
+   ```
+
+   错误通常来自第一条编译信息，按文件名和行号修正源码后重新构建。
+
+3. **确认产物已生成**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   ls -l build/bin/app
+   ```
+
+   命令列出 `app` 文件后，运行 `./build/bin/app`，确认输出仍为 `Hello, World!`。
 
 ## 本章回顾
 

@@ -39,8 +39,11 @@ static-library/
 ## 构建并运行
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译库和 app，并完成链接
 cmake --build build
+# 运行程序
 ./build/bin/app
 ```
 
@@ -68,10 +71,12 @@ ldd build/bin/app
 
 ### 链接器找不到 makeGreeting()
 
-先确认顶层 `CMakeLists.txt` 包含 `target_link_libraries(app PRIVATE greeting)`。补回后重新执行：
+先确认顶层 `CMakeLists.txt` 包含 `target_link_libraries(app PRIVATE greeting)`。补回后重新配置并构建：
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让 CMake 重新读取链接关系
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译库和 app，并完成链接
 cmake --build build
 ```
 

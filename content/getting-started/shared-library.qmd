@@ -33,8 +33,11 @@ title: "构建动态库"
 ## 构建并运行
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译动态库和 app，并完成链接
 cmake --build build
+# 运行程序
 ./build/bin/app
 ```
 
@@ -61,8 +64,11 @@ ldd build/bin/app | grep libgreeting
 先确认 `build/lib/libgreeting.so` 已生成，再检查顶层规则是否包含 `BUILD_RPATH "$ORIGIN/../lib"`。补回后重新配置和构建：
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让 RPATH 写入新构建的 app
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 重新编译并链接
 cmake --build build
+# 查看 app 记录的库查找结果
 ldd build/bin/app | grep libgreeting
 ```
 

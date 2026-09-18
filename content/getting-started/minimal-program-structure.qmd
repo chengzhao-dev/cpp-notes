@@ -74,6 +74,7 @@ clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \
   build/main.o build/greeting.o -o build/minimal-program-structure
 
+# 运行程序
 ./build/minimal-program-structure
 ```
 
