@@ -1,0 +1,39 @@
+# Quarto 生成物与缓存
+/_book/
+/.quarto/
+**/*.quarto_ipynb
+/content/**/*.html
+/content/**/*_files/
+
+# CMake 构建产物
+/code/**/build/
+
+# C++ 直接编译产物
+*.o
+*.obj
+a.out
+
+# Python 缓存与本机运行时配置
+__pycache__/
+*.py[cod]
+/.agents/skills/python-tools/assets/config/runtime.json
+
+# 编辑器与操作系统临时文件
+/.vscode/
+/.zcode/
+.DS_Store
+*.local
+
+# 本地依赖与临时目录
+node_modules/
+.tmp/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+coverage.xml
+*.coverage
+
+# 临时分析、重构报告与知识库索引（不入库）
+/temp/

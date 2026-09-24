@@ -1,0 +1,7 @@
+interface:
+  display_name: "Agent Ops"
+  short_description: "Maintain agent entries, skills and repo checks"
+  default_prompt: "Use $agent-ops to merge these two references into one and verify with run.py check."
+
+policy:
+  allow_implicit_invocation: true

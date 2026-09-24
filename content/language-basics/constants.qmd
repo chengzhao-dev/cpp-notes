@@ -1,0 +1,69 @@
+---
+title: "常量与配置"
+---
+
+程序中的上限、比例和阈值通常是规则，而不是运行时随意修改的状态。把这些值写成常量，可以让名字表达意图，也让编译器阻止误修改。本章介绍 `const` 和 `constexpr`，复杂配置对象留到自定义类型章节。
+
+## 用 const 固定运行时值
+
+`const` 变量必须在创建时初始化，之后不能通过这个名字赋值：
+
+```{.cpp filename="片段：运行时常量"}
+// 片段
+int currentValue{12};
+const int maxCount{5};
+
+// maxCount = 6;  // 编译失败
+currentValue = 13; // 普通变量仍可修改
+```
+
+`const` 表示“不能通过这个名字修改”，不等于对象在所有路径上永远不可变。先问这个值是否代表规则或不应变化的事实，再决定是否使用它。
+
+## 用 constexpr 表达编译期规则
+
+如果值由常量表达式计算得到，可以使用 `constexpr`：
+
+```{.cpp filename="constants.cpp"}
+#include <iostream>
+
+int main() {
+  const int maxCount{5};
+  constexpr int threshold{5000};
+  constexpr double ratio{0.90};
+
+  std::cout << "最大数量: " << maxCount << "\n";
+  std::cout << "阈值: " << threshold << "\n";
+  std::cout << "比例: " << ratio << "\n";
+  return 0;
+}
+```
+
+`constexpr` 变量也具备不可修改属性，并要求初始化结果能在编译期确定。带单位的整数值通常比没有单位的浮点值更容易检查。
+
+## 给规则起稳定的名字
+
+项目约定常量使用 `k` 加大驼峰，例如 `kMaxCount`。名字应说明单位和含义；比例、时间和其他带单位的数值最好在名字中体现单位。
+
+## 常见错误
+
+### 只声明不初始化 const
+
+`const int limit;` 没有可用的初始值，会编译失败。常量的值必须在创建时给出。
+
+### 把 const 和 constexpr 当成完全相同
+
+二者都阻止通过该名字修改，但 `constexpr` 还要求初始化结果可在编译期确定。运行时才知道的配置仍可使用 `const`。
+
+### 用浮点保存需要精确比较的值
+
+需要精确计数或比较时优先使用合适的整数单位；比例等测量值才考虑 `double`，并在数值安全章节学习容差比较。
+
+## 自测问题
+
+1. 为什么最大数量适合写成常量？
+2. `const` 和 `constexpr` 的共同点与主要区别是什么？
+3. 为什么带单位的整数阈值通常比无单位的数值更容易正确使用？
+
+## 本章回顾
+
+你已经能把不会改变的值写成有意义的 `const` 或 `constexpr` 常量，并理解初始化要求；示例见 [constants.cpp](../../code/language-basics/constants.cpp)。

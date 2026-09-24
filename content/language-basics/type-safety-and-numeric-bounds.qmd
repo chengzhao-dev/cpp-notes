@@ -1,0 +1,104 @@
+---
+title: "类型安全与数值边界"
+---
+
+数量、测量值和索引都会遇到边界：类型大小不够会溢出，浮点数会有舍入误差，混合有符号和无符号也可能改变比较结果。本章把这些高频问题整理成可检查的规则。
+
+## 查询大小、范围和宽度
+
+标准不保证 `int` 永远是 32 位，也不保证 `long` 一定比 `int` 大。使用 `sizeof(T)` 查看当前实现的大小，用 `<limits>` 查询范围；需要明确宽度时使用 `<cstdint>` 的 `std::int32_t` 等类型。
+
+```{.cpp filename="type-safety-and-numeric-bounds.cpp"}
+#include <cstdint>
+#include <iostream>
+#include <limits>
+
+int main() {
+  std::cout << "int 字节数: " << sizeof(int) << "\n";
+  std::cout << "int 最大值: " << std::numeric_limits<int>::max() << "\n";
+  std::int32_t value{1000};
+  std::cout << "明确宽度的值: " << value << "\n";
+  return 0;
+}
+```
+
+`sizeof` 的结果类型是 `std::size_t`。浮点类型的有效数字、最小正值和最大值也应从 `std::numeric_limits<float>` 或 `double` 查询，而不是凭记忆猜测。
+
+## 管好有符号、无符号和溢出
+
+`int`、`long` 默认有符号；加上 `unsigned` 后只能表示非负值。无符号整数溢出按模 `2^N` 回绕，有定义；有符号溢出是未定义行为，编译器可能据此进行激进优化。新手规则是：不要为了“装更多正数”随意把数量改成 `unsigned`，更不要混用有符号和无符号。
+
+```{.cpp filename="片段：安全观察无符号边界"}
+// 片段
+#include <limits>
+
+unsigned int value{std::numeric_limits<unsigned int>::max()};
+++value;  // 回绕到 0，有定义
+
+// int signedValue{std::numeric_limits<int>::max()};
+// ++signedValue;  // 有符号溢出：未定义行为，不要运行
+```
+
+数组越界、空指针解引用和读取未初始化变量同样属于未定义行为。它不是“每次随机”，而是编译器可以假设这条路径不会发生。
+
+## 显式转换，先问是否会丢信息
+
+隐式转换可能悄悄发生，例如 `int` 转 `double`、`double` 转 `int`，或有符号转无符号。需要转换时优先写出意图：
+
+```{.cpp filename="片段：显式转换"}
+// 片段
+double value{19.99};
+int wholeValue{static_cast<int>(value)};  // 截断为 19
+double ratio{static_cast<double>(wholeValue)};
+```
+
+大整数转小整数可能截断，浮点转整数会丢掉小数部分。避免 `(int)value` 这种 C 风格强转，因为它隐藏了转换类别。
+
+整数相除时，如果两边都是整数，结果会向零截断；例如 7 / 2 得到 3，余数用 `%` 获取。整数除以零仍是未定义行为，计算前要验证除数。
+
+## 分别处理浮点数和 bool
+
+二进制浮点数通常不能精确表示十进制小数，所以 `0.1 + 0.2` 不应直接与 `0.3` 用 `==` 比较。比较时使用与问题尺度匹配的容差；还要识别 `NaN` 和无穷大。整数除以零是未定义行为，浮点除以零可能产生 `inf` 或 `nan`，都不应忽略。
+
+```{.cpp filename="片段：浮点与 bool"}
+// 片段
+#include <cmath>
+#include <iostream>
+
+double a{0.1 + 0.2};
+bool closeEnough{std::abs(a - 0.3) < 1e-9};
+bool enabled{static_cast<bool>(2)};  // 非 0 转为 true
+std::cout << std::boolalpha << closeEnough << " " << enabled << "\n";
+```
+
+默认输出 `bool` 是 `1` 或 `0`；`std::boolalpha` 才会输出 `true` 或 `false`。
+
+## 还要留意三个常见边界
+
+- `char` 是否带符号由实现决定；存文本字符时不要把它当成固定范围的有符号整数。
+- 整数文字量的类型由后缀和能容纳它的候选类型决定；需要明确宽度时写出目标类型并检查转换。
+- `std::size_t` 常用于大小和下标。它是无符号类型，与 `int` 比较前先统一类型，避免负数转换成很大的正数。
+
+## 常见错误
+
+### 用等号比较计算得到的浮点数
+
+改用容差，并先处理 `NaN`、无穷大和单位尺度。
+
+### 把无符号当成“更安全的整数”
+
+无符号只改变范围和溢出规则，不能防止越界、错误比较或逻辑错误。
+
+### 看到警告就用强转压掉
+
+先确认范围、单位和符号，再选择 `static_cast` 或修改数据模型。
+
+## 自测问题
+
+1. 为什么要用 `<limits>` 和 `<cstdint>`，而不是假定 `int` 为 32 位？
+2. 无符号回绕和有符号溢出的标准语义有什么不同？
+3. 为什么 `std::size_t` 与 `int` 混合比较可能隐藏错误？
+
+## 本章回顾
+
+你已经能查询基础类型的真实边界，区分有定义回绕与未定义行为，并对转换、浮点和 `bool` 使用安全写法；示例见 [type-safety-and-numeric-bounds.cpp](../../code/language-basics/type-safety-and-numeric-bounds.cpp)。

@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Ops"
+  short_description: "Run git, GitHub CLI and Pages release tasks"
+  default_prompt: "Use $github-ops to stage these files and commit them with a Chinese message."
+
+policy:
+  allow_implicit_invocation: false

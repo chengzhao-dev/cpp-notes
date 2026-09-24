@@ -1,0 +1,150 @@
+---
+title: "拆分最小 C++ 程序结构"
+---
+
+上一章的程序只有一个源文件。本章把同一个问候程序拆成入口、接口和实现三个文件。你将先阅读目录和源码，再通过编译与链接确认它们如何协作。
+
+## 查看工程文件
+
+```{.text filename="工程目录"}
+minimal-program-structure/
+├── main.cpp          # 程序入口，调用问候接口并输出结果
+├── greeting.h        # 声明 makeGreeting()
+├── greeting.cpp      # 定义 makeGreeting()
+└── build-and-run.sh  # 一次完成创建目录、编译和链接
+```
+
+编译器分别处理两个 `.cpp` 文件，链接器再把它们的结果组合成一个可执行程序。
+
+## 阅读三个文件
+
+按“入口 → 接口 → 实现”的顺序阅读下面的源码。
+
+### main.cpp 如何看到声明
+
+`main()` 是程序入口，操作系统从它的第一条语句开始执行，花括号 `{}` 之间是函数体。
+
+```{.cpp filename="main.cpp"}
+{{< include /code/getting-started/minimal-program-structure/main.cpp >}}
+```
+
+`main()` 最后返回 `0`，表示程序正常结束。`std::cout` 是标准输出流，字符串末尾的 `\n` 表示换行。
+
+`main.cpp` 通过 `#include "greeting.h"` 看到 `makeGreeting()` 的声明，因此能在调用点做类型检查。`#include` 只把头文件内容放进当前翻译单元，不会把 `greeting.cpp` 的实现链接进程序。
+
+### greeting.h 如何声明接口
+
+下面的头文件声明返回 `std::string` 的函数，声明末尾必须有分号，也没有函数体：
+
+```{.cpp filename="greeting.h"}
+{{< include /code/getting-started/minimal-program-structure/greeting.h >}}
+```
+
+`#pragma once` 是广泛支持的实现扩展，不是 ISO C++ 标准保证。本项目用它防止同一个头文件在一次编译中重复包含。`#include <string>` 提供 `std::string` 的声明。尖括号和引号表达不同的查找意图，具体搜索路径由编译器和编译参数决定。
+
+### greeting.cpp 如何提供定义
+
+实现文件包含自己的头文件，并提供与声明完全一致的函数定义：
+
+```{.cpp filename="greeting.cpp"}
+{{< include /code/getting-started/minimal-program-structure/greeting.cpp >}}
+```
+
+实现只在一个源文件中出现，避免重复定义。头文件和实现的返回类型、函数名与参数必须一致，否则调用点看到的接口和链接输入就不再是同一个函数。
+
+## 编译并链接
+
+两个源文件先经过预处理和编译，再由链接器组合成可执行程序。
+
+### 编译：分别生成目标文件
+
+预处理器先把 `#include "greeting.h"` 的声明放进 `main.cpp` 对应的翻译单元，这个阶段只解决“调用点能看到什么”。编译器再分别处理两个源文件，把每个翻译单元转换为目标文件。`-c` 表示只编译、不进行最终链接，因此可以看到两个独立的中间产物。
+
+```{.bash filename="Ubuntu Bash（minimal-program-structure 目录）"}
+# 创建构建目录
+mkdir -p build
+# 分别生成两个目标文件
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c main.cpp -o build/main.o
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build/greeting.o
+```
+
+命令成功后，`build/main.o` 和 `build/greeting.o` 应该存在。目标文件还不是可以直接运行的程序。
+
+### 链接：组合目标文件
+
+链接器把两个目标文件中的入口、调用关系和函数实现组合起来，解析 `main.cpp` 对 `makeGreeting()` 的引用，并生成最终可执行文件。
+
+```{.bash filename="Ubuntu Bash（minimal-program-structure 目录）"}
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \
+  build/main.o build/greeting.o -o build/minimal-program-structure
+```
+
+链接成功后会生成 `build/minimal-program-structure`。如果省略 `build/greeting.o`，编译阶段仍可能成功，但链接器会报告 `undefined reference to makeGreeting()`。
+
+### 运行：验证最终产物
+
+运行可执行文件，确认加载和执行阶段也成功。也可以运行 `bash build-and-run.sh`，让脚本一次完成创建目录、编译和链接。
+
+```{.bash filename="Ubuntu Bash（minimal-program-structure 目录）"}
+./build/minimal-program-structure
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+## 常见错误
+
+### undefined reference to makeGreeting
+
+这个错误说明编译器看到了声明，但链接器没有找到 `makeGreeting()` 的实现。按下面的顺序恢复。
+
+1. **定位缺失定义**
+
+   查看链接命令是否包含 `greeting.cpp` 或 `build/greeting.o`。
+
+2. **修复链接输入**
+
+   把缺失的 `greeting.cpp` 加回编译和链接命令。
+
+3. **验证链接结果**
+
+   重新执行本章的编译、链接和运行命令，终端应输出 `Hello, World!`。
+
+### 找不到 greeting.h
+
+编译器提示找不到 `greeting.h` 时，按下面的顺序检查头文件位置。
+
+1. **定位当前目录**
+
+   先用 `pwd` 确认当前目录，再用 `ls main.cpp greeting.cpp greeting.h` 确认三个文件都在。命令没有列出文件时，说明执行位置不对。
+
+2. **修复包含路径**
+
+   回到示例目录再执行命令。文件位于其他目录时，用 `-I` 告诉编译器头文件路径。
+
+3. **验证编译**
+
+   重新执行本章的编译和链接命令，两个源文件都应成功生成目标文件。
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. 为什么先把 `main.cpp` 和 `greeting.cpp` 分别编译成目标文件，而不是只执行一次链接命令？
+
+   ::: {.answer}
+   每个源文件先独立编译，编译器才能分别检查各自的翻译单元并生成可复用的目标文件，链接阶段再组合这些目标文件。这样修改一个源文件时，构建系统可以只重新编译受影响的部分。
+   :::
+
+2. 为什么链接命令必须包含 `greeting.cpp` 或 `build/greeting.o`？
+
+   ::: {.answer}
+   `greeting.h` 只提供 `makeGreeting()` 的声明，真正的函数定义在 `greeting.cpp` 中。链接输入缺少该定义时，调用点虽然通过了编译，链接器仍无法解析符号。
+   :::
+
+## 本章回顾
+
+你已经能区分程序入口、声明、实现、编译和链接。下一章用 `CMake` 把这套命令保存成可重复的工程规则。

@@ -1,0 +1,123 @@
+---
+title: "用 CMake 构建 C++ 程序"
+---
+
+上一章每次修改后都要手动执行编译命令。本章把编译参数写进 `CMakeLists.txt`，再用 `CMake` 和 `Ninja` 重复构建。
+
+## 查看工程文件
+
+示例工程包含三个文件：
+
+```{.text filename="工程目录"}
+cmake-project/
+├── CMakeLists.txt    # 构建规则
+├── build-and-run.sh  # 一键配置、构建并运行
+└── main.cpp          # 程序源码
+```
+
+程序入口仍然只负责输出问候句，避免把语言细节和构建工具混在一起。
+
+```{.cpp filename="main.cpp"}
+{{< include /code/getting-started/cmake-project/main.cpp >}}
+```
+
+构建规则如下：
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/cmake-project/CMakeLists.txt >}}
+```
+
+`project()` 设置工程名。`set()` 选择 C++20、输出目录和编译数据库。`add_executable()` 创建名为 `app` 的可执行目标，后面的 `target_compile_options()` 和 `target_link_options()` 为它设置编译与链接参数。
+
+## 配置工程
+
+在工程根目录执行下面的命令。`CMake` 会读取构建规则，并生成 `Ninja` 使用的文件。
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+```
+
+`-S .` 指定源码目录，`-B build` 指定构建目录，`-G Ninja` 选择 Ninja。只有构建规则改变时才需要重新配置。
+
+## 构建并运行
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 编译并链接 app
+cmake --build build
+# 运行程序
+./build/bin/app
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+`CMake` 生成 `build/bin/app`，`Ninja` 负责实际编译和链接。修改 `main.cpp` 后再次执行 `cmake --build build` 即可。
+
+也可以直接运行 `bash build-and-run.sh`，依次完成配置、构建和运行。
+
+## 常见错误
+
+### 配置时找不到 Ninja
+
+先检查命令是否安装：
+
+```{.bash filename="Ubuntu Bash"}
+command -v cmake ninja clang++
+```
+
+缺少工具时，回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具)重新安装。
+
+### 构建后找不到 app
+
+执行 `./build/bin/app` 时提示文件不存在，或构建结束后 `build/bin/app` 仍未生成。按下面的顺序定位，再重新构建并运行。
+
+1. **确认执行位置**
+
+   当前目录不是工程根目录时，`build/` 会指向错误位置。用根目录特征文件确认位置：
+
+   ```{.bash filename="Ubuntu Bash"}
+   ls CMakeLists.txt
+   ```
+
+   输出包含 `CMakeLists.txt`，说明当前位于工程根目录。否则先用 `cd` 进入示例工程目录。
+
+2. **重新构建并定位失败来源**
+
+   重新构建并显示每条实际执行的编译命令：
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   cmake --build build --verbose
+   ```
+
+   错误通常来自第一条编译信息，按文件名和行号修正源码后重新构建。
+
+3. **确认产物已生成**
+
+   ```{.bash filename="Ubuntu Bash（工程根目录）"}
+   ls -l build/bin/app
+   ```
+
+   命令列出 `app` 文件后，运行 `./build/bin/app`，确认输出仍为 `Hello, World!`。
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. 修改 `main.cpp` 后，为什么通常只需要再次执行 `cmake --build build`，而不必重新执行配置命令？
+
+   ::: {.answer}
+   配置阶段已经把 `CMakeLists.txt` 转换成构建规则。修改源文件只影响构建阶段，`cmake --build build` 会根据依赖关系重新编译并链接。只有构建规则、生成器或编译器配置改变时，才需要重新配置。
+   :::
+
+2. `cmake -S . -B build` 和 `cmake --build build` 分别负责什么？
+
+   ::: {.answer}
+   前者读取项目配置并生成构建规则，后者执行这些规则，实际调用编译器和链接器生成程序。
+   :::
+
+## 本章回顾
+
+你已经能用 `CMake` 保存构建规则，并通过 `cmake --build` 构建 `app`。下一章会把代码拆成多个文件。

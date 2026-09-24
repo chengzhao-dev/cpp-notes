@@ -1,0 +1,95 @@
+---
+title: "构建静态库并链接程序"
+---
+
+当同一份实现要被多个程序使用时，每次复制源码会带来重复维护。本章把 `greeting` 构建成静态库，再链接进 `app`。
+
+## 认识静态库
+
+静态库在 Linux 上通常使用 `.a` 扩展名。它保存已经编译好的库代码，不能直接运行。链接 `app` 时，链接器会把程序实际使用的库代码放进最终可执行文件。
+
+```{.text filename="工程目录"}
+static-library/
+├── CMakeLists.txt
+├── main.cpp
+└── greeting/
+    ├── CMakeLists.txt
+    ├── include/
+    │   └── greeting.h
+    └── src/
+        └── greeting.cpp
+```
+
+## 查看构建规则
+
+顶层规则负责加载库目录并创建 `app`。
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/static-library/CMakeLists.txt >}}
+```
+
+库目录自己负责创建 `greeting` 目标。
+
+```{.cmake filename="greeting/CMakeLists.txt"}
+{{< include /code/getting-started/static-library/greeting/CMakeLists.txt >}}
+```
+
+`add_library(greeting STATIC ...)` 创建静态库。`PUBLIC` 表示使用这个库的程序也能找到 `include/`。`target_link_libraries(app PRIVATE greeting)` 告诉 `CMake`：构建 `app` 时使用这个库。
+
+## 构建并运行
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译库和 app，并完成链接
+cmake --build build
+# 运行程序
+./build/bin/app
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+构建后会得到 `build/lib/libgreeting.a` 和 `build/bin/app`。
+
+## 检查静态库产物
+
+```{.bash filename="Ubuntu Bash（static-library 工程根目录）"}
+ldd build/bin/app
+```
+
+输出中不会出现 `libgreeting.a`。静态库只参与链接，需要的代码已经进入 `app`，运行时不再读取 `.a` 文件。
+
+## 选择静态库
+
+静态库能让程序少带一个运行时库文件，适合希望简化部署的场景。代价是库改变后，所有使用它的程序都要重新链接。
+
+## 常见错误
+
+### 链接器找不到 makeGreeting()
+
+先确认顶层 `CMakeLists.txt` 包含 `target_link_libraries(app PRIVATE greeting)`。补回后重新配置并构建：
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让 CMake 重新读取链接关系
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译库和 app，并完成链接
+cmake --build build
+```
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. 为什么 `ldd build/bin/app` 不会列出 `libgreeting.a`？
+
+   ::: {.answer}
+   静态库只在链接阶段提供目标代码，链接器会把被使用的代码复制进 `app`。程序运行时不再依赖原来的 `.a` 文件。
+   :::
+
+## 本章回顾
+
+你已经能构建并链接静态库。下一章会改成动态库，观察程序运行时如何查找库文件。

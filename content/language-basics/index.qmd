@@ -1,0 +1,32 @@
+---
+title: "语言基础"
+description: "从基础类型、变量和常量开始，逐步建立 C++ 语言基础。"
+number-sections: false
+body-classes: index-page
+---
+
+入门与构建已经完成了从源码到工程的基本闭环。实际程序会记录数量、比例、状态和限制条件；本分册先用这些常见数据说明 C++ 的语言规则，再逐步扩展到运算、控制流和更复杂的类型。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [基础类型与变量](types-and-variables.qmd)
+用 `int`、`double`、`bool` 和 `char` 表达常见数据，并理解变量、类型和作用域。
+:::
+
+::: {.landing-card}
+### [初始化与类型推断](initialization-and-type-inference.qmd)
+区分初始化与赋值，掌握列表初始化、`auto` 和初始化列表推导。
+:::
+
+::: {.landing-card}
+### [常量与配置](constants.qmd)
+用 `const` 和 `constexpr` 表达不会随流程改变的值。
+:::
+
+::: {.landing-card}
+### [类型安全与数值边界](type-safety-and-numeric-bounds.qmd)
+检查类型范围、溢出、转换、浮点精度、`bool` 和 `std::size_t` 的常见陷阱。
+:::
+:::
+
+后续章节会继续补充运算、控制流、函数、字符串和自定义类型。

@@ -1,0 +1,114 @@
+---
+title: "编译并运行第一个 C++ 程序"
+---
+
+本章用一个源文件走通“写代码、编译、运行”这条最短路径。完成后，终端会输出 `Hello, World!`。下一章再拆开多文件程序的结构。完整示例见 [first-program 示例目录](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)。
+
+## 创建源文件
+
+新建 `first-program.cpp`，输入下面的代码。
+
+```{.cpp filename="first-program.cpp"}
+{{< include /code/getting-started/first-program/first-program.cpp >}}
+```
+
+`main()` 是程序入口，后面的花括号 `{}` 组成函数体。不必现在记住其他细节，先按下面的步骤得到结果。
+
+## 编译并运行
+
+在源码所在目录执行下面的命令。
+
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
+# 创建构建目录
+mkdir -p build
+
+# 编译并链接源文件
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+
+# 运行程序
+./build/first-program
+```
+
+程序输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+`clang++` 先编译源码，再把程序需要的运行代码链接起来。`-o build/first-program` 指定可执行文件的输出路径，`./` 表示运行当前目录中的文件。看到 `Hello, World!`，说明这个单文件程序已经完成编译、链接并运行。
+
+::: {.callout-note title="编译选项"}
+- `-std=c++20` 选择 C++20 标准。
+- `-stdlib=libc++` 选择 libc++ 标准库。
+- `-Wall -Wextra -Werror` 打开常见警告，并让警告阻止构建。
+:::
+
+## 修改后验证
+
+把源码中的 `Hello, World!` 改成其他文字，再执行下面的命令。
+
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
+# 重新编译
+clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program
+# 运行程序
+./build/first-program
+```
+
+终端显示修改后的文字，说明源码改变后重新编译并运行成功。源码改变后必须重新编译。
+
+示例目录中的 `build-and-run.sh` 会依次完成创建目录、编译和运行：
+
+```{.bash filename="Ubuntu Bash（first-program 目录）"}
+# 编译并运行当前示例
+bash build-and-run.sh
+```
+
+## 常见错误
+
+### 找不到 clang++
+
+如果提示 `command not found: clang++`，先检查当前 Ubuntu 终端能否定位编译器。
+
+1. **定位工具**
+
+   ```{.bash filename="Ubuntu Bash"}
+   command -v clang++
+   ```
+
+2. **修复环境**
+
+   没有输出时，回到上一章重新安装 C++ 工具，并确认命令是在 Ubuntu 中执行。
+
+3. **验证编译**
+
+   回到本章的编译命令，程序成功输出 `Hello, World!` 后再继续。
+
+### 编译出现 error
+
+编译器会在输出中给出文件名、行号和第一条错误原因。按下面的顺序修复后重新运行。
+
+1. **定位错误**
+
+   查看第一条 `error:` 前后的文件名和行号。
+
+2. **修复源码**
+
+   修改对应位置，保留 `main()` 和输出语句的完整结构。
+
+3. **验证结果**
+
+   重新执行编译和运行命令，终端应显示源码中的问候文字。
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. 单文件程序从源码到终端输出，中间经过哪些步骤？
+
+   ::: {.answer}
+   `clang++` 读取源文件，完成编译和链接，生成可执行文件。运行该文件后，程序把 `Hello, World!` 写到终端。
+   :::
+
+## 本章回顾
+
+你已经能把一个源文件编译成可执行程序。下一章会拆开这个最小程序，说明入口、头文件、声明、定义和链接各自为什么存在。

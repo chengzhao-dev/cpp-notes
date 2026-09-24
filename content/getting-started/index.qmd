@@ -1,0 +1,43 @@
+---
+title: "入门与构建"
+description: "从开发环境开始，逐步完成单文件程序、最小结构、CMake 工程和库。"
+number-sections: false
+body-classes: index-page
+---
+
+按顺序阅读即可。每页只完成一个目标，并为下一页留下可以继续使用的文件。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [准备 WSL2 C++ 开发环境](setup-wsl2.qmd)
+在 Windows 上准备 Ubuntu 和 C++ 工具。
+:::
+::: {.landing-card}
+### [编译并运行第一个 C++ 程序](first-program.qmd)
+直接编译一个源文件并运行。
+:::
+::: {.landing-card}
+### [拆分最小 C++ 程序结构](minimal-program-structure.qmd)
+分清入口、声明、实现、编译和链接。
+:::
+::: {.landing-card}
+### [用 CMake 构建 C++ 程序](cmake-project.qmd)
+用构建规则重复生成程序。
+:::
+::: {.landing-card}
+### [用 CMake 管理多文件工程](multi-file-project.qmd)
+把接口、实现和程序入口拆开。
+:::
+::: {.landing-card}
+### [构建静态库并链接程序](static-library.qmd)
+把库代码链接进最终程序。
+:::
+::: {.landing-card}
+### [构建动态库并运行程序](shared-library.qmd)
+让程序在运行时查找库文件。
+:::
+:::
+
+::: {.callout-note title="统一开发环境"}
+本笔记的命令默认在 WSL2 Ubuntu 中执行。先完成[准备 WSL2 C++ 开发环境](setup-wsl2.qmd)，再按页面顺序继续学习。
+:::

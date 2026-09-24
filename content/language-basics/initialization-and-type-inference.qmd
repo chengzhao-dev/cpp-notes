@@ -1,0 +1,86 @@
+---
+title: "初始化与类型推断"
+---
+
+创建对象时，初始值必须有明确来源。初始化发生在变量诞生时，赋值发生在变量已经存在之后；`auto` 则让编译器从初始化表达式推断类型。本章使用 C++11 引入的列表初始化和类型推断，并按 C++20 的规则观察结果。
+
+## 区分初始化与赋值
+
+优先使用花括号初始化。空花括号会把基础类型初始化为零或对应的值，也能拒绝许多窄化转换：
+
+```{.cpp filename="片段：初始化与赋值"}
+// 片段
+int count{};            // 值初始化为 0
+int limit{100};         // 创建时得到 100
+count = 80;             // 修改已有变量
+
+// int level{3.5};      // 编译失败：窄化转换
+int truncated = 3.5;    // 可编译，但结果为 3，不推荐
+```
+
+局部自动变量若只写 `int count;` 就直接读取，其值是不确定的；这类读取属于未定义行为。不要为了“看看会输出什么”而运行这种代码。
+
+## 让 auto 记录推断结果
+
+`auto` 不是动态类型。编译器在编译期根据初始化表达式确定类型，变量创建后仍保持该类型：
+
+```{.cpp filename="initialization-and-type-inference.cpp"}
+#include <iostream>
+
+int main() {
+  int count{};
+  int limit{100};
+  count = 80;
+
+  auto value = 1200;      // int
+  auto ratio = 4.5;       // double
+  auto enabled = true;    // bool
+
+  value -= 100;
+  std::cout << "数量: " << count << "/" << limit << "\n";
+  std::cout << "值: " << value << "\n";
+  std::cout << "比例: " << ratio << "\n";
+  std::cout << std::boolalpha << "已启用: " << enabled << "\n";
+  return 0;
+}
+```
+
+当右侧类型一眼可见时，`auto` 能减少重复；当类型本身就是接口意图时，显式写出类型更清楚。
+
+## 注意初始化列表的推导
+
+C++11 的 `auto` 与花括号组合有特殊规则。C++20 中，多个元素会推导为 `std::initializer_list<T>`；单个元素的直接列表初始化推导为该元素类型：
+
+```{.cpp filename="片段：初始化列表推导"}
+// 片段
+auto oneValue{10};           // int
+auto manyValues{10, 20, 30}; // std::initializer_list<int>
+auto sameType = {10, 20};    // std::initializer_list<int>
+// auto mixed{10, 2.5};       // 编译失败：元素类型无法统一
+```
+
+`auto` 仍然需要初始化表达式；`auto value;` 没有推断来源，会编译失败。
+
+## 常见错误
+
+### 把初始化当成赋值
+
+初始化只发生一次；之后的 `=` 是赋值。区分二者能避免误判对象何时获得第一个有效值。
+
+### 忽略花括号的窄化检查
+
+列表初始化拒绝可能丢失信息的转换。遇到编译错误时，先确认目标类型和数值范围，而不是马上改回 C 风格强转。
+
+### 误以为 auto 会改变类型
+
+`auto` 只在编译期推断一次，不会让变量在运行时从 `int` 变成 `double`。
+
+## 自测问题
+
+1. `count{}` 和 `count = 80` 分别发生在什么时机？
+2. `auto manyValues{10, 20, 30};` 为什么不是一个 `int`？
+3. 什么情况下显式类型比 `auto` 更能表达接口意图？
+
+## 本章回顾
+
+你已经能用列表初始化建立安全的初始值，并能解释 C++11 `auto` 与初始化列表的推导边界；示例见 [initialization-and-type-inference.cpp](../../code/language-basics/initialization-and-type-inference.cpp)。

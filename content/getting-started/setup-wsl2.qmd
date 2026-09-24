@@ -1,0 +1,122 @@
+---
+title: "准备 WSL2 C++ 开发环境"
+---
+
+本章在 Windows 上准备后续 C++ 学习所需的 Ubuntu 环境。WSL2 提供运行 Linux 的环境，Ubuntu 是本章使用的 Linux 发行版。完成后，你能在 Ubuntu 中安装并定位 C++ 开发工具。
+
+## 安装 WSL2 和 Ubuntu
+
+以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu 发行版。
+
+```{.powershell filename="PowerShell（管理员）"}
+# 安装 WSL2 和默认的 Ubuntu 发行版
+wsl --install
+```
+
+命令完成后按提示重启 Windows。重启后从开始菜单首次启动 Ubuntu，并按顺序完成初始化：
+
+1. 创建 Linux 用户名和密码。输入密码时终端不会显示字符，这是正常现象。
+2. 等待初始化完成，直到看到类似 `user@host:~$` 的提示符。
+3. 从看到该提示符开始，本章后续命令都在这个 Ubuntu 终端中执行。
+
+以后可以从 Windows 开始菜单启动 Ubuntu，也可以在 PowerShell 或 Windows Terminal 中执行 `wsl` 进入默认发行版。再次看到 Ubuntu 提示符后，继续执行 Ubuntu 命令。
+
+::: {.callout-note title="认识 Ubuntu 提示符"}
+- `user` 是 Linux 用户名。
+- `host` 是计算机名。
+- `~` 表示当前用户的主目录。
+- 末尾的 `$` 表示普通用户提示符。
+:::
+
+## 安装 C++ 工具
+
+先更新软件包索引并升级已安装的软件，再安装后续需要的开发工具。
+
+```{.bash filename="Ubuntu Bash"}
+# 更新软件包索引
+sudo apt update
+
+# 升级已安装的软件包
+sudo apt upgrade -y
+
+# 安装 C++ 开发工具
+sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build
+```
+
+`clang` 提供编译器，`clangd` 提供代码提示，`lldb` 提供调试器，`CMake` 和 `Ninja` 负责构建，`libc++` 相关包提供 C++ 标准库。
+
+::: {.callout-tip title="下载较慢时再更换软件源"}
+只有默认软件源下载明显过慢时才需要更换来源。更换软件源只影响软件下载位置，不改变编译器和构建工具。可以参考[清华 Ubuntu 软件源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)。
+:::
+
+## 检查工具命令是否可定位
+
+执行下面的命令，确认当前 Ubuntu 的 `PATH` 中可以找到这些工具。
+
+```{.bash filename="Ubuntu Bash"}
+command -v clang++ clangd lldb cmake ninja
+```
+
+输出顺序与命令中的工具顺序一致，实际路径可能因 Ubuntu 环境不同而变化。下面是一个输出示例：
+
+```{.text filename="输出示例"}
+/usr/bin/clang++
+/usr/bin/clangd
+/usr/bin/lldb
+/usr/bin/cmake
+/usr/bin/ninja
+```
+
+只要每项都输出非空路径，就说明对应命令已经安装并且可以被 Shell 定位，不要求路径与示例完全一致。这项检查不能证明编译、构建、调试或代码提示功能正常。后续 Hello World 程序会通过实际编译和运行验证最小编译链。
+
+## 常见错误
+
+### WSL2 安装失败
+
+如果提示“虚拟机平台未启用”，按下面的顺序检查系统设置，再重新安装。
+
+1. **定位虚拟化设置**
+
+   在电脑启动设置或任务管理器中确认 CPU 虚拟化已经开启。
+
+2. **启用 WSL 功能**
+
+   在“启用或关闭 Windows 功能”中启用“虚拟机平台”和“适用于 Linux 的 Windows 子系统”，然后重启 Windows。
+
+3. **验证安装**
+
+   重新执行 `wsl --install`，并在重启后确认能够进入 Ubuntu 提示符。
+
+### 找不到工具
+
+如果某个工具显示 `command not found`，按下面的顺序恢复到检查步骤。
+
+1. **定位缺失命令**
+
+   ```{.bash filename="Ubuntu Bash"}
+   command -v clang++
+   ```
+
+   没有输出时，确认终端位于 Ubuntu，而不是 Windows PowerShell。
+
+2. **重新安装工具**
+
+   在 Ubuntu 中重新执行本章的 `sudo apt install` 命令。
+
+3. **验证命令定位**
+
+   重新执行 `command -v clang++ clangd lldb cmake ninja`，每项都应输出非空路径。
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. `command -v clang++` 能列出路径，是否就能证明 `clang++` 已经可以成功编译程序？为什么？
+
+   ::: {.answer}
+   不能。它只证明 Shell 能在当前 `PATH` 中找到命令。还需要实际编译并运行一个程序，才能验证编译链的功能。
+   :::
+
+## 本章回顾
+
+看到 Ubuntu 提示符，并且 `command -v` 能列出全部工具路径，说明这些命令已经可以被 Shell 定位。下一章会创建第一个源文件，通过实际编译和运行继续验证 `clang++`。

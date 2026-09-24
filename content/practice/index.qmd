@@ -1,0 +1,15 @@
+---
+title: "工程应用"
+description: "从入门构建路线延伸到真实工程中的 C++ 交付背景。"
+number-sections: false
+body-classes: index-page
+---
+
+本分册关注 C++ 产物在真实工程中的职责。它不替代入门分册的构建练习，也不把 Android NDK、Gradle 或 JNI 实现展开成教程。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [影像算法的交付形态](android-imaging.qmd)
+理解影像算法为什么先用可执行文件仿真，再以按 ABI 交付的动态库 SDK 接入 App 或系统模块。
+:::
+:::

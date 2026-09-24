@@ -1,0 +1,87 @@
+---
+title: "构建动态库并运行程序"
+---
+
+静态库代码会进入最终程序。动态库改为在程序运行时加载，多个程序也可以共享同一个库文件。本章把上一章的 `greeting` 改成动态库。
+
+## 认识动态库
+
+动态库在 Linux 上通常使用 `.so` 扩展名。构建 `app` 时，链接器记录它对库的依赖，不把库代码复制进程序。
+
+| 内容 | 静态库 | 动态库 |
+| --- | --- | --- |
+| 文件 | `libgreeting.a` | `libgreeting.so` |
+| 链接结果 | 库代码进入 `app` | `app` 记录库依赖 |
+| 运行条件 | 不再需要库文件 | 必须找到匹配的 `.so` |
+
+## 查看构建规则
+
+顶层规则与静态库工程基本相同，只改变库的输出目录和运行路径。
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/shared-library/CMakeLists.txt >}}
+```
+
+库目录把 `STATIC` 改成 `SHARED`。
+
+```{.cmake filename="greeting/CMakeLists.txt"}
+{{< include /code/getting-started/shared-library/greeting/CMakeLists.txt >}}
+```
+
+`BUILD_RPATH "$ORIGIN/../lib"` 会把库的查找位置写进 `app`。`$ORIGIN` 表示 `app` 所在目录，所以程序能从 `build/bin/` 找到旁边的 `build/lib/`。
+
+## 构建并运行
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译动态库和 app，并完成链接
+cmake --build build
+# 运行程序
+./build/bin/app
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+构建产物是 `build/lib/libgreeting.so` 和 `build/bin/app`。
+
+## 检查动态库
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+ldd build/bin/app | grep libgreeting
+```
+
+输出会显示 `libgreeting.so` 的查找结果。移动或删除这个 `.so` 后，程序将无法启动。
+
+## 常见错误
+
+### 运行时找不到 libgreeting.so
+
+先确认 `build/lib/libgreeting.so` 已生成，再检查顶层规则是否包含 `BUILD_RPATH "$ORIGIN/../lib"`。补回后重新配置和构建：
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让 RPATH 写入新构建的 app
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 重新编译并链接
+cmake --build build
+# 查看 app 记录的库查找结果
+ldd build/bin/app | grep libgreeting
+```
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. 为什么动态库工程可能构建成功，但运行 `app` 时仍然失败？
+
+   ::: {.answer}
+   构建阶段只证明链接器记录了动态库依赖。运行阶段还需要动态加载器找到匹配的 `.so`。如果库文件不在搜索路径中，或 `RPATH` 没有指向 `build/lib/`，程序就无法启动。
+   :::
+
+## 本章回顾
+
+你已经能构建动态库，并让程序在运行时找到它。完成本页后，入门路线中的六个构建阶段就全部走通。

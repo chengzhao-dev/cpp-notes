@@ -1,0 +1,37 @@
+---
+title: "C++ 学习轨迹笔记"
+description: "记录从 Linux 环境、C++ 工程构建到语言基础的学习过程。"
+number-sections: false
+body-classes: homepage
+---
+
+::: {.hero-eyebrow}
+记录 C++ 学习轨迹
+:::
+
+## 开始阅读
+
+先进入“入门与构建”，按页面顺序完成七个小目标。再从“语言基础”学习类型和变量。“工程应用”用一页说明这些构建产物在真实项目中的职责，可以随时阅读。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [入门与构建](content/getting-started/index.qmd)
+从 WSL2 开始，经过直接编译、最小程序结构、CMake、多文件工程，最后完成静态库和动态库。
+
+[查看内容 →](content/getting-started/index.qmd){.cta}
+:::
+
+::: {.landing-card}
+### [语言基础](content/language-basics/index.qmd)
+学习类型、变量、常量，以及后续语言概念。
+
+[查看内容 →](content/language-basics/index.qmd){.cta}
+:::
+
+::: {.landing-card}
+### [工程应用](content/practice/index.qmd)
+理解可执行文件和动态库在真实工程中各自承担什么职责。
+
+[查看内容 →](content/practice/index.qmd){.cta}
+:::
+:::

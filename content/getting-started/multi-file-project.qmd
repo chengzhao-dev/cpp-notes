@@ -1,0 +1,102 @@
+---
+title: "用 CMake 管理多文件工程"
+---
+
+代码变多后，把接口、实现和程序入口放在同一个文件中会很难阅读。本章把 `Hello, World!` 示例拆成三个源文件，再由 `CMake` 构建成一个程序。
+
+## 查看工程结构
+
+```{.text filename="工程目录"}
+multi-file-project/
+├── CMakeLists.txt    # 构建规则
+├── build-and-run.sh  # 一键构建并运行
+├── include/
+│   └── greeting.h    # 接口声明
+└── src/
+    ├── greeting.cpp  # 接口实现
+    └── main.cpp      # 程序入口
+```
+
+`include/` 放头文件，`src/` 放实现和程序入口。
+
+## 阅读源码
+
+`greeting.h` 声明 `makeGreeting()`，让其他源文件知道这个函数如何使用。
+
+```{.cpp filename="include/greeting.h"}
+{{< include /code/getting-started/multi-file-project/include/greeting.h >}}
+```
+
+`greeting.cpp` 实现这个函数。
+
+```{.cpp filename="src/greeting.cpp"}
+{{< include /code/getting-started/multi-file-project/src/greeting.cpp >}}
+```
+
+`main.cpp` 调用函数并输出结果。
+
+```{.cpp filename="src/main.cpp"}
+{{< include /code/getting-started/multi-file-project/src/main.cpp >}}
+```
+
+编译 `main.cpp` 时，编译器只需要看到函数声明。链接阶段再把 `main.cpp` 和 `greeting.cpp` 连成一个程序。
+
+## 查看构建规则
+
+```{.cmake filename="CMakeLists.txt"}
+{{< include /code/getting-started/multi-file-project/CMakeLists.txt >}}
+```
+
+`file(GLOB ...)` 收集 `src/` 下的源文件，`add_executable()` 用收集结果创建 `app`。`CONFIGURE_DEPENDS` 让 `Ninja` 在构建前检查目录变化：新增 `.cpp` 后不必修改 `CMakeLists.txt`，直接重新构建就会进入目标。`target_include_directories()` 让 `app` 能从 `include/` 找到 `greeting.h`。
+
+收集规则只覆盖 `src/` 直属的 `.cpp`。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。
+
+## 构建并运行
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 配置工程，并生成 Ninja 使用的构建规则
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译并链接 app
+cmake --build build
+# 运行程序
+./build/bin/app
+```
+
+输出如下：
+
+```{.text filename="输出"}
+Hello, World!
+```
+
+也可以运行 `bash build-and-run.sh`。
+
+## 常见错误
+
+### 找不到 greeting.h
+
+确认 `CMakeLists.txt` 包含 `target_include_directories(app PRIVATE include)`，再重新配置并构建。
+
+### 链接器找不到 makeGreeting()
+
+确认 `src/greeting.cpp` 存在，且文件后缀是 `.cpp`，因为收集规则只包含 `src/` 直属的 `.cpp` 文件。修正后重新配置并构建：
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 重新配置，让收集规则重新读取 src/ 下的源文件
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+# 编译并链接 app
+cmake --build build
+```
+
+## 自测问题
+
+先自己回答，再展开核对。
+
+1. `target_include_directories(app PRIVATE include)` 和源文件收集规则分别解决什么问题？
+
+   ::: {.answer}
+   `target_include_directories` 让目标知道到哪里查找头文件，解决声明的可见性。源文件收集规则决定哪些 `.cpp` 会进入目标并参与编译，解决实现是否进入构建和后续链接。
+   :::
+
+## 本章回顾
+
+你已经能把接口、实现和程序入口拆开。下一章会把可复用实现构建成静态库。
