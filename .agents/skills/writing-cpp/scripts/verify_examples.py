@@ -10,7 +10,7 @@ Linux（如 CI）直接在本地编译。脚本不会保持 WSL 常驻会话。
   python verify_examples.py --paths code/language-basics/types-and-variables.cpp content/language-basics/types-and-variables.qmd
 
 Windows 下使用仓库配置的 Python 3.12 运行：
-  python .agents/skills/agent-ops/scripts/run.py verify
+  python .agents/skills/governing-agents/scripts/run.py verify
 退出码：0 = 全部通过，1 = 至少一处失败。
 
 编译阶段：
@@ -21,7 +21,7 @@ Windows 下使用仓库配置的 Python 3.12 运行：
 风格阶段（仅 --style，规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
   S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
-  配置显式指向 .agents/skills/cpp-content/assets/config/（.clang-format、.clang-tidy）。
+  配置显式指向 .agents/skills/writing-cpp/assets/config/（.clang-format、.clang-tidy）。
   clang 工具缺失/过旧时降级为警告。编译始终是硬门槛。
 """
 
@@ -45,7 +45,7 @@ SKIP_DIRS = {"build", ".git", "__pycache__", ".venv"}
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CPP_CONFIG_DIR = SKILL_ROOT / "assets" / "config"
-sys.path.insert(0, str(REPO_ROOT / ".agents" / "skills" / "python-tools" / "scripts"))
+sys.path.insert(0, str(REPO_ROOT / ".agents" / "skills" / "maintaining-python" / "scripts"))
 from temp_paths import temp_dir  # noqa: E402
 
 

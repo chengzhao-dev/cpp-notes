@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-chinese-style-v1"
 title: "中文技术写作的句段与措辞案例"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "writing"
 tags: [chinese, paragraph, long_paragraph, paragraph_merge, sentence, punctuation, semicolon, terminology, wording, direct_compilation, referent, validation, tone]
 level_range: [0, 9]
@@ -13,7 +13,7 @@ estimated_tokens: 1100
 
 # 中文技术写作的句段与措辞案例
 
-本文件保存段落、句子和措辞不佳时的改写对照。可执行规则见 `quarto-docs` 的 `writing-principles` reference，本文件不维护第二套规范。标题、代码块、Callout 和文件名密度案例见标识 `cpp-quarto-qmd-element-cases-v1`。
+本文件保存段落、句子和措辞不佳时的改写对照。可执行规则见 `writing-quarto` 的 `writing-principles` reference，本文件不维护第二套规范。标题、代码块、Callout 和文件名密度案例见标识 `cpp-quarto-qmd-element-cases-v1`。
 
 ## 长句与连接关系案例
 

@@ -54,7 +54,7 @@ README 遵循 GitHub Markdown，可以保留 Actions、许可证徽章和有信�
 写完章节后用 `run.py check --profile fast` 检查关键工具和命令是否漏标记。标记边界与间距依据运行：
 
 ```bash
-& .agents/skills/agent-ops/scripts/run.ps1 kb-search "行内代码 链接间距" --domain quarto-docs
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "行内代码 链接间距" --domain writing-quarto
 ```
 
 ## 文档元素
@@ -89,7 +89,7 @@ README 遵循 GitHub Markdown，可以保留 Actions、许可证徽章和有信�
 
 唯一例外是“结果型 Callout”：成功判据是读者会看到的稳定界面或状态，同一信息还需要拆解说明，并且其后没有必经动作时，正文先用“完成某动作后，请对照下面的格式确认结果，并了解后续范围”一类可执行检查句完成交接，再把精确判据、下一步范围和解释列表一起放进该任务末尾的 `note`。正文检查句只建立动作和目标，Callout 首句必须直接兑现该动作，不再重新起句。提示框是正文结果的延伸，不是独立插入的必经步骤。不符合这些条件时，成功判据仍留在正文。
 
-正文与 Callout 的信息密度、列表化和重量平衡见 `references/zh/section-focus-and-density.md`「避免头重脚轻」。这里的字号只由 `quarto-theme` 维护。
+正文与 Callout 的信息密度、列表化和重量平衡见 `references/zh/section-focus-and-density.md`「避免头重脚轻」。这里的字号只由 `designing-theme` 维护。
 
 ### 可折叠答案
 
@@ -105,7 +105,7 @@ README 遵循 GitHub Markdown，可以保留 Actions、许可证徽章和有信�
 
 - 只有读者可以先自行回答、再核对结论的内容才折叠。定义、命令和必经判据留在正文。
 - 答案与问题处于同一个列表项，不集中到章末，也不为每道题单独起标题。
-- `.answer` 由 `.agents/skills/quarto-docs/scripts/answer-disclosure.lua` 渲染为默认收起的原生 `details.answer-disclosure`，摘要固定为“查看答案”。正文不手写这段 HTML。
+- `.answer` 由 `.agents/skills/writing-quarto/scripts/answer-disclosure.lua` 渲染为默认收起的原生 `details.answer-disclosure`，摘要固定为“查看答案”。正文不手写这段 HTML。
 - 列表型答案直接以有序列表开头时，先写一句与问题同主题的导语，交代对象、起止范围或顺序，再列出步骤。不要让列表突然承接问题。
 - 答案只使用本章已经讲解的概念，内部不使用 `h1`–`h6`。
 

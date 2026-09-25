@@ -5,7 +5,7 @@
 为什么这样归一化行尾、为什么远端只留两个分支、提交按什么边界切分，都在知识库，一条命令取用：
 
 ```powershell
-& .agents/skills/agent-ops/scripts/run.ps1 kb-search "仓库一致性与分支保护依据" --domain github-ops
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "仓库一致性与分支保护依据" --domain shipping-github
 ```
 
 ## 硬约束
@@ -13,7 +13,7 @@
 - 用户没明确要求时不 commit、push、创建 PR。用户要求提交时只覆盖其列出的路径组与目标分支，不扩展到未列改动、`git add -A`、amend、改 remote 或额外分支。不 force-push main。不建空 commit。
 - 不用 `git commit --amend`（除非修复刚失败且未推送的 commit）。不用 `-i` 交互式。不跳过 hooks。不更新 `git config`（除非明确要求）。
 - 只 `git add` 显式路径，禁止 `git add -A` 裹挟用户既有未提交改动。
-- 提交信息使用中文分类前缀，例如“文档：”“修复：”“维护：”，让读者不看 diff 就能判断影响面与是否需要跑检查。整句保持中文，只有没有合适中文译名时才保留 `CMake`、`Ninja`、`clangd` 等技术标识。
+- 提交信息使用 Conventional Commits 前缀：`type(scope): 中文说明`，例如 `docs(writing-quarto): 章节骨架补充术语门槛`、`refactor(agents): 解释器配置并入根目录 config.toml`。`type` 取 `feat`/`fix`/`refactor`/`docs`/`chore`/`ci`/`test`/`perf`/`build`；`scope` 可选，用小写英文（如技能名或目录短名）；冒号后用简洁中文说明改动，只有没有合适中文译名时才保留 `CMake`、`Ninja`、`clangd` 等技术标识。破坏性变更在冒号前加 `!`。让读者不看 diff 就能判断影响面与是否需要跑检查。
 - 必传 `.agents/skills/**`。必不传本机运行时配置、`_book/`、`.quarto/`、`node_modules/`。项目 Python 唯一来源为已提交的根目录 `config.toml`，不得新增第二份解释器路径。忽略规则统一放根 `.gitignore`，不在嵌套目录放「自忽略 `.gitignore`」。
 
 ## Git 对比频率
@@ -35,7 +35,7 @@ Git 对比服务于当前任务，不要在每个步骤重复运行 `git status`
 中文文件禁止经过系统代码页或 GBK 往返转换。改动 `.qmd` 或规范文档后先跑编码检查。
 
 ```powershell
-git check-ignore -v .agents/skills/python-tools/assets/config/runtime.json _book .quarto node_modules/
+git check-ignore -v .agents/skills/maintaining-python/assets/config/runtime.json _book .quarto node_modules/
 # 每个路径都应命中一条忽略规则；.agents/skills 不应出现在输出里
 ```
 
@@ -72,13 +72,13 @@ git log --oneline -10
 
 先看 `git status --short`、`git diff --stat`、`git diff --name-only`，再按可独立回滚的边界分组暂存，每组显式路径 `git add`，随后检查 `git diff --cached --check` 与 `git diff --cached --stat`。
 
-前缀：`文档：` 表示文档与写作规范，`功能：` 表示新增功能或章节，`修复：` 表示行为修复，`重构：` 表示不改变行为的结构调整，`维护：` 表示配置与维护。一次任务通常 3–5 个提交，按实际边界决定，不为拆分而拆分。
+type 前缀用英文：`feat:` 新增功能或章节，`fix:` 行为修复，`refactor:` 不改变行为的结构调整，`docs:` 文档与写作规范，`chore:` 配置与维护，`ci:`/`test:`/`perf:`/`build:` 对应专项。scope 可选，用技能或目录短名。一次任务通常 3–5 个提交，按实际边界决定，不为拆分而拆分。
 
 ## 日常流程与分支
 
 ```powershell
 git add <file>...            # 只 add 要提交的文件
-git commit -m "描述"          # 简洁描述本次改动
+git commit -m "docs: 提交规范说明"   # type(scope): 中文说明
 git push origin main          # 远端只推 main
 git pull                      # 拉取并合并
 ```

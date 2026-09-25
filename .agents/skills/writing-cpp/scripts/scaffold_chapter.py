@@ -4,7 +4,7 @@
 用法：
   python scaffold_chapter.py --topic <ascii-name> [--part <part>] [--title "中文标题"]
 创建 content/<part>/<topic>.qmd（title 已填入，--part 默认与 topic 同名），
-模板位于 .agents/skills/cpp-content/templates/cpp-topic.qmd。
+模板位于 .agents/skills/writing-cpp/templates/cpp-topic.qmd。
 part 索引页 index.qmd 不由本脚本生成。
 之后需手动在 _quarto.yml 的 book.chapters 注册，并运行 verify_examples.py。
 
@@ -37,8 +37,8 @@ def main():
     parser.add_argument("--part", default="", help="父目录名（part 主题目录；默认与 topic 同名）")
     parser.add_argument("--title", default="", help="显示标题（默认用 topic 名）")
     parser.add_argument(
-        "--skill-root", default=os.path.join(".agents", "skills", "cpp-content"),
-        help="cpp-content skill 根目录（相对仓库根）",
+        "--skill-root", default=os.path.join(".agents", "skills", "writing-cpp"),
+        help="writing-cpp skill 根目录（相对仓库根）",
     )
     parser.add_argument("--content-root", default="content", help="章节根目录")
     args = parser.parse_args()

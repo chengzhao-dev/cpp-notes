@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-cpp-preprocessing-headers-linking-v1"
 title: "从源码到可执行程序的阶段边界"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "toolchain"
 tags: [preprocessor, include, header, translation_unit, declaration, definition, compiler, object_file, linker, executable, runtime_loader, static_library, shared_library, pragma_once, include_guard]
 level_range: [0, 5]
@@ -68,4 +68,4 @@ estimated_tokens: 1200
 - 找不到头文件：通常是预处理或编译阶段的包含路径问题。
 - 找不到函数定义：通常是链接输入缺少目标文件或库。
 - 动态库找不到：通常是程序启动时的运行期搜索路径问题。
-- 以上阶段由 `cpp-content` Skill 路由；CMake 配置、构建和工具分工见 `cpp-tooling-build-chain-v2`。
+- 以上阶段由 `writing-cpp` Skill 路由；CMake 配置、构建和工具分工见 `cpp-tooling-build-chain-v2`。

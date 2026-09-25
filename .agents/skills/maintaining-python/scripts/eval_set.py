@@ -5,7 +5,7 @@
 """
 
 TOOLING = [
-    # agent-ops：上下文、预算、计划与仓库命名
+    # governing-agents：上下文、预算、计划与仓库命名
     ("上下文压缩由谁触发", "压缩由宿主触发而不是 agent", "concept"),
     ("压缩摘要为什么不能当成执行授权", "摘要不是执行授权", "concept"),
     ("哪些加载路径需要限制 Token", "按加载路径控制而不是限制全库总量", "concept"),
@@ -16,7 +16,7 @@ TOOLING = [
     ("章节文件为什么不用数字前缀", "排序与编号", "concept"),
     ("part 目录应该怎样命名", "Part 名称", "procedure"),
     ("practice 分册为什么用短目录名", "Part 名称", "concept"),
-    # cpp-content：命名、注释、构建与库
+    # writing-cpp：命名、注释、构建与库
     ("Google C++ 的函数和变量使用什么命名", "标准差异", "concept"),
     ("项目函数和变量为什么使用小驼峰", "项目规则", "concept"),
     ("教程源码为什么需要文件用途注释", "最低注释合同", "concept"),
@@ -56,7 +56,7 @@ TOOLING = [
     ("知识库增长后怎样避免按文档扫描全部 Chunk", "知识分块与摘要", "concept"),
     ("页面增长后浏览器布局为什么抽样", "抽样与全量", "concept"),
     ("什么情况下必须恢复全量布局校验", "何时升级校验", "procedure"),
-    # github-ops：部署、卫生与提交
+    # shipping-github：部署、卫生与提交
     ("GitHub Pages 部署源怎么选", "部署源的类型与边界", "procedure"),
     ("Pages 权限由什么决定", "权限由部署方式决定", "concept"),
     ("站点部署在子路径时链接为什么要带前缀", "URL 前缀决定链接写法", "concept"),
@@ -65,7 +65,7 @@ TOOLING = [
     ("忽略规则为什么要集中管理", "忽略规则的集中与可验证性", "concept"),
     ("远端为什么只保留必要分支", "分支拓扑与保护", "concept"),
     ("提交应该按什么边界拆分", "提交切分的依据", "concept"),
-    # quarto-docs：HTML、渲染、页面与措辞
+    # writing-quarto：HTML、渲染、页面与措辞
     ("Quarto HTML 选项在哪些作用域生效", "作用域", "concept"),
     ("Quarto 配置为什么会静默失效", "配置与产物", "concept"),
     ("三栏布局为什么会压缩正文", "三栏宽度预算", "concept"),

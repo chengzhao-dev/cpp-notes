@@ -4,9 +4,9 @@
 
 ## 公共读写边界
 
-- **必读**: `AGENTS.md`、本文件、`.agents/skills/cpp-content/references/cpp/modern-cpp.md`、`.agents/skills/quarto-docs/references/quarto/authoring.md`、`.agents/skills/quarto-docs/references/zh/chapter-writing.md`
+- **必读**: `AGENTS.md`、本文件、`.agents/skills/writing-cpp/references/cpp/modern-cpp.md`、`.agents/skills/writing-quarto/references/quarto/authoring.md`、`.agents/skills/writing-quarto/references/zh/chapter-writing.md`
 - **可写**: 本行「正文」与「示例」所列路径，以及 `_quarto.yml`（追加本章）
-- **禁止**: `.agents/skills/quarto-theme/assets/theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
+- **禁止**: `.agents/skills/designing-theme/assets/theme/`、`content/<其他 part>/`、示例目录下的 `build/`（CMake 产物）
 
 示例默认单文件 `code/<part>/<chapter>.cpp`，需要构建工程时优先使用同名子目录。单入口工程的 `main.cpp` 放工程根；消费端增长为多文件后再建带 `CMakeLists.txt` 的 `app/`。一章需要多个独立工程时，在「示例」列登记全部路径，产物分别落各工程的 `build/`。
 

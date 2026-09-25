@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-repo-hygiene-v1"
 title: "仓库一致性与分支保护依据"
-domain: "github-ops"
+domain: "shipping-github"
 subdomain: "repository_hygiene"
 tags: [gitattributes, line_ending, gitignore, branch_protection, renormalize, workflow, diff_frequency]
 level_range: [0, 9]
@@ -15,7 +15,7 @@ estimated_tokens: 1300
 # 仓库一致性与分支保护依据
 
 > 本文件记录跨平台仓库卫生措施的成因与取舍，是这块领域知识的唯一出处。
-> 具体命令序列与禁止事项由 skill 侧 `github-ops/references/git-workflow.md` 承载，不在此重复。
+> 具体命令序列与禁止事项由 skill 侧 `shipping-github/references/git-workflow.md` 承载，不在此重复。
 
 ## 行尾与编码的归一化
 
@@ -74,7 +74,7 @@ estimated_tokens: 1300
 3. 提交信息前缀的作用是让读者不看 diff 就能判断影响面与是否需要跑检查
 4. 一次任务通常三到五组，超过说明改动本身该拆成多个任务。为拆而拆会让回溯成本高于收益
 
-面向中文读者的仓库统一使用中文分类前缀，例如“文档：”“修复：”“维护：”。分类前缀先标出变更性质，正文再说明动机与影响。`CMake`、`Ninja`、`clangd` 等没有稳定中文译名的技术标识可以保留英文，其余句子保持中文，避免同一项目出现中英文混杂的提交历史。
+面向中文读者的仓库统一使用 Conventional Commits 前缀 `type(scope): 中文说明`，例如 `docs: 补充术语表`、`refactor(agents): 索引目录并入 config.toml`。`type`（feat/fix/refactor/docs/chore 等）标出变更性质，便于 changelog 与 commitlint 工具识别；冒号后的说明用中文，正文再展开动机与影响。`CMake`、`Ninja`、`clangd` 等没有稳定中文译名的技术标识可以保留英文，避免同一项目出现中英文混杂的提交历史。
 
 ## Git 对比频率的取舍
 

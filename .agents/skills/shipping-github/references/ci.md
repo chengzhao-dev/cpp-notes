@@ -7,7 +7,7 @@
 ### pages.yml
 
 - 触发：`push` 到 `main`，或 `workflow_dispatch`
-- 步骤：checkout → setup Quarto → setup Python → `quarto render` → `.agents/skills/python-tools/scripts/render/defer_mermaid.py` → `peaceiris/actions-gh-pages` 推 `_book/` 到 `gh-pages`（`force_orphan`）→ 可选校正 Pages source
+- 步骤：checkout → setup Quarto → setup Python → `quarto render` → `.agents/skills/maintaining-python/scripts/render/defer_mermaid.py` → `peaceiris/actions-gh-pages` 推 `_book/` 到 `gh-pages`（`force_orphan`）→ 可选校正 Pages source
 - 权限：`contents: write`（推分支）、`pages: write`（调 Pages API）
 - Pages 设置：Deploy from a branch → `gh-pages` / `(root)`（见 `github-pages.md` 方式四）
 
@@ -21,7 +21,7 @@
 在 `render-check.yml` 追加：
 
 ```yaml
-      - run: python3 .agents/skills/cpp-content/scripts/verify_examples.py
+      - run: python3 .agents/skills/writing-cpp/scripts/verify_examples.py
 ```
 
 可选 `--style` 需 WSL 内 clang 工具链，CI 默认仅编译校验。
@@ -35,8 +35,8 @@
    - 依赖环境：Ubuntu 最新版、Quarto 运行环境、Python 3.12。
    - 执行阶段：
      - quarto render：检查文档语法、YAML 配置与跨文件引用。
-     - python3 .agents/skills/python-tools/scripts/render/defer_mermaid.py：验证渲染后处理脚本。
-     - python3 .agents/skills/cpp-content/scripts/verify_examples.py：硬性门禁，保证书中所有 C++ 代码均可通过编译。
+     - python3 .agents/skills/maintaining-python/scripts/render/defer_mermaid.py：验证渲染后处理脚本。
+     - python3 .agents/skills/writing-cpp/scripts/verify_examples.py：硬性门禁，保证书中所有 C++ 代码均可通过编译。
 2. **pages.yml**（Main 分支发布）：
    - 具备单并发控制（concurrency: pages），避免多任务并发覆盖。
    - 生成完整静态网站产物，推送到 gh-pages 分支。

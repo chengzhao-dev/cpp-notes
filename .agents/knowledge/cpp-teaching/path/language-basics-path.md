@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-language-basics-path-v1"
 title: "C++ 语言基础的教学顺序与边界"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "language_basics"
 tags: [cpp, language_basics, types, variables, constants, auto, scope, initialization, curriculum, build_boundary]
 level_range: [0, 4]

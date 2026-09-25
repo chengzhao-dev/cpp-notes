@@ -5,7 +5,7 @@
 跨文档交集恒空 → overlap 恒 0 → 检索侧降权从未生效，且没有任何报错。
 这里用内存 SQLite 和合成注册表跑，不依赖 index_data/，也不写任何产物。
 
-用法：python .agents/skills/python-tools/scripts/test_conflict_detection.py
+用法：python .agents/skills/maintaining-python/scripts/test_conflict_detection.py
 退出码：0 = 断言全过，非 0 = 链路又断了（AssertionError 直接给现场）。
 """
 

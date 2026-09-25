@@ -628,7 +628,7 @@ def main():
     source_paths = sorted(
         p for base in (
             ROOT / "code",
-            ROOT / ".agents" / "skills" / "cpp-content" / "templates" / "projects",
+            ROOT / ".agents" / "skills" / "writing-cpp" / "templates" / "projects",
         )
         if base.is_dir() for p in base.rglob("*")
         if p.is_file() and (p.suffix.lower() in CODE_EXTENSIONS or p.name in CODE_NAMES)

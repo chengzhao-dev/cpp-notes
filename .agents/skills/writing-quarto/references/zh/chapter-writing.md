@@ -71,4 +71,4 @@
 
 ## 收尾
 
-最后说明下一页可以继续使用什么状态。需要领域原因时检索 `run.py kb-search "<查询>" --domain quarto-docs`，不在本文件复制知识正文。
+最后说明下一页可以继续使用什么状态。需要领域原因时检索 `run.py kb-search "<查询>" --domain writing-quarto`，不在本文件复制知识正文。

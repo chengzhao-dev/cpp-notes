@@ -1,7 +1,7 @@
 ---
 kb_id: cpp-retrieval-governance-v1
 title: Agent 资源分层与统一检索协议
-domain: agent-ops
+domain: governing-agents
 subdomain: retrieval
 tags: [skill, knowledge, memory, registry, retrieval, mcp]
 dependencies: []

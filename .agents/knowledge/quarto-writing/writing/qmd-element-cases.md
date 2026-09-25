@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-qmd-element-cases-v1"
 title: "Quarto 教学元素与衔接案例"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "writing"
 tags: [heading_lead, block_punctuation, code_title, code_block, paragraph, filename_density, callout, callout_transition, source_reading, directory_tree, h3_granularity, multi_command_block, subcomment, working_directory, execution_location, diagnosis]
 level_range: [0, 9]
@@ -14,7 +14,7 @@ estimated_tokens: 1300
 
 # Quarto 教学元素与衔接案例
 
-本文件保存标题、代码块、Callout、文件名密度和源码阅读顺序的改写案例。具体格式与硬约束见 `quarto-docs` 对应 reference，本文件只说明为什么这些安排更便于新手理解。
+本文件保存标题、代码块、Callout、文件名密度和源码阅读顺序的改写案例。具体格式与硬约束见 `writing-quarto` 对应 reference，本文件只说明为什么这些安排更便于新手理解。
 
 ## 标题导语与代码块前标点案例
 
@@ -79,7 +79,7 @@ C++ 教学代码块首先要让读者知道“这段能不能直接编译”。�
 
 提示符之后没有必经动作时，可以把稳定界面与符号解释放在同一个末尾 `note`。正文先用检查动作完成交接，Callout 首句直接给出判据，不再从“出现……”重新起句。读者还要据此继续操作时，判据应留在正文。
 
-Callout 只解释新信息，不重复紧邻正文的命令、重启动作或成功判据。类型、标题语法和块级位置见 `quarto-docs` 的 `authoring` reference，小节内的信息分层见 `cpp-quarto-section-focus-density-v1`。
+Callout 只解释新信息，不重复紧邻正文的命令、重启动作或成功判据。类型、标题语法和块级位置见 `writing-quarto` 的 `authoring` reference，小节内的信息分层见 `cpp-quarto-section-focus-density-v1`。
 
 ## 多个源码文件的阅读顺序案例
 

@@ -1,6 +1,6 @@
 # Quarto 基础（Book 项目）
 
-本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的选项语义与失效边界归 `.agents/knowledge/quarto-docs/output/html-output.md`，本项目现行取值归 `rendering-and-output.md`，本文件不复制。
+本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的选项语义与失效边界归 `.agents/knowledge/quarto-writing/output/html-output.md`，本项目现行取值归 `rendering-and-output.md`，本文件不复制。
 
 > 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节
 
@@ -74,8 +74,8 @@ book:
 format:
   html:
     theme:
-      light: [cosmo, .agents/skills/quarto-theme/assets/theme/scss/theme-light.scss]
-      dark: [darkly, .agents/skills/quarto-theme/assets/theme/scss/theme-dark.scss]
+      light: [cosmo, .agents/skills/designing-theme/assets/theme/palettes/github/theme-light.scss]
+      dark: [darkly, .agents/skills/designing-theme/assets/theme/palettes/github/theme-dark.scss]
     # format: html 的其余取值（grid/css/toc/code-*/lang）以 _quarto.yml 与
     # references/quarto/rendering-and-output.md 的现行取值表为准，本文件不复制
 ```
@@ -138,6 +138,6 @@ report_files/        # 依赖资源（图片、CSS、JS）
 
 - 正文结构、代码块/终端约定与文档元素：`authoring.md`
 - 外观配置（toc/theme/grid/code-fold）：`rendering-and-output.md`
-- 发布 GitHub Pages：见 `github-ops` skill
+- 发布 GitHub Pages：见 `shipping-github` skill
 - 渲染/路径/编码坑：本目录 `rendering-and-output.md`（编号索引）
-- 本仓库渲染/预览/缓存等操作细节：**以 `AGENTS.md` 与 `.agents/skills/quarto-theme/assets/theme/css/` 组件 css 为准**（见 SKILL.md 分工说明），本文件不重复承载。
+- 本仓库渲染/预览/缓存等操作细节：**以 `AGENTS.md` 与 `.agents/skills/designing-theme/assets/theme/css/` 组件 css 为准**（见 SKILL.md 分工说明），本文件不重复承载。

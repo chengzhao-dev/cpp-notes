@@ -1,17 +1,17 @@
 # .agents/knowledge/ 知识库
 
-本目录是领域依据的唯一出处：回答「为什么这样配置、为什么这样设计、为什么会失败」。目录名与对应 Skill 一致。
-「skill 与 knowledge 怎么分工」的权威定义在 `.agents/skills/catalog.md`「skill 与 knowledge 的分工」，本文件只引用不复制。
+本目录是领域依据的唯一出处：回答「为什么这样配置、为什么这样设计、为什么会失败」。目录名是名词 kebab 领域名，与对应技能的功能域对应。
+「skill 与 knowledge 怎么分工」的权威定义在 `.agents/skills/governing-agents/references/catalog.md`「skill 与 knowledge 的分工」，本文件只引用不复制。
 
 ## 目录结构
 
 ```text
 .agents/knowledge/
-├── cpp-content/                  # 按 language、memory、toolchain 等性质归档
-├── quarto-docs/                  # 按 writing、rendering、output 等性质归档
-├── quarto-theme/                 # 主题令牌、布局几何与响应式行为
-├── github-ops/                   # Git、CI、Pages 与发布
-└── agent-ops/                    # Agent 运行、重构与维护
+├── agent-workspace/               # Agent 运行、检索治理、上下文与维护（技能：governing-agents）
+├── cpp-teaching/                  # 按 style、toolchain 等性质归档（技能：writing-cpp）
+├── quarto-writing/                # 按 writing、rendering、output 等性质归档（技能：writing-quarto）
+├── visual-theme/                  # 主题令牌、布局几何与响应式行为（技能：designing-theme）
+└── repo-github/                   # Git、CI、Pages 与发布（技能：shipping-github）
 ```
 
 按性质创建子目录，不创建空目录。文件名与目录名一律纯 ASCII。
@@ -24,8 +24,8 @@ frontmatter 字段：
 |---|---|---|
 | `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-pattern-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
-| `domain` | 是 | 检索预过滤维度，取值与 Skill 目录名一致 |
-| `subdomain` | 建议 | 同一 Skill 内的主题筛选 |
+| `domain` | 是 | 检索预过滤维度，取值与对应技能目录名一致 |
+| `subdomain` | 建议 | 同一技能内的主题筛选 |
 | `tags` | 建议 | 行内列表，参与概念图谱连线，也是冲突检测的概念来源之一 |
 | `level_range` | 建议 | 面向读者的难度区间 |
 | `dependencies` | 建议 | 前置知识的 `kb_id` 列表，图谱按它建边 |
@@ -59,21 +59,21 @@ frontmatter 字段：
 ## 索引与验证
 
 ```powershell
-& .agents/skills/agent-ops/scripts/run.ps1 kb-index            # 增量（按 content_hash 跳过未变文件）
-& .agents/skills/agent-ops/scripts/run.ps1 kb-index --rebuild  # 改分词或结构后全量重建
-& .agents/skills/agent-ops/scripts/run.ps1 kb-check            # 格式违规、重复、孤立、断链、P95 延迟
-& .agents/skills/agent-ops/scripts/run.ps1 kb-eval             # Top-5 召回率与注入 Token 预算
-& .agents/skills/agent-ops/scripts/run.ps1 kb-search "<查询>" --domain quarto-docs --explain
+& .agents/skills/governing-agents/scripts/run.ps1 kb-index            # 增量（按 content_hash 跳过未变文件）
+& .agents/skills/governing-agents/scripts/run.ps1 kb-index --rebuild  # 改分词或结构后全量重建
+& .agents/skills/governing-agents/scripts/run.ps1 kb-check            # 格式违规、重复、孤立、断链、P95 延迟
+& .agents/skills/governing-agents/scripts/run.ps1 kb-eval             # Top-5 召回率与注入 Token 预算
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<查询>" --domain writing-quarto --explain
 ```
 
-产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/python-tools/scripts/`：
-`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` FTS5 与图谱索引、
-`retriever.py` 检索与 Parent 回溯、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
+产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/maintaining-python/scripts/`：
+`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` FTS5、向量与图谱索引、
+`retriever.py` 混合检索与 Parent 回溯、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `check --profile knowledge`）。
 
 ## 新增知识的最小闭环
 
 1. 建文件或更新唯一权威 → `kb-index` → `kb-check`（重复与 Parent 超限必须为 0）。
-2. 在 `.agents/skills/python-tools/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
+2. 在 `.agents/skills/maintaining-python/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做和一行 `kb-search` 入口；详细取舍依据留在 knowledge。
-4. 更新 `.agents/skills/catalog.md` 短路由，最后按改动域运行 `run.py check --profile ...`。
+4. 更新 `.agents/skills/governing-agents/references/catalog.md` 短路由，最后按改动域运行 `run.py check --profile ...`。

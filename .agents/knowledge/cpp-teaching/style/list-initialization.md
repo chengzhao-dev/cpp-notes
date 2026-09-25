@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-list-initialization-v1"
 title: "C++ 初始化形式的选择依据"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "style"
 tags: [cpp, initialization, default_initialization, value_initialization, list_initialization, brace_init, narrowing_conversion, copy_initialization, indeterminate_value, auto, cpp11, assignment, teaching_order]
 level_range: [0, 9]

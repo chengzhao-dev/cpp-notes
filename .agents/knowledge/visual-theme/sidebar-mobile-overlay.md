@@ -1,11 +1,11 @@
 ---
 kb_id: "cpp-quarto-sidebar-overlay-v1"
 title: "窄屏左侧栏浮层的可读性"
-domain: "quarto-theme"
+domain: "designing-theme"
 subdomain: "layout"
 tags: [sidebar, mobile, overlay, transparency, scrim, backdrop_filter, breakpoint, z_index, android, readability]
 level_range: [0, 9]
-dependencies: ["cpp-tooling-quarto-render-v2", "quarto-theme-brand-bar-v1"]
+dependencies: ["cpp-tooling-quarto-render-v2", "designing-theme-brand-bar-v1"]
 created: "2026-09-19"
 updated: "2026-09-19"
 chunk_strategy: "semantic_heading"

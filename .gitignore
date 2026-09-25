@@ -16,7 +16,7 @@ a.out
 # Python 缓存与本机运行时配置
 __pycache__/
 *.py[cod]
-/.agents/skills/python-tools/assets/config/runtime.json
+/.agents/skills/maintaining-python/assets/config/runtime.json
 
 # 编辑器与操作系统临时文件
 /.vscode/

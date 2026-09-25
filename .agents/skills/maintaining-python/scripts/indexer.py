@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""知识库索引构建器：从 chunk_registry.json 增量构建 FTS5 与知识图谱。
+"""知识库索引构建器：从 chunk_registry.json 增量构建 FTS5、向量与知识图谱。
 
-为什么用 SQLite 而不是 FAISS / Tantivy：本机没有第三方包，且知识库要能在 CI 与
-WSL 之间用同一个文件跑。SQLite 自带 FTS5 与 bm25()，单文件、支持增量删改，
-把「装不上的依赖」换成「已经存在的依赖」。
+为什么用 SQLite 而不是 FAISS / Tantivy：知识库要能在 CI 与 WSL 之间用同一个文件跑。
+SQLite 自带 FTS5 与 bm25()；向量走 sqlite-vec 扩展（同一库文件、vec0 虚表），
+把「再装一个向量库」换成「已存在的 SQLite 进程内扩展」。
 
-检索由两层互补：
+检索由三层互补（retriever.py 按 RRF 融合）：
   FTS5：CJK 二元组与 ASCII 标识符，bm25() 负责精确召回。
+  向量：sqlite-vec + MiniLM 多语模型，补充同义与改写类查询。
   图谱：concept / edge / community 三张表，补充符号与概念关联。
 
 增量策略：以 content_hash 为准，未变的 Chunk 不重建 FTS 行。
 删除的文件与消失的 Chunk 标 deprecated 而不是物理删除，支持回溯。
 
 用法：
-    python .agents/skills/python-tools/scripts/indexer.py              # 增量构建（先跑 chunker）
-    python .agents/skills/python-tools/scripts/indexer.py --rebuild    # 推倒重建
-    python .agents/skills/python-tools/scripts/indexer.py --verbose    # 打印每层的行数与耗时
+    python .agents/skills/maintaining-python/scripts/indexer.py              # 增量构建（先跑 chunker）
+    python .agents/skills/maintaining-python/scripts/indexer.py --rebuild    # 推倒重建
+    python .agents/skills/maintaining-python/scripts/indexer.py --verbose    # 打印每层的行数与耗时
 退出码：0 = 成功，1 = 注册表缺失或有文件不符合规范。
 """
 
@@ -93,6 +94,13 @@ SCHEMA = (
         tokenize = 'unicode61 remove_diacritics 2'
     );
     """,
+)
+
+# vec0 表在 connect() 里动态建（需要先加载 sqlite-vec 扩展），列维度来自 kb.EMBED_DIM。
+VEC_SCHEMA = (
+    "CREATE VIRTUAL TABLE IF NOT EXISTS " + kb.VEC_TABLE + " USING vec0("
+    " chunk_id TEXT PRIMARY KEY, embedding float[" + str(kb.EMBED_DIM) + "]"
+    ");"
 )
 
 
@@ -334,7 +342,7 @@ def doc_concepts(registry: dict) -> dict:
     """文档级概念集合：frontmatter tags ∪ 代码片段里的严格标识符。
 
     刻意不用 graph_nodes()：后者把正文里所有 ASCII 串都当标识符，于是
-    `.agents/skills/quarto-docs/references/…` 贡献 `references`、`GitHub Pages`
+    `.agents/skills/writing-quarto/references/…` 贡献 `references`、`GitHub Pages`
     贡献 `github`，四份 tooling 文档靠这类路径碎片「共享概念」，重合度全是噪声。
     这里只认反引号片段内的完整标识符（3–64 字符、允许下划线），加上人工维护的 tags。
     """

@@ -8,8 +8,8 @@
 16px 仍可辨的实心字形（少用细描边）、圆角容器、明暗自适应。
 
 用法：
-    python .agents/skills/python-tools/scripts/maintenance/generate_favicon.py              # 写 .agents/skills/quarto-theme/assets/theme/assets/favicon.svg
-    python .agents/skills/python-tools/scripts/maintenance/generate_favicon.py --preview d  # 另存 16/32/256 预览 PNG 到目录 d
+    python .agents/skills/maintaining-python/scripts/maintenance/generate_favicon.py              # 写 .agents/skills/designing-theme/assets/theme/assets/favicon.svg
+    python .agents/skills/maintaining-python/scripts/maintenance/generate_favicon.py --preview d  # 另存 16/32/256 预览 PNG 到目录 d
 
 说明：_quarto.yml 的 book.favicon 只接受单个文件，现代浏览器（含 Safari 15+）
 支持 SVG favicon，故不附带 ICO——避免发布无人引用的产物。
@@ -258,7 +258,7 @@ def main():
     )
     args = parser.parse_args()
 
-    out = Path(".agents/skills/quarto-theme/assets/theme/assets")
+    out = Path(".agents/skills/designing-theme/assets/theme/assets")
     out.mkdir(parents=True, exist_ok=True)
     target = out / "favicon.svg"
     target.write_text(svg_text(), encoding="utf-8", newline="\n")

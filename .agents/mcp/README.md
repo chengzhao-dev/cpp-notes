@@ -49,7 +49,7 @@ skills 和知识库中的命令由统一入口执行。MCP 宿主配置使用根
 ## 资源
 
 - `project://structure`：当前允许访问的项目结构。
-- `project://skills`：`.agents/skills/catalog.md`。
+- `project://skills`：`.agents/skills/governing-agents/references/catalog.md`。
 - `project://agent`：`.agents/mcp/README.md` 和能力边界。
 
 ## 安全边界

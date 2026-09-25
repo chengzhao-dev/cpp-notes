@@ -25,7 +25,7 @@
      普通 sourceCode 代码块。浏览器加载脚本后由占位符转换为 SVG。
   C6 代码主题稳定性：源 CSS 必须使用统一代码字体，不得保留按 Bash/PowerShell
       命令 token 强制改色的旧选择器。普通文本代码块不得带语言 token。
-  C7 代码块视觉契约：普通文本代码块与语言代码块必须共用 GitHub 代码背景、边框、
+  C7 代码块视觉契约：普通文本代码块与语言代码块必须共用代码背景、边框、
       字体和布局令牌，避免两套代码块样式分叉。
   C8 代码来源标题：QMD 代码块必须由 .code-with-filename 包裹，且主题必须提供
       标题背景、文字和间距令牌。标题条不能退化为普通代码块。
@@ -160,29 +160,82 @@ def hidden_selectors(block_css, needle):
     return hits
 
 
+def parse_highlight_styles(quarto_text):
+    """从 _quarto.yml 解析 highlight-style.light / .dark。"""
+    block = re.search(
+        r"highlight-style:\s*\n((?:[ \t]+.+\n)+)",
+        quarto_text,
+    )
+    if not block:
+        return None, None
+    body = block.group(1)
+    light = re.search(r"light:\s*(\S+)", body)
+    dark = re.search(r"dark:\s*(\S+)", body)
+    return (
+        light.group(1) if light else None,
+        dark.group(1) if dark else None,
+    )
+
+
+def parse_active_palette(quarto_text):
+    """从 css 列表解析 palettes/<name>/tokens.css。"""
+    match = re.search(r"palettes/([A-Za-z0-9_-]+)/tokens\.css", quarto_text)
+    return match.group(1) if match else None
+
+
+def parse_palette_meta_highlights(meta_text):
+    """从 palette meta.md 表格读取期望的 highlight 主题名。"""
+    light = re.search(r"highlight light\s*\|\s*`([^`]+)`", meta_text)
+    dark = re.search(r"highlight dark\s*\|\s*`([^`]+)`", meta_text)
+    return (
+        light.group(1) if light else None,
+        dark.group(1) if dark else None,
+    )
+
+
 def check_contracts(book_dir, htmls, css_pairs):
     """跑完全部契约，返回 [(id, 名称, ok, 摘要, [细节行])]。"""
     results = []
+    root = Path(__file__).resolve().parents[4]
 
-    # ---------- C0 GitHub 主题配置 ----------
-    quarto = (Path(__file__).resolve().parents[4] / "_quarto.yml")
+    # ---------- C0 活跃 palette 与高亮主题一致 ----------
+    quarto = root / "_quarto.yml"
     try:
         quarto_text = quarto.read_text(encoding="utf-8")
     except OSError:
         quarto_text = ""
-    c0 = (
-        "light: github-light" in quarto_text
-        and "dark: github-dark" in quarto_text
-        and "one-dark" not in quarto_text.lower()
-        and "custom.theme" not in quarto_text.lower()
+    light_hl, dark_hl = parse_highlight_styles(quarto_text)
+    palette = parse_active_palette(quarto_text)
+    meta_path = (
+        root
+        / ".agents/skills/designing-theme/assets/theme/palettes"
+        / (palette or "_missing_")
+        / "meta.md"
+    )
+    try:
+        meta_text = meta_path.read_text(encoding="utf-8") if meta_path.is_file() else ""
+    except OSError:
+        meta_text = ""
+    expect_light, expect_dark = parse_palette_meta_highlights(meta_text)
+    no_custom = "custom.theme" not in quarto_text.lower()
+    c0 = bool(
+        palette
+        and light_hl
+        and dark_hl
+        and expect_light
+        and expect_dark
+        and light_hl == expect_light
+        and dark_hl == expect_dark
+        and no_custom
     )
     results.append((
-        "C0", "仅使用 GitHub Light / GitHub Dark 高亮主题", c0,
-        "github-light=%s，github-dark=%s，未发现 One Dark/自定义主题=%s" % (
-            "light: github-light" in quarto_text,
-            "dark: github-dark" in quarto_text,
-            "one-dark" not in quarto_text.lower() and "custom.theme" not in quarto_text.lower()),
-        ["_quarto.yml 只保留 highlight-style.light=github-light 和 dark=github-dark"],
+        "C0", "活跃 palette 与 highlight-style 一致", c0,
+        "palette=%s，light=%s（期望 %s），dark=%s（期望 %s），无 custom.theme=%s" % (
+            palette, light_hl, expect_light, dark_hl, expect_dark, no_custom),
+        [
+            "_quarto.yml 的 palettes/<name>/tokens.css 须与同 pack meta.md 的 highlight 映射一致",
+            "禁止 custom.theme；换色板时同步改 theme SCSS、palette tokens 与 highlight-style",
+        ],
     ))
 
     # ---------- C1 复制按钮可见性 ----------
@@ -260,8 +313,8 @@ def check_contracts(book_dir, htmls, css_pairs):
             summary += " …"
     results.append((
         "C4", "站点图标已注入并发布", c4, summary,
-        ["每页 <head> 需 <link rel=\"icon\" … favicon.svg>；源文件见 .agents/skills/quarto-theme/assets/theme/assets/favicon.svg，"
-         "由 .agents/skills/python-tools/scripts/maintenance/generate_favicon.py 生成"],
+        ["每页 <head> 需 <link rel=\"icon\" … favicon.svg>；源文件见 .agents/skills/designing-theme/assets/theme/assets/favicon.svg，"
+         "由 .agents/skills/maintaining-python/scripts/maintenance/generate_favicon.py 生成"],
     ))
 
     # ---------- C5 Mermaid ----------
@@ -325,9 +378,9 @@ def check_contracts(book_dir, htmls, css_pairs):
     summary = "统一字体=%s，左对齐=%s，旧命令着色选择器=%d，普通文本代码块语言类=%d" % (
         has_font, has_left_align, len(stale_selectors), len(legacy_output_pages))
     results.append((
-        "C6", "GitHub 代码主题与 token 样式稳定", c6, summary,
+        "C6", "代码主题与 token 样式稳定", c6, summary,
         [
-            "亮色/暗色应由 _quarto.yml 的 github-light/github-dark 提供",
+            "亮色/暗色应由 _quarto.yml 的 highlight-style（与活跃 palette meta 一致）提供",
             "代码 CSS 应统一使用 --mono-font，不按 Bash/PowerShell 命令 token 强制改色",
             "普通文本代码块应保持左对齐并保留终端输出的空格",
             "普通文本代码块不应带 sourceCode、bash、powershell 或 hljs 类",
@@ -335,9 +388,15 @@ def check_contracts(book_dir, htmls, css_pairs):
     ))
 
     # ---------- C7 普通文本代码块与语言代码块的视觉契约 ----------
+    theme_root = root / ".agents/skills/designing-theme/assets/theme"
+    source_css_paths = list(theme_root.glob("css/*.css"))
+    if palette:
+        pack_tokens = theme_root / "palettes" / palette / "tokens.css"
+        if pack_tokens.is_file():
+            source_css_paths.append(pack_tokens)
     source_css_text = "\n".join(
         path.read_text(encoding="utf-8", errors="ignore")
-        for path in sorted(Path(__file__).resolve().parents[4].glob(".agents/skills/quarto-theme/assets/theme/css/*.css"))
+        for path in sorted(source_css_paths)
     )
     shared_selectors = (
         "pre.sourceCode,\npre:not(.sourceCode)" in source_css_text
@@ -349,11 +408,11 @@ def check_contracts(book_dir, htmls, css_pairs):
     ))
     c7 = shared_selectors and shared_tokens
     results.append((
-        "C7", "普通文本代码块与 GitHub 代码块共享视觉令牌", c7,
+        "C7", "普通文本代码块与语言代码块共享视觉令牌", c7,
         "共享选择器=%s，代码令牌=%s" % (shared_selectors, shared_tokens),
         [
-            ".agents/skills/quarto-theme/assets/theme/css/code.css 应让 pre.sourceCode、pre:not(.sourceCode) 与 div.sourceCode 共用布局",
-            "背景、边框、字体、字号、行高和内边距应引用 .agents/skills/quarto-theme/assets/theme/css/tokens.css 的代码令牌",
+            ".agents/skills/designing-theme/assets/theme/css/code.css 应让 pre.sourceCode、pre:not(.sourceCode) 与 div.sourceCode 共用布局",
+            "背景、边框、字体、字号、行高和内边距应引用共享 tokens 与活跃 palette 的代码令牌",
         ],
     ))
 

@@ -1,7 +1,7 @@
 ---
 kb_id: "quarto-practice-page-pattern-v1"
 title: "工程应用分册的页面分层"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "writing"
 created: "2026-09-16"
 updated: "2026-09-16"

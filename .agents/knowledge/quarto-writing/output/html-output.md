@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-quarto-html-v2"
 title: "Quarto HTML 输出选项与生效边界"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "html_output"
 tags: [quarto, html, toc, theme, grid, syntax_highlight, code_fold, navigation]
 level_range: [0, 9]

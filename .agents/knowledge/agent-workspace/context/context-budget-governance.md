@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-agent-context-budget-v1"
 title: "内容增量与上下文预算治理"
-domain: "agent-ops"
+domain: "governing-agents"
 subdomain: "agent_runtime"
 tags: [context_budget, token_budget, qmd, skill, knowledge, page_split, include, progressive_disclosure]
 level_range: [0, 9]

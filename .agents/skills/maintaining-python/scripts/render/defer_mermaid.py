@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """渲染后为 mermaid 脚本标签添加 defer，避免阻塞首屏。
 
-用法：python .agents/skills/python-tools/scripts/render/defer_mermaid.py [_book]
+用法：python .agents/skills/maintaining-python/scripts/render/defer_mermaid.py [_book]
 退出码：0。
 """
 

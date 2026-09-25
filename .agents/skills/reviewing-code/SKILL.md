@@ -1,11 +1,11 @@
 ---
-name: code-review
+name: reviewing-code
 description: 采用 Defect-First 原则对 C++ 示例代码与 Quarto 文档进行只读审查，输出可操作缺陷列表。
 metadata:
   short-description: 只读审查 C++ 代码与文档缺陷
 ---
 
-# Skill: code-review
+# Skill: reviewing-code
 
 对提交、改动或指定文件做只读缺陷审查，只报有实质影响的缺陷，不提主观风格琐碎意见。
 

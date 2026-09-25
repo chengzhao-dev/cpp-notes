@@ -1,6 +1,6 @@
 # C++ 语言基础教学顺序
 
-本文件只规定 `language-basics` 的页面边界、示例递进和后续顺序。基础类型的标准语义与设计原因见 `primitive-types-and-numeric-safety.md` 及知识条目 `cpp-primitive-types-numeric-safety-v1`；页面骨架遵循 `quarto-docs`。
+本文件只规定 `language-basics` 的页面边界、示例递进和后续顺序。基础类型的标准语义与设计原因见 `primitive-types-and-numeric-safety.md` 及知识条目 `cpp-primitive-types-numeric-safety-v1`；页面骨架遵循 `writing-quarto`。
 
 ## 基础类型与变量
 

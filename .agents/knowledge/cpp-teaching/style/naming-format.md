@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-naming-format-v1"
 title: "C++ 命名与格式化决策依据"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "style"
 tags: [cpp, naming, format, clang_format, clang_tidy, google, qt, webkit, llvm, lower_camel, pascal_case, include_order, header_order]
 level_range: [0, 9]

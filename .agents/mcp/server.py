@@ -168,7 +168,7 @@ def run_command(args: list[str], timeout: int = 120) -> dict[str, Any]:
 def run_agent(*args: str, timeout: int = 120) -> dict[str, Any]:
     if not PYTHON:
         return {"exitCode": 127, "output": "config.toml python is missing"}
-    return run_command([PYTHON, str(ROOT / ".agents/skills/agent-ops/scripts/run.py"), *args], timeout)
+    return run_command([PYTHON, str(ROOT / ".agents/skills/governing-agents/scripts/run.py"), *args], timeout)
 
 
 def validate_python() -> None:
@@ -252,7 +252,7 @@ TOOLS = [
     },
     {
         "name": "project_scope",
-        "description": "Resolve the repository's minimal task scope using .agents/skills/agent-ops/scripts/run.py.",
+        "description": "Resolve the repository's minimal task scope using .agents/skills/governing-agents/scripts/run.py.",
         "inputSchema": {"type": "object", "required": ["target"], "properties": {"target": {"type": "string"}}},
         "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     },
@@ -381,7 +381,7 @@ def handle_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
             raise MCPError("query must be a non-empty string")
         top_k = min(int(args.get("topK", 5)), 20)
         budget = min(int(args.get("tokenBudget", 4000)), 6000)
-        command = [PYTHON, str(ROOT / ".agents/skills/python-tools/scripts/unified_retrieval.py"),
+        command = [PYTHON, str(ROOT / ".agents/skills/maintaining-python/scripts/unified_retrieval.py"),
                    query, "--top-k", str(top_k), "--budget", str(budget)]
         if args.get("domain"):
             command.extend(["--domain", str(args["domain"])])
@@ -446,7 +446,7 @@ def resource_text(uri: str) -> str:
             paths.append(path.name + ("/" if path.is_dir() else ""))
         return "\n".join(paths) + "\n"
     if uri == "project://skills":
-        return read_text(".agents/skills/catalog.md")
+        return read_text(".agents/skills/governing-agents/references/catalog.md")
     if uri == "project://agent":
         return read_text(".agents/mcp/README.md")
     raise MCPError(f"unknown resource: {uri}")

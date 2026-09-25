@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-chapter-pattern-v1"
 title: "教学正文的页面块序列与职责边界"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "page_pattern"
 tags: [page, block, sequence, preface, task, granularity, recap, self_test, answer_disclosure, heading_hierarchy, h3_granularity, beginner_scan, landing, card, index, readme, troubleshooting, diagnosis, validation]
 level_range: [0, 9]
@@ -86,7 +86,7 @@ estimated_tokens: 2600
 - 自测问题服务刚跑通主线、需要确认理解的读者：每章保留 0–7 道高价值“为什么”问题，答案就地折叠；没有高价值问题时不添加。
 - 本章回顾服务已经成功的读者：总结获得的能力并给出下一入口。
 
-常见错误与回顾服务不同状态的读者，因此顺序不能互换。具体故障结构和回顾格式归 `quarto-docs` 的章节写作 reference。
+常见错误与回顾服务不同状态的读者，因此顺序不能互换。具体故障结构和回顾格式归 `writing-quarto` 的章节写作 reference。
 
 ## 自测答案为什么就地折叠
 
@@ -94,7 +94,7 @@ estimated_tokens: 2600
 
 答案紧跟问题，是为了让读者在核对时同时看到条件和结论，不必在章末寻找对应关系。答案集中到单独区域后，问题与解释会形成两套编号或两跳导航，自测就退化成答案列表。
 
-答案采用原生折叠语义，不依赖脚本模拟可访问交互，也不会作为 `##` 标题进入右侧目录。固定摘要让每个问题都使用一致的自测入口。正文仍只使用本章已经讲过的概念。需要引入新知识时，应改写成正文任务或后续章节内容。具体组件写法见 `quarto-docs` 的 `authoring` reference，本文件只解释为什么。
+答案采用原生折叠语义，不依赖脚本模拟可访问交互，也不会作为 `##` 标题进入右侧目录。固定摘要让每个问题都使用一致的自测入口。正文仍只使用本章已经讲过的概念。需要引入新知识时，应改写成正文任务或后续章节内容。具体组件写法见 `writing-quarto` 的 `authoring` reference，本文件只解释为什么。
 
 ### 列表型答案为什么先写导语
 

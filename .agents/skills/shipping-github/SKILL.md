@@ -1,11 +1,11 @@
 ---
-name: github-ops
+name: shipping-github
 description: GitHub 仓库操作与发布。涉及 git、gh CLI、Pages、Actions、PR/Issue 时使用。默认中文。
 metadata:
   short-description: Git 操作、Pages 发布与 CI
 ---
 
-# Skill: github-ops
+# Skill: shipping-github
 
 管 git 工作流、Pages 发布与 CI 操作清单。配置成因与平台限制从知识库检索。Book 产物目录 `_book/`。
 
@@ -33,9 +33,9 @@ metadata:
 
 ## 工作流程
 
-1. 先跑 `& .agents/skills/agent-ops/scripts/run.ps1 status --all` 看清工作区，确认不覆盖他人改动。
+1. 先跑 `& .agents/skills/governing-agents/scripts/run.ps1 status --all` 看清工作区，确认不覆盖他人改动。
 2. 按路由读取对应 reference，再执行操作。
-3. 提交信息使用中文分类前缀（如“文档：”“修复：”“维护：”）说明动机与影响，一次提交只做一件事。整句保持中文，仅在没有合适中文译名时保留技术标识。
+3. 提交信息使用 Conventional Commits 前缀 `type(scope): 中文说明`（如 `docs: 术语表补充`、`refactor(agents): 索引目录并入 config.toml`）说明动机与影响，一次提交只做一件事。`type`/`scope` 用小写英文，说明用简洁中文，仅在没有合适中文译名时保留技术标识。
 4. 推 `main` 触发 `.github/workflows/pages.yml` 部署。PR 触发 `render-check.yml` 跑渲染与示例校验。
 
 ## 完成判据

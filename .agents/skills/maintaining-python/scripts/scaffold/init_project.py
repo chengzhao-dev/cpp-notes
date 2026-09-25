@@ -12,7 +12,7 @@
   auto    目标在仓库 code/ 下 -> single，否则 -> simple。
 
 标准用法（使用仓库配置的 Python 3.12）：
-  python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+  python .agents/skills/maintaining-python/scripts/scaffold/init_project.py `
     --name cmake-project `
     --dir code/getting-started `
     --layout single
@@ -21,14 +21,14 @@
   bash build-and-run.sh
 
 仓库根目录已配置好 Python 时，也可以使用：
-  python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+  python .agents/skills/maintaining-python/scripts/scaffold/init_project.py `
     --name multi-file-project --dir code/getting-started --layout multi
 
 库工程示例：
-  python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+  python .agents/skills/maintaining-python/scripts/scaffold/init_project.py `
     --name static-library --dir code/getting-started --layout static-library
 
-用法：python .agents/skills/python-tools/scripts/scaffold/init_project.py `
+用法：python .agents/skills/maintaining-python/scripts/scaffold/init_project.py `
   --name <name> [--dir code/<part>] [--layout single|multi|static-library|shared-library]
 退出码：0 成功，1 参数/路径错误。
 """
@@ -56,10 +56,10 @@ LIBRARY_LAYOUTS = {"static-library", "shared-library"}
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[4]
 CPP_CONFIG_DIR = (
-    REPO_ROOT / ".agents" / "skills" / "cpp-content" / "assets" / "config"
+    REPO_ROOT / ".agents" / "skills" / "writing-cpp" / "assets" / "config"
 )
 PROJECT_TEMPLATE_DIR = (
-    REPO_ROOT / ".agents" / "skills" / "cpp-content" / "templates" / "projects"
+    REPO_ROOT / ".agents" / "skills" / "writing-cpp" / "templates" / "projects"
 )
 
 
@@ -119,7 +119,7 @@ def readme_text(name, layout):
             "",
             "```bash",
             "# 验证 C++ 示例",
-            "$ & .agents/skills/agent-ops/scripts/run.ps1 verify",
+            "$ & .agents/skills/governing-agents/scripts/run.ps1 verify",
             "```",
         ]
     elif layout in LIBRARY_LAYOUTS:

@@ -1,7 +1,7 @@
 # C++ 代码风格
 
 > Google 排版与 include 顺序 · 项目小驼峰命名 · C++20 · 2 空格缩进
-> 配置源见 `.agents/skills/cpp-content/assets/config/`
+> 配置源见 `.agents/skills/writing-cpp/assets/config/`
 
 ## 命名
 
@@ -41,26 +41,26 @@ Qt、WebKit 常用的小驼峰。Google 原规则对函数使用大驼峰，对�
 
 ## 工具
 
-正文中的工具名、命令、参数、路径和标识符按 `quarto-docs` 的行内代码规则统一标记。不要只给部分工具加反引号。
+正文中的工具名、命令、参数、路径和标识符按 `writing-quarto` 的行内代码规则统一标记。不要只给部分工具加反引号。
 
 编译并运行完整 C++ 示例：
 
 ```bash
 # 校验 code/ 下全部 C++ 示例
-& .agents/skills/agent-ops/scripts/run.ps1 verify
+& .agents/skills/governing-agents/scripts/run.ps1 verify
 ```
 
 检查 C++ 格式：
 
 ```bash
 # 追加 clang-format 与 clang-tidy 检查
-& .agents/skills/agent-ops/scripts/run.ps1 verify --style
+& .agents/skills/governing-agents/scripts/run.ps1 verify --style
 ```
 
-clang 配置源位于 `.agents/skills/cpp-content/assets/config/`，由 `.agents/skills/python-tools/scripts/scaffold/init_project.py` 复制到独立工程根目录。
-`single` 与 `multi` 工程模板位于 `.agents/skills/cpp-content/templates/projects/`，示例工程应与模板结构保持一致。
+clang 配置源位于 `.agents/skills/writing-cpp/assets/config/`，由 `.agents/skills/maintaining-python/scripts/scaffold/init_project.py` 复制到独立工程根目录。
+`single` 与 `multi` 工程模板位于 `.agents/skills/writing-cpp/templates/projects/`，示例工程应与模板结构保持一致。
 
-Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `& .agents/skills/agent-ops/scripts/run.ps1 verify`。单章节构建使用 `& .agents/skills/agent-ops/scripts/run.ps1 build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
+Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `& .agents/skills/governing-agents/scripts/run.ps1 verify`。单章节构建使用 `& .agents/skills/governing-agents/scripts/run.ps1 build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
 
 ## 示例
 
@@ -72,7 +72,7 @@ Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一
 
 ## 源码注释合同
 
-`code/**` 与 `cpp-content/templates/projects/**` 中的完整 `.h`、`.cpp`、`.sh` 和
+`code/**` 与 `writing-cpp/templates/projects/**` 中的完整 `.h`、`.cpp`、`.sh` 和
 `CMakeLists.txt` 使用“用途 + 重点”注释。首个有效行必须用语言原生注释说明文件职责。
 Shell 首行是 shebang 时，用途注释紧随其后。文件要能脱离正文独立读懂，但不逐行翻译代码。
 
@@ -85,7 +85,7 @@ Shell 首行是 shebang 时，用途注释紧随其后。文件要能脱离正�
 - 讲 `vector` 时只注释 `std::vector`、元素访问和迭代器等当前学习重点，不重复解释
   `iostream` 或 `std::cout`。CMake 命令和变量优先采用 CMake 官方中文文档术语。
 
-inline `cpp`、`bash`、`powershell` 和 `cmake` 代码块仍按 `quarto-docs` 的
+inline `cpp`、`bash`、`powershell` 和 `cmake` 代码块仍按 `writing-quarto` 的
 `terminal-validation.md` 控制总注释与子注释，不为满足文件合同机械增加注释。
 `{{< include /code/... >}}` 引用的真实文件则按本节的独立阅读标准维护。注释只解释学习重点，
 不引入正文尚未出现的比较对象。复杂原理、参数边界和背景放到正文或标识

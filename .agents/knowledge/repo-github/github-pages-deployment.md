@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-pages-deploy-v1"
 title: "GitHub Pages 部署方式与产物分支策略"
-domain: "github-ops"
+domain: "shipping-github"
 subdomain: "publishing"
 tags: [github_pages, deployment, artifact_branch, permissions, workflow, site_url]
 level_range: [0, 9]
@@ -15,7 +15,7 @@ estimated_tokens: 1500
 # GitHub Pages 部署方式与产物分支策略
 
 > 本文件记录站点发布环节的实际行为与取舍依据，是这块领域知识的唯一出处。
-> 可执行清单与本仓库现行工作流位置由 skill 侧 `github-ops/references/github-pages.md` 承载，不在此重复。
+> 可执行清单与本仓库现行工作流位置由 skill 侧 `shipping-github/references/github-pages.md` 承载，不在此重复。
 
 ## 部署源的类型与边界
 

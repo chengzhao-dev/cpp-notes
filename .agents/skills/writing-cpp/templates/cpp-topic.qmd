@@ -2,7 +2,7 @@
 title: "章节标题"
 ---
 
-（为什么开始 + 读者读完能做什么，1–2 段自然说明。不要重复后续任务的前置条件、命令和完成结果。体量预算见 `.agents/skills/agent-ops/references/repository-structure.md`。）
+（为什么开始 + 读者读完能做什么，1–2 段自然说明。不要重复后续任务的前置条件、命令和完成结果。体量预算见 `.agents/skills/governing-agents/references/repository-structure.md`。）
 
 ## 第一个任务
 

@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-quarto-render-v2"
 title: "Quarto 渲染行为与失效模式"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "rendering"
 tags: [quarto, render, yaml, callout, include, encoding, troubleshooting, grid_width, reading_width, gutter, viewport_target, sidebar_width, margin_width, sidebar_collapse, collapse_level, text_wrap, code_block_border, code_title, filename, toc_indent, typography, line_height, font_stack, webfont_subset, fixel_text, lxgw_wenkai_screen, lxgw_bright_code, monaspace_argon, code_followup_gap, reference_sites, homepage_hero, marketing_layout]
 level_range: [0, 9]
@@ -14,7 +14,7 @@ estimated_tokens: 2500
 
 # Quarto 渲染行为与失效模式
 
-> 本文件是 Quarto 配置生效边界与页面几何行为的唯一出处。写作侧怎么做见 `quarto-docs` 的 reference，`_quarto.yml` 的现行取值见 `references/quarto/rendering-and-output.md`。
+> 本文件是 Quarto 配置生效边界与页面几何行为的唯一出处。写作侧怎么做见 `writing-quarto` 的 reference，`_quarto.yml` 的现行取值见 `references/quarto/rendering-and-output.md`。
 
 ## 配置与产物
 
@@ -50,7 +50,7 @@ Book 的 sidebar 选项写在 `book:` 键下，不是 `website:`；Book 与 Webs
 
 正文的拉丁字符使用 Fixel Text 的 500/600/700，界面中文使用 `LXGW WenKai Screen`，代码使用 `LXGW Bright Code`。三者均为 SIL OFL 1.1，适合自托管的个人和商业项目。中文与代码字体各使用一个常用字符集 WOFF2，覆盖当前公开内容和一级常用汉字。每个包只有一个请求，单页最多请求 5 个字体文件，体积预算为 1.6 MB。Bright Code 的拉丁部分来自 Monaspace Argon，中文部分来自霞鹜文楷。代码栈保留 `LXGW WenKai Screen` 作为缺字回退，避免扩展区字符或下载失败时掉到系统衬线字体。
 
-参考站点承担不同任务：Quarto 教程在 1280px 下正文约 616px，采用 17px / 1.5。GitHub Markdown 约 823px，采用 16px / 1.5。gitcn 的主内容区约 1024px，但说明文字会缩到约 672px。根首页的文字密度和卡片布局服务于快速浏览，不能直接当作连续正文的基准。教程正文保留 16px / 1.65，并把上限收至 800px，兼顾中文字形、代码宽度与连续阅读。
+参考站点承担不同任务：Quarto 教程在 1280px 下正文约 616px，采用 17px / 1.5。GitHub Markdown 约 823px，采用 16px / 1.5。gitcn 的主内容区约 1024px，但说明文字会缩到约 672px。根首页的文字密度和卡片布局服务于快速浏览，不能直接当作连续正文的基准。教程正文保留 16px / 1.75（2026-09 自 1.65 上调，CJK 行高舒适带），并把上限收至 800px，兼顾中文字形、代码宽度与连续阅读。
 
 ## 列表内代码块后的结果间距
 

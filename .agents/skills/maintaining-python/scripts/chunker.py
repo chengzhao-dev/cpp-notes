@@ -14,10 +14,10 @@ Parent 不注入前缀，因为它本身就带标题。只有标题没有正文�
 而不是随「库有多大」增长。
 
 用法：
-    python .agents/skills/python-tools/scripts/chunker.py               # 增量：只重切变更文件
-    python .agents/skills/python-tools/scripts/chunker.py --all         # 忽略哈希，强制全量重切
-    python .agents/skills/python-tools/scripts/chunker.py --verbose      # 逐篇打印 Parent/Child 数量
-    python .agents/skills/python-tools/scripts/chunker.py --show         # 打印每篇的 Child 标题路径与令牌数
+    python .agents/skills/maintaining-python/scripts/chunker.py               # 增量：只重切变更文件
+    python .agents/skills/maintaining-python/scripts/chunker.py --all         # 忽略哈希，强制全量重切
+    python .agents/skills/maintaining-python/scripts/chunker.py --verbose      # 逐篇打印 Parent/Child 数量
+    python .agents/skills/maintaining-python/scripts/chunker.py --show         # 打印每篇的 Child 标题路径与令牌数
 退出码：0 = 成功，1 = 有文件不符合规范（缺字段、无 ## 段落）。
 """
 

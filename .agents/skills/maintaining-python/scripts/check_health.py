@@ -14,9 +14,9 @@
 | 陈旧条目 | 0 | 源码 hash 变了但索引还是旧的，说明增量没跑 |
 
 用法：
-    python .agents/skills/python-tools/scripts/check_health.py            # 体检（有告警时退出码 1）
-    python .agents/skills/python-tools/scripts/check_health.py --gate     # 给 run.py check 用：只在 FAIL 时非 0
-    python .agents/skills/python-tools/scripts/check_health.py --verbose   # 打印每条超阈值项的具体位置
+    python .agents/skills/maintaining-python/scripts/check_health.py            # 体检（有告警时退出码 1）
+    python .agents/skills/maintaining-python/scripts/check_health.py --gate     # 给 run.py check 用：只在 FAIL 时非 0
+    python .agents/skills/maintaining-python/scripts/check_health.py --verbose   # 打印每条超阈值项的具体位置
 退出码：0 = 全部达标（或 --gate 下无 FAIL），1 = 有 WARN/FAIL。
 """
 

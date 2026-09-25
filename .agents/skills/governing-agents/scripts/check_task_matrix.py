@@ -28,8 +28,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
-TASKS = ROOT / ".agents" / "skills" / "cpp-content" / "references" / "tasks"
-SCOPE = ROOT / ".agents" / "skills" / "agent-ops" / "scripts" / "scope.py"
+TASKS = ROOT / ".agents" / "skills" / "writing-cpp" / "references" / "tasks"
+SCOPE = ROOT / ".agents" / "skills" / "governing-agents" / "scripts" / "scope.py"
 HEADER = "| ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |"
 PREFIX = {
     "ENV": "getting-started", "LANG": "language-basics", "STD": "standard-library",

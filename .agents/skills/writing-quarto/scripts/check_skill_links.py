@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """检查所有 skills 的内部链接是否可解析。
 
-覆盖范围：.agents/skills/catalog.md、各 SKILL.md、references/**/*.md 和 templates/*.qmd。
+覆盖范围：.agents/skills/governing-agents/references/catalog.md、各 SKILL.md、references/**/*.md 和 templates/*.qmd。
 校验的链接形态：
   - <skill>/references/...、<skill>/templates/...（skills 根相对路径，catalog.md 用这种跨 skill 指路）
   - references/...、templates/...（skill 根相对路径）
@@ -35,11 +35,14 @@ VALID_EXT_RE = re.compile(r"\.(md|qmd|py)$")
 
 
 def collect_files(skills_root):
-    """待扫文件：catalog.md（skill 与 reference 的总路由表）+ 各 skill 的 SKILL.md/references/templates。"""
+    """待扫文件：catalog.md（skill 与 reference 的总路由表，已迁入 governing-agents/references/）+ 各 skill 的 SKILL.md/references/templates。"""
     files = []
-    catalog = os.path.join(skills_root, "catalog.md")
-    if os.path.isfile(catalog):
-        files.append(catalog)
+    for catalog in (
+        os.path.join(skills_root, "governing-agents", "references", "catalog.md"),
+        os.path.join(skills_root, "catalog.md"),  # 兼容旧位置
+    ):
+        if os.path.isfile(catalog):
+            files.append(catalog)
     for name in sorted(os.listdir(skills_root)):
         skill_dir = os.path.join(skills_root, name)
         if not os.path.isdir(skill_dir):
@@ -88,9 +91,9 @@ def main():
     bad = []
     for f in collect_files(skills_root):
         rel = os.path.relpath(f, skills_root).replace(os.sep, "/")
-        # catalog.md 位于 skills 根，它的链接按仓库内 .agents/skills/ 下的相对路径解析
+        # catalog.md 现位于 governing-agents/references/，其链接按仓库内 .agents/skills/ 下的相对路径解析
         skill_root = (
-            skills_root if rel == "catalog.md"
+            skills_root if rel.endswith("catalog.md")
             else os.path.join(skills_root, rel.split("/")[0])
         )
         file_dir = os.path.dirname(f)
@@ -109,11 +112,11 @@ def main():
                     bad.append((rel, link, "无扩展名的 reference 引用（应带 .md）"))
                 continue
             if not os.path.exists(target):
-                if link.startswith((".agents/skills/agent-ops/scripts/",
-                                     ".agents/skills/python-tools/scripts/")):
+                if link.startswith((".agents/skills/governing-agents/scripts/",
+                                     ".agents/skills/maintaining-python/scripts/")):
                     target = os.path.normpath(os.path.join(repo_root, link))
                 elif link.startswith("scripts/"):
-                    # 兼容 .agents/skills/python-tools/scripts 与 .agents/skills/agent-ops/scripts
+                    # 兼容 .agents/skills/maintaining-python/scripts 与 .agents/skills/governing-agents/scripts
                     cand1 = os.path.normpath(os.path.join(repo_root, ".agents", "skills", link))
                     cand2 = os.path.normpath(os.path.join(repo_root, ".agents", "tools",
                                                           os.path.basename(link)))

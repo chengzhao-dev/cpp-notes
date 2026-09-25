@@ -4,7 +4,7 @@
 
 ## 权威出处规则
 
-- 分工边界与「同一知识点只允许一个出处」的权威定义在 `.agents/skills/catalog.md`「skill 与 knowledge 的分工」，其他文件只引用不复制。
+- 分工边界与「同一知识点只允许一个出处」的权威定义在 `.agents/skills/governing-agents/references/catalog.md`「skill 与 knowledge 的分工」，其他文件只引用不复制。
 - 迁移内容前先判定归属：「怎么做」留 `references/`，「为什么」进 `.agents/knowledge/`，两处都有时删掉非权威的一份。
 
 ## 分层加载契约
@@ -36,8 +36,8 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `.agents/knowledge/`�
 
 ## 任务矩阵契约（L2 的特殊形态）
 
-`.agents/skills/cpp-content/references/tasks/<part>.md` 一行一章，是章节路由与状态的唯一权威记录，格式由
-`.agents/skills/agent-ops/scripts/scope.py` 解析、由 `check_task_matrix.py` 断言，两者必须同步：
+`.agents/skills/writing-cpp/references/tasks/<part>.md` 一行一章，是章节路由与状态的唯一权威记录，格式由
+`.agents/skills/governing-agents/scripts/scope.py` 解析、由 `check_task_matrix.py` 断言，两者必须同步：
 
 1. 列顺序固定为 `ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注`，行以 `| \`TASK-` 开头且 8 格。
 2. `—` 表示空。无内容占位写作 `—（不新建）`、`—（本章无示例）`，不留裸空白。
@@ -59,5 +59,5 @@ P1 强制细则、P2 建议和反模式一律下沉 L2 或 `.agents/knowledge/`�
 
 1. 先更新已有的 skill reference、knowledge 文件或任务矩阵；没有独立读者任务或独立结论时不得新增第二份权威。
 2. 超出 L1–L3 或 Parent 预算时，依次压缩措辞、合并相近主题、删除一次性案例，再按读者任务拆页或按概念边界拆知识。
-3. 新增 QMD 时同步更新 `_quarto.yml`、part 索引和任务矩阵；新增 knowledge 时同步更新 `.agents/knowledge/README.md` 与 `eval_set.py`。
+3. 新增 QMD 时同步更新 `_quarto.yml`、part 索引和任务矩阵；新增 knowledge 时同步更新 `.agents/knowledge/KNOWLEDGE.md` 与 `eval_set.py`。
 4. 收口按改动域运行 `run.py check --profile ...`；跨域或发布运行 `full`，知识内容变更先重建索引，再检查 Parent 预算、召回率和注入峰值。

@@ -77,7 +77,7 @@ def main() -> int:
         if not path.is_file() or is_skipped(path) or not is_text_candidate(path):
             continue
         rel = path.relative_to(ROOT)
-        if rel == Path(".agents/skills/agent-ops/scripts/check_encoding.py"):
+        if rel == Path(".agents/skills/governing-agents/scripts/check_encoding.py"):
             continue
         findings = []
         try:

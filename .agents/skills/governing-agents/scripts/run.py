@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 MIN_PYTHON = (3, 12)
 CONFIG = ROOT / "config.toml"
-TOOL_CONFIG = ROOT / ".agents" / "skills" / "python-tools" / "assets" / "config" / "runtime.json"
+TOOL_CONFIG = ROOT / ".agents" / "skills" / "maintaining-python" / "assets" / "config" / "runtime.json"
 
 
 class ToolNotFound(RuntimeError):
@@ -103,20 +103,20 @@ def resolve_tool(name):
 
 # 校验项：(名称, 脚本相对路径, 需要 _book 产物, 固定参数)
 CHECKS = [
-    ("encoding", ".agents/skills/agent-ops/scripts/check_encoding.py", False, ()),
-    ("agent-controls", ".agents/skills/agent-ops/scripts/test_agent_controls.py", False, ()),
-    ("layout", ".agents/skills/quarto-theme/scripts/check_layout.py", True, ()),
-    ("callouts", ".agents/skills/quarto-docs/scripts/check_callouts.py", True, ()),
-    ("dom", ".agents/skills/agent-ops/scripts/check_dom_contracts.py", True, ()),
-    ("size", ".agents/skills/agent-ops/scripts/check_skill_size.py", False, ()),
-    ("ascii", ".agents/skills/quarto-docs/scripts/check_ascii_names.py", False, ()),
-    ("links", ".agents/skills/quarto-docs/scripts/check_skill_links.py", False, ()),
-    ("docs", ".agents/skills/agent-ops/scripts/check_docs.py", False, ()),
-    ("tasks", ".agents/skills/agent-ops/scripts/check_task_matrix.py", False, ()),
-    ("scaffold", ".agents/skills/python-tools/scripts/test_scaffold_projects.py", False, ()),
-    ("kb", ".agents/skills/python-tools/scripts/check_health.py", False, ("--gate",)),
-    ("kb-eval", ".agents/skills/python-tools/scripts/evaluator.py", False, ("--skip-latency",)),
-    ("conflict", ".agents/skills/python-tools/scripts/test_conflict_detection.py", False, ()),
+    ("encoding", ".agents/skills/governing-agents/scripts/check_encoding.py", False, ()),
+    ("agent-controls", ".agents/skills/governing-agents/scripts/test_agent_controls.py", False, ()),
+    ("layout", ".agents/skills/designing-theme/scripts/check_layout.py", True, ()),
+    ("callouts", ".agents/skills/writing-quarto/scripts/check_callouts.py", True, ()),
+    ("dom", ".agents/skills/governing-agents/scripts/check_dom_contracts.py", True, ()),
+    ("size", ".agents/skills/governing-agents/scripts/check_skill_size.py", False, ()),
+    ("ascii", ".agents/skills/writing-quarto/scripts/check_ascii_names.py", False, ()),
+    ("links", ".agents/skills/writing-quarto/scripts/check_skill_links.py", False, ()),
+    ("docs", ".agents/skills/governing-agents/scripts/check_docs.py", False, ()),
+    ("tasks", ".agents/skills/governing-agents/scripts/check_task_matrix.py", False, ()),
+    ("scaffold", ".agents/skills/maintaining-python/scripts/test_scaffold_projects.py", False, ()),
+    ("kb", ".agents/skills/maintaining-python/scripts/check_health.py", False, ("--gate",)),
+    ("kb-eval", ".agents/skills/maintaining-python/scripts/evaluator.py", False, ("--skip-latency",)),
+    ("conflict", ".agents/skills/maintaining-python/scripts/test_conflict_detection.py", False, ()),
 ]
 
 PROFILE_CHECKS = {
@@ -286,7 +286,7 @@ def cmd_check(args):
 
 def cmd_verify(args):
     """编译校验示例。Windows 自动调用 WSL，默认只回结论行以控制输出量。"""
-    argv = [PY, str(ROOT / ".agents/skills/cpp-content/scripts/verify_examples.py")]
+    argv = [PY, str(ROOT / ".agents/skills/writing-cpp/scripts/verify_examples.py")]
     note = ""
     if args.style:
         argv.append("--style")
@@ -343,14 +343,14 @@ def changed_paths():
         index += 1
 
     global_prefixes = (
-        ".agents/skills/cpp-content/assets/config/",
-        ".agents/skills/cpp-content/templates/",
-        ".agents/skills/python-tools/scripts/scaffold/",
-        ".agents/skills/cpp-content/scripts/",
+        ".agents/skills/writing-cpp/assets/config/",
+        ".agents/skills/writing-cpp/templates/",
+        ".agents/skills/maintaining-python/scripts/scaffold/",
+        ".agents/skills/writing-cpp/scripts/",
     )
     global_files = {
-        ".agents/skills/agent-ops/scripts/run.py",
-        ".agents/skills/cpp-content/scripts/verify_examples.py",
+        ".agents/skills/governing-agents/scripts/run.py",
+        ".agents/skills/writing-cpp/scripts/verify_examples.py",
     }
     if any(path.startswith(global_prefixes) or path in global_files for path in paths):
         return None
@@ -381,7 +381,7 @@ def relevant_cpp_paths(paths):
         ):
             selected.append(path)
         elif (
-            path.startswith(".agents/skills/cpp-content/references/cpp/")
+            path.startswith(".agents/skills/writing-cpp/references/cpp/")
             and path.endswith(".md")
             and (ROOT / path).is_file()
         ):
@@ -407,7 +407,7 @@ def cmd_render(args):
 
 
 def cmd_scope(args):
-    argv = [PY, str(ROOT / ".agents/skills/agent-ops/scripts/scope.py")]
+    argv = [PY, str(ROOT / ".agents/skills/governing-agents/scripts/scope.py")]
     if args.list:
         argv.append("--list")
     if args.verbose:
@@ -469,8 +469,8 @@ KB_INDEX_DB = "temp/knowledge-index/kb_index.sqlite"
 
 
 def kb_script(name):
-    """拼出 .agents/skills/python-tools/scripts/ 下的知识库脚本绝对路径。"""
-    return str(ROOT / ".agents" / "skills" / "python-tools" / "scripts" / name)
+    """拼出 .agents/skills/maintaining-python/scripts/ 下的知识库脚本绝对路径。"""
+    return str(ROOT / ".agents" / "skills" / "maintaining-python" / "scripts" / name)
 
 
 def ensure_kb_index():
@@ -596,7 +596,7 @@ def main():
 
     args, extra = parser.parse_known_args()
     if args.cmd == "kb-search":
-        # retriever 的参数表由 .agents/skills/python-tools/scripts/retriever.py 自己定义，本解析器只做统一入口，
+        # retriever 的参数表由 .agents/skills/maintaining-python/scripts/retriever.py 自己定义，本解析器只做统一入口，
         # 故按原始 argv 顺序整体接管 kb-search 之后的参数，避免 --toc 这类 flag 被
         # 本层吞掉后报 unrecognized arguments。--verbose 归本层使用，其余原样透传。
         tail = sys.argv[sys.argv.index("kb-search") + 1:]

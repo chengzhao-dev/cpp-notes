@@ -7,8 +7,8 @@
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
 ```powershell
-& .agents/skills/agent-ops/scripts/run.ps1 kb-search "html 输出选项" --domain quarto-docs --subdomain html_output
-& .agents/skills/agent-ops/scripts/run.ps1 kb-search --toc "代码块显示"
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "html 输出选项" --domain writing-quarto --subdomain html_output
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search --toc "代码块显示"
 ```
 
 ### 本仓库的现行取值
@@ -17,9 +17,9 @@
 
 | 选项 | 取值 | 备注 |
 |---|---|---|
-| `theme` | `light: [cosmo, .agents/skills/quarto-theme/assets/theme/scss/theme-light.scss]` + `dark: [darkly, …]` | 内置主题与项目样式叠加，顺序决定覆盖关系 |
+| `theme` | `light: [cosmo, .agents/skills/designing-theme/assets/theme/palettes/github/theme-light.scss]` + `dark: [darkly, …]` | 内置主题与项目样式叠加，顺序决定覆盖关系 |
 | `highlight-style` | `light: github-light` + `dark: github-dark` | 明暗分别指定，语义颜色交给引擎 |
-| `filters` | `.agents/skills/quarto-docs/scripts/answer-disclosure.lua` | 将正文 `.answer` 转为默认收起的原生 `details` |
+| `filters` | `.agents/skills/writing-quarto/scripts/answer-disclosure.lua` | 将正文 `.answer` 转为默认收起的原生 `details` |
 | `toc` / `toc-depth` / `toc-location` | `true` / `3` / `right` | 右侧目录最多到 H3，窄屏会折叠，不作唯一定位手段 |
 | `number-sections` | `false` | 因此标题不手填序号，见 `basics.md` |
 | `code-copy` / `code-overflow` | `true` / `wrap` | 长行换行，不让读者横向拖动 |
@@ -33,8 +33,8 @@
 ### 改动约定
 
 1. 改 `format: html:` 任何取值都属于主题级改动，会触发整本渲染，先确认代价再走 `run.py render`。
-2. 新增或删减 `.agents/skills/quarto-theme/assets/theme/css/**` 组件样式表时，同步修改配置里的样式表清单，否则新样式不参与渲染。
-3. 页面视觉问题（提示符配色、文件名条、术语色）改 `.agents/skills/quarto-theme/assets/theme/**` 与设计令牌，不在文档里内联样式，也不改高亮配置。
+2. 新增或删减 `.agents/skills/designing-theme/assets/theme/css/**` 组件样式表时，同步修改配置里的样式表清单，否则新样式不参与渲染。
+3. 页面视觉问题（提示符配色、文件名条、术语色）改 `.agents/skills/designing-theme/assets/theme/**` 与设计令牌，不在文档里内联样式，也不改高亮配置。
 4. 流程图使用图表专用围栏，配色由主题样式控制。配置里不指定图表主题名。
 5. 拿不准选项名、默认值或嵌套层级时查官方参考页，不凭记忆写 YAML（入口见本文件 #8）。
 
@@ -45,8 +45,8 @@
 
 ## 渲染与发布排查索引
 按症状查此表：每条只给可执行处置。**行为成因与取舍**的唯一出处是知识库，用
-`& .agents/skills/agent-ops/scripts/run.ps1 kb-search "<症状关键词>"` 取用
-（可加 `--domain quarto-docs --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
+`& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<症状关键词>"` 取用
+（可加 `--domain writing-quarto --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
 
 > 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · `{{< include >}}` 必须包在带语言名的围栏里
 
@@ -73,7 +73,7 @@
 ### 5. 中文乱码/编码
 
 - **症状**：中文变成「锟/鐜/绔」类字串，或文件带 BOM、行尾变 CRLF。
-- **处置**：改 `.qmd` 或 Skill 文档后先跑 `run.ps1 check --profile fast`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 github-ops skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
+- **处置**：改 `.qmd` 或 Skill 文档后先跑 `run.ps1 check --profile fast`。失败时从 Git 可读版本恢复再重做修改，**不要**对已乱码文本反向转码。全仓库统一 UTF-8 无 BOM、LF（`.gitattributes` 约定，见 shipping-github skill 的 `git-workflow.md`）。front matter 可设 `lang: zh`。
 - **注意**：PowerShell 5.1 的 `Out-File`/`Set-Content -Encoding utf8` 会附带 BOM，需显式无 BOM 或改用 Python 写入，不要让系统代码页参与中文读写。
 - **自检**：`run.ps1 check --profile fast` 的 `encoding` 项已覆盖 BOM、行尾与乱码特征。
 
@@ -98,7 +98,7 @@
 ### 9. 路径/名称含特殊字符导致渲染失败
 
 - **症状**：`quarto render` 报 `recoverEncode: invalid argument (cannot encode character '\8209')`，错误栈在 `main.lua` 的 `writeFullIndex`/`io.open`。
-- **处置**：项目、目录、文件名一律纯 ASCII，连字符一律用普通 `-`（U+002D）。可用 `.agents/skills/quarto-docs/scripts/check_ascii_names.py` 校验整个仓库。命名规范见 `../../../cpp-content/references/cpp/cpp.md`。
+- **处置**：项目、目录、文件名一律纯 ASCII，连字符一律用普通 `-`（U+002D）。可用 `.agents/skills/writing-quarto/scripts/check_ascii_names.py` 校验整个仓库。命名规范见 `../../../writing-cpp/references/cpp/cpp.md`。
 - **定位隐藏字符**（把目录名转成字节，查看是否出现 `E2 80 91`）：
 
 ```powershell

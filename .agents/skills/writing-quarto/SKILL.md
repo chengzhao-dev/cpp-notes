@@ -1,17 +1,17 @@
 ---
-name: quarto-docs
+name: writing-quarto
 description: 编写结构清晰、可验证、适合 HTML 阅读的 Quarto 中文技术文档。涉及 QMD、README、章节润色和渲染时使用。
 metadata:
   short-description: 编写可验证的中文 Quarto 文档
 ---
 
-# Skill: quarto-docs
-负责页面结构、中文表达与多文件协作。C++ 语义交给 `cpp-content`，主题样式交给 `quarto-theme`。按路由只读所需 reference，不整包加载。
+# Skill: writing-quarto
+负责页面结构、中文表达与多文件协作。C++ 语义交给 `writing-cpp`，主题样式交给 `designing-theme`。按路由只读所需 reference，不整包加载。
 ## 适用场景
 
 - 新写或润色 `.qmd` 正文、标题、代码块、终端命令、图表与 Callout，以及 `README.md`、`AGENTS.md` 体例。
 - 全局环境约定只在入门分册声明一次，其它分册的首页与章节正文都不重复；自测题答案统一使用 `.answer`，由 Lua filter 默认收起。
-- **不适用**：渲染参数取值与设计令牌（转 `quarto-theme`）、C++ 语义正确性（转 `cpp-content`）。
+- **不适用**：渲染参数取值与设计令牌（转 `designing-theme`）、C++ 语义正确性（转 `writing-cpp`）。
 
 ## 任务路由
 
@@ -23,7 +23,7 @@ metadata:
 | 小节密度、Callout 和排错结构 | `references/zh/section-focus-and-density.md` |
 | Book 结构、front matter、标题层级与 H2/H3 判定 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
-| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain quarto-docs` |
+| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain writing-quarto` |
 
 ## P0 硬约束
 1. 标题只由 YAML `title:` 提供，页面内不再写同文本 `# H1`。小节从 `##` 开始，不手填序号，`##`/`###` 前不写 `---` 水平线。
@@ -38,7 +38,7 @@ metadata:
 ## 工作流程
 
 1. 多文件修改先定页面角色：入口只回答「这是什么、从哪开始」，索引只安排顺序，正文负责一个可完成任务。
-2. 跑 `run.ps1 scope <part>/<chapter>`，按路由读取该主题需要的 reference。章节骨架用 `../cpp-content/templates/cpp-topic.qmd`。
+2. 跑 `run.ps1 scope <part>/<chapter>`，按路由读取该主题需要的 reference。章节骨架用 `../writing-cpp/templates/cpp-topic.qmd`。
 3. 逐节核对围栏、标题层级、链接与输出一致性。删改正文后按 `authoring.md` 回读切口，检查动作、因果、指代和验收是否仍扣合。影响渲染时跑 `run.ps1 render`，日常收口只跑 `run.ps1 check`。
 ## 完成判据
 - [ ] `run.ps1 check` 全通过（含 `docs`、`callouts`、`links` 与 `encoding`，有 `_book/` 时另含 `layout` 与 `dom`）。

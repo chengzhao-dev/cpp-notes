@@ -6,7 +6,7 @@
 渲染产物、其它章节一律列入禁止清单。
 调用方只需读「单元」与「读取」所列文件，其余不碰——省掉「整包多读」与「反复枚举目录」。
 
-零新增元数据：路由表就是 .agents/skills/cpp-content/references/tasks/<part>.md 任务矩阵。
+零新增元数据：路由表就是 .agents/skills/writing-cpp/references/tasks/<part>.md 任务矩阵。
 「公共必读」行给出该 part 每章共用的 reference，矩阵行的「专项必读」列给出该章独有的部分，
 「状态」列给出是否已开工，因此矩阵改名或合并章节都不需要改本脚本。
 
@@ -27,7 +27,7 @@ from pathlib import Path
 # 其中含 int main，误读会污染示例校验与写作判断）
 BUILD_DIRS = ("build", ".cache", ".tmp", "temp", "__pycache__")
 ALWAYS_DENY = [
-    "_book/**（渲染产物：校验走 .agents/skills/agent-ops/scripts/check_dom_contracts.py，不直接读）",
+    "_book/**（渲染产物：校验走 .agents/skills/governing-agents/scripts/check_dom_contracts.py，不直接读）",
     "code/**/build/**（CMake 产物：永不入上下文）",
     ".quarto/**（Quarto 缓存）",
     "**/.cache/**（工具缓存）",
@@ -38,7 +38,7 @@ ALWAYS_DENY = [
 ]
 # 单个单元的代码文件上限：超出则只报计数，避免清单本身膨胀
 MAX_UNIT_FILES = 12
-TASKS_DIR = ".agents/skills/cpp-content/references/tasks"
+TASKS_DIR = ".agents/skills/writing-cpp/references/tasks"
 MERGED = "merged"
 STATUS_LABELS = {"todo": "待办", "done": "完成", "merged": "已合并"}
 # 反查单元时用来剥离文件后缀（章节名与 chapter 同名，含连字符与 .cpp/.qmd/.txt）
@@ -191,12 +191,12 @@ def resolve_path(target, root):
 
 
 DOMAIN_READ = {
-    "theme": [".agents/skills/quarto-theme/SKILL.md",
-              ".agents/skills/quarto-theme/references/theme-system.md"],
-    "dev": [".agents/skills/agent-ops/assets/config/editorconfig",
-            ".agents/skills/python-tools/scripts/scaffold/"],
-    "repo": ["AGENTS.md", ".agents/skills/catalog.md",
-             ".agents/skills/agent-ops/references/repository-structure.md"],
+    "theme": [".agents/skills/designing-theme/SKILL.md",
+              ".agents/skills/designing-theme/references/theme-system.md"],
+    "dev": [".agents/skills/governing-agents/assets/config/editorconfig",
+            ".agents/skills/maintaining-python/scripts/scaffold/"],
+    "repo": ["AGENTS.md", ".agents/skills/governing-agents/references/catalog.md",
+             ".agents/skills/governing-agents/references/repository-structure.md"],
 }
 
 
@@ -213,7 +213,7 @@ def resolve_repo_domain(target, root):
             return {
                 "kind": "repo",
                 "label": "skills",
-                "reads": [".agents/skills/catalog.md"],
+                "reads": [".agents/skills/governing-agents/references/catalog.md"],
             }
         skill = parts[2]
         reads = [f".agents/skills/{skill}/SKILL.md"]
@@ -224,12 +224,12 @@ def resolve_repo_domain(target, root):
             if rel_path + "/" not in reads:
                 reads.append(rel_path + "/")
         maintenance_paths = {
-            ".agents/skills/catalog.md",
-            ".agents/skills/agent-ops/references/refactor-guidelines.md",
-            ".agents/skills/agent-ops/scripts/check_skill_size.py",
+            ".agents/skills/governing-agents/references/catalog.md",
+            ".agents/skills/governing-agents/references/refactor-guidelines.md",
+            ".agents/skills/governing-agents/scripts/check_skill_size.py",
         }
         if rel_path in maintenance_paths:
-            reads.insert(0, ".agents/skills/catalog.md")
+            reads.insert(0, ".agents/skills/governing-agents/references/catalog.md")
         return {"kind": "repo", "label": f"skill {skill}", "reads": reads}
     if parts[:2] == [".agents", "mcp"]:
         return {
@@ -238,7 +238,7 @@ def resolve_repo_domain(target, root):
             "reads": [".agents/mcp/README.md", rel_path],
         }
     if parts[:2] == [".agents", "knowledge"]:
-        reads = [".agents/knowledge/README.md"]
+        reads = [".agents/knowledge/KNOWLEDGE.md"]
         if len(parts) > 2 and path.is_file():
             reads.append(rel_path)
         elif len(parts) > 2 and path.is_dir():
@@ -349,7 +349,7 @@ def main():
     if not unit:
         print(f"无法解析目标：{target}")
         print("支持形式：<part>/<chapter>、skill/knowledge/MCP/仓库内路径，或 theme/dev/repo。")
-        print("章节须先在 .agents/skills/cpp-content/references/tasks/<part>.md 任务矩阵登记；")
+        print("章节须先在 .agents/skills/writing-cpp/references/tasks/<part>.md 任务矩阵登记；")
         print("未登记时请按约定补行，本脚本不做猜测。可用 --list 查看现有单元。")
         return 1
 

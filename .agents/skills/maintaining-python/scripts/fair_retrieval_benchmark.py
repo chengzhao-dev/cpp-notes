@@ -20,11 +20,11 @@ import kb_common as kb  # noqa: E402
 from unified_retrieval import adapt  # noqa: E402
 
 CASES = [
-    ("链接阶段为什么需要目标文件", "cpp-content", "目标文件"),
-    ("为什么统一使用列表初始化", "cpp-content", "列表初始化"),
-    ("Quarto HTML 选项在哪些作用域生效", "quarto-docs", "作用域"),
-    ("项目级 MCP 的安全边界", "agent-ops", "MCP"),
-    ("知识库增长后怎样避免按文档扫描全部 Chunk", "cpp-content", "知识分块"),
+    ("链接阶段为什么需要目标文件", "writing-cpp", "目标文件"),
+    ("为什么统一使用列表初始化", "writing-cpp", "列表初始化"),
+    ("Quarto HTML 选项在哪些作用域生效", "writing-quarto", "作用域"),
+    ("项目级 MCP 的安全边界", "governing-agents", "MCP"),
+    ("知识库增长后怎样避免按文档扫描全部 Chunk", "writing-cpp", "知识分块"),
 ]
 
 

@@ -23,9 +23,9 @@
 
 - **DOM 与布局契约**：检查代码块是否符合 GitHub 风格。Mermaid 图表是否严格使用 ```` ```{mermaid} ```` 围栏，而不是普通的 ```` ```mermaid ```` 代码块。普通终端演示是否使用 `text` 代码块。
 - **中文写作与体例**：章节是否按“目标 → 示例 → 操作 → 验证 → 排查”推进，是否在标题后第一句直接兑现承诺，正文反引号是否仅包裹真实技术对象。
-- **删改连续性**：局部删除或移动内容后，是否按 `quarto-docs` 的 `authoring` reference 回读切口，动作、因果、指代和验收没有因过渡句消失而断裂。
-- **正文与 Callout 密度**：相邻正文与尾置 Callout 的信息密度、列表结构和视觉重量是否协调。结果型 Callout 的正文预告与首句是否形成“检查动作 → 可观察结果 → 后续范围”的连续接力，且其后无必经步骤。规则以 `quarto-docs` 的 `section-focus-and-density` reference 为准。
-- **命令接力**：后续命令依赖前一条命令输出时，正文是否说明取值来源、占位符替换方式与执行时机。规则以 `quarto-docs` 的 `terminal-validation` reference 为准。
+- **删改连续性**：局部删除或移动内容后，是否按 `writing-quarto` 的 `authoring` reference 回读切口，动作、因果、指代和验收没有因过渡句消失而断裂。
+- **正文与 Callout 密度**：相邻正文与尾置 Callout 的信息密度、列表结构和视觉重量是否协调。结果型 Callout 的正文预告与首句是否形成“检查动作 → 可观察结果 → 后续范围”的连续接力，且其后无必经步骤。规则以 `writing-quarto` 的 `section-focus-and-density` reference 为准。
+- **命令接力**：后续命令依赖前一条命令输出时，正文是否说明取值来源、占位符替换方式与执行时机。规则以 `writing-quarto` 的 `terminal-validation` reference 为准。
 - **结构与链接**：跨章交叉引用是否使用规范 @sec- 锚点，图片与本地文件引用是否存在，小节标题层级是否跳跃。
 - **Callout 规范**：是否仅使用内置的 `note`、`tip`、`warning`、`important`、`caution` 五类，严禁自定义类。
 - **可折叠答案**：自测题答案是否使用 `.answer` 组件、紧跟对应列表项、默认收起，且没有把新概念或标题藏进折叠区。列表型答案是否先用导语交代对象、起止范围或顺序。

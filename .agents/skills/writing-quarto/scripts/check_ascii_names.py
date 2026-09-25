@@ -3,7 +3,7 @@
 
 目的：防止 U+2011（non-breaking hyphen）、全角、U+2212（减号）等特殊字符
 触发 Quarto 渲染 `recoverEncode: invalid argument` 错误。
-规范出处：.agents/skills/cpp-content/references/cpp/cpp.md（命名规范）。
+规范出处：.agents/skills/writing-cpp/references/cpp/cpp.md（命名规范）。
 
 用法：python check_ascii_names.py
 退出码：0 = 全部纯 ASCII，1 = 发现非法字符。

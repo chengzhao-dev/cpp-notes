@@ -1,11 +1,11 @@
 ---
-name: agent-ops
+name: governing-agents
 description: 维护 Agent 运行入口、Skills、MCP 与仓库重构时使用，统一脚本、路由和验收。
 metadata:
   short-description: 维护 Agent 入口与 Skills 结构
 ---
 
-# Skill: agent-ops
+# Skill: governing-agents
 
 统一承载 Agent 运行入口、Skills 分层、MCP 与仓库级验收。只回答「怎么组织与维护」，领域结论交给 `.agents/knowledge/`。
 
@@ -13,7 +13,7 @@ metadata:
 
 - 新建、合并、重构、改名或删除 skill、reference、MCP 工具与脚本入口。
 - 用 `scope` 确定读取边界，用 `check`（含 `tasks` 矩阵一致性）收口验收。
-- **不适用**：写章节正文（转 `cpp-content` 或 `quarto-docs`）、改样式（转 `quarto-theme`）。
+- **不适用**：写章节正文（转 `writing-cpp` 或 `writing-quarto`）、改样式（转 `designing-theme`）。
 
 ## 任务路由
 
@@ -21,7 +21,7 @@ metadata:
 | --- | --- |
 | 改 skill 结构、上下文预算、任务矩阵格式与 ID 规则 | `references/refactor-guidelines.md` |
 | 目录关系、章节路线图、运行边界与诊断逃生舱 | `references/repository-structure.md` |
-| skill 短路由与领域分工 | `../catalog.md` |
+| skill 短路由与领域分工 | `references/catalog.md` |
 
 ## P0 硬约束
 
@@ -35,7 +35,7 @@ metadata:
 1. 先读目标 skill、结构性 reference 和 `check_skill_size.py --verbose`，量清当前余量。
 2. 搜索相近规则，优先并入职责最接近的现有文件，同时删除重复表述。
 3. 超预算时按序处理：压缩措辞 → 合并相近主题 → 移除一次性案例 → 新增 L2 → 新增 L1。
-4. 同步更新父级 `SKILL.md`、`../catalog.md` 与必要路由说明。删文件后移除随之变空的目录。
+4. 同步更新父级 `SKILL.md`、`references/catalog.md` 与必要路由说明。删文件后移除随之变空的目录。
 
 ## 完成判据
 

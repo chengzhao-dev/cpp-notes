@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-teaching-source-comments-v1"
 title: "教程源码注释决策依据"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "style"
 tags: [cpp, comments, file_purpose, beginner_friendly, teaching_code, source_file, include, cmake, shell, comment_density, target_comment, add_executable, add_library]
 level_range: [0, 9]
@@ -68,9 +68,9 @@ Shell 首行说明脚本用途，并为 `set -euo pipefail` 这类会改变执�
 
 ## 与正文和命令块的分工
 
-inline 命令块仍遵守 `quarto-docs` 的代码块注释规则，以总注释说明整块任务，以子注释补充不明显
+inline 命令块仍遵守 `writing-quarto` 的代码块注释规则，以总注释说明整块任务，以子注释补充不明显
 的依赖或用途。`include` 引用的真实源码文件脱离文档后仍要可读，因此使用本文件的文件用途合同。
 
 正文负责原因、概念边界、参数差异和验证结果，源码注释负责就地标记角色和观察重点。两者可以
-形成接力，但不互相抄写。`cpp-content/references/cpp/code-style.md` 保存写作侧的操作规则，
+形成接力，但不互相抄写。`writing-cpp/references/cpp/code-style.md` 保存写作侧的操作规则，
 本文件只保留这样取舍的依据。

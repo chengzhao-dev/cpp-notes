@@ -19,7 +19,7 @@ reference 过长则一次任务就读掉大量无关内容。本脚本把预算�
       front matter：name <= 64 字符、description <= 1024 字符
       全部 skill 的 name + description <= 8000 字符（Codex 列表预算）
   L2  .agents/skills/*/references/**.md  <= 160 行 且 <= 6000 字符
-      .agents/skills/catalog.md            <= 3000 字符
+      .agents/skills/governing-agents/references/catalog.md            <= 3000 字符
       （内聚的单一主题不硬拆：拆开会迫使一次读多份，反而更费 token）
   L3  content/**/*.qmd（不含 index）     <= 150 行 且 <= 5000 有效字符
       有效字符排除围栏代码和 include 行；完整源码由 code/ 独立维护
@@ -145,12 +145,12 @@ def main():
     catalog = ROOT / ".agents" / "skills" / "catalog.md"
     if catalog.is_file():
         _n, catalog_chars, _b = stat(catalog)
-        rows.append((".agents/skills/catalog.md", _n, catalog_chars))
+        rows.append((".agents/skills/governing-agents/references/catalog.md", _n, catalog_chars))
         if catalog_chars > CATALOG_CHAR_LIMIT:
             bad.append(
                 (
                     "L1 目录路由",
-                    ".agents/skills/catalog.md",
+                    ".agents/skills/governing-agents/references/catalog.md",
                     "%d 字符 > %d" % (catalog_chars, CATALOG_CHAR_LIMIT),
                 )
             )

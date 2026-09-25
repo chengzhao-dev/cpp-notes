@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-practice-artifact-delivery-v1"
 title: "工程应用中的 C++ 产物与 Android 影像交付"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "toolchain"
 tags: [practice, executable, static_library, shared_library, android, imaging, abi, sdk, simulation]
 level_range: [0, 5]

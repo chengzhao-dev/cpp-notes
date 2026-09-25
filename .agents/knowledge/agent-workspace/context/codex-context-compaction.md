@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-codex-context-v1"
 title: "Codex 上下文压缩的触发方与可配置项"
-domain: "agent-ops"
+domain: "governing-agents"
 subdomain: "agent_runtime"
 tags: [context_compaction, auto_compact, config, hooks, long_task, token_budget, plan_mode, approval]
 level_range: [0, 9]
@@ -15,7 +15,7 @@ estimated_tokens: 1850
 # Codex 上下文压缩的触发方与可配置项
 
 > 本文件记录 Codex 宿主侧上下文压缩（compaction）由谁触发、agent 能做什么、哪些配置项真的可选。
-> 它是这块领域事实的唯一出处。`.agents/skills/agent-ops/references/repository-structure.md` 只保留压缩前后的执行纪律，
+> 它是这块领域事实的唯一出处。`.agents/skills/governing-agents/references/repository-structure.md` 只保留压缩前后的执行纪律，
 > 不复述机制。结论来自本机 `codex-cli 0.153.4` 的可复现核验，换版本时需重新实测。
 
 ## 压缩由宿主触发而不是 agent

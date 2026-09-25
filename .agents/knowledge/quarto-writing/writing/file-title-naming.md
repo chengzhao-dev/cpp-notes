@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-file-title-naming-v1"
 title: "QMD 文件名与中文标题命名依据"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "writing"
 tags: [qmd, filename, title, kebab_case, naming, chapter, navigation, readability]
 level_range: [0, 5]

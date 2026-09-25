@@ -1,7 +1,7 @@
 ---
 kb_id: cpp-retrieval-audit-2026-09-24-v1
 title: Agent 资源职责与检索统一审计
-domain: agent-ops
+domain: governing-agents
 subdomain: retrieval
 tags: [audit, retrieval, benchmark, mcp]
 dependencies: [cpp-retrieval-governance-v1]
@@ -19,14 +19,14 @@ estimated_tokens: 700
 
 `skills/`、`knowledge/` 和 MCP 不应合并为一个目录或一个事实源。`skills/` 负责怎么做，`.agents/knowledge/` 负责稳定事实、设计理由和失败模式，MCP 负责宿主的结构化受限调用。`chengzhao-dev` 的 registry 适合条目级 L1 路由，`cpp-notes` 的 SQLite FTS5/BM25、概念关联和 Parent 回溯适合 L2/L3 正文检索。
 
-本轮新增 `.agents/knowledge/agent-ops/retrieval-governance.md` 作为统一职责和协议的领域依据；没有把现有 knowledge 搬进 skills，也没有删除 MCP。
+本轮新增 `.agents/knowledge/agent-workspace/retrieval-governance.md` 作为统一职责和协议的领域依据；没有把现有 knowledge 搬进 skills，也没有删除 MCP。
 
 ## 文件级决策
 
 | 区域 | 当前处理 | 依据 |
 |---|---|---|
-| `.agents/skills/catalog.md` | 保留短路由，补充统一治理知识入口 | 不复制领域正文 |
-| `.agents/skills/python-tools/SKILL.md` | 保留管道执行与运行时硬约束，链接统一协议 | 流程归 skill |
+| `.agents/skills/governing-agents/references/catalog.md` | 保留短路由，补充统一治理知识入口 | 不复制领域正文 |
+| `.agents/skills/maintaining-python/SKILL.md` | 保留管道执行与运行时硬约束，链接统一协议 | 流程归 skill |
 | `.agents/knowledge/` | 保留领域依据，新增治理知识 | 稳定事实归 knowledge |
 | `.agents/mcp/server.py` | 保留受限 MCP，增加只读 `knowledge_search` | MCP 是安全适配层 |
 | `chengzhao-dev/.agents/tools/` | 新增条目级统一响应适配器 | 保留 registry 定位语义 |

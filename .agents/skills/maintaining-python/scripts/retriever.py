@@ -19,10 +19,10 @@
 缓存（§3.5）：非 explain 排名结果按全参数键缓存 24h，命中时不重跑四路召回。
 
 用法：
-    python .agents/skills/python-tools/scripts/retriever.py "shared_ptr 循环引用怎么打破"
-    python .agents/skills/python-tools/scripts/retriever.py --explain "std::span 和裸指针加长度比有什么好处"
-    python .agents/skills/python-tools/scripts/retriever.py --domain cpp_core --level 5 --budget 2500 "所有权转移"
-    python .agents/skills/python-tools/scripts/retriever.py --rounds 2 --json "动态库为什么需要 RPATH"
+    python .agents/skills/maintaining-python/scripts/retriever.py "shared_ptr 循环引用怎么打破"
+    python .agents/skills/maintaining-python/scripts/retriever.py --explain "std::span 和裸指针加长度比有什么好处"
+    python .agents/skills/maintaining-python/scripts/retriever.py --domain cpp_core --level 5 --budget 2500 "所有权转移"
+    python .agents/skills/maintaining-python/scripts/retriever.py --rounds 2 --json "动态库为什么需要 RPATH"
 退出码：0 = 有注入结果，2 = 无结果（便于上层脚本判断）。
 """
 
@@ -397,10 +397,10 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
     """五阶段检索 + 版本降权 + 滑动窗口 + 24h 查询缓存。toc=True 时只回摘要地图。"""
     started = time.time()
     if not kb.DB_PATH.is_file():
-        raise SystemExit("FAIL  retriever  索引不存在，先运行 python .agents/skills/python-tools/scripts/indexer.py")
+        raise SystemExit("FAIL  retriever  索引不存在，先运行 python .agents/skills/maintaining-python/scripts/indexer.py")
     registry = kb.read_json(kb.REGISTRY_PATH, {"documents": {}, "chunks": {}})
     if not registry.get("chunks"):
-        raise SystemExit("FAIL  retriever  注册表为空，先运行 python .agents/skills/python-tools/scripts/indexer.py")
+        raise SystemExit("FAIL  retriever  注册表为空，先运行 python .agents/skills/maintaining-python/scripts/indexer.py")
     con = sqlite3.connect(kb.DB_PATH)
     tags = tags or []
 
@@ -533,7 +533,7 @@ def retrieve(query: str, domain: str = "", subdomain: str = "", level=None,
 def fetch_parent(parent_id: str, budget: int | None) -> dict:
     """按 Parent id 精确取 L3 正文：配合 toc 地图完成第二、三轮披露。"""
     if not kb.DB_PATH.is_file():
-        raise SystemExit("FAIL  retriever  索引不存在，先运行 python .agents/skills/python-tools/scripts/indexer.py")
+        raise SystemExit("FAIL  retriever  索引不存在，先运行 python .agents/skills/maintaining-python/scripts/indexer.py")
     registry = kb.read_json(kb.REGISTRY_PATH, {"documents": {}, "chunks": {}})
     chunk = registry["chunks"].get(parent_id)
     if not chunk:
@@ -598,7 +598,7 @@ def main() -> int:
         for row in result["parents"]:
             print("  L2 " + str(row["token_count"]).rjust(4) + "  [" + row["ref_id"] + "] "
                   + row["text"][:120])
-        print("      取正文：python .agents/skills/python-tools/scripts/retriever.py --parent <ref_id>")
+        print("      取正文：python .agents/skills/maintaining-python/scripts/retriever.py --parent <ref_id>")
         return 0
 
     print("查询 " + result["query"] + "  意图=" + result["intent"]["kind"]

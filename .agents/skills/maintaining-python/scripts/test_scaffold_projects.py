@@ -14,12 +14,12 @@ SCAFFOLD = (
     ROOT
     / ".agents"
     / "skills"
-    / "python-tools"
+    / "maintaining-python"
     / "scripts"
     / "scaffold"
     / "init_project.py"
 )
-sys.path.insert(0, str(ROOT / ".agents" / "skills" / "python-tools" / "scripts"))
+sys.path.insert(0, str(ROOT / ".agents" / "skills" / "maintaining-python" / "scripts"))
 from temp_paths import temp_dir  # noqa: E402
 
 

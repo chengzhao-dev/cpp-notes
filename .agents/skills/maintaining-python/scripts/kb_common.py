@@ -31,6 +31,73 @@ MAX_CONTEXT_TOKENS = 6000
 RESERVED_FOR_RESPONSE = 2000
 AVAILABLE_FOR_RETRIEVAL = MAX_CONTEXT_TOKENS - RESERVED_FOR_RESPONSE
 
+# ---- 混合检索（FTS5 + sqlite-vec + RRF）常量 ----
+# 嵌入模型与维度必须配套改动：vec0 表列维度在建表时固定，换模型必须 --rebuild。
+EMBED_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
+EMBED_DIM = 384
+RRF_K = 60
+VEC_TABLE = "chunks_vec"
+# 向量通道在 RRF 里的默认权重（BM25=1.0 基准；图谱、向量按意图再调）。
+VEC_WEIGHT_DEFAULT = 0.8
+# 安装提示：sqlite-vec 与 sentence-transformers 是 kb 混合检索的可选依赖，
+# 声明在 maintaining-python/assets/config/requirements-kb.txt。
+KB_DEPS_HINT = ("pip install -r .agents/skills/maintaining-python/assets/config/requirements-kb.txt")
+
+_embed_model_cache: object = None
+
+
+def embed_available() -> tuple[bool, str]:
+    """探测 sqlite-vec 扩展与嵌入模型是否可用，返回 (是否可用, 原因)。
+
+    明确失败优于静默降级：向量列缺失会让改写类查询悄悄退回纯词面，
+    问题要在这里暴露而不是在检索质量里。
+    """
+    try:
+        import sqlite_vec  # noqa: F401
+    except ImportError:
+        return False, "未安装 sqlite-vec（" + KB_DEPS_HINT + "）"
+    try:
+        from sentence_transformers import SentenceTransformer  # noqa: F401
+    except ImportError:
+        return False, "未安装 sentence-transformers（" + KB_DEPS_HINT + "）"
+    return True, ""
+
+
+def load_vec_extension(con) -> bool:
+    """在连接上加载 sqlite-vec 扩展；成功返回 True。失败返回 False，由调用方决定是否硬失败。"""
+    try:
+        import sqlite_vec
+    except ImportError:
+        return False
+    try:
+        con.enable_load_extension(True)
+        sqlite_vec.load(con)
+        con.enable_load_extension(False)
+        return True
+    except Exception:
+        try:
+            con.enable_load_extension(False)
+        except Exception:
+            pass
+        return False
+
+
+def get_embedder():
+    """惰性加载嵌入模型（进程内单例）。首次调用会下载模型，属预期冷启动。"""
+    global _embed_model_cache
+    if _embed_model_cache is None:
+        from sentence_transformers import SentenceTransformer
+        _embed_model_cache = SentenceTransformer(EMBED_MODEL)
+    return _embed_model_cache
+
+
+def embed_text(text: str) -> bytes:
+    """文本 -> float32 bytes（vec0 BLOB）。查询与索引共用同一模型与维度。"""
+    import numpy as np
+    model = get_embedder()
+    vector = model.encode(text, normalize_embeddings=True)
+    return vector.astype("float32").tobytes()
+
 NL = chr(10)
 SPACES = " " + chr(9)
 FENCE_RE = re.compile("^(" + chr(96) + "{3,}|~{3,})")
@@ -148,7 +215,7 @@ def list_knowledge_files() -> list[Path]:
         return []
     return [
         path for path in sorted(KB_ROOT.rglob("*.md"))
-        if not path.name.startswith("_") and path.name.lower() != "readme.md"
+        if not path.name.startswith("_") and path.name.lower() not in {"readme.md", "knowledge.md"}
     ]
 
 

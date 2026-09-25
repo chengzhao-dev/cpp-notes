@@ -34,7 +34,7 @@
 
 ## Callout
 
-Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/references/quarto/authoring.md`，这里只记录 C++ 章节不应把必经步骤或普通说明放进提示框。
+Callout 的语义选择与例外式使用边界见 `.agents/skills/writing-quarto/references/quarto/authoring.md`，这里只记录 C++ 章节不应把必经步骤或普通说明放进提示框。
 
 ## 核心主题索引
 
@@ -49,8 +49,8 @@ Callout 的语义选择与例外式使用边界见 `.agents/skills/quarto-docs/r
 ## 示例约定
 
 - 源码：`code/<part>/<name>.cpp`，与 `content/<part>/` 对齐。
-- 新建工程：`python .agents/skills/python-tools/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。
-- 校验：`& .agents/skills/agent-ops/scripts/run.ps1 verify`。
+- 新建工程：`python .agents/skills/maintaining-python/scripts/scaffold/init_project.py --name <name> --dir code/<part>`。
+- 校验：`& .agents/skills/governing-agents/scripts/run.ps1 verify`。
 
 ## 命名
 

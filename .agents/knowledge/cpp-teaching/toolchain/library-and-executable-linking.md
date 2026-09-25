@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-library-and-executable-linking-v1"
 title: "可执行文件与静态库、动态库的链接边界"
-domain: "cpp-content"
+domain: "writing-cpp"
 subdomain: "toolchain"
 tags: [cpp, executable, static_library, shared_library, linker, loader, rpath, archive, shared_object, cmake, target_link_libraries, output_directory, teaching_example, single_file_layout, android, ndk, jni, abi, sdk, simulation, mobile_imaging, artifact_delivery]
 level_range: [0, 5]

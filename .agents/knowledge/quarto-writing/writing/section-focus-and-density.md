@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-section-focus-density-v1"
 title: "教学小节的主线收束与信息分层"
-domain: "quarto-docs"
+domain: "writing-quarto"
 subdomain: "writing"
 tags: [section, focus, mainline, density, progressive_disclosure, command, output, validation, parameter, filename, box_ratio, long_paragraph, paragraph_merge, parent_heading, callout, callout_weight, result_callout, callout_transition, visual_hierarchy, font_scale, project_tree, inline_code, backticks, diagram]
 level_range: [0, 5]
@@ -14,7 +14,7 @@ estimated_tokens: 3200
 
 # 教学小节的主线收束与信息分层
 
-本文件解释为什么一个小节要先闭合成功路径，再展开必要细节。具体写法见 `quarto-docs` 的小节主线 reference。页面块的整体顺序见标识 `cpp-quarto-chapter-pattern-v1`。
+本文件解释为什么一个小节要先闭合成功路径，再展开必要细节。具体写法见 `writing-quarto` 的小节主线 reference。页面块的整体顺序见标识 `cpp-quarto-chapter-pattern-v1`。
 
 ## 主线必须先闭合
 
@@ -64,7 +64,7 @@ estimated_tokens: 3200
 
 ## 元素边界
 
-细节只有拥有独立输入、动作和验收结果时才升级为标题，否则留在当前小节的延伸区域。常见错误使用三级结构，是因为目录负责导航、具体症状负责识别、有序步骤负责操作。具体写法见 `cpp-quarto-chapter-pattern-v1` 和 `quarto-docs` 的章节写作 reference。
+细节只有拥有独立输入、动作和验收结果时才升级为标题，否则留在当前小节的延伸区域。常见错误使用三级结构，是因为目录负责导航、具体症状负责识别、有序步骤负责操作。具体写法见 `cpp-quarto-chapter-pattern-v1` 和 `writing-quarto` 的章节写作 reference。
 
 这种分层与页面整体的六段块序列并不冲突：它只收束任务段内部的阅读路径，不重新定义引言、任务序列、排查、自测和回顾的页面职责。
 
@@ -88,4 +88,4 @@ Callout 是视觉上独立的盒子。把它插在段落、命令或输出之间
 
 同一对象在同一页保持一种标记方式。链接标签内不再嵌套行内代码。行内标记连续出现时，改用完整句子减少读者来回切换字体。
 
-标记边界和链接空格由 `quarto-docs` 的 `authoring.md` 维护，本文件只解释为什么需要克制。
+标记边界和链接空格由 `writing-quarto` 的 `authoring.md` 维护，本文件只解释为什么需要克制。

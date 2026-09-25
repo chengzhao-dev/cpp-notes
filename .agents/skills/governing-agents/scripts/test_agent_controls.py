@@ -17,14 +17,14 @@ def load(path: Path, name: str):
     return module
 
 
-encoding = load(ROOT / ".agents/skills/agent-ops/scripts/check_encoding.py", "check_encoding")
-docs = load(ROOT / ".agents/skills/agent-ops/scripts/check_docs.py", "check_docs")
+encoding = load(ROOT / ".agents/skills/governing-agents/scripts/check_encoding.py", "check_encoding")
+docs = load(ROOT / ".agents/skills/governing-agents/scripts/check_docs.py", "check_docs")
 mcp = load(ROOT / ".agents/mcp/server.py", "mcp_server")
-runner = load(ROOT / ".agents/skills/agent-ops/scripts/run.py", "run_agent")
-scope = load(ROOT / ".agents/skills/agent-ops/scripts/scope.py", "scope")
-size = load(ROOT / ".agents/skills/agent-ops/scripts/check_skill_size.py", "check_skill_size")
+runner = load(ROOT / ".agents/skills/governing-agents/scripts/run.py", "run_agent")
+scope = load(ROOT / ".agents/skills/governing-agents/scripts/scope.py", "scope")
+size = load(ROOT / ".agents/skills/governing-agents/scripts/check_skill_size.py", "check_skill_size")
 verify = load(
-    ROOT / ".agents/skills/cpp-content/scripts/verify_examples.py",
+    ROOT / ".agents/skills/writing-cpp/scripts/verify_examples.py",
     "verify_examples",
 )
 
@@ -33,7 +33,7 @@ def main() -> int:
     assert encoding.control_issues("auto\x07") == [(1, 5, "U+0007")]
     assert encoding.control_issues("中文\n\ttext") == []
     assert encoding.suspicious("\u951f" * 4)
-    assert encoding.severity(Path(".agents/skills/agent-ops/scripts/x.py")) == "hard"
+    assert encoding.severity(Path(".agents/skills/governing-agents/scripts/x.py")) == "hard"
     assert encoding.severity(Path("content/language-basics/types-and-variables.qmd")) == "hard"
 
     valid_answer = [
@@ -164,7 +164,7 @@ def main() -> int:
     assert knowledge_tool["inputSchema"]["properties"]["topK"]["maximum"] == 20
     review = next(tool for tool in mcp.TOOLS if tool["name"] == "project_review")
     assert review["inputSchema"]["properties"] == {}
-    assert runner.status_group(".agents/skills/catalog.md") == "maintenance"
+    assert runner.status_group(".agents/skills/governing-agents/references/catalog.md") == "maintenance"
     assert runner.status_group(".agents/knowledge/README.md") == "maintenance"
     changed_cpp = [
         "code/getting-started/first-program/first-program.cpp",
@@ -196,18 +196,18 @@ def main() -> int:
     )
     assert library_unit["chapter"] == "shared-library"
     assert scope.resolve_repo_domain(
-        ".agents/skills/github-ops/SKILL.md", ROOT
-    )["label"] == "skill github-ops"
+        ".agents/skills/shipping-github/SKILL.md", ROOT
+    )["label"] == "skill shipping-github"
     skill_reads = scope.resolve_repo_domain(
-        ".agents/skills/cpp-content/SKILL.md", ROOT
+        ".agents/skills/writing-cpp/SKILL.md", ROOT
     )["reads"]
-    assert skill_reads == [".agents/skills/cpp-content/SKILL.md"]
+    assert skill_reads == [".agents/skills/writing-cpp/SKILL.md"]
     maintenance_reads = scope.resolve_repo_domain(
-        ".agents/skills/agent-ops/references/refactor-guidelines.md", ROOT
+        ".agents/skills/governing-agents/references/refactor-guidelines.md", ROOT
     )["reads"]
-    assert ".agents/skills/catalog.md" in maintenance_reads
+    assert ".agents/skills/governing-agents/references/catalog.md" in maintenance_reads
     assert scope.resolve_repo_domain(
-        ".agents/knowledge/README.md", ROOT
+        ".agents/knowledge/KNOWLEDGE.md", ROOT
     )["label"] == "knowledge"
     def headings(path):
         return {
@@ -219,20 +219,20 @@ def main() -> int:
     agents_text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     assert "Plan Mode" in agents_text
     assert "提交与推送默认不做" in agents_text
-    assert not (ROOT / ".agents/skills/agent-ops/references/plan-artifacts.md").exists()
+    assert not (ROOT / ".agents/skills/governing-agents/references/plan-artifacts.md").exists()
     git_workflow_text = (
-        ROOT / ".agents/skills/github-ops/references/git-workflow.md"
+        ROOT / ".agents/skills/shipping-github/references/git-workflow.md"
     ).read_text(encoding="utf-8")
     assert "只在用户明确要求时" in git_workflow_text
-    assert (ROOT / ".agents/skills/cpp-content/references/cpp/language-basics.md").is_file()
-    assert (ROOT / ".agents/knowledge/cpp-content/language-basics-path.md").is_file()
-    assert (ROOT / ".agents/knowledge/agent-ops/scalable-course-maintenance.md").is_file()
+    assert (ROOT / ".agents/skills/writing-cpp/references/cpp/language-basics.md").is_file()
+    assert (ROOT / ".agents/knowledge/cpp-teaching/path/language-basics-path.md").is_file()
+    assert (ROOT / ".agents/knowledge/agent-workspace/navigation/scalable-course-maintenance.md").is_file()
     assert runner.display_command("kb-index") == "知识库索引"
     assert runner.display_check("kb-eval") == "知识库评测"
     assert "默认本地交付的依据" in headings(
-        ROOT / ".agents/knowledge/agent-ops/host-planning-delivery.md"
+        ROOT / ".agents/knowledge/agent-workspace/navigation/host-planning-delivery.md"
     )
-    assert (ROOT / ".agents/knowledge/agent-ops/retrieval-governance.md").is_file()
+    assert (ROOT / ".agents/knowledge/agent-workspace/retrieval/retrieval-governance.md").is_file()
     tools = {tool["name"]: tool for tool in mcp.TOOLS}
     execution_only = {
         "project_review",
