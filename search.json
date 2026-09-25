@@ -1,0 +1,1009 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "C++ 学习轨迹笔记",
+    "section": "",
+    "text": "开始阅读\n先进入“入门与构建”，按页面顺序完成七个小目标。再从“语言基础”学习类型和变量。“工程应用”用一页说明这些构建产物在真实项目中的职责，可以随时阅读。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 学习轨迹笔记</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#开始阅读",
+    "href": "index.html#开始阅读",
+    "title": "C++ 学习轨迹笔记",
+    "section": "",
+    "text": "入门与构建\n从 WSL2 开始，经过直接编译、最小程序结构、CMake、多文件工程，最后完成静态库和动态库。\n查看内容 →\n\n\n语言基础\n学习类型、变量、常量，以及后续语言概念。\n查看内容 →\n\n\n工程应用\n理解可执行文件和动态库在真实工程中各自承担什么职责。\n查看内容 →",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 学习轨迹笔记</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/index.html",
+    "href": "content/getting-started/index.html",
+    "title": "入门与构建",
+    "section": "",
+    "text": "按顺序阅读即可。每页只完成一个目标，并为下一页留下可以继续使用的文件。\n\n\n准备 WSL2 C++ 开发环境\n在 Windows 上准备 Ubuntu 和 C++ 工具。\n\n\n编译并运行第一个 C++ 程序\n直接编译一个源文件并运行。\n\n\n拆分最小 C++ 程序结构\n分清入口、声明、实现、编译和链接。\n\n\n用 CMake 构建 C++ 程序\n用构建规则重复生成程序。\n\n\n用 CMake 管理多文件工程\n把接口、实现和程序入口拆开。\n\n\n构建静态库并链接程序\n把库代码链接进最终程序。\n\n\n构建动态库并运行程序\n让程序在运行时查找库文件。\n\n\n\n\n\n\n\n\n注意统一开发环境\n\n\n\n本笔记的命令默认在 WSL2 Ubuntu 中执行。先完成准备 WSL2 C++ 开发环境，再按页面顺序继续学习。",
+    "crumbs": [
+      "入门与构建"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html",
+    "href": "content/getting-started/setup-wsl2.html",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "",
+    "text": "安装 WSL2 和 Ubuntu\n本章在 Windows 上准备后续 C++ 学习所需的 Ubuntu 环境。WSL2 提供运行 Linux 的环境，Ubuntu 是本章使用的 Linux 发行版。完成后，你能在 Ubuntu 中安装并定位 C++ 开发工具。\n以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu 发行版。\n命令完成后按提示重启 Windows。重启后从开始菜单首次启动 Ubuntu，并按顺序完成初始化：\n以后可以从 Windows 开始菜单启动 Ubuntu，也可以在 PowerShell 或 Windows Terminal 中执行 wsl 进入默认发行版。再次看到 Ubuntu 提示符后，继续执行 Ubuntu 命令。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#安装-wsl2-和-ubuntu",
+    "href": "content/getting-started/setup-wsl2.html#安装-wsl2-和-ubuntu",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "",
+    "text": "PowerShell（管理员）\n\n# 安装 WSL2 和默认的 Ubuntu 发行版\nwsl --install\n\n\n\n创建 Linux 用户名和密码。输入密码时终端不会显示字符，这是正常现象。\n等待初始化完成，直到看到类似 user@host:~$ 的提示符。\n从看到该提示符开始，本章后续命令都在这个 Ubuntu 终端中执行。\n\n\n\n\n\n\n\n\n注意认识 Ubuntu 提示符\n\n\n\n\nuser 是 Linux 用户名。\nhost 是计算机名。\n~ 表示当前用户的主目录。\n末尾的 $ 表示普通用户提示符。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#安装-c-工具",
+    "href": "content/getting-started/setup-wsl2.html#安装-c-工具",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "安装 C++ 工具",
+    "text": "安装 C++ 工具\n先更新软件包索引并升级已安装的软件，再安装后续需要的开发工具。\n\n\nUbuntu Bash\n\n# 更新软件包索引\nsudo apt update\n\n# 升级已安装的软件包\nsudo apt upgrade -y\n\n# 安装 C++ 开发工具\nsudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build\n\nclang 提供编译器，clangd 提供代码提示，lldb 提供调试器，CMake 和 Ninja 负责构建，libc++ 相关包提供 C++ 标准库。\n\n\n\n\n\n\n提示下载较慢时再更换软件源\n\n\n\n只有默认软件源下载明显过慢时才需要更换来源。更换软件源只影响软件下载位置，不改变编译器和构建工具。可以参考清华 Ubuntu 软件源帮助。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#检查工具命令是否可定位",
+    "href": "content/getting-started/setup-wsl2.html#检查工具命令是否可定位",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "检查工具命令是否可定位",
+    "text": "检查工具命令是否可定位\n执行下面的命令，确认当前 Ubuntu 的 PATH 中可以找到这些工具。\n\n\nUbuntu Bash\n\ncommand -v clang++ clangd lldb cmake ninja\n\n输出顺序与命令中的工具顺序一致，实际路径可能因 Ubuntu 环境不同而变化。下面是一个输出示例：\n\n\n输出示例\n\n/usr/bin/clang++\n/usr/bin/clangd\n/usr/bin/lldb\n/usr/bin/cmake\n/usr/bin/ninja\n\n只要每项都输出非空路径，就说明对应命令已经安装并且可以被 Shell 定位，不要求路径与示例完全一致。这项检查不能证明编译、构建、调试或代码提示功能正常。后续 Hello World 程序会通过实际编译和运行验证最小编译链。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#常见错误",
+    "href": "content/getting-started/setup-wsl2.html#常见错误",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "常见错误",
+    "text": "常见错误\n\nWSL2 安装失败\n如果提示“虚拟机平台未启用”，按下面的顺序检查系统设置，再重新安装。\n\n定位虚拟化设置\n在电脑启动设置或任务管理器中确认 CPU 虚拟化已经开启。\n启用 WSL 功能\n在“启用或关闭 Windows 功能”中启用“虚拟机平台”和“适用于 Linux 的 Windows 子系统”，然后重启 Windows。\n验证安装\n重新执行 wsl --install，并在重启后确认能够进入 Ubuntu 提示符。\n\n\n\n找不到工具\n如果某个工具显示 command not found，按下面的顺序恢复到检查步骤。\n\n定位缺失命令\n\n\nUbuntu Bash\n\ncommand -v clang++\n\n没有输出时，确认终端位于 Ubuntu，而不是 Windows PowerShell。\n重新安装工具\n在 Ubuntu 中重新执行本章的 sudo apt install 命令。\n验证命令定位\n重新执行 command -v clang++ clangd lldb cmake ninja，每项都应输出非空路径。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#自测问题",
+    "href": "content/getting-started/setup-wsl2.html#自测问题",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\ncommand -v clang++ 能列出路径，是否就能证明 clang++ 已经可以成功编译程序？为什么？\n\n查看答案\n不能。它只证明 Shell 能在当前 PATH 中找到命令。还需要实际编译并运行一个程序，才能验证编译链的功能。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#本章回顾",
+    "href": "content/getting-started/setup-wsl2.html#本章回顾",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "本章回顾",
+    "text": "本章回顾\n看到 Ubuntu 提示符，并且 command -v 能列出全部工具路径，说明这些命令已经可以被 Shell 定位。下一章会创建第一个源文件，通过实际编译和运行继续验证 clang++。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html",
+    "href": "content/getting-started/first-program.html",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "",
+    "text": "创建源文件\n本章用一个源文件走通“写代码、编译、运行”这条最短路径。完成后，终端会输出 Hello, World!。下一章再拆开多文件程序的结构。完整示例见 first-program 示例目录。\n新建 first-program.cpp，输入下面的代码。\nmain() 是程序入口，后面的花括号 {} 组成函数体。不必现在记住其他细节，先按下面的步骤得到结果。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#创建源文件",
+    "href": "content/getting-started/first-program.html#创建源文件",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "",
+    "text": "first-program.cpp\n\n// 程序入口：向标准输出打印问候。\n#include &lt;iostream&gt;\n\nint main() {\n  std::cout &lt;&lt; \"Hello, World!\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#编译并运行",
+    "href": "content/getting-started/first-program.html#编译并运行",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "编译并运行",
+    "text": "编译并运行\n在源码所在目录执行下面的命令。\n\n\nUbuntu Bash（first-program 目录）\n\n# 创建构建目录\nmkdir -p build\n\n# 编译并链接源文件\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program\n\n# 运行程序\n./build/first-program\n\n程序输出如下：\n\n\n输出\n\nHello, World!\n\nclang++ 先编译源码，再把程序需要的运行代码链接起来。-o build/first-program 指定可执行文件的输出路径，./ 表示运行当前目录中的文件。看到 Hello, World!，说明这个单文件程序已经完成编译、链接并运行。\n\n\n\n\n\n\n注意编译选项\n\n\n\n\n-std=c++20 选择 C++20 标准。\n-stdlib=libc++ 选择 libc++ 标准库。\n-Wall -Wextra -Werror 打开常见警告，并让警告阻止构建。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#修改后验证",
+    "href": "content/getting-started/first-program.html#修改后验证",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "修改后验证",
+    "text": "修改后验证\n把源码中的 Hello, World! 改成其他文字，再执行下面的命令。\n\n\nUbuntu Bash（first-program 目录）\n\n# 重新编译\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program\n# 运行程序\n./build/first-program\n\n终端显示修改后的文字，说明源码改变后重新编译并运行成功。源码改变后必须重新编译。\n示例目录中的 build-and-run.sh 会依次完成创建目录、编译和运行：\n\n\nUbuntu Bash（first-program 目录）\n\n# 编译并运行当前示例\nbash build-and-run.sh",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#常见错误",
+    "href": "content/getting-started/first-program.html#常见错误",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n找不到 clang++\n如果提示 command not found: clang++，先检查当前 Ubuntu 终端能否定位编译器。\n\n定位工具\n\n\nUbuntu Bash\n\ncommand -v clang++\n\n修复环境\n没有输出时，回到上一章重新安装 C++ 工具，并确认命令是在 Ubuntu 中执行。\n验证编译\n回到本章的编译命令，程序成功输出 Hello, World! 后再继续。\n\n\n\n编译出现 error\n编译器会在输出中给出文件名、行号和第一条错误原因。按下面的顺序修复后重新运行。\n\n定位错误\n查看第一条 error: 前后的文件名和行号。\n修复源码\n修改对应位置，保留 main() 和输出语句的完整结构。\n验证结果\n重新执行编译和运行命令，终端应显示源码中的问候文字。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#自测问题",
+    "href": "content/getting-started/first-program.html#自测问题",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\n单文件程序从源码到终端输出，中间经过哪些步骤？\n\n查看答案\nclang++ 读取源文件，完成编译和链接，生成可执行文件。运行该文件后，程序把 Hello, World! 写到终端。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#本章回顾",
+    "href": "content/getting-started/first-program.html#本章回顾",
+    "title": "编译并运行第一个 C++ 程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把一个源文件编译成可执行程序。下一章会拆开这个最小程序，说明入口、头文件、声明、定义和链接各自为什么存在。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>编译并运行第一个 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html",
+    "href": "content/getting-started/minimal-program-structure.html",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "",
+    "text": "查看工程文件\n上一章的程序只有一个源文件。本章把同一个问候程序拆成入口、接口和实现三个文件。你将先阅读目录和源码，再通过编译与链接确认它们如何协作。\n编译器分别处理两个 .cpp 文件，链接器再把它们的结果组合成一个可执行程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#查看工程文件",
+    "href": "content/getting-started/minimal-program-structure.html#查看工程文件",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "",
+    "text": "工程目录\n\nminimal-program-structure/\n├── main.cpp          # 程序入口，调用问候接口并输出结果\n├── greeting.h        # 声明 makeGreeting()\n├── greeting.cpp      # 定义 makeGreeting()\n└── build-and-run.sh  # 一次完成创建目录、编译和链接",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#阅读三个文件",
+    "href": "content/getting-started/minimal-program-structure.html#阅读三个文件",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "阅读三个文件",
+    "text": "阅读三个文件\n按“入口 → 接口 → 实现”的顺序阅读下面的源码。\n\nmain.cpp 如何看到声明\nmain() 是程序入口，操作系统从它的第一条语句开始执行，花括号 {} 之间是函数体。\n\n\nmain.cpp\n\n// 程序入口：调用 makeGreeting() 并输出结果。\n#include &lt;iostream&gt;\n\n#include \"greeting.h\"\n\nint main() {\n  std::cout &lt;&lt; makeGreeting() &lt;&lt; \"\\n\";\n  return 0;\n}\n\nmain() 最后返回 0，表示程序正常结束。std::cout 是标准输出流，字符串末尾的 \\n 表示换行。\nmain.cpp 通过 #include \"greeting.h\" 看到 makeGreeting() 的声明，因此能在调用点做类型检查。#include 只把头文件内容放进当前翻译单元，不会把 greeting.cpp 的实现链接进程序。\n\n\ngreeting.h 如何声明接口\n下面的头文件声明返回 std::string 的函数，声明末尾必须有分号，也没有函数体：\n\n\ngreeting.h\n\n// 问候接口：声明 makeGreeting()，供其他源文件调用。\n#pragma once\n\n#include &lt;string&gt;\n\nstd::string makeGreeting();\n\n#pragma once 是广泛支持的实现扩展，不是 ISO C++ 标准保证。本项目用它防止同一个头文件在一次编译中重复包含。#include &lt;string&gt; 提供 std::string 的声明。尖括号和引号表达不同的查找意图，具体搜索路径由编译器和编译参数决定。\n\n\ngreeting.cpp 如何提供定义\n实现文件包含自己的头文件，并提供与声明完全一致的函数定义：\n\n\ngreeting.cpp\n\n// 实现 greeting.h 中声明的 makeGreeting()。\n#include \"greeting.h\"\n\nstd::string makeGreeting() {\n  return \"Hello, World!\";\n}\n\n实现只在一个源文件中出现，避免重复定义。头文件和实现的返回类型、函数名与参数必须一致，否则调用点看到的接口和链接输入就不再是同一个函数。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#编译并链接",
+    "href": "content/getting-started/minimal-program-structure.html#编译并链接",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "编译并链接",
+    "text": "编译并链接\n两个源文件先经过预处理和编译，再由链接器组合成可执行程序。\n\n编译：分别生成目标文件\n预处理器先把 #include \"greeting.h\" 的声明放进 main.cpp 对应的翻译单元，这个阶段只解决“调用点能看到什么”。编译器再分别处理两个源文件，把每个翻译单元转换为目标文件。-c 表示只编译、不进行最终链接，因此可以看到两个独立的中间产物。\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\n# 创建构建目录\nmkdir -p build\n# 分别生成两个目标文件\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c main.cpp -o build/main.o\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build/greeting.o\n\n命令成功后，build/main.o 和 build/greeting.o 应该存在。目标文件还不是可以直接运行的程序。\n\n\n链接：组合目标文件\n链接器把两个目标文件中的入口、调用关系和函数实现组合起来，解析 main.cpp 对 makeGreeting() 的引用，并生成最终可执行文件。\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \\\n  build/main.o build/greeting.o -o build/minimal-program-structure\n\n链接成功后会生成 build/minimal-program-structure。如果省略 build/greeting.o，编译阶段仍可能成功，但链接器会报告 undefined reference to makeGreeting()。\n\n\n运行：验证最终产物\n运行可执行文件，确认加载和执行阶段也成功。也可以运行 bash build-and-run.sh，让脚本一次完成创建目录、编译和链接。\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\n./build/minimal-program-structure\n\n输出如下：\n\n\n输出\n\nHello, World!",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#常见错误",
+    "href": "content/getting-started/minimal-program-structure.html#常见错误",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "常见错误",
+    "text": "常见错误\n\nundefined reference to makeGreeting\n这个错误说明编译器看到了声明，但链接器没有找到 makeGreeting() 的实现。按下面的顺序恢复。\n\n定位缺失定义\n查看链接命令是否包含 greeting.cpp 或 build/greeting.o。\n修复链接输入\n把缺失的 greeting.cpp 加回编译和链接命令。\n验证链接结果\n重新执行本章的编译、链接和运行命令，终端应输出 Hello, World!。\n\n\n\n找不到 greeting.h\n编译器提示找不到 greeting.h 时，按下面的顺序检查头文件位置。\n\n定位当前目录\n先用 pwd 确认当前目录，再用 ls main.cpp greeting.cpp greeting.h 确认三个文件都在。命令没有列出文件时，说明执行位置不对。\n修复包含路径\n回到示例目录再执行命令。文件位于其他目录时，用 -I 告诉编译器头文件路径。\n验证编译\n重新执行本章的编译和链接命令，两个源文件都应成功生成目标文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#自测问题",
+    "href": "content/getting-started/minimal-program-structure.html#自测问题",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\n为什么先把 main.cpp 和 greeting.cpp 分别编译成目标文件，而不是只执行一次链接命令？\n\n查看答案\n每个源文件先独立编译，编译器才能分别检查各自的翻译单元并生成可复用的目标文件，链接阶段再组合这些目标文件。这样修改一个源文件时，构建系统可以只重新编译受影响的部分。\n\n为什么链接命令必须包含 greeting.cpp 或 build/greeting.o？\n\n查看答案\ngreeting.h 只提供 makeGreeting() 的声明，真正的函数定义在 greeting.cpp 中。链接输入缺少该定义时，调用点虽然通过了编译，链接器仍无法解析符号。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#本章回顾",
+    "href": "content/getting-started/minimal-program-structure.html#本章回顾",
+    "title": "拆分最小 C++ 程序结构",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能区分程序入口、声明、实现、编译和链接。下一章用 CMake 把这套命令保存成可重复的工程规则。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>拆分最小 C++ 程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html",
+    "href": "content/getting-started/cmake-project.html",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "",
+    "text": "查看工程文件\n上一章每次修改后都要手动执行编译命令。本章把编译参数写进 CMakeLists.txt，再用 CMake 和 Ninja 重复构建。\n示例工程包含三个文件：\n程序入口仍然只负责输出问候句，避免把语言细节和构建工具混在一起。\n构建规则如下：\nproject() 设置工程名。set() 选择 C++20、输出目录和编译数据库。add_executable() 创建名为 app 的可执行目标，后面的 target_compile_options() 和 target_link_options() 为它设置编译与链接参数。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#查看工程文件",
+    "href": "content/getting-started/cmake-project.html#查看工程文件",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "",
+    "text": "工程目录\n\ncmake-project/\n├── CMakeLists.txt    # 构建规则\n├── build-and-run.sh  # 一键配置、构建并运行\n└── main.cpp          # 程序源码\n\n\n\n\nmain.cpp\n\n// 程序入口：向标准输出打印问候。\n#include &lt;iostream&gt;\n\nint main() {\n  std::cout &lt;&lt; \"Hello, World!\\n\";\n  return 0;\n}\n\n\n\n\nCMakeLists.txt\n\n# 构建 CMakeProject 可执行目标。\ncmake_minimum_required(VERSION 3.31)\nproject(CMakeProject LANGUAGES CXX)\n\n# 使用 C++20，并把可执行文件统一输出到 build/bin。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n\n# 生成编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 创建 app 可执行目标。\nadd_executable(app main.cpp)\n\n# 使用 libc++，并启用常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(app PRIVATE -stdlib=libc++)",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#配置工程",
+    "href": "content/getting-started/cmake-project.html#配置工程",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "配置工程",
+    "text": "配置工程\n在工程根目录执行下面的命令。CMake 会读取构建规则，并生成 Ninja 使用的文件。\n\n\nUbuntu Bash（工程根目录）\n\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n\n-S . 指定源码目录，-B build 指定构建目录，-G Ninja 选择 Ninja。只有构建规则改变时才需要重新配置。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#构建并运行",
+    "href": "content/getting-started/cmake-project.html#构建并运行",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 编译并链接 app\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\nCMake 生成 build/bin/app，Ninja 负责实际编译和链接。修改 main.cpp 后再次执行 cmake --build build 即可。\n也可以直接运行 bash build-and-run.sh，依次完成配置、构建和运行。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#常见错误",
+    "href": "content/getting-started/cmake-project.html#常见错误",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n配置时找不到 Ninja\n先检查命令是否安装：\n\n\nUbuntu Bash\n\ncommand -v cmake ninja clang++\n\n缺少工具时，回到搭建 WSL2 开发环境重新安装。\n\n\n构建后找不到 app\n执行 ./build/bin/app 时提示文件不存在，或构建结束后 build/bin/app 仍未生成。按下面的顺序定位，再重新构建并运行。\n\n确认执行位置\n当前目录不是工程根目录时，build/ 会指向错误位置。用根目录特征文件确认位置：\n\n\nUbuntu Bash\n\nls CMakeLists.txt\n\n输出包含 CMakeLists.txt，说明当前位于工程根目录。否则先用 cd 进入示例工程目录。\n重新构建并定位失败来源\n重新构建并显示每条实际执行的编译命令：\n\n\nUbuntu Bash（工程根目录）\n\ncmake --build build --verbose\n\n错误通常来自第一条编译信息，按文件名和行号修正源码后重新构建。\n确认产物已生成\n\n\nUbuntu Bash（工程根目录）\n\nls -l build/bin/app\n\n命令列出 app 文件后，运行 ./build/bin/app，确认输出仍为 Hello, World!。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#自测问题",
+    "href": "content/getting-started/cmake-project.html#自测问题",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\n修改 main.cpp 后，为什么通常只需要再次执行 cmake --build build，而不必重新执行配置命令？\n\n查看答案\n配置阶段已经把 CMakeLists.txt 转换成构建规则。修改源文件只影响构建阶段，cmake --build build 会根据依赖关系重新编译并链接。只有构建规则、生成器或编译器配置改变时，才需要重新配置。\n\ncmake -S . -B build 和 cmake --build build 分别负责什么？\n\n查看答案\n前者读取项目配置并生成构建规则，后者执行这些规则，实际调用编译器和链接器生成程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#本章回顾",
+    "href": "content/getting-started/cmake-project.html#本章回顾",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用 CMake 保存构建规则，并通过 cmake --build 构建 app。下一章会把代码拆成多个文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html",
+    "href": "content/getting-started/multi-file-project.html",
+    "title": "用 CMake 管理多文件工程",
+    "section": "",
+    "text": "查看工程结构\n代码变多后，把接口、实现和程序入口放在同一个文件中会很难阅读。本章把 Hello, World! 示例拆成三个源文件，再由 CMake 构建成一个程序。\ninclude/ 放头文件，src/ 放实现和程序入口。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#查看工程结构",
+    "href": "content/getting-started/multi-file-project.html#查看工程结构",
+    "title": "用 CMake 管理多文件工程",
+    "section": "",
+    "text": "工程目录\n\nmulti-file-project/\n├── CMakeLists.txt    # 构建规则\n├── build-and-run.sh  # 一键构建并运行\n├── include/\n│   └── greeting.h    # 接口声明\n└── src/\n    ├── greeting.cpp  # 接口实现\n    └── main.cpp      # 程序入口",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#阅读源码",
+    "href": "content/getting-started/multi-file-project.html#阅读源码",
+    "title": "用 CMake 管理多文件工程",
+    "section": "阅读源码",
+    "text": "阅读源码\ngreeting.h 声明 makeGreeting()，让其他源文件知道这个函数如何使用。\n\n\ninclude/greeting.h\n\n// 问候接口：声明 makeGreeting()，供其他源文件调用。\n#pragma once\n\n#include &lt;string&gt;\n\nstd::string makeGreeting();\n\ngreeting.cpp 实现这个函数。\n\n\nsrc/greeting.cpp\n\n// 实现 greeting.h 中声明的 makeGreeting()。\n#include \"greeting.h\"\n\n#include &lt;string&gt;\n\nstd::string makeGreeting() {\n  return \"Hello, World!\";\n}\n\nmain.cpp 调用函数并输出结果。\n\n\nsrc/main.cpp\n\n// 程序入口：调用 makeGreeting() 并输出结果。\n#include &lt;iostream&gt;\n\n#include \"greeting.h\"\n\nint main() {\n  std::cout &lt;&lt; makeGreeting() &lt;&lt; \"\\n\";\n  return 0;\n}\n\n编译 main.cpp 时，编译器只需要看到函数声明。链接阶段再把 main.cpp 和 greeting.cpp 连成一个程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#查看构建规则",
+    "href": "content/getting-started/multi-file-project.html#查看构建规则",
+    "title": "用 CMake 管理多文件工程",
+    "section": "查看构建规则",
+    "text": "查看构建规则\n\n\nCMakeLists.txt\n\n# 构建 MultiFileProject 可执行目标。\ncmake_minimum_required(VERSION 3.31)\nproject(MultiFileProject LANGUAGES CXX)\n\n# 使用 C++20，并把可执行文件统一输出到 build/bin。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n\n# 生成编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 收集 src/ 下的直属源文件，新增 .cpp 后重新构建即可进入目标。\nfile(GLOB APP_SOURCES CONFIGURE_DEPENDS \"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp\")\n\n# 创建 app 可执行目标，源文件来自 src/ 的收集结果。\nadd_executable(app ${APP_SOURCES})\n\n# 让 app 找到 include/ 中的头文件。\ntarget_include_directories(app PRIVATE include)\n\n# 使用 libc++，并启用常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\nfile(GLOB ...) 收集 src/ 下的源文件，add_executable() 用收集结果创建 app。CONFIGURE_DEPENDS 让 Ninja 在构建前检查目录变化：新增 .cpp 后不必修改 CMakeLists.txt，直接重新构建就会进入目标。target_include_directories() 让 app 能从 include/ 找到 greeting.h。\n收集规则只覆盖 src/ 直属的 .cpp。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#构建并运行",
+    "href": "content/getting-started/multi-file-project.html#构建并运行",
+    "title": "用 CMake 管理多文件工程",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译并链接 app\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n也可以运行 bash build-and-run.sh。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#常见错误",
+    "href": "content/getting-started/multi-file-project.html#常见错误",
+    "title": "用 CMake 管理多文件工程",
+    "section": "常见错误",
+    "text": "常见错误\n\n找不到 greeting.h\n确认 CMakeLists.txt 包含 target_include_directories(app PRIVATE include)，再重新配置并构建。\n\n\n链接器找不到 makeGreeting()\n确认 src/greeting.cpp 存在，且文件后缀是 .cpp，因为收集规则只包含 src/ 直属的 .cpp 文件。修正后重新配置并构建：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让收集规则重新读取 src/ 下的源文件\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译并链接 app\ncmake --build build",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#自测问题",
+    "href": "content/getting-started/multi-file-project.html#自测问题",
+    "title": "用 CMake 管理多文件工程",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\ntarget_include_directories(app PRIVATE include) 和源文件收集规则分别解决什么问题？\n\n查看答案\ntarget_include_directories 让目标知道到哪里查找头文件，解决声明的可见性。源文件收集规则决定哪些 .cpp 会进入目标并参与编译，解决实现是否进入构建和后续链接。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#本章回顾",
+    "href": "content/getting-started/multi-file-project.html#本章回顾",
+    "title": "用 CMake 管理多文件工程",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把接口、实现和程序入口拆开。下一章会把可复用实现构建成静态库。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>用 CMake 管理多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html",
+    "href": "content/getting-started/static-library.html",
+    "title": "构建静态库并链接程序",
+    "section": "",
+    "text": "认识静态库\n当同一份实现要被多个程序使用时，每次复制源码会带来重复维护。本章把 greeting 构建成静态库，再链接进 app。\n静态库在 Linux 上通常使用 .a 扩展名。它保存已经编译好的库代码，不能直接运行。链接 app 时，链接器会把程序实际使用的库代码放进最终可执行文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#认识静态库",
+    "href": "content/getting-started/static-library.html#认识静态库",
+    "title": "构建静态库并链接程序",
+    "section": "",
+    "text": "工程目录\n\nstatic-library/\n├── CMakeLists.txt\n├── main.cpp\n└── greeting/\n    ├── CMakeLists.txt\n    ├── include/\n    │   └── greeting.h\n    └── src/\n        └── greeting.cpp",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#查看构建规则",
+    "href": "content/getting-started/static-library.html#查看构建规则",
+    "title": "构建静态库并链接程序",
+    "section": "查看构建规则",
+    "text": "查看构建规则\n顶层规则负责加载库目录并创建 app。\n\n\nCMakeLists.txt\n\n# 构建 StaticLibrary 工程：根 main.cpp 使用 greeting/ 提供的静态库。\ncmake_minimum_required(VERSION 3.31)\nproject(StaticLibrary LANGUAGES CXX)\n\n# 使用 C++20，并把可执行文件和库分别输出到 build/bin 与 build/lib。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\nset(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)\n\n# 生成编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 加载 greeting/CMakeLists.txt 中的静态库目标。\nadd_subdirectory(greeting)\n\n# 创建 app 可执行目标，并在链接阶段使用 greeting 静态库。\nadd_executable(app main.cpp)\ntarget_link_libraries(app PRIVATE greeting)\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\n库目录自己负责创建 greeting 目标。\n\n\ngreeting/CMakeLists.txt\n\n# 构建 greeting 静态库。\n\n# 构建静态库，并把 include/ 作为它的公开接口目录。\nadd_library(greeting STATIC src/greeting.cpp)\ntarget_include_directories(greeting PUBLIC include)\ntarget_compile_options(greeting PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n\nadd_library(greeting STATIC ...) 创建静态库。PUBLIC 表示使用这个库的程序也能找到 include/。target_link_libraries(app PRIVATE greeting) 告诉 CMake：构建 app 时使用这个库。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#构建并运行",
+    "href": "content/getting-started/static-library.html#构建并运行",
+    "title": "构建静态库并链接程序",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译库和 app，并完成链接\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n构建后会得到 build/lib/libgreeting.a 和 build/bin/app。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#检查静态库产物",
+    "href": "content/getting-started/static-library.html#检查静态库产物",
+    "title": "构建静态库并链接程序",
+    "section": "检查静态库产物",
+    "text": "检查静态库产物\n\n\nUbuntu Bash（static-library 工程根目录）\n\nldd build/bin/app\n\n输出中不会出现 libgreeting.a。静态库只参与链接，需要的代码已经进入 app，运行时不再读取 .a 文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#选择静态库",
+    "href": "content/getting-started/static-library.html#选择静态库",
+    "title": "构建静态库并链接程序",
+    "section": "选择静态库",
+    "text": "选择静态库\n静态库能让程序少带一个运行时库文件，适合希望简化部署的场景。代价是库改变后，所有使用它的程序都要重新链接。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#常见错误",
+    "href": "content/getting-started/static-library.html#常见错误",
+    "title": "构建静态库并链接程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n链接器找不到 makeGreeting()\n先确认顶层 CMakeLists.txt 包含 target_link_libraries(app PRIVATE greeting)。补回后重新配置并构建：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让 CMake 重新读取链接关系\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译库和 app，并完成链接\ncmake --build build",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#自测问题",
+    "href": "content/getting-started/static-library.html#自测问题",
+    "title": "构建静态库并链接程序",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\n为什么 ldd build/bin/app 不会列出 libgreeting.a？\n\n查看答案\n静态库只在链接阶段提供目标代码，链接器会把被使用的代码复制进 app。程序运行时不再依赖原来的 .a 文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/static-library.html#本章回顾",
+    "href": "content/getting-started/static-library.html#本章回顾",
+    "title": "构建静态库并链接程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能构建并链接静态库。下一章会改成动态库，观察程序运行时如何查找库文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>构建静态库并链接程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html",
+    "href": "content/getting-started/shared-library.html",
+    "title": "构建动态库并运行程序",
+    "section": "",
+    "text": "认识动态库\n静态库代码会进入最终程序。动态库改为在程序运行时加载，多个程序也可以共享同一个库文件。本章把上一章的 greeting 改成动态库。\n动态库在 Linux 上通常使用 .so 扩展名。构建 app 时，链接器记录它对库的依赖，不把库代码复制进程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#认识动态库",
+    "href": "content/getting-started/shared-library.html#认识动态库",
+    "title": "构建动态库并运行程序",
+    "section": "",
+    "text": "内容\n静态库\n动态库\n\n\n\n\n文件\nlibgreeting.a\nlibgreeting.so\n\n\n链接结果\n库代码进入 app\napp 记录库依赖\n\n\n运行条件\n不再需要库文件\n必须找到匹配的 .so",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#查看构建规则",
+    "href": "content/getting-started/shared-library.html#查看构建规则",
+    "title": "构建动态库并运行程序",
+    "section": "查看构建规则",
+    "text": "查看构建规则\n顶层规则与静态库工程基本相同，只改变库的输出目录和运行路径。\n\n\nCMakeLists.txt\n\n# 构建 SharedLibrary 工程：根 main.cpp 使用 greeting/ 提供的动态库。\ncmake_minimum_required(VERSION 3.31)\nproject(SharedLibrary LANGUAGES CXX)\n\n# 使用 C++20，并把可执行文件和库分别输出到 build/bin 与 build/lib。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\nset(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)\n\n# 生成编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 加载 greeting/CMakeLists.txt 中的动态库目标。\nadd_subdirectory(greeting)\n\n# 创建 app 可执行目标，并在链接阶段记录对 greeting 动态库的依赖。\nadd_executable(app main.cpp)\ntarget_link_libraries(app PRIVATE greeting)\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\n# 运行 app 时从 build/bin/../lib 查找动态库。\nset_target_properties(app PROPERTIES BUILD_RPATH \"$ORIGIN/../lib\")\n\n库目录把 STATIC 改成 SHARED。\n\n\ngreeting/CMakeLists.txt\n\n# 构建 greeting 动态库。\n\n# 构建动态库，并把 include/ 作为它的公开接口目录。\nadd_library(greeting SHARED src/greeting.cpp)\ntarget_include_directories(greeting PUBLIC include)\ntarget_compile_options(greeting PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\ntarget_link_options(greeting PRIVATE -stdlib=libc++)\n\nBUILD_RPATH \"$ORIGIN/../lib\" 会把库的查找位置写进 app。$ORIGIN 表示 app 所在目录，所以程序能从 build/bin/ 找到旁边的 build/lib/。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#构建并运行",
+    "href": "content/getting-started/shared-library.html#构建并运行",
+    "title": "构建动态库并运行程序",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译动态库和 app，并完成链接\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n构建产物是 build/lib/libgreeting.so 和 build/bin/app。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#检查动态库",
+    "href": "content/getting-started/shared-library.html#检查动态库",
+    "title": "构建动态库并运行程序",
+    "section": "检查动态库",
+    "text": "检查动态库\n\n\nUbuntu Bash（工程根目录）\n\nldd build/bin/app | grep libgreeting\n\n输出会显示 libgreeting.so 的查找结果。移动或删除这个 .so 后，程序将无法启动。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#常见错误",
+    "href": "content/getting-started/shared-library.html#常见错误",
+    "title": "构建动态库并运行程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n运行时找不到 libgreeting.so\n先确认 build/lib/libgreeting.so 已生成，再检查顶层规则是否包含 BUILD_RPATH \"$ORIGIN/../lib\"。补回后重新配置和构建：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让 RPATH 写入新构建的 app\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 重新编译并链接\ncmake --build build\n# 查看 app 记录的库查找结果\nldd build/bin/app | grep libgreeting",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#自测问题",
+    "href": "content/getting-started/shared-library.html#自测问题",
+    "title": "构建动态库并运行程序",
+    "section": "自测问题",
+    "text": "自测问题\n先自己回答，再展开核对。\n\n为什么动态库工程可能构建成功，但运行 app 时仍然失败？\n\n查看答案\n构建阶段只证明链接器记录了动态库依赖。运行阶段还需要动态加载器找到匹配的 .so。如果库文件不在搜索路径中，或 RPATH 没有指向 build/lib/，程序就无法启动。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/shared-library.html#本章回顾",
+    "href": "content/getting-started/shared-library.html#本章回顾",
+    "title": "构建动态库并运行程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能构建动态库，并让程序在运行时找到它。完成本页后，入门路线中的六个构建阶段就全部走通。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>构建动态库并运行程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/index.html",
+    "href": "content/language-basics/index.html",
+    "title": "语言基础",
+    "section": "",
+    "text": "入门与构建已经完成了从源码到工程的基本闭环。实际程序会记录数量、比例、状态和限制条件；本分册先用这些常见数据说明 C++ 的语言规则，再逐步扩展到运算、控制流和更复杂的类型。\n\n\n基础类型与变量\n用 int、double、bool 和 char 表达常见数据，并理解变量、类型和作用域。\n\n\n初始化与类型推断\n区分初始化与赋值，掌握列表初始化、auto 和初始化列表推导。\n\n\n常量与配置\n用 const 和 constexpr 表达不会随流程改变的值。\n\n\n类型安全与数值边界\n检查类型范围、溢出、转换、浮点精度、bool 和 std::size_t 的常见陷阱。\n\n\n后续章节会继续补充运算、控制流、函数、字符串和自定义类型。",
+    "crumbs": [
+      "语言基础"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html",
+    "href": "content/language-basics/types-and-variables.html",
+    "title": "基础类型与变量",
+    "section": "",
+    "text": "选择基础类型\n程序需要保存数量、比例、状态和字符。类型说明一份数据能表示什么，变量则给这份数据一个可以在代码中使用的名字。本章只讨论 C++ 内置基础类型与变量；文本类型放到字符串章节。\n常见基础类型可以先这样理解：\n类型不是装饰：它会影响可表示的值、允许的运算和编译器能发现的错误。double 不是“更大的 int”，bool 也不是只能保存任意整数的容器。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#选择基础类型",
+    "href": "content/language-basics/types-and-variables.html#选择基础类型",
+    "title": "基础类型与变量",
+    "section": "",
+    "text": "类型\n适合表示\n示例\n\n\n\n\nint\n整数\ncount\n\n\ndouble\n近似小数\nratio\n\n\nbool\n真或假\nenabled\n\n\nchar\n单个字符\ngrade\n\n\n\n\n\ntypes-and-variables.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  int count{12};\n  double ratio{0.85};\n  bool enabled{true};\n  char grade{'A'};\n\n  std::cout &lt;&lt; \"数量: \" &lt;&lt; count &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; ratio &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; std::boolalpha &lt;&lt; \"已启用: \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"等级: \" &lt;&lt; grade &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#区分声明初始化与赋值",
+    "href": "content/language-basics/types-and-variables.html#区分声明初始化与赋值",
+    "title": "基础类型与变量",
+    "section": "区分声明、初始化与赋值",
+    "text": "区分声明、初始化与赋值\n声明变量时要写类型和名字，初始化则是在创建时给它第一个值；赋值是修改已经存在的变量：\n\n\n片段：声明、初始化与赋值\n\n// 片段\nint count{12};\ncount = count - 3;\nint remaining{count};\n\n变量的类型在创建后不会改变。需要表达数量时使用整数，需要表达是否成立时使用 bool，不要把所有数据都塞进 double 或 int。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#观察作用域与名字可见性",
+    "href": "content/language-basics/types-and-variables.html#观察作用域与名字可见性",
+    "title": "基础类型与变量",
+    "section": "观察作用域与名字可见性",
+    "text": "观察作用域与名字可见性\n写在函数外的名字处于全局作用域，整个翻译单元都可能看见它；写在一对花括号内的名字处于块作用域，离开代码块后就不能再使用：\n\n\n片段：全局作用域与块作用域\n\n// 片段\nint defaultLimit{1};  // 全局作用域：示例中的共享值\n\nint main() {\n  int count{12};      // main 的块作用域\n  {\n    int increment{3}; // 内层块作用域\n    count += increment;\n  }\n  // increment 在这里已经不可见。\n}\n\n全局可见不等于应该到处修改。可变全局状态会让代码难以测试；后续常量、函数和自定义类型章节会继续说明更稳妥的组织方式。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#常见错误",
+    "href": "content/language-basics/types-and-variables.html#常见错误",
+    "title": "基础类型与变量",
+    "section": "常见错误",
+    "text": "常见错误\n\n把字符当成文本\nchar 用单引号表示一个字符，例如 'A'；多个字符的文本属于字符串主题。\n\n\n使用前没有初始化\n局部自动变量写成 int count; 后直接读取，没有可依赖的初始值，属于未定义行为。创建时使用 {} 或明确的初始值。\n\n\n过度使用全局变量\n全局作用域用于少量真正共享的值即可。会变化的状态优先放在更小的作用域中。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#自测问题",
+    "href": "content/language-basics/types-and-variables.html#自测问题",
+    "title": "基础类型与变量",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么比例适合用 double，数量适合用 int？\n全局作用域和块作用域的可见范围有什么不同？\ncount = 500; 与 int count{500}; 分别是什么动作？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#本章回顾",
+    "href": "content/language-basics/types-and-variables.html#本章回顾",
+    "title": "基础类型与变量",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用 int、double、bool 和 char 表达基础数据，并能区分初始化、赋值以及全局和块作用域；可运行示例见 types-and-variables.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>基础类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html",
+    "href": "content/language-basics/initialization-and-type-inference.html",
+    "title": "初始化与类型推断",
+    "section": "",
+    "text": "区分初始化与赋值\n创建对象时，初始值必须有明确来源。初始化发生在变量诞生时，赋值发生在变量已经存在之后；auto 则让编译器从初始化表达式推断类型。本章使用 C++11 引入的列表初始化和类型推断，并按 C++20 的规则观察结果。\n优先使用花括号初始化。空花括号会把基础类型初始化为零或对应的值，也能拒绝许多窄化转换：\n局部自动变量若只写 int count; 就直接读取，其值是不确定的；这类读取属于未定义行为。不要为了“看看会输出什么”而运行这种代码。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#区分初始化与赋值",
+    "href": "content/language-basics/initialization-and-type-inference.html#区分初始化与赋值",
+    "title": "初始化与类型推断",
+    "section": "",
+    "text": "片段：初始化与赋值\n\n// 片段\nint count{};            // 值初始化为 0\nint limit{100};         // 创建时得到 100\ncount = 80;             // 修改已有变量\n\n// int level{3.5};      // 编译失败：窄化转换\nint truncated = 3.5;    // 可编译，但结果为 3，不推荐",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#让-auto-记录推断结果",
+    "href": "content/language-basics/initialization-and-type-inference.html#让-auto-记录推断结果",
+    "title": "初始化与类型推断",
+    "section": "让 auto 记录推断结果",
+    "text": "让 auto 记录推断结果\nauto 不是动态类型。编译器在编译期根据初始化表达式确定类型，变量创建后仍保持该类型：\n\n\ninitialization-and-type-inference.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  int count{};\n  int limit{100};\n  count = 80;\n\n  auto value = 1200;      // int\n  auto ratio = 4.5;       // double\n  auto enabled = true;    // bool\n\n  value -= 100;\n  std::cout &lt;&lt; \"数量: \" &lt;&lt; count &lt;&lt; \"/\" &lt;&lt; limit &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"值: \" &lt;&lt; value &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; ratio &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; std::boolalpha &lt;&lt; \"已启用: \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n  return 0;\n}\n\n当右侧类型一眼可见时，auto 能减少重复；当类型本身就是接口意图时，显式写出类型更清楚。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#注意初始化列表的推导",
+    "href": "content/language-basics/initialization-and-type-inference.html#注意初始化列表的推导",
+    "title": "初始化与类型推断",
+    "section": "注意初始化列表的推导",
+    "text": "注意初始化列表的推导\nC++11 的 auto 与花括号组合有特殊规则。C++20 中，多个元素会推导为 std::initializer_list&lt;T&gt;；单个元素的直接列表初始化推导为该元素类型：\n\n\n片段：初始化列表推导\n\n// 片段\nauto oneValue{10};           // int\nauto manyValues{10, 20, 30}; // std::initializer_list&lt;int&gt;\nauto sameType = {10, 20};    // std::initializer_list&lt;int&gt;\n// auto mixed{10, 2.5};       // 编译失败：元素类型无法统一\n\nauto 仍然需要初始化表达式；auto value; 没有推断来源，会编译失败。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#常见错误",
+    "href": "content/language-basics/initialization-and-type-inference.html#常见错误",
+    "title": "初始化与类型推断",
+    "section": "常见错误",
+    "text": "常见错误\n\n把初始化当成赋值\n初始化只发生一次；之后的 = 是赋值。区分二者能避免误判对象何时获得第一个有效值。\n\n\n忽略花括号的窄化检查\n列表初始化拒绝可能丢失信息的转换。遇到编译错误时，先确认目标类型和数值范围，而不是马上改回 C 风格强转。\n\n\n误以为 auto 会改变类型\nauto 只在编译期推断一次，不会让变量在运行时从 int 变成 double。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#自测问题",
+    "href": "content/language-basics/initialization-and-type-inference.html#自测问题",
+    "title": "初始化与类型推断",
+    "section": "自测问题",
+    "text": "自测问题\n\ncount{} 和 count = 80 分别发生在什么时机？\nauto manyValues{10, 20, 30}; 为什么不是一个 int？\n什么情况下显式类型比 auto 更能表达接口意图？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#本章回顾",
+    "href": "content/language-basics/initialization-and-type-inference.html#本章回顾",
+    "title": "初始化与类型推断",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用列表初始化建立安全的初始值，并能解释 C++11 auto 与初始化列表的推导边界；示例见 initialization-and-type-inference.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与类型推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html",
+    "href": "content/language-basics/constants.html",
+    "title": "常量与配置",
+    "section": "",
+    "text": "用 const 固定运行时值\n程序中的上限、比例和阈值通常是规则，而不是运行时随意修改的状态。把这些值写成常量，可以让名字表达意图，也让编译器阻止误修改。本章介绍 const 和 constexpr，复杂配置对象留到自定义类型章节。\nconst 变量必须在创建时初始化，之后不能通过这个名字赋值：\nconst 表示“不能通过这个名字修改”，不等于对象在所有路径上永远不可变。先问这个值是否代表规则或不应变化的事实，再决定是否使用它。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#用-const-固定运行时值",
+    "href": "content/language-basics/constants.html#用-const-固定运行时值",
+    "title": "常量与配置",
+    "section": "",
+    "text": "片段：运行时常量\n\n// 片段\nint currentValue{12};\nconst int maxCount{5};\n\n// maxCount = 6;  // 编译失败\ncurrentValue = 13; // 普通变量仍可修改",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#用-constexpr-表达编译期规则",
+    "href": "content/language-basics/constants.html#用-constexpr-表达编译期规则",
+    "title": "常量与配置",
+    "section": "用 constexpr 表达编译期规则",
+    "text": "用 constexpr 表达编译期规则\n如果值由常量表达式计算得到，可以使用 constexpr：\n\n\nconstants.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  const int maxCount{5};\n  constexpr int threshold{5000};\n  constexpr double ratio{0.90};\n\n  std::cout &lt;&lt; \"最大数量: \" &lt;&lt; maxCount &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"阈值: \" &lt;&lt; threshold &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; ratio &lt;&lt; \"\\n\";\n  return 0;\n}\n\nconstexpr 变量也具备不可修改属性，并要求初始化结果能在编译期确定。带单位的整数值通常比没有单位的浮点值更容易检查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#给规则起稳定的名字",
+    "href": "content/language-basics/constants.html#给规则起稳定的名字",
+    "title": "常量与配置",
+    "section": "给规则起稳定的名字",
+    "text": "给规则起稳定的名字\n项目约定常量使用 k 加大驼峰，例如 kMaxCount。名字应说明单位和含义；比例、时间和其他带单位的数值最好在名字中体现单位。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#常见错误",
+    "href": "content/language-basics/constants.html#常见错误",
+    "title": "常量与配置",
+    "section": "常见错误",
+    "text": "常见错误\n\n只声明不初始化 const\nconst int limit; 没有可用的初始值，会编译失败。常量的值必须在创建时给出。\n\n\n把 const 和 constexpr 当成完全相同\n二者都阻止通过该名字修改，但 constexpr 还要求初始化结果可在编译期确定。运行时才知道的配置仍可使用 const。\n\n\n用浮点保存需要精确比较的值\n需要精确计数或比较时优先使用合适的整数单位；比例等测量值才考虑 double，并在数值安全章节学习容差比较。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#自测问题",
+    "href": "content/language-basics/constants.html#自测问题",
+    "title": "常量与配置",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么最大数量适合写成常量？\nconst 和 constexpr 的共同点与主要区别是什么？\n为什么带单位的整数阈值通常比无单位的数值更容易正确使用？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constants.html#本章回顾",
+    "href": "content/language-basics/constants.html#本章回顾",
+    "title": "常量与配置",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把不会改变的值写成有意义的 const 或 constexpr 常量，并理解初始化要求；示例见 constants.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>常量与配置</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html",
+    "title": "类型安全与数值边界",
+    "section": "",
+    "text": "查询大小、范围和宽度\n数量、测量值和索引都会遇到边界：类型大小不够会溢出，浮点数会有舍入误差，混合有符号和无符号也可能改变比较结果。本章把这些高频问题整理成可检查的规则。\n标准不保证 int 永远是 32 位，也不保证 long 一定比 int 大。使用 sizeof(T) 查看当前实现的大小，用 &lt;limits&gt; 查询范围；需要明确宽度时使用 &lt;cstdint&gt; 的 std::int32_t 等类型。\nsizeof 的结果类型是 std::size_t。浮点类型的有效数字、最小正值和最大值也应从 std::numeric_limits&lt;float&gt; 或 double 查询，而不是凭记忆猜测。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#查询大小范围和宽度",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#查询大小范围和宽度",
+    "title": "类型安全与数值边界",
+    "section": "",
+    "text": "type-safety-and-numeric-bounds.cpp\n\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n#include &lt;limits&gt;\n\nint main() {\n  std::cout &lt;&lt; \"int 字节数: \" &lt;&lt; sizeof(int) &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"int 最大值: \" &lt;&lt; std::numeric_limits&lt;int&gt;::max() &lt;&lt; \"\\n\";\n  std::int32_t value{1000};\n  std::cout &lt;&lt; \"明确宽度的值: \" &lt;&lt; value &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#管好有符号无符号和溢出",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#管好有符号无符号和溢出",
+    "title": "类型安全与数值边界",
+    "section": "管好有符号、无符号和溢出",
+    "text": "管好有符号、无符号和溢出\nint、long 默认有符号；加上 unsigned 后只能表示非负值。无符号整数溢出按模 2^N 回绕，有定义；有符号溢出是未定义行为，编译器可能据此进行激进优化。新手规则是：不要为了“装更多正数”随意把数量改成 unsigned，更不要混用有符号和无符号。\n\n\n片段：安全观察无符号边界\n\n// 片段\n#include &lt;limits&gt;\n\nunsigned int value{std::numeric_limits&lt;unsigned int&gt;::max()};\n++value;  // 回绕到 0，有定义\n\n// int signedValue{std::numeric_limits&lt;int&gt;::max()};\n// ++signedValue;  // 有符号溢出：未定义行为，不要运行\n\n数组越界、空指针解引用和读取未初始化变量同样属于未定义行为。它不是“每次随机”，而是编译器可以假设这条路径不会发生。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#显式转换先问是否会丢信息",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#显式转换先问是否会丢信息",
+    "title": "类型安全与数值边界",
+    "section": "显式转换，先问是否会丢信息",
+    "text": "显式转换，先问是否会丢信息\n隐式转换可能悄悄发生，例如 int 转 double、double 转 int，或有符号转无符号。需要转换时优先写出意图：\n\n\n片段：显式转换\n\n// 片段\ndouble value{19.99};\nint wholeValue{static_cast&lt;int&gt;(value)};  // 截断为 19\ndouble ratio{static_cast&lt;double&gt;(wholeValue)};\n\n大整数转小整数可能截断，浮点转整数会丢掉小数部分。避免 (int)value 这种 C 风格强转，因为它隐藏了转换类别。\n整数相除时，如果两边都是整数，结果会向零截断；例如 7 / 2 得到 3，余数用 % 获取。整数除以零仍是未定义行为，计算前要验证除数。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#分别处理浮点数和-bool",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#分别处理浮点数和-bool",
+    "title": "类型安全与数值边界",
+    "section": "分别处理浮点数和 bool",
+    "text": "分别处理浮点数和 bool\n二进制浮点数通常不能精确表示十进制小数，所以 0.1 + 0.2 不应直接与 0.3 用 == 比较。比较时使用与问题尺度匹配的容差；还要识别 NaN 和无穷大。整数除以零是未定义行为，浮点除以零可能产生 inf 或 nan，都不应忽略。\n\n\n片段：浮点与 bool\n\n// 片段\n#include &lt;cmath&gt;\n#include &lt;iostream&gt;\n\ndouble a{0.1 + 0.2};\nbool closeEnough{std::abs(a - 0.3) &lt; 1e-9};\nbool enabled{static_cast&lt;bool&gt;(2)};  // 非 0 转为 true\nstd::cout &lt;&lt; std::boolalpha &lt;&lt; closeEnough &lt;&lt; \" \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n\n默认输出 bool 是 1 或 0；std::boolalpha 才会输出 true 或 false。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#还要留意三个常见边界",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#还要留意三个常见边界",
+    "title": "类型安全与数值边界",
+    "section": "还要留意三个常见边界",
+    "text": "还要留意三个常见边界\n\nchar 是否带符号由实现决定；存文本字符时不要把它当成固定范围的有符号整数。\n整数文字量的类型由后缀和能容纳它的候选类型决定；需要明确宽度时写出目标类型并检查转换。\nstd::size_t 常用于大小和下标。它是无符号类型，与 int 比较前先统一类型，避免负数转换成很大的正数。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#常见错误",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#常见错误",
+    "title": "类型安全与数值边界",
+    "section": "常见错误",
+    "text": "常见错误\n\n用等号比较计算得到的浮点数\n改用容差，并先处理 NaN、无穷大和单位尺度。\n\n\n把无符号当成“更安全的整数”\n无符号只改变范围和溢出规则，不能防止越界、错误比较或逻辑错误。\n\n\n看到警告就用强转压掉\n先确认范围、单位和符号，再选择 static_cast 或修改数据模型。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#自测问题",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#自测问题",
+    "title": "类型安全与数值边界",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么要用 &lt;limits&gt; 和 &lt;cstdint&gt;，而不是假定 int 为 32 位？\n无符号回绕和有符号溢出的标准语义有什么不同？\n为什么 std::size_t 与 int 混合比较可能隐藏错误？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#本章回顾",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#本章回顾",
+    "title": "类型安全与数值边界",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能查询基础类型的真实边界，区分有定义回绕与未定义行为，并对转换、浮点和 bool 使用安全写法；示例见 type-safety-and-numeric-bounds.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>类型安全与数值边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/index.html",
+    "href": "content/practice/index.html",
+    "title": "工程应用",
+    "section": "",
+    "text": "本分册关注 C++ 产物在真实工程中的职责。它不替代入门分册的构建练习，也不把 Android NDK、Gradle 或 JNI 实现展开成教程。\n\n\n影像算法的交付形态\n理解影像算法为什么先用可执行文件仿真，再以按 ABI 交付的动态库 SDK 接入 App 或系统模块。",
+    "crumbs": [
+      "工程应用"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html",
+    "href": "content/practice/android-imaging.html",
+    "title": "影像算法的交付形态",
+    "section": "",
+    "text": "开发期的可执行文件\n本页只解释 Android 手机影像项目中两类原生（native）产物的职责，不提供 NDK、Gradle、JNI 实现或 APK 打包教程。\nAndroid 手机影像算法通常用 C++ 编写。开发阶段先把核心算法编译成可执行文件，在 PC 或设备上读取 YUV、RAW、RGBA 等图像数据或图片序列。它用来检查结果、对比效果、调整参数和做回归测试。\n设备端验证时，可以用 adb push 将程序和测试数据放进 /data/local/tmp，再从 shell 运行。这个程序直接调用算法，不需要先接入 App，问题边界更清晰。验证完成后，算法才会封装成动态库 SDK。仿真程序通常不是最终上线交付物。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>影像算法的交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#开发期的可执行文件",
+    "href": "content/practice/android-imaging.html#开发期的可执行文件",
+    "title": "影像算法的交付形态",
+    "section": "",
+    "text": "提示交付边界\n\n\n\n可执行文件服务于开发期仿真和验证。它可以随测试包进入设备，但不等于面向用户发布的 App 组件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>影像算法的交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#上线交付的动态库",
+    "href": "content/practice/android-imaging.html#上线交付的动态库",
+    "title": "影像算法的交付形态",
+    "section": "上线交付的动态库",
+    "text": "上线交付的动态库\n在 Android 手机影像开发中，动态库是算法上线时的常见交付形式。算法团队把 C++ 核心按 ABI（应用二进制接口）编译成 .so。这些 .so 连同头文件、模型、配置、JNI（Java 与 C++ 的接口）封装和集成文档组成 SDK。App、相机或系统模块通过 JNI 调用，不直接接触算法源码。\n这种交付方式便于独立编译算法、复用模块、适配不同硬件，也能减少上层对源码和模型的直接依赖。跨语言接口通常使用 extern \"C\" 暴露稳定的 C 风格函数，并避免直接传递复杂 C++ 对象，以降低兼容风险。.so 通常随 APK、AAB 或系统插件发布，仍受签名和应用商店政策限制，不是无条件热更新。\n\n\n常见交付链路\n\nC++ 核心 → 可执行程序仿真 → 按 ABI 提供的 .so SDK → JNI 集成 → App/相机上线",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>影像算法的交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#本章回顾",
+    "href": "content/practice/android-imaging.html#本章回顾",
+    "title": "影像算法的交付形态",
+    "section": "本章回顾",
+    "text": "本章回顾\n可执行文件负责开发期的仿真和验证，动态库 SDK 负责上线集成。两者共用同一套 C++ 核心，但交付对象、运行方式和关注点不同。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>影像算法的交付形态</span>"
+    ]
+  }
+]
