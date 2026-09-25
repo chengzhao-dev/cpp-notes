@@ -4,7 +4,7 @@
 静态阶段用单次字面匹配（子串查找）+ 计数，不对压缩后大 CSS 做宽模式扫描。
 Node、Playwright 与 Edge 可用时，调用 measure_pages.mjs 验证真实几何。不可用时
 输出明确 SKIP，不把静态断言冒充布局验收。
-规范出处：.agents/skills/quarto-theme/references/theme-system.md。
+规范出处：.agents/skills/designing-theme/references/theme-system.md。
 
 用法：python check_layout.py [--book-dir _book] [--browser]
 退出码：0 = 关键令牌全部存在，1 = 有缺失。
@@ -23,8 +23,11 @@ from pathlib import Path
 THEME_DIR = Path(__file__).resolve().parents[1]
 FONT_DIR = THEME_DIR / "assets" / "theme" / "assets" / "fonts"
 FONTS_CSS = THEME_DIR / "assets" / "theme" / "css" / "fonts.css"
+SHARED_TOKENS_CSS = THEME_DIR / "assets" / "theme" / "css" / "tokens.css"
+PALETTE_ROOT = THEME_DIR / "assets" / "theme" / "palettes"
 MEASURE_SCRIPT = Path(__file__).resolve().parent / "measure_pages.mjs"
 ROOT = THEME_DIR.parents[2]
+QUARTO_YML = ROOT / "_quarto.yml"
 FONT_FAMILIES = ("LXGW WenKai Screen", "LXGW Bright Code")
 EXPECTED_FONT_FACES = {
     "Fixel Text": 3,
@@ -44,21 +47,23 @@ def color_alpha(value):
     parts = [part.strip() for part in match.group(1).split(",")]
     return float(parts[3]) if len(parts) == 4 else 1.0
 
-# 与 references/theme-system.md / .agents/skills/quarto-theme/assets/theme/css/tokens.css 保持同步
-CHECKS = [
-    ("light body token #1F2328", "--body-color: #1F2328"),
-    ("light GitHub link #0969DA", "#0969DA"),
-    ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
-    ("dark navbar page-bg token", "--navbar-bg: #0D1117"),
-    ("body line-height 1.65", "line-height: 1.65"),
-    ("GitHub content width", "--content-width: 800px"),
+
+def active_palette_name(quarto_text=""):
+    """从 _quarto.yml 的 css 列表解析活跃 palette 名。"""
+    text = quarto_text
+    if not text and QUARTO_YML.is_file():
+        text = QUARTO_YML.read_text(encoding="utf-8")
+    match = re.search(r"palettes/([A-Za-z0-9_-]+)/tokens\.css", text)
+    return match.group(1) if match else None
+
+
+# 共享结构令牌与组件规则（与色板无关）
+SHARED_CHECKS = [
+    ("body line-height 1.75", "line-height: 1.75"),
+    ("content width", "--content-width: 800px"),
     ("code font 15px", "--code-font-size: 0.9375rem"),
-    ("code line-height 1.65", "--code-line-height: 1.65"),
-    ("code title background", "--code-title-bg"),
-    ("code title foreground", "--code-title-fg"),
-    ("code title padding", "--code-title-padding"),
-    ("light code background", "--code-bg: #F6F8FA"),
-    ("dark code background", "--code-bg: #161B22"),
+    ("code line-height 1.75", "--code-line-height: 1.75"),
+    ("code title padding token", "--code-title-padding"),
     ("ui font stack", '--ui-font: "Fixel Text", "LXGW WenKai Screen"'),
     ("cjk font fallback", '"LXGW WenKai Screen"'),
     ("code font stack", '--mono-font: "LXGW Bright Code", "LXGW WenKai Screen"'),
@@ -66,22 +71,42 @@ CHECKS = [
     ("code followup gap", "--code-followup-gap: 1rem"),
     ("list code followup spacing", "margin-top: var(--code-followup-gap)"),
     ("list code with filename selector", "li > :is(.code-copy-outer-scaffold, .code-with-filename"),
-    ("GitHub readable body font", "font-size: 1rem"),
-    ("accent dot token", "--dot-accent"),
-    ("dark page #0D1117", "#0D1117"),
-    ("dark body #E6EDF3", "#E6EDF3"),
-    ("dark link #4493F8", "#4493F8"),
-    ("callout note border light", "--callout-note-border: #2563EB"),
+    ("readable body font", "font-size: 1rem"),
     ("h2 rhythm", "margin-top: 2.75rem"),
     ("paragraphs follow the body column", "max-width: 100%"),
     ("answer disclosure container", "details.answer-disclosure"),
     ("answer disclosure summary", "details.answer-disclosure > summary"),
-    # callout 断言只测内置 5 类：自定义 .callout-* 类会被 Quarto 丢弃（见 rendering-and-output.md #12）
+    ("feature-grid max two columns", "calc((100% - 1.25rem) / 2)"),
+]
+
+# 语义令牌名必须存在（色值由活跃 palette 提供）
+TOKEN_NAME_CHECKS = [
+    ("code title background", "--code-title-bg"),
+    ("code title foreground", "--code-title-fg"),
+    ("accent dot token", "--dot-accent"),
     ("callout tip (best-practice semantics)", "--callout-tip-border"),
     ("callout warning (key-insight semantics)", "--callout-warning-border"),
     ("callout important (deep-dive semantics)", "--callout-important-border"),
-    ("feature-grid max two columns", "calc((100% - 1.25rem) / 2)"),
 ]
+
+# palettes/github 色值期望；换 pack 时改对应表，勿把实验包色值写进 github 表
+PALETTE_VALUE_CHECKS = {
+    "github": [
+        ("light body token #1F2328", "--body-color: #1F2328"),
+        ("light GitHub link #0969DA", "#0969DA"),
+        ("light navbar page-bg token", "--navbar-bg: #FFFFFF"),
+        ("dark navbar page-bg token", "--navbar-bg: #22272E"),
+        ("light code background", "--code-bg: #F6F8FA"),
+        ("dark code background", "--code-bg: #2D333B"),
+        ("dark page #22272E", "#22272E"),
+        ("dark body #ADBAC7", "#ADBAC7"),
+        ("dark link #539BF5", "#539BF5"),
+        ("callout note border light", "--callout-note-border: #2563EB"),
+    ],
+}
+
+# 兼容旧名：测试与外部引用仍可能导入 CHECKS
+CHECKS = SHARED_CHECKS + TOKEN_NAME_CHECKS + PALETTE_VALUE_CHECKS["github"]
 
 CALLOUT_CHECKS = [
     ("callout body font 16px", "font-size: 1rem;"),
@@ -258,7 +283,7 @@ def full_layout_required():
             "--quiet",
             "HEAD",
             "--",
-            ".agents/skills/quarto-theme/assets/theme",
+            ".agents/skills/designing-theme/assets/theme",
             "_quarto.yml",
         ],
         cwd=str(ROOT),
@@ -524,10 +549,34 @@ def main():
         p.read_text(encoding="utf-8", errors="ignore")
         for p in sorted(book_dir.rglob("*.css"))
     ]
+    # 源主题也纳入检索：共享令牌与活跃 palette 在渲染前即可核对
+    theme_css_sources = [
+        SHARED_TOKENS_CSS,
+    ]
+    quarto_text = QUARTO_YML.read_text(encoding="utf-8") if QUARTO_YML.is_file() else ""
+    palette = active_palette_name(quarto_text)
+    palette_tokens = None
+    if palette:
+        palette_tokens = PALETTE_ROOT / palette / "tokens.css"
+        theme_css_sources.append(palette_tokens)
+    source_css_texts = [
+        p.read_text(encoding="utf-8", errors="ignore")
+        for p in theme_css_sources
+        if p.is_file()
+    ]
+    search_texts = css_texts + source_css_texts
 
     fail = 0
-    for name, pattern in CHECKS:
-        found = any(pattern in text for text in css_texts)
+    if not palette or not palette_tokens or not palette_tokens.is_file():
+        print("  MISS active palette tokens  (palettes/<name>/tokens.css in _quarto.yml)")
+        fail += 1
+    else:
+        print(f"  OK   active palette `{palette}`  ({palette_tokens.as_posix()})")
+
+    checks = list(SHARED_CHECKS) + list(TOKEN_NAME_CHECKS)
+    checks.extend(PALETTE_VALUE_CHECKS.get(palette or "", []))
+    for name, pattern in checks:
+        found = any(pattern in text for text in search_texts)
         mark = "OK  " if found else "MISS"
         print(f"  {mark} {name}  ({pattern})")
         if not found:

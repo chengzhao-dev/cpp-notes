@@ -141,7 +141,7 @@ body.homepage #quarto-document-content h1 {
 }
 #quarto-document-content p,
 #quarto-document-content li {
-  line-height: 1.65;
+  line-height: 1.75;
 }
 /* 代码块↔代码块：额外 +0.4rem，命令序列更疏朗 */
 #quarto-document-content > :is(.code-copy-outer-scaffold, pre) + :is(.code-copy-outer-scaffold, pre),

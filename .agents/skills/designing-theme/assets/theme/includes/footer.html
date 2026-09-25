@@ -25,7 +25,7 @@
   // 避免与令牌双写漂移；取不到时按当前明暗兜底
   var sync = function () {
     var v = window.getComputedStyle(document.body).getPropertyValue('--page-bg').trim();
-    if (!v) v = document.body.classList.contains('quarto-dark') ? '#0D1117' : '#FFFFFF';
+    if (!v) v = document.body.classList.contains('quarto-dark') ? '#22272E' : '#FFFFFF';
     meta.setAttribute('content', v);
   };
   sync();

@@ -7,7 +7,7 @@ $font-family-monospace: "LXGW Bright Code", "LXGW WenKai Screen", ui-monospace, 
 $web-font-path: false !default;
 
 $font-size-root: 16px !default;
-$line-height-base: 1.65 !default;
+$line-height-base: 1.75 !default;
 $font-size-base: 1rem !default;
 
 // GitHub Light：以 GitHub 蓝色链接和绿色成功状态为主
@@ -22,7 +22,7 @@ $border-color: #D0D7DE !default;
 $navbar-bg: #FFFFFF !default;
 $navbar-fg: #1F2328 !default;
 
-// Callout 语义色（与 tokens.css --callout-*-border 亮色一致；驱动编译期图标 data URI）
+// Callout 语义色（与 palettes/github/tokens.css --callout-*-border 亮色一致；驱动编译期图标 data URI）
 $callout-color-note: #2563EB !default;
 $callout-color-tip: #16A34A !default;
 $callout-color-warning: #D97706 !default;

@@ -1,7 +1,7 @@
 interface:
   display_name: "Quarto Theme"
   short_description: "Adjust the Quarto book theme and CSS tokens"
-  default_prompt: "Use $quarto-theme to adjust the sidebar width and render to verify it."
+  default_prompt: "Use $designing-theme to adjust the sidebar width and render to verify it."
 
 policy:
   allow_implicit_invocation: true

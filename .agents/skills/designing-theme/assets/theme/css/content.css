@@ -4,7 +4,7 @@
 .table {
   --bs-table-hover-bg: transparent;
   /* 表体与正文同档：表格字号一旦小于正文，正文里嵌表格就会出现两次字级跳变，
-     扫读时表格被读成「另一类内容」。表头仍用小号大写（见 thead th）。 */
+     扫读时表格被读成「另一类内容」。表头小一号但不加大写（中文表头 uppercase 无意义且显僵硬）。 */
   font-size: 1rem;
   border-collapse: collapse;
   display: block; /* 宽表横向滚动，避免移动端溢出 */
@@ -32,8 +32,6 @@
   background-color: transparent;
   font-weight: 600;
   font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   text-align: left;
   padding-top: 0;
   border-bottom: 1px solid var(--table-border);
@@ -82,7 +80,7 @@ blockquote.blockquote {
 }
 /* 图片 / 图：圆角 + 细边 + 居中图注 */
 #quarto-document-content img:not(.no-border) {
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--code-border);
   max-width: 100%;
 }
@@ -100,7 +98,7 @@ blockquote.blockquote {
   background: var(--inline-code-bg);
   border: 1px solid var(--code-border);
   border-bottom-width: 2px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 0.1em 0.4em;
 }
 
@@ -124,7 +122,7 @@ dd {
 }
 #quarto-document-content details.answer-disclosure {
   border: 1px solid var(--card-border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 0.6rem 1rem;
   margin: 1.2rem 0;
 }
@@ -220,7 +218,7 @@ html {
 #quarto-document-content :is(h2, h3, h4, h5, h6):target {
   scroll-margin-top: 7rem;
   background-color: var(--line-hover-bg);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 0.05em 0.35em;
   margin-left: -0.35em;
 }

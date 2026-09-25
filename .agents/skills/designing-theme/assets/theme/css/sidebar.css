@@ -60,7 +60,7 @@ body::-webkit-scrollbar-thumb {
   padding: 0.3rem 1.5rem;
   margin: 0;
   border-left: 2px solid transparent;
-  border-radius: 0;
+  border-radius: var(--radius-sm);
   font-family: var(--ui-font);
   font-size: 0.875rem;
   font-weight: 400;
@@ -81,7 +81,7 @@ body::-webkit-scrollbar-thumb {
   font-weight: 600;
   background-color: var(--sidebar-active-bg);
   border-left: 2px solid var(--accent);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 }
 /* 嵌套子项（章节分组 / 小节）：缩进由条目 padding-left 提供，色条与 part 标题左缘对齐 */
 #quarto-sidebar .sidebar-section .sidebar-item {
@@ -101,7 +101,7 @@ body::-webkit-scrollbar-thumb {
   font-weight: 600;
   background-color: var(--sidebar-active-bg);
   border-left: 2px solid var(--accent);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
 }
 
 /* 右 TOC：分组标题 + 滚动高亮（冷灰 docs "On this page" 观感：14px 常规、不大写） */
@@ -185,7 +185,7 @@ nav.page-navigation {
   align-items: center;
   height: 100%;
   border: 1px solid var(--card-border);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   color: var(--body-color);
   font-size: 0.85rem;
   padding: 0.9rem 1.1rem;

@@ -35,7 +35,7 @@
   display: block;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 1.35rem 1.5rem;
   transition: var(--transition);
   min-height: 100%; /* 两卡并排时等高，避免短卡显得挤 */
@@ -44,6 +44,7 @@
 .landing-card:hover {
   border-color: var(--card-hover-border);
   background-color: var(--surface-raised);
+  box-shadow: var(--card-shadow);
 }
 .landing-card:focus-within {
   border-color: var(--accent);
@@ -54,7 +55,7 @@
   margin-top: 0;
   margin-bottom: 0.5rem;
   font-size: 1.0625rem;
-  font-weight: 700;        /* 卡片标题加粗（对齐 gitcn 卡片标题） */
+  font-weight: 600;        /* 卡片标题 600：文楷加粗辨识度有限，700 显僵 */
   color: var(--body-color);
 }
 #quarto-document-content .landing-card h3 a {
