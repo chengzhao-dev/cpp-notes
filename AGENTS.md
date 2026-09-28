@@ -11,7 +11,7 @@
 - 提交与推送默认不做。只有用户明确要求时，才按 `shipping-github/references/git-workflow.md` 执行 commit、push 或远端核对；提交信息用 `type(scope): 中文说明`（Conventional Commits），`check`、`verify`、`render` 和 `build` 只证明本地改动可用。
 - 面向用户的进度、结论和总结使用中文；命令、路径、代码和 API 名保留原文。计划与任务状态由宿主工具维护，本仓库不为此设立文件、模板或校验。
 - 成功执行每阶段只输出一行中文结论，不粘贴原始成功日志。失败时先给中文结论，再附最少诊断。`--verbose` 仅用于默认输出无法定位失败时。不回显密钥、凭据、`.env` 或无关个人信息。
-- 维护仓库规范时保持单一权威出处。流程和格式放 skill/reference，领域原因放 `.agents/knowledge/`。
+- 维护仓库规范时保持单一权威出处。流程和格式放 skill/reference，领域原因放 `.agents/knowledge/`；新增或迁移规则的落点表见 `.agents/skills/governing-agents/references/refactor-guidelines.md`。
 - 构建配置和脚本的版本规则见 `writing-cpp` 的代码风格 reference。QMD 代码块、`include` 文件和正文标点规则见 `writing-quarto` 对应 reference。
 
 ## C++ 学习轨迹笔记项目
@@ -53,7 +53,7 @@
 3. 预计读取超过 8 个文件或需要全仓检索时才派侦察代理。编辑回主线程完成。
 4. 中文文件使用 UTF-8 无 BOM、LF。修改 `.qmd`、skill 或主题 CSS 后先跑编码检查。QMD 正文标点和句长遵循 `writing-quarto/references/zh/writing-principles.md`。
 5. 修改 `.agents/skills/designing-theme/assets/theme/**` 或 `_quarto.yml` 会触发整本渲染。确认代价后运行 `render`；需要四档视口和明暗矩阵时运行 `render --require-browser`。
-6. `AGENTS.md` 受 `project_doc_max_bytes = 65536` 约束。`.agents/skills/` 的 L1/L2 与教学 QMD 体量由 `check_skill_size.py` 强制；知识库 Parent Token 由 `kb-check` 强制。
+6. `AGENTS.md` 受 `project_doc_max_bytes = 65536` 约束。`.agents/skills/` 的 L1/L2 体量由 `check_skill_size.py` 强制；教学 QMD 体量是本仓建议阈值（默认 WARN，`--strict` 才失败，可按章上调）；知识库 Parent Token 由 `kb-check` 强制。
 7. 长任务每轮推进一个可验证子目标。Plan Mode 严格只读，不得写文件、编译、渲染，也不得调用 `project_edit`、`project_build`、`project_verify` 或 `project_render`。只有用户发来新的明确批准消息后才进入执行；压缩摘要、重复的原始需求、计划完成标记、自动续跑和任务摘要都不算批准。上下文压缩后重读本文件与 `git status`，但仍在 Plan Mode 时只继续规划。执行阶段每轮按改动域运行一次 `run.ps1 check --profile ...`，跨域或发布收口再运行 `full`。排查失败或异常时才读 `.agents/incidents/INDEX.md`，其余时刻不读 incidents；每个任务开始时可读 `.agents/memory/MEMORY.md` 索引防重复踩坑。
 8. Git 对比服务于审查、冲突解决、发布和最近改动调试。普通文档任务不重复运行。
 

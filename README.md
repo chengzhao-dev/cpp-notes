@@ -21,6 +21,8 @@
 8. [类型与变量](content/language-basics/types-and-variables.qmd)
 9. [常量与不可变值](content/language-basics/constants.qmd)
 
+语言机制的工程用法见姊妹仓库 [cpp-board-games](https://github.com/chengzhao-dev/cpp-board-games)，其中的[棋盘与状态](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tic-tac-toe/03-board-and-state.qmd)把枚举、结构体与命名空间用在游戏状态模型上。
+
 [工程应用分册](content/practice/index.qmd)从真实项目视角说明构建产物的交付职责，其中的[影像算法的交付形态](content/practice/android-imaging.qmd)可以随时阅读。
 
 建议边读边输入命令。章节示例放在 `code/getting-started/` 和 `code/language-basics/`，可以直接运行，也可以修改后重新构建。
@@ -31,7 +33,6 @@
 | --- | --- |
 | `content/` | 笔记正文 |
 | `code/` | 正文使用的 C++ 示例 |
-| `.agents/knowledge/` | 写作和工程决定的依据 |
-| `.agents/` | 维护规则、检查脚本和网站主题 |
+| `.agents/` | 维护规则、领域知识库（`knowledge/`）、检查脚本和网站主题 |
 
 需要修改仓库时，先阅读 [AGENTS.md](AGENTS.md)。

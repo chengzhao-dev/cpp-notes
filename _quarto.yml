@@ -35,17 +35,18 @@ book:
         - content/language-basics/initialization-and-type-inference.qmd
         - content/language-basics/constants.qmd
         - content/language-basics/type-safety-and-numeric-bounds.qmd
+        - content/language-basics/enums-and-namespaces.qmd
+        - content/language-basics/structs-and-value-types.qmd
+    - part: content/language-advanced/index.qmd
+      chapters:
+        - content/language-advanced/strong-types.qmd
     - part: content/practice/index.qmd
       chapters:
         - content/practice/android-imaging.qmd
 
-# Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
-language:
-  callout-note-title: "注意"
-  callout-tip-title: "提示"
-  callout-important-title: "重要"
-  callout-warning-title: "警告"
-  callout-caution-title: "危险"
+filters:
+  # 与 cpp-board-games 仓库同构：filter 注册在顶层，对所有格式生效
+  - .agents/skills/writing-quarto/scripts/answer-disclosure.lua
 
 format:
   html:
@@ -85,8 +86,6 @@ format:
       # 与 palettes/github/meta.md 同步；语义色交给 Pandoc，不叠加自定义 token。
       light: github-light
       dark: github-dark
-    filters:
-      - .agents/skills/writing-quarto/scripts/answer-disclosure.lua
     # mermaid 不配置 theme：quarto-diagram 的 init.js 走 --mermaid-* 变量驱动的
     # 内置 themeCSS 路径，配色/字体由 theme/css/mermaid.css 控制（明暗自适应）
     include-in-header:
@@ -100,3 +99,11 @@ format:
 resources:
   # 整目录发布：自托管 woff2 + 站点图标 favicon.svg
   - .agents/skills/designing-theme/assets/theme/assets
+
+# Callout 中文标题（覆盖 Quarto zh 语言包：zh 默认 note=注记、caution=注意）
+language:
+  callout-note-title: "注意"
+  callout-tip-title: "提示"
+  callout-important-title: "重要"
+  callout-warning-title: "警告"
+  callout-caution-title: "危险"

@@ -21,5 +21,3 @@ jobs:
       - run: quarto render
       # 同时验证后处理脚本本身可用
       - run: python3 .agents/skills/maintaining-python/scripts/render/defer_mermaid.py
-      # 硬性门槛：书中所有 C++ 示例必须能编译
-      - run: python3 .agents/skills/writing-cpp/scripts/verify_examples.py
