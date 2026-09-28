@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-build-chain-v2"
 title: "C++ 构建与工具链决策依据"
-domain: "writing-cpp"
+domain: "cpp-teaching"
 subdomain: "toolchain"
 tags: [toolchain, clang, llvm, libcxx, lldb, cmake, ninja, ninja-build, generator, compiler_flags, sanitizer, warnings, optimization, header, translation_unit, include_path, include_directories, target_include_directories, source_glob, configure_depends, project_name, multi_file, clangd, compile_commands, verification]
 level_range: [0, 9]
@@ -17,7 +17,7 @@ estimated_tokens: 680
 
 本项目在 Windows 的 WSL2 Linux 环境中使用 Clang/LLVM、libc++、CMake 与 Ninja。先让最小程序编译和运行，再把命令固化为 CMake 目标。MSVC 仅作为对照，不是主线前置条件。
 
-工具职责要分开：`clang++` 负责编译器驱动的预处理、编译和链接；CMake 读取 `CMakeLists.txt` 并生成构建规则；Ninja 执行这些规则；调试器负责运行期排查；`clangd` 读取 `compile_commands.json` 提供语言服务。源码、目标文件、链接、可执行文件和运行期加载的阶段边界，不在本文件重复解释，统一见 `cpp-cpp-preprocessing-headers-linking-v1`。
+工具职责要分开：`clang++` 负责编译器驱动的预处理、编译和链接；CMake 读取 `CMakeLists.txt` 并生成构建规则；Ninja 执行这些规则；调试器负责运行期排查；`clangd` 读取 `compile_commands.json` 提供语言服务。源码、目标文件、链接、可执行文件和运行期加载的阶段边界，不在本文件重复解释，统一见 `cpp-preprocessing-headers-linking-v1`。
 
 环境按“编译器 → CMake + Ninja → 调试器 → 语言服务”建立依赖层次。Ubuntu 环境安装 `clang`、`clangd`、`llvm`、`lldb`、`libc++-dev`、`libc++abi-dev` 和 `ninja-build`。其中 `ninja-build` 是软件包名，安装后执行命令为 `ninja`。默认 Ubuntu 是本教程为降低选择成本采用的教学路径，不代表发行版优劣。
 

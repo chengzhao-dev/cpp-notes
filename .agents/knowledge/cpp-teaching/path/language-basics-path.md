@@ -1,13 +1,13 @@
 ---
 kb_id: "cpp-language-basics-path-v1"
 title: "C++ 语言基础的教学顺序与边界"
-domain: "writing-cpp"
-subdomain: "language_basics"
+domain: "cpp-teaching"
+subdomain: "path"
 tags: [cpp, language_basics, types, variables, constants, auto, scope, initialization, curriculum, build_boundary]
 level_range: [0, 4]
 dependencies: ["cpp-agent-context-budget-v1", "cpp-list-initialization-v1", "cpp-tooling-build-chain-v2"]
 created: "2026-09-16"
-updated: "2026-09-19"
+updated: "2026-09-28"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 760
 ---
@@ -50,7 +50,7 @@ estimated_tokens: 760
 
 ## 语言基础路线
 
-语言基础按“基础类型与变量 → 初始化与推断 → 常量 → 数值安全 → 运算 → 控制 → 函数 → 复合数据 → 自定义类型”推进：
+语言基础按“基础类型与变量 → 初始化与推断 → 常量 → 数值安全 → 枚举与命名空间 → 结构体与值类型 → 运算 → 控制 → 函数 → 复合数据 → 自定义类型”推进：
 
 1. 运算符与表达式。
 2. 条件、循环和代码块。
@@ -59,6 +59,10 @@ estimated_tokens: 760
 5. 自定义类型、类与引用。
 
 新章节只在任务矩阵登记后创建，一次只引入一个主要变化。前一章已经演示过的语法不再复制完整示例，只保留理解当前规则所需的最短上下文。
+
+## 值类型与分组章节的最小边界
+
+`enums-and-namespaces` 与 `structs-and-value-types` 插在数值安全之后、运算之前，为姊妹仓库 cpp-board-games 的项目值类型建模（如井字棋状态模型）提供最小语言集。枚举章只讲 `enum class` 声明、限定名访问、与整数的显式转换和命名空间分组，不讲位掩码与 `using enum`；结构体章只讲聚合初始化、成员默认值与值语义复制，成员函数、访问控制与引用留给原定章节。
 
 ## 扩展与验证约束
 

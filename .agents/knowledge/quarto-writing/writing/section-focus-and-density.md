@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-section-focus-density-v1"
 title: "教学小节的主线收束与信息分层"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "writing"
 tags: [section, focus, mainline, density, progressive_disclosure, command, output, validation, parameter, filename, box_ratio, long_paragraph, paragraph_merge, parent_heading, callout, callout_weight, result_callout, callout_transition, visual_hierarchy, font_scale, project_tree, inline_code, backticks, diagram]
 level_range: [0, 5]

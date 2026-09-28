@@ -7,7 +7,7 @@
 选项语义、作用域层级与生效边界的**唯一出处是知识库**，本文件只留本仓库的取值和写作口径：
 
 ```powershell
-& .agents/skills/governing-agents/scripts/run.ps1 kb-search "html 输出选项" --domain writing-quarto --subdomain html_output
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "html 输出选项" --domain quarto-writing --subdomain html_output
 & .agents/skills/governing-agents/scripts/run.ps1 kb-search --toc "代码块显示"
 ```
 
@@ -46,7 +46,7 @@
 ## 渲染与发布排查索引
 按症状查此表：每条只给可执行处置。**行为成因与取舍**的唯一出处是知识库，用
 `& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<症状关键词>"` 取用
-（可加 `--domain writing-quarto --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
+（可加 `--domain quarto-writing --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
 
 > 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · `{{< include >}}` 必须包在带语言名的围栏里
 

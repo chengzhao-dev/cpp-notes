@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-pages-deploy-v1"
 title: "GitHub Pages 部署方式与产物分支策略"
-domain: "shipping-github"
+domain: "repo-github"
 subdomain: "publishing"
 tags: [github_pages, deployment, artifact_branch, permissions, workflow, site_url]
 level_range: [0, 9]

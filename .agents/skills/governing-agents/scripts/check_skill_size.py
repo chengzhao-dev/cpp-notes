@@ -21,13 +21,15 @@ reference 过长则一次任务就读掉大量无关内容。本脚本把预算�
   L2  .agents/skills/*/references/**.md  <= 160 行 且 <= 6000 字符
       .agents/skills/governing-agents/references/catalog.md            <= 3000 字符
       （内聚的单一主题不硬拆：拆开会迫使一次读多份，反而更费 token）
-  L3  content/**/*.qmd（不含 index）     <= 150 行 且 <= 5000 有效字符
+  L3  content/**/*.qmd（不含 index）     建议 <= 150 行 且 <= 5000 有效字符
       有效字符排除围栏代码和 include 行；完整源码由 code/ 独立维护
-      content/**/index.qmd                <= 45 行
-      README.md                           <= 90 行
+      content/**/index.qmd                建议 <= 45 行
+      README.md                           建议 <= 90 行
+    L3 是本仓建议阈值，按章实际需要上调：先判断内容是否必要，再拆分或
+    上调（调整时同步 refactor-guidelines.md）；--strict 把建议越界判为失败。
 
-用法：python check_skill_size.py [--verbose]
-退出码：0 = 全部在预算内，1 = 有文件越界。
+用法：python check_skill_size.py [--strict] [--verbose]
+退出码：0 = 无硬失败（建议越界只 WARN），1 = 有硬失败或 --strict 下有建议越界。
 """
 import argparse
 import io
@@ -98,10 +100,12 @@ def main():
     except Exception:
         pass
     ap = argparse.ArgumentParser(description="skills 体积护栏")
+    ap.add_argument("--strict", action="store_true", help="L3 建议阈值越界也判失败")
     ap.add_argument("--verbose", action="store_true", help="逐项列出文件与字符数")
     args = ap.parse_args()
 
     bad = []
+    warned = []
     rows = []
 
     n0, c0, b0 = stat(ROOT / "AGENTS.md")
@@ -164,32 +168,42 @@ def main():
         rel = path.relative_to(ROOT).as_posix()
         rows.append((rel, n, c))
         if n > CONTENT_LINE_LIMIT:
-            bad.append(("L3 教学页面", rel, "%d 行 > %d" % (n, CONTENT_LINE_LIMIT)))
+            warned.append(("L3 教学页面", rel, "%d 行 > %d（本仓建议）" % (n, CONTENT_LINE_LIMIT)))
         elif c > CONTENT_CHAR_LIMIT:
-            bad.append(
-                ("L3 教学页面", rel, "%d 有效字符 > %d" % (c, CONTENT_CHAR_LIMIT))
+            warned.append(
+                ("L3 教学页面", rel, "%d 有效字符 > %d（本仓建议）" % (c, CONTENT_CHAR_LIMIT))
             )
     for path in indexes:
         n, c, _b = stat(path)
         rel = path.relative_to(ROOT).as_posix()
         rows.append((rel, n, c))
         if n > INDEX_LINE_LIMIT:
-            bad.append(("L3 索引页面", rel, "%d 行 > %d" % (n, INDEX_LINE_LIMIT)))
+            warned.append(("L3 索引页面", rel, "%d 行 > %d（本仓建议）" % (n, INDEX_LINE_LIMIT)))
     readme = ROOT / "README.md"
     n, c, _b = stat(readme)
     rows.append(("README.md", n, c))
     if n > README_LINE_LIMIT:
-        bad.append(("L3 仓库说明", "README.md", "%d 行 > %d" % (n, README_LINE_LIMIT)))
+        warned.append(("L3 仓库说明", "README.md", "%d 行 > %d（本仓建议）" % (n, README_LINE_LIMIT)))
 
     if args.verbose:
         for rel, n, c in rows:
             print(f"  {n:>4} 行 {c:>6} 字符  {rel}")
 
+    if args.strict:
+        bad.extend(warned)
+        warned = []
     if bad:
-        print(f"FAIL  context-size 越界 {len(bad)} 项")
+        print(f"FAIL  context-size 硬失败 {len(bad)} 项")
         for tier, name, why in bad:
             print(f"      {tier}  {name}  {why}")
+        for tier, name, why in warned:
+            print(f"      WARN {tier}  {name}  {why}")
         return 1
+    if warned:
+        print(f"WARN  context-size 建议越界 {len(warned)} 项（--strict 升级为失败）")
+        for tier, name, why in warned:
+            print(f"      {tier}  {name}  {why}")
+        return 0
     skills = len(list(ROOT.glob(L1[0])))
     refs = len(list(ROOT.glob(L2[0])))
     print(

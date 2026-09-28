@@ -1,7 +1,7 @@
 ---
-kb_id: "designing-theme-brand-bar-v1"
+kb_id: "cpp-theme-brand-bar-v1"
 title: "顶部品牌区的视觉一致性"
-domain: "designing-theme"
+domain: "visual-theme"
 subdomain: "navigation"
 tags: [navbar, brand, svg, baseline, responsive, dark_mode, contrast]
 level_range: [0, 9]

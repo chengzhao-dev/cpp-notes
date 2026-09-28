@@ -34,6 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 MIN_PYTHON = (3, 12)
 CONFIG = ROOT / "config.toml"
+# 可选的外部工具配置（工具绝对路径覆盖）；文件缺失时按环境变量与 PATH 解析
 TOOL_CONFIG = ROOT / ".agents" / "skills" / "maintaining-python" / "assets" / "config" / "runtime.json"
 
 

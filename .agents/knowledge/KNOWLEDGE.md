@@ -8,10 +8,17 @@
 ```text
 .agents/knowledge/
 ├── agent-workspace/               # Agent 运行、检索治理、上下文与维护（技能：governing-agents）
-├── cpp-teaching/                  # 按 style、toolchain 等性质归档（技能：writing-cpp）
-├── quarto-writing/                # 按 writing、rendering、output 等性质归档（技能：writing-quarto）
+│   ├── context/
+│   ├── navigation/
+│   └── retrieval/
+├── cpp-teaching/                  # 按 path、style、toolchain、types 等性质归档（技能：writing-cpp）
+├── quarto-writing/                # 按 output、rendering、writing 等性质归档（技能：writing-quarto）
 ├── visual-theme/                  # 主题令牌、布局几何与响应式行为（技能：designing-theme）
+│   ├── layout/
+│   └── navigation/
 └── repo-github/                   # Git、CI、Pages 与发布（技能：shipping-github）
+    ├── hygiene/
+    └── publishing/
 ```
 
 按性质创建子目录，不创建空目录。文件名与目录名一律纯 ASCII。
@@ -24,8 +31,8 @@ frontmatter 字段：
 |---|---|---|
 | `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-pattern-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
-| `domain` | 是 | 检索预过滤维度，取值与对应技能目录名一致 |
-| `subdomain` | 建议 | 同一技能内的主题筛选 |
+| `domain` | 是 | 检索预过滤维度，取同名领域目录值 |
+| `subdomain` | 建议 | 同一技能内的主题筛选，取同名子域目录值 |
 | `tags` | 建议 | 行内列表，参与概念图谱连线，也是冲突检测的概念来源之一 |
 | `level_range` | 建议 | 面向读者的难度区间 |
 | `dependencies` | 建议 | 前置知识的 `kb_id` 列表，图谱按它建边 |
@@ -63,7 +70,7 @@ frontmatter 字段：
 & .agents/skills/governing-agents/scripts/run.ps1 kb-index --rebuild  # 改分词或结构后全量重建
 & .agents/skills/governing-agents/scripts/run.ps1 kb-check            # 格式违规、重复、孤立、断链、P95 延迟
 & .agents/skills/governing-agents/scripts/run.ps1 kb-eval             # Top-5 召回率与注入 Token 预算
-& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<查询>" --domain writing-quarto --explain
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<查询>" --domain quarto-writing --explain
 ```
 
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/maintaining-python/scripts/`：

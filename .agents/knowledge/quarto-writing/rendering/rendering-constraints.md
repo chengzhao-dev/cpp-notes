@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-tooling-quarto-render-v2"
 title: "Quarto 渲染行为与失效模式"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "rendering"
 tags: [quarto, render, yaml, callout, include, encoding, troubleshooting, grid_width, reading_width, gutter, viewport_target, sidebar_width, margin_width, sidebar_collapse, collapse_level, text_wrap, code_block_border, code_title, filename, toc_indent, typography, line_height, font_stack, webfont_subset, fixel_text, lxgw_wenkai_screen, lxgw_bright_code, monaspace_argon, code_followup_gap, reference_sites, homepage_hero, marketing_layout]
 level_range: [0, 9]

@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-tooling-repo-hygiene-v1"
 title: "仓库一致性与分支保护依据"
-domain: "shipping-github"
-subdomain: "repository_hygiene"
+domain: "repo-github"
+subdomain: "hygiene"
 tags: [gitattributes, line_ending, gitignore, branch_protection, renormalize, workflow, diff_frequency]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-pages-deploy-v1"]

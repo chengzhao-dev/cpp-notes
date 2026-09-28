@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-chinese-style-v1"
 title: "中文技术写作的句段与措辞案例"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "writing"
 tags: [chinese, paragraph, long_paragraph, paragraph_merge, sentence, punctuation, semicolon, terminology, wording, direct_compilation, referent, validation, tone]
 level_range: [0, 9]

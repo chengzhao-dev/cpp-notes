@@ -1,10 +1,14 @@
 ---
-kb_id: "quarto-practice-page-pattern-v1"
+kb_id: "cpp-quarto-practice-pattern-v1"
 title: "工程应用分册的页面分层"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "writing"
+tags: [practice, landing, part_page, callout, answer_disclosure, page_layering]
+level_range: [0, 9]
+dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-16"
 updated: "2026-09-16"
+estimated_tokens: 350
 chunk_strategy: "semantic_heading"
 ---
 

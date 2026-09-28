@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-agent-repository-navigation-v1"
 title: "仓库 part 与章节命名决策依据"
-domain: "governing-agents"
-subdomain: "repository"
+domain: "agent-workspace"
+subdomain: "navigation"
 tags: [repository, navigation, part, chapter, filename, naming, ordering, quarto, yaml, kebab_case, semantic_name, display_title, stable_slug]
 level_range: [0, 9]
 created: "2026-09-15"

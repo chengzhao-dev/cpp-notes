@@ -54,7 +54,7 @@ README 遵循 GitHub Markdown，可以保留 Actions、许可证徽章和有信�
 写完章节后用 `run.py check --profile fast` 检查关键工具和命令是否漏标记。标记边界与间距依据运行：
 
 ```bash
-& .agents/skills/governing-agents/scripts/run.ps1 kb-search "行内代码 链接间距" --domain writing-quarto
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "行内代码 链接间距" --domain quarto-writing
 ```
 
 ## 文档元素

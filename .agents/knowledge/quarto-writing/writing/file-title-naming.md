@@ -1,13 +1,13 @@
 ---
 kb_id: "cpp-quarto-file-title-naming-v1"
 title: "QMD 文件名与中文标题命名依据"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "writing"
 tags: [qmd, filename, title, kebab_case, naming, chapter, navigation, readability]
 level_range: [0, 5]
 dependencies: ["cpp-quarto-chapter-pattern-v1"]
 created: "2026-09-18"
-updated: "2026-09-18"
+updated: "2026-09-26"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 700
 ---
@@ -36,6 +36,21 @@ estimated_tokens: 700
 | `shared-library.qmd` | `构建动态库并运行程序` | 提醒读者还要验证运行期加载 |
 
 不要用标题替代页面结构：一个页面只保留一个 YAML `title`，正文从 `##` 开始；标题层级、任务顺序和入口页卡片分别承担不同导航职责。
+
+## 字数硬限（2026-09-26 定死）
+
+与 cpp-board-games 仓库统一后，title 与各级标题采用同一硬限：
+
+| 层级 | 长度 | 形式 |
+| --- | --- | --- |
+| YAML `title` | 6-12 个汉字 | 动词短语，优先「动作 + 对象（+ 结果）」 |
+| `##` 二级标题 | 2-10 个汉字 | 动词短语 |
+| `###` 三级标题 | 2-12 个汉字 | 动词短语或症状句 |
+
+- 一律**不加冒号、破折号、括号补充说明**；并列结构可用顿号或逗号连接（如「区分声明、初始化与赋值」）。
+- 固定收尾节名复用：`常见错误`、`自测问题`、`本章回顾`。
+- 标题与导航不使用行内代码；文件名承担稳定路径职责，`CMakeLists.txt` 这类专名不进标题。
+- 本仓库历史标题超限的保留不改名（与 kb_id 同一原则）；新增和改写标题必须符合硬限。
 
 ## 命名检查
 

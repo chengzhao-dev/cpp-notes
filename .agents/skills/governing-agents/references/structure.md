@@ -70,3 +70,21 @@
 - 知识库索引产物只写根目录 `temp/knowledge-index/`，不入 `.agents/`。
 - `.agents/skills/designing-theme/assets/theme/**` 是 Quarto 消费的主题资源，其内部组织以渲染链路为准，不受 2.2 约束。
 - `mcp/server.py` 是宿主登记的固定入口路径，保持不动。
+- 本仓库与 cpp-board-games 仓库的 `.agents/` 结构同构；跨仓读者链接只用两个 GitHub base（`https://github.com/chengzhao-dev/cpp-notes` 与 `https://github.com/chengzhao-dev/cpp-board-games`；目录 `tree/main/<路径>`、文件 `blob/main/<路径>`），不写本机检出路径；`.agents/` 规则与主题资产的双仓同步只在用户显式要求时执行。
+
+## 6. 与 cpp-board-games 的对照表
+
+两仓 `.agents/` 同构（四区 + 同名知识领域目录），职责与落点对齐；具体数字（体量阈值、篇幅预算）按仓可调，不对齐。除下表所列差异外，同名文件语义一致，双向同步只在用户显式要求时执行。
+
+| 项 | 本仓（cpp-notes） | cpp-board-games | 说明 |
+| --- | --- | --- | --- |
+| 领域知识 | `agent-workspace`、`cpp-teaching`、`quarto-writing`、`repo-github`、`visual-theme` 均已建 | 同名三域已建；`repo-github`、`visual-theme` 有文件再建 | 领域目录名与 `domain` 字段取值规则一致 |
+| `kb_id` 前缀 | 一律 `cpp-*` | 一律 `bg-*` | 跨仓只链 GitHub，索引与 eval 各认各的前缀 |
+| C++ 技能 | `writing-cpp`（语言机制系统讲解） | `cpp-development`（工程用法）+ `game-design` + `python-tooling` | 教学内容互补：本仓讲语言机制，board-games 讲工程用法 |
+| 任务路由 | 任务矩阵（本仓 `writing-cpp` 技能按 part 分册的任务表），`scope.py` 解析 part/chapter，另有 `check_task_matrix.py` | 阶段路由表（board-games 的 `cpp-development` 技能按 game 分册的阶段表），`scope.py` 解析 game/stage | 互不移植对方的路由形态 |
+| C++ 验证 | `verify_examples.py`，`run.py verify`，CI 不编译 | 各阶段 `build-and-run.sh`，`run.py build <game>/<stage>` 进 WSL | 验证入口不同，`scope` 输出的读取边界语义一致 |
+| `run.py` 子命令 | check/verify/render/scope/build/status/kb-* | 同名同义 | `verify` 在本仓包装 verify_examples，在 board-games 包装 verify_content |
+| Python 来源 | 根 `config.toml` 的 `python`，最低 3.12，失败即停 | 同左 | CI 用 `sed` 把该字段指向 runner 的 python3 |
+| 体量阈值 | L0/L1/L2/listing 厂商与分层硬约束；L3 教学体量为本仓建议（WARN，`--strict` 失败） | L0/listing 硬约束；L1/L2/catalog 均为本仓建议 | 落点表与「预算按仓可调」原则见各自 `refactor-guidelines.md` |
+| C++ 命名 | Google C++ Style Guide 为主标准：函数与类型 PascalCase、变量 snake_case、常量与枚举子 `k` 前缀；偏离白名单（`#pragma once`、`.cpp`/`.h`、C++20、异常边界、LLVM 横幅、不强制 cpplint），权威见 `cpp-naming-format-v1` | 同构：同一主标准与白名单，权威见 `bg-google-cpp-style-v1` | 两仓同步废止小驼峰选型；`.clang-tidy` 命名配置一致 |
+| 主题资产 | 同一套 GitHub palette 与组件 CSS | 同左 | `check_layout.py` 环境变量前缀 `CPP_MEMO_*` vs `BOARD_GAMES_*` |

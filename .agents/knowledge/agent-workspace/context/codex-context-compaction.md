@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-tooling-codex-context-v1"
 title: "Codex 上下文压缩的触发方与可配置项"
-domain: "governing-agents"
-subdomain: "agent_runtime"
+domain: "agent-workspace"
+subdomain: "context"
 tags: [context_compaction, auto_compact, config, hooks, long_task, token_budget, plan_mode, approval]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-repo-hygiene-v1"]

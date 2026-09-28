@@ -1,4 +1,8 @@
--- 将正文里的 .answer fenced div 渲染为默认收起的原生答案块。
+-- answer-disclosure.lua - 把正文里的 .answer 围栏 div 渲染为默认收起的原生答案块
+--
+-- 用法：在 _quarto.yml 顶层 filters 中注册本脚本；
+-- 章节自测问题的答案写在 ::: {.answer} 围栏 div 内。
+
 local function answer_disclosure(div)
   if not div.classes:includes("answer") then
     return nil

@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-quarto-qmd-element-cases-v1"
 title: "Quarto 教学元素与衔接案例"
-domain: "writing-quarto"
+domain: "quarto-writing"
 subdomain: "writing"
 tags: [heading_lead, block_punctuation, code_title, code_block, paragraph, filename_density, callout, callout_transition, source_reading, directory_tree, h3_granularity, multi_command_block, subcomment, working_directory, execution_location, diagnosis]
 level_range: [0, 9]

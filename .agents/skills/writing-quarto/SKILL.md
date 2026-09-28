@@ -23,7 +23,7 @@ metadata:
 | 小节密度、Callout 和排错结构 | `references/zh/section-focus-and-density.md` |
 | Book 结构、front matter、标题层级与 H2/H3 判定 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
-| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain writing-quarto` |
+| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain quarto-writing` |
 
 ## P0 硬约束
 1. 标题只由 YAML `title:` 提供，页面内不再写同文本 `# H1`。小节从 `##` 开始，不手填序号，`##`/`###` 前不写 `---` 水平线。

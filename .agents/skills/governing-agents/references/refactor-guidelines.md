@@ -2,10 +2,21 @@
 
 重构以行为守恒和可验证契约为最终裁决：公共 CLI、MCP 工具名、`description`、参数 Schema 与返回结构保持兼容。
 
-## 权威出处规则
+## 权威出处规则（落点表）
 
-- 分工边界与「同一知识点只允许一个出处」的权威定义在 `.agents/skills/governing-agents/references/catalog.md`「skill 与 knowledge 的分工」，其他文件只引用不复制。
-- 迁移内容前先判定归属：「怎么做」留 `references/`，「为什么」进 `.agents/knowledge/`，两处都有时删掉非权威的一份。
+同一规则只允许一个权威正文；新增或迁移前先按下表判定落点，两处都有时删掉非权威的一份：
+
+| 落点 | 放什么 | 禁止 |
+| --- | --- | --- |
+| `AGENTS.md` | 项目级硬约束、结构、命令表 | 长 why、评审清单、写作细则 |
+| `skills/*/SKILL.md` | 路由 + P0 + 判据（L1 预算内） | 复制 knowledge 正文 |
+| `skills/*/references/` | 可执行 how（步骤、清单、本仓约定） | 与 knowledge 双写完整规则 |
+| `knowledge/` | 稳定 why / 取舍；本仓差异 `cpp-*` | 流程步骤、命令表 |
+| `content/**/*.qmd` | 面向读者的设计与过程 | Agent 内部路径与脚本细节 |
+| `memory/` / `incidents/` | 教训 / 失败复盘 | 当作常规路由 |
+| 脚本 | 强制执行 | 当文档通读 |
+
+跨仓：通用 why 可链 cpp-board-games 的 GitHub `bg-*`；本仓索引与 eval 只认 `cpp-*`。分工边界的另一表述见 `catalog.md`「skill 与 knowledge 的分工」，与本表语义一致。
 
 ## 分层加载契约
 
@@ -14,9 +25,9 @@
 | L0 `AGENTS.md` | 项目结构、命令、硬约束 | ≤65536 字节 | `check_skill_size.py` |
 | L1 `*/SKILL.md` | 职责、适用场景、路由、P0、流程、判据 | ≤45 行且 ≤3000 字符 | 同上 |
 | L2 `*/references/**/*.md` | 单一主题的 P1/P2 细则与按需知识 | ≤160 行且 ≤6000 字符 | 同上；route 由 L1 和各目录就近维护 |
-| L3 教学 QMD | 单一读者任务、直接可读的叙述与指令 | ≤150 行且 ≤5000 有效字符 | 同上；代码围栏与 include 行不计字符 |
+| L3 教学 QMD | 单一读者任务、直接可读的叙述与指令 | 建议 ≤150 行且 ≤5000 有效字符 | `check_skill_size.py` 默认 WARN，`--strict` 才失败；超限先判断内容是否必要，再拆分或按章上调本仓阈值（调整时同步脚本常量与下表） |
 
-`name` ≤64 字符、`description` ≤1024 字符、全部 skill 的 `name + description` ≤8000 字符。预算按字符为主、字节为次级护栏，理由见脚本头部说明。
+`name` ≤64 字符、`description` ≤1024 字符、全部 skill 的 `name + description` ≤8000 字符。预算按字符为主、字节为次级护栏，理由见脚本头部说明。所有数字都是本仓建议与约定，按本仓实际阅读与维护需求调整，不与其他仓库对齐；调整时同步脚本常量与本表。
 
 知识库不以整文件大小设硬上限，而以检索单元为边界：默认每次最多注入 4000 Token，硬上限 6000 Token，任一 live Parent 不得超过 4000 Token。这样保留内聚主题，同时约束真正进入上下文的内容。
 

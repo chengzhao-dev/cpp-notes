@@ -30,13 +30,14 @@ metadata:
 3. 远端只维护 `main` 与 `gh-pages`。Actions 用 peaceiris 把 `_book/` 以 `force_orphan` 推到 `gh-pages`。
 4. 行尾 LF、UTF-8 无 BOM，忽略规则集中在根 `.gitignore`。
 5. Git 状态、diff 和 log 只在任务需要时检查，禁止为了轮询而频繁重复对比。
+6. 提交 author/committer 只用用户本人身份（当前 `chengzhao-dev`）；提交信息不添加 `Co-authored-by`、`cursoragent` 等 trailer；push 前检查近期提交作者集合，出现其他作者即停止并报告。
 
 ## 工作流程
 
 1. 先跑 `& .agents/skills/governing-agents/scripts/run.ps1 status --all` 看清工作区，确认不覆盖他人改动。
 2. 按路由读取对应 reference，再执行操作。
 3. 提交信息使用 Conventional Commits 前缀 `type(scope): 中文说明`（如 `docs: 术语表补充`、`refactor(agents): 索引目录并入 config.toml`）说明动机与影响，一次提交只做一件事。`type`/`scope` 用小写英文，说明用简洁中文，仅在没有合适中文译名时保留技术标识。
-4. 推 `main` 触发 `.github/workflows/pages.yml` 部署。PR 触发 `render-check.yml` 跑渲染与示例校验。
+4. 推 `main` 触发 `.github/workflows/pages.yml` 部署。PR 触发 `render-check.yml` 跑渲染与文档后处理校验（C++ 示例编译不进 CI）。
 
 ## 完成判据
 

@@ -11,6 +11,7 @@
 
 import os
 import sys
+from pathlib import Path
 
 # 需要排除的目录（生成产物 / 依赖 / VCS）
 # 生成产物 / 依赖 / VCS / CMake 构建目录（build/ 非源码，不属校验对象）
@@ -32,7 +33,7 @@ def main():
     except Exception:
         pass
 
-    repo_root = os.getcwd()
+    repo_root = str(Path(__file__).resolve().parents[4])
     print(f"扫描：{repo_root}")
     print(f"排除目录：{', '.join(sorted(EXCLUDE_DIRS))}")
     print()

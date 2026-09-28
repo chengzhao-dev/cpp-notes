@@ -1,7 +1,7 @@
 ---
-kb_id: cpp-retrieval-audit-2026-09-24-v1
+kb_id: cpp-agent-retrieval-audit-v1
 title: Agent 资源职责与检索统一审计
-domain: governing-agents
+domain: agent-workspace
 subdomain: retrieval
 tags: [audit, retrieval, benchmark, mcp]
 dependencies: [cpp-retrieval-governance-v1]

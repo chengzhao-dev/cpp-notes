@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-quarto-chapter-pattern-v1"
 title: "教学正文的页面块序列与职责边界"
-domain: "writing-quarto"
-subdomain: "page_pattern"
+domain: "quarto-writing"
+subdomain: "writing"
 tags: [page, block, sequence, preface, task, granularity, recap, self_test, answer_disclosure, heading_hierarchy, h3_granularity, beginner_scan, landing, card, index, readme, troubleshooting, diagnosis, validation]
 level_range: [0, 9]
 dependencies: []
@@ -72,7 +72,7 @@ estimated_tokens: 2600
 
 ### 何时再分层
 
-一个任务同时需要概念、多个操作阶段和独立验证时才切出更小的标题。只有一两句话的内容并入相邻任务。为凑层级增加的标题会让右侧目录变成噪声。
+一个任务同时需要概念、多个操作阶段和独立验证时才切出更小的标题。只有一两句话的内容并入相邻任务。为凑层级增加的标题会让右侧目录变成噪声。`##` 出现多个连续子流程、或篇幅触达 token 预算时，强制拆分为 `###` 子小节，不整块下压。
 
 ## 环境章与构建章的骨架
 

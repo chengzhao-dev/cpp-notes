@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-agent-host-planning-delivery-v1"
 title: "计划生命周期与本地交付默认"
-domain: "governing-agents"
-subdomain: "planning"
+domain: "agent-workspace"
+subdomain: "navigation"
 tags: [plan_mode, host_capability, delivery_boundary, commit_default, temp_directory, context_compaction]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-codex-context-v1", "cpp-tooling-repo-hygiene-v1"]

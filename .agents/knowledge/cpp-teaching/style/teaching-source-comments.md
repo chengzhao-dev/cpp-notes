@@ -1,7 +1,7 @@
 ---
 kb_id: "cpp-teaching-source-comments-v1"
 title: "教程源码注释决策依据"
-domain: "writing-cpp"
+domain: "cpp-teaching"
 subdomain: "style"
 tags: [cpp, comments, file_purpose, beginner_friendly, teaching_code, source_file, include, cmake, shell, comment_density, target_comment, add_executable, add_library]
 level_range: [0, 9]

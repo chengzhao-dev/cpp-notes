@@ -331,7 +331,7 @@ def check_contracts(book_dir, htmls, css_pairs):
             mermaid_runtime_pages += 1
         if re.search(
             r"<pre\b[^>]*class=\"[^\"]*\bsourceCode\b[^\"]*\"[^>]*>"
-            r".*?(?:(?:flowchart|graph)\s+(?:TD|TB|LR|RL|BT)"
+            r"(?:(?!</pre>).)*?(?:(?:flowchart|graph)\s+(?:TD|TB|LR|RL|BT)"
             r"|sequenceDiagram|stateDiagram|classDiagram)",
             html, re.S,
         ):
@@ -426,6 +426,8 @@ def check_contracts(book_dir, htmls, css_pairs):
             if node.tag != "pre":
                 continue
             if any(is_descendant(node, wrapper) for wrapper in wrappers):
+                continue
+            if node.classes & {"mermaid", "mermaid-js"}:
                 continue
             untitled.append(str(path.relative_to(book_dir)))
     title_tokens = all(token in source_css_text for token in (

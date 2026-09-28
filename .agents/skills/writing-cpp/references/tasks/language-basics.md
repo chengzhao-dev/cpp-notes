@@ -30,3 +30,5 @@
 | `TASK-LANG-008` | arrays-strings | todo | `TASK-LANG-007` | `content/language-basics/arrays-strings.qmd` | `code/language-basics/arrays-strings.cpp` | — | — |
 | `TASK-LANG-009` | structs-classes | todo | `TASK-LANG-008` | `content/language-basics/structs-classes.qmd` | `code/language-basics/structs-classes.cpp` | — | — |
 | `TASK-LANG-010` | references | todo | `TASK-LANG-009` | `content/language-basics/references.qmd` | `code/language-basics/references.cpp` | — | — |
+| `TASK-LANG-011` | enums-and-namespaces | done | `TASK-LANG-004` | `content/language-basics/enums-and-namespaces.qmd` | `code/language-basics/enums-and-namespaces.cpp` | `.agents/skills/writing-cpp/references/cpp/language-basics.md` | 只讲 `enum class`、限定名访问与命名空间分组，不讲位掩码与 `using enum` |
+| `TASK-LANG-012` | structs-and-value-types | done | `TASK-LANG-011` | `content/language-basics/structs-and-value-types.qmd` | `code/language-basics/structs-and-value-types.cpp` | `.agents/skills/writing-cpp/references/cpp/language-basics.md` | 只讲聚合初始化、成员默认值与值语义复制，成员函数与访问控制留给 `TASK-LANG-009` |

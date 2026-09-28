@@ -1,7 +1,7 @@
 ---
-kb_id: "cpp-cpp-preprocessing-headers-linking-v1"
+kb_id: "cpp-preprocessing-headers-linking-v1"
 title: "从源码到可执行程序的阶段边界"
-domain: "writing-cpp"
+domain: "cpp-teaching"
 subdomain: "toolchain"
 tags: [preprocessor, include, header, translation_unit, declaration, definition, compiler, object_file, linker, executable, runtime_loader, static_library, shared_library, pragma_once, include_guard]
 level_range: [0, 5]
@@ -43,7 +43,7 @@ estimated_tokens: 1200
 
 ### 链接：解析符号并生成可执行文件
 
-链接器接收目标文件、静态库和必要的系统库，解析跨文件符号，完成重定位并生成可执行文件。若 `main.cpp` 调用了 `makeGreeting()`，链接输入必须包含提供该函数定义的 `greeting.o` 或对应库；否则常见诊断会包含 `undefined reference`。
+链接器接收目标文件、静态库和必要的系统库，解析跨文件符号，完成重定位并生成可执行文件。若 `main.cpp` 调用了 `MakeGreeting()`，链接输入必须包含提供该函数定义的 `greeting.o` 或对应库；否则常见诊断会包含 `undefined reference`。
 
 静态库中的目标代码在链接时被选入最终程序，因此分发程序时通常不需要再把该静态库作为运行期文件放在旁边。动态库通常不被复制进可执行文件本身；程序启动时由运行时加载器查找并加载 `.so`，所以“链接成功”和“程序能启动”是两个不同的验收点。
 

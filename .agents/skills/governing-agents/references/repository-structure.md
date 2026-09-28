@@ -16,7 +16,7 @@
 | 入口与卡片页（index.qmd） | ≤45 行 | 只做定位，不承担讲解 |
 | 根 README.md | ≤90 行 | 路线与仓库结构，细节指向文档站与 skills |
 
-页面预算由 `check_skill_size.py` 强制。QMD 拆页、代码 include 与知识库 Token 的决策依据见标识 `cpp-agent-context-budget-v1`；两类页面的组织依据见 `cpp-quarto-chapter-pattern-v1` 与 `cpp-quarto-landing-pattern-v1`。
+页面预算由 `check_skill_size.py` 强制。QMD 拆页、代码 include 与知识库 Token 的决策依据见标识 `cpp-agent-context-budget-v1`；两类页面的组织依据见标识 `cpp-quarto-chapter-pattern-v1` 与 `cpp-quarto-practice-pattern-v1` 的知识文件。
 
 ## Agent 运行约定
 统一入口是 `.agents/skills/governing-agents/scripts/run.py`。先用 `scope` 确定读取边界，再按改动域运行 `check --profile fast|book|knowledge|python`，跨域或发布时运行 `full`。`render` 默认只跑 `book` profile，需要完整浏览器矩阵时加 `--require-browser`。

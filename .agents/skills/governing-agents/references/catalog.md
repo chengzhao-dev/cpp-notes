@@ -5,8 +5,9 @@
 ## skill 与 knowledge 的分工
 
 同一个知识点只允许有一个出处：怎么做（流程、格式约定、硬约束）留 `references/`，为什么（领域结论与取舍依据）进
-`.agents/knowledge/`。`references/` 优先写稳定 `kb_id`，确需检索时再给一行带 `--domain` 的 `run.ps1 kb-search`
-入口，不复制知识正文。
+`.agents/knowledge/`。完整落点表（AGENTS、skills、references、knowledge、content、memory/incidents、脚本）与
+「预算按仓可调」原则见 `refactor-guidelines.md`「权威出处规则（落点表）」。`references/` 优先写稳定 `kb_id`，
+确需检索时再给一行带 `--domain` 的 `run.ps1 kb-search` 入口，不复制知识正文。
 
 新增或迁移 `.agents/knowledge/` 文件后运行 `kb-index`、`kb-check` 和 `kb-eval`。索引产物统一放在 `temp/`，缺失时脚本会自动重建。
 
@@ -27,7 +28,7 @@
 - part 与章节文件的命名约束以 `writing-cpp/references/cpp/engineering.md` 为准；工程背景分册用短路径 `practice`、读者可见标题“工程应用”。
 
 - `.agents/skills/writing-cpp/references/tasks/<part>.md`：章节状态、读写边界和验收的唯一出处，由 `scope` 自动选中。
-- `.agents/knowledge/<领域>/`：领域目录为名词 kebab（`agent-workspace`、`cpp-teaching`、`repo-github`、`quarto-writing`、`visual-theme`），`domain` 字段取对应技能新名。主题布局几何的依据在 `.agents/knowledge/visual-theme/`，检索用 `kb-search --domain designing-theme`。
+- `.agents/knowledge/<领域>/`：领域目录为名词 kebab（`agent-workspace`、`cpp-teaching`、`repo-github`、`quarto-writing`、`visual-theme`），`domain` 字段取同名领域目录值，`subdomain` 取同名子域目录值。主题布局几何的依据在 `.agents/knowledge/visual-theme/`，检索用 `kb-search --domain visual-theme`。
 - `.agents/knowledge/KNOWLEDGE.md`：知识库规范和新增流程。新增或迁移知识后运行 `kb-index`、`kb-check` 和 `kb-eval`。
 - `.agents/knowledge/agent-workspace/retrieval/retrieval-governance.md`：skills、knowledge、memory、incidents 与 MCP 的职责边界，以及统一检索协议和公平评测原则。
 - `writing-quarto/references/zh/writing-principles.md`：所有中文文档任务的最高优先规则。

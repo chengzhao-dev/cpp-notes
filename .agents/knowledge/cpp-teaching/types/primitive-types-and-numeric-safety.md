@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-primitive-types-numeric-safety-v1"
 title: "C++ 基础类型与数值安全"
-domain: "writing-cpp"
-subdomain: "language_basics"
+domain: "cpp-teaching"
+subdomain: "types"
 tags: [cpp, primitive_types, variables, integer, floating_point, bool, conversion, overflow, undefined_behavior, size_t]
 level_range: [0, 4]
 dependencies: ["cpp-language-basics-path-v1", "cpp-list-initialization-v1"]

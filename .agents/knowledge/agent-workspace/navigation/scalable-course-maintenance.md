@@ -1,8 +1,8 @@
 ---
 kb_id: "cpp-agent-scalable-course-v1"
 title: "百章课程的任务矩阵与分层校验"
-domain: "governing-agents"
-subdomain: "repository_maintenance"
+domain: "agent-workspace"
+subdomain: "navigation"
 tags: [curriculum, task_matrix, validation, performance, browser_sampling, chunker, scalability]
 level_range: [0, 9]
 dependencies: ["cpp-agent-context-budget-v1", "cpp-agent-repository-navigation-v1"]
