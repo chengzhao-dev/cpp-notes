@@ -1,5 +1,7 @@
 ---
-# C++ 静态检查：modernize + cppcoreguidelines + bugprone 等。
+# C++ 静态检查：modernize + cppcoreguidelines + bugprone 等，命名规则
+# 与 google-* 启用项以 Google C++ Style Guide 为主标准（依据见知识库
+# cpp-naming-format-v1）。
 Checks: >
   bugprone-*,
   cppcoreguidelines-*,
@@ -8,6 +10,9 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
+  google-build-using-namespace,
+  google-global-names-in-headers,
+  google-explicit-constructor,
   -bugprone-easily-swappable-parameters,
   -modernize-use-trailing-return-type,
   -readability-identifier-length,
@@ -20,18 +25,22 @@ CheckOptions:
   - key: readability-identifier-naming.StructCase
     value: CamelCase
   - key: readability-identifier-naming.FunctionCase
-    value: camelBack
+    value: CamelCase
   - key: readability-identifier-naming.VariableCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.ParameterCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.MemberCase
-    value: camelBack
+    value: lower_case
   - key: readability-identifier-naming.PrivateMemberSuffix
     value: _
   - key: readability-identifier-naming.ConstantCase
     value: CamelCase
   - key: readability-identifier-naming.ConstantPrefix
+    value: k
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantPrefix
     value: k
   - key: readability-identifier-naming.MacroDefinitionCase
     value: UPPER_CASE

@@ -1,6 +1,6 @@
-// 问候接口：声明 makeGreeting()，供其他源文件调用。
+// 问候接口：声明 MakeGreeting()，供其他源文件调用。
 #pragma once
 
 #include <string>
 
-std::string makeGreeting();
+std::string MakeGreeting();

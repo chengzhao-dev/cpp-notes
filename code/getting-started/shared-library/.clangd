@@ -10,5 +10,13 @@ CompileFlags:
     - -Wextra
 
 Diagnostics:
+  # 命名规则与 google 检查不在 clangd 默认开启集内，显式补上，
+  # 与本目录 .clang-tidy 的命名约束保持一致。
+  ClangTidy:
+    Add:
+      - readability-identifier-naming
+      - google-build-using-namespace
+      - google-global-names-in-headers
+      - google-explicit-constructor
   Suppress:
     - pp_file_not_found

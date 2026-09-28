@@ -13,12 +13,12 @@ int main() {
   ++wrapped;
 
   double a{0.1 + 0.2};
-  bool closeEnough{std::abs(a - 0.3) < 1e-9};
+  bool close_enough{std::abs(a - 0.3) < 1e-9};
   bool enabled{static_cast<bool>(2)};
 
   std::cout << "明确宽度的值: " << value << "\n";
   std::cout << "无符号回绕后: " << wrapped << "\n";
-  std::cout << std::boolalpha << "浮点值足够接近: " << closeEnough << "\n";
+  std::cout << std::boolalpha << "浮点值足够接近: " << close_enough << "\n";
   std::cout << "是否启用: " << enabled << "\n";
   return 0;
 }
