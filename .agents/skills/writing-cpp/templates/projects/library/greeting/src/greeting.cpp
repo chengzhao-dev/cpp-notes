@@ -1,6 +1,6 @@
-// 实现 greeting.h 中声明的 makeGreeting()。
+// 实现 greeting.h 中声明的 MakeGreeting()。
 #include "greeting.h"
 
-std::string makeGreeting() {
+std::string MakeGreeting() {
   return "Hello, World!";
 }

@@ -23,11 +23,9 @@
 | learncpp.com | 章节拆分粒度、渐进式披露 |
 | zh.cppreference.com | 译名、标准措辞、复杂度（`## 深入` 引标准时以此为准） |
 | CMake 官方文档 | 构建章节的 command/variable 语义与注释措辞 |
-| Google C++ Style Guide | include 顺序、排版与常量命名 |
-| Qt、WebKit Coding Style | 函数、变量、参数和成员使用小驼峰的依据 |
+| Google C++ Style Guide | include 顺序、排版与全套标识符命名 |
 
-本项目以 Google 的 include 顺序和 `clang-format` 为排版基底，把函数、变量、参数和成员调整为
-小驼峰，并保留 Google 的 `kPascalCase` 常量。**例外：本仓库启用异常**，不采用 Google
+本项目以 Google 的 include 顺序和 `clang-format` 为排版基底，标识符命名整体按 Google 执行：函数与类型大驼峰，变量、参数和成员 snake_case，常量与枚举子 `kPascalCase`。**例外：本仓库启用异常**，不采用 Google
 的异常限制。完整取舍见标识 `cpp-naming-format-v1`。
 
 这些来源用于不同层次：Primer 和 LearnCpp 参考教学顺序，Stroustrup 参考语言整体观，Effective C++ 参考可执行规则，cppreference 负责标准精度，它们不是逐段翻译的材料。

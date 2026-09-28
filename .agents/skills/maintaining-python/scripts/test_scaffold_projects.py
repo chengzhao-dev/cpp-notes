@@ -117,13 +117,13 @@ def main():
     assert "target_include_directories(app PRIVATE include)" in cmake
     assert (multi / "include/greeting.h").read_text(
         encoding="utf-8"
-    ).splitlines()[0] == "// 问候接口：声明 makeGreeting()，供其他源文件调用。"
+    ).splitlines()[0] == "// 问候接口：声明 MakeGreeting()，供其他源文件调用。"
     assert (multi / "src/greeting.cpp").read_text(
         encoding="utf-8"
-    ).splitlines()[0] == "// 实现 greeting.h 中声明的 makeGreeting()。"
+    ).splitlines()[0] == "// 实现 greeting.h 中声明的 MakeGreeting()。"
     assert (multi / "src/main.cpp").read_text(
         encoding="utf-8"
-    ).splitlines()[0] == "// 程序入口：调用 makeGreeting() 并输出结果。"
+    ).splitlines()[0] == "// 程序入口：调用 MakeGreeting() 并输出结果。"
 
     library_cases = (
         (
@@ -181,10 +181,10 @@ def main():
         assert not (library / "app").exists()
         assert (library / "greeting/include/greeting.h").read_text(
             encoding="utf-8"
-        ).splitlines()[0] == "// 问候库接口：声明 makeGreeting()，供 app 调用。"
+        ).splitlines()[0] == "// 问候库接口：声明 MakeGreeting()，供 app 调用。"
         assert (library / "main.cpp").read_text(
             encoding="utf-8"
-        ).splitlines()[0] == "// 程序入口：调用库提供的 makeGreeting() 并输出结果。"
+        ).splitlines()[0] == "// 程序入口：调用库提供的 MakeGreeting() 并输出结果。"
         if name == "shared-library":
             assert 'set_target_properties(app PROPERTIES BUILD_RPATH "$ORIGIN/../lib")' in library_cmake
 

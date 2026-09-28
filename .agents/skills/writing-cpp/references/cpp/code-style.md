@@ -1,6 +1,6 @@
 # C++ 代码风格
 
-> Google 排版与 include 顺序 · 项目小驼峰命名 · C++20 · 2 空格缩进
+> Google C++ 风格（排版、include 顺序与命名） · C++20 · 2 空格缩进
 > 配置源见 `.agents/skills/writing-cpp/assets/config/`
 
 ## 命名
@@ -8,16 +8,14 @@
 | 实体 | 规则 | 示例 |
 |---|---|---|
 | 类型 | 大驼峰 | `HttpRequest`、`UrlTable` |
-| 函数/方法 | 小驼峰 | `addEntry()`、`makeGreeting()` |
-| 变量/参数/成员 | 小驼峰 | `entryCount`、`maxRetries` |
-| 类私有成员 | 小驼峰 + `_` | `width_`、`entryCount_` |
-| 常量 | `k` + 大驼峰 | `kMaxRetries` |
+| 函数/方法 | 大驼峰 | `AddEntry()`、`MakeGreeting()` |
+| 变量/参数/成员 | snake_case | `entry_count`、`max_retries` |
+| 类私有成员 | snake_case + `_` | `width_`、`entry_count_` |
+| 常量与枚举子 | `k` + 大驼峰 | `kMaxRetries`、`Color::kRed` |
 | 命名空间 | `lower_case` | `url_table` |
 | C++ 文件 | snake_case | `url_table.cpp` |
 
-这套命名以 Google C++ Style Guide 的结构和常量约定为底，只把函数、变量、参数和成员改为
-Qt、WebKit 常用的小驼峰。Google 原规则对函数使用大驼峰，对变量和成员使用 snake_case。
-这里不把两种规则混写成“Google 默认小驼峰”。命名依据见标识 `cpp-naming-format-v1`。
+命名整体采用 Google C++ Style Guide：函数与类型大驼峰，变量与成员 snake_case，常量与枚举子 `k` 前缀。历史的小驼峰选型已废止，不在新代码中出现。命名依据见标识 `cpp-naming-format-v1`。
 
 ## Include 顺序
 
