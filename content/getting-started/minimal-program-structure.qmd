@@ -9,8 +9,8 @@ title: "拆分最小 C++ 程序结构"
 ```{.text filename="工程目录"}
 minimal-program-structure/
 ├── main.cpp          # 程序入口，调用问候接口并输出结果
-├── greeting.h        # 声明 makeGreeting()
-├── greeting.cpp      # 定义 makeGreeting()
+├── greeting.h        # 声明 MakeGreeting()
+├── greeting.cpp      # 定义 MakeGreeting()
 └── build-and-run.sh  # 一次完成创建目录、编译和链接
 ```
 
@@ -30,7 +30,7 @@ minimal-program-structure/
 
 `main()` 最后返回 `0`，表示程序正常结束。`std::cout` 是标准输出流，字符串末尾的 `\n` 表示换行。
 
-`main.cpp` 通过 `#include "greeting.h"` 看到 `makeGreeting()` 的声明，因此能在调用点做类型检查。`#include` 只把头文件内容放进当前翻译单元，不会把 `greeting.cpp` 的实现链接进程序。
+`main.cpp` 通过 `#include "greeting.h"` 看到 `MakeGreeting()` 的声明，因此能在调用点做类型检查。`#include` 只把头文件内容放进当前翻译单元，不会把 `greeting.cpp` 的实现链接进程序。
 
 ### greeting.h 如何声明接口
 
@@ -72,14 +72,14 @@ clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build
 
 ### 链接：组合目标文件
 
-链接器把两个目标文件中的入口、调用关系和函数实现组合起来，解析 `main.cpp` 对 `makeGreeting()` 的引用，并生成最终可执行文件。
+链接器把两个目标文件中的入口、调用关系和函数实现组合起来，解析 `main.cpp` 对 `MakeGreeting()` 的引用，并生成最终可执行文件。
 
 ```{.bash filename="Ubuntu Bash（minimal-program-structure 目录）"}
 clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \
   build/main.o build/greeting.o -o build/minimal-program-structure
 ```
 
-链接成功后会生成 `build/minimal-program-structure`。如果省略 `build/greeting.o`，编译阶段仍可能成功，但链接器会报告 `undefined reference to makeGreeting()`。
+链接成功后会生成 `build/minimal-program-structure`。如果省略 `build/greeting.o`，编译阶段仍可能成功，但链接器会报告 `undefined reference to MakeGreeting()`。
 
 ### 运行：验证最终产物
 
@@ -97,9 +97,9 @@ Hello, World!
 
 ## 常见错误
 
-### undefined reference to makeGreeting
+### undefined reference to MakeGreeting
 
-这个错误说明编译器看到了声明，但链接器没有找到 `makeGreeting()` 的实现。按下面的顺序恢复。
+这个错误说明编译器看到了声明，但链接器没有找到 `MakeGreeting()` 的实现。按下面的顺序恢复。
 
 1. **定位缺失定义**
 
@@ -142,7 +142,7 @@ Hello, World!
 2. 为什么链接命令必须包含 `greeting.cpp` 或 `build/greeting.o`？
 
    ::: {.answer}
-   `greeting.h` 只提供 `makeGreeting()` 的声明，真正的函数定义在 `greeting.cpp` 中。链接输入缺少该定义时，调用点虽然通过了编译，链接器仍无法解析符号。
+   `greeting.h` 只提供 `MakeGreeting()` 的声明，真正的函数定义在 `greeting.cpp` 中。链接输入缺少该定义时，调用点虽然通过了编译，链接器仍无法解析符号。
    :::
 
 ## 本章回顾

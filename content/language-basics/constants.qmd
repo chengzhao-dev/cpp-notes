@@ -10,11 +10,11 @@ title: "常量与配置"
 
 ```{.cpp filename="片段：运行时常量"}
 // 片段
-int currentValue{12};
-const int maxCount{5};
+int current_value{12};
+const int kMaxCount{5};
 
-// maxCount = 6;  // 编译失败
-currentValue = 13; // 普通变量仍可修改
+// kMaxCount = 6;  // 编译失败
+current_value = 13; // 普通变量仍可修改
 ```
 
 `const` 表示“不能通过这个名字修改”，不等于对象在所有路径上永远不可变。先问这个值是否代表规则或不应变化的事实，再决定是否使用它。
@@ -27,13 +27,13 @@ currentValue = 13; // 普通变量仍可修改
 #include <iostream>
 
 int main() {
-  const int maxCount{5};
-  constexpr int threshold{5000};
-  constexpr double ratio{0.90};
+  const int kMaxCount{5};
+  constexpr int kThreshold{5000};
+  constexpr double kRatio{0.90};
 
-  std::cout << "最大数量: " << maxCount << "\n";
-  std::cout << "阈值: " << threshold << "\n";
-  std::cout << "比例: " << ratio << "\n";
+  std::cout << "最大数量: " << kMaxCount << "\n";
+  std::cout << "阈值: " << kThreshold << "\n";
+  std::cout << "比例: " << kRatio << "\n";
   return 0;
 }
 ```

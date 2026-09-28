@@ -1,0 +1,78 @@
+---
+title: "枚举与命名空间"
+---
+
+对局状态、配置档位这类数据只取有限的几个值；用 `int` 编号表达它们时，任何整数都是合法赋值，类型系统帮不上忙。`enum class` 把封闭的取值集合变成新类型，命名空间把相关的名字分组存放。本章在类型安全规则之上补上这两种组织手段。
+
+## 用枚举类表达封闭取值
+
+`enum class` 定义一个只包含列出值的新类型，完整示例只做状态赋值和编号输出：
+
+```{.cpp filename="enums-and-namespaces.cpp"}
+// 枚举与命名空间示例：定义封闭取值的状态类型并输出其编号。
+#include <iostream>
+
+enum class GameState { kOngoing, kWin, kDraw };
+
+int main() {
+  GameState state{GameState::kOngoing};
+  std::cout << "初始状态编号: " << static_cast<int>(state) << "\n";
+  state = GameState::kWin;
+  std::cout << "当前状态编号: " << static_cast<int>(state) << "\n";
+  return 0;
+}
+```
+
+`GameState::kWin` 的 `::` 表示取 `GameState` 类型内的值；枚举值只能与同类型值比较或赋值，`state = 1;` 和把 `state` 直接赋给 `int` 都通不过编译。需要编号时用 `static_cast<int>` 写出转换意图，它只用于输出或与既有接口对接，不参与算术。列出值时也可以指定底层整数类型，例如 `enum class Level : std::uint8_t { kLow, kHigh };`，不写时由实现选择能容纳所有值的整数类型。
+
+## 用命名空间分组名字
+
+命名空间把相关的常量、类型和函数收在一个名字下：
+
+```{.cpp filename="片段：同名常量放在不同命名空间"}
+// 片段
+namespace board {
+  constexpr int Size{3};
+}
+
+namespace config {
+  constexpr int Size{16};
+}
+// 访问时写 board::Size 与 config::Size，两个同名常量互不冲突
+```
+
+限定名说明了值来自哪个分组；同一工程的不同模块因此可以各自拥有同名实体。项目代码把同一游戏的类型收进一个命名空间，例如井字棋的值类型定义在 `tic_tac_toe` 命名空间中。
+
+## 常见错误
+
+### 忘写 class 让枚举名泄漏到外层作用域
+
+`enum Color { Red };` 的 `Red` 直接进入外层作用域，并且能与整数隐式转换，失去类型保护。统一写 `enum class`。
+
+### 把枚举值当整数使用
+
+枚举值与 `int` 之间没有隐式转换，参与算术或存入整型变量都会编译失败。需要编号时先想清楚是否真的需要，再写出 `static_cast`。
+
+## 自测问题
+
+1. 写与不写 `class` 的枚举在作用域和类型转换上有什么差别？
+
+   ::: {.answer}
+   `enum class` 的枚举值限定在类型名内，与整数之间不发生隐式转换；不写 `class` 的枚举把枚举值放进外层作用域，并允许向整数隐式转换，容易造成误赋值。
+   :::
+
+2. 访问枚举值为什么要写 `GameState::kWin` 这样的限定名？
+
+   ::: {.answer}
+   枚举值属于 `GameState` 这个新类型的作用域，限定名既说明值的来源，也允许不同枚举类型拥有同名取值。
+   :::
+
+3. 命名空间解决什么问题？
+
+   ::: {.answer}
+   它把相关的名字分组，避免不同模块的同名实体冲突；调用处用限定名选择具体分组。
+   :::
+
+## 本章回顾
+
+你现在能用 `enum class` 定义封闭的取值集合，用命名空间给名字分组；完整示例见 [enums-and-namespaces.cpp](../../code/language-basics/enums-and-namespaces.cpp)。下一章用 `struct` 把相关的数据组合成值类型。

@@ -27,6 +27,16 @@ body-classes: index-page
 ### [类型安全与数值边界](type-safety-and-numeric-bounds.qmd)
 检查类型范围、溢出、转换、浮点精度、`bool` 和 `std::size_t` 的常见陷阱。
 :::
+
+::: {.landing-card}
+### [枚举与命名空间](enums-and-namespaces.qmd)
+用 `enum class` 表达封闭的取值集合，用命名空间给名字分组。
+:::
+
+::: {.landing-card}
+### [结构体与值类型](structs-and-value-types.qmd)
+用 `struct` 聚合相关的数据，理解按值复制带来的独立性。
+:::
 :::
 
 后续章节会继续补充运算、控制流、函数、字符串和自定义类型。

@@ -53,9 +53,9 @@ C++11 的 `auto` 与花括号组合有特殊规则。C++20 中，多个元素会
 
 ```{.cpp filename="片段：初始化列表推导"}
 // 片段
-auto oneValue{10};           // int
-auto manyValues{10, 20, 30}; // std::initializer_list<int>
-auto sameType = {10, 20};    // std::initializer_list<int>
+auto one_value{10};           // int
+auto many_values{10, 20, 30}; // std::initializer_list<int>
+auto same_type = {10, 20};    // std::initializer_list<int>
 // auto mixed{10, 2.5};       // 编译失败：元素类型无法统一
 ```
 
@@ -78,7 +78,7 @@ auto sameType = {10, 20};    // std::initializer_list<int>
 ## 自测问题
 
 1. `count{}` 和 `count = 80` 分别发生在什么时机？
-2. `auto manyValues{10, 20, 30};` 为什么不是一个 `int`？
+2. `auto many_values{10, 20, 30};` 为什么不是一个 `int`？
 3. 什么情况下显式类型比 `auto` 更能表达接口意图？
 
 ## 本章回顾

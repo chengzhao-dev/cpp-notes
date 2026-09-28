@@ -2,7 +2,7 @@
 title: "构建动态库并运行程序"
 ---
 
-静态库代码会进入最终程序。动态库改为在程序运行时加载，多个程序也可以共享同一个库文件。本章把上一章的 `greeting` 改成动态库。
+静态库的代码会进入最终程序。动态库改为在程序运行时加载，多个程序也可以共享同一个库文件。本章把上一章的 `greeting` 改成动态库，先认识动态库的查找机制，再依次约定产物目录、把查找路径写进可执行文件，最后构建、运行并检查。
 
 ## 认识动态库
 
@@ -14,23 +14,49 @@ title: "构建动态库并运行程序"
 | 链接结果 | 库代码进入 `app` | `app` 记录库依赖 |
 | 运行条件 | 不再需要库文件 | 必须找到匹配的 `.so` |
 
-## 查看构建规则
+## 约定产物目录
 
-顶层规则与静态库工程基本相同，只改变库的输出目录和运行路径。
+运行时能找到库，前提是产物位置固定。顶层规则把可执行文件和动态库分别归入 `build/bin` 与 `build/lib`。
 
 ```{.cmake filename="CMakeLists.txt"}
 {{< include /code/getting-started/shared-library/CMakeLists.txt >}}
 ```
 
-库目录把 `STATIC` 改成 `SHARED`。
+其中两行 `set` 决定产物位置：`CMAKE_RUNTIME_OUTPUT_DIRECTORY` 收纳可执行文件，`CMAKE_LIBRARY_OUTPUT_DIRECTORY` 收纳动态库。`build/lib` 是构建产物目录，源码树里没有 `lib/` 目录。
+
+库目录把 `STATIC` 改成 `SHARED`，其余与静态库工程相同。
 
 ```{.cmake filename="greeting/CMakeLists.txt"}
 {{< include /code/getting-started/shared-library/greeting/CMakeLists.txt >}}
 ```
 
-`BUILD_RPATH "$ORIGIN/../lib"` 会把库的查找位置写进 `app`。`$ORIGIN` 表示 `app` 所在目录，所以程序能从 `build/bin/` 找到旁边的 `build/lib/`。
+`SHARED` 让 `add_library` 生成动态库 `libgreeting.so`，构建后出现在 `build/lib/` 下。顶层规则里的 `set_target_properties` 行负责运行时查找，下一节单独解释。
 
-## 构建并运行
+## 把查找路径写进可执行文件
+
+产物分离后，运行中的 `app` 需要自己找到 `build/lib/` 里的库。主路径是下面这行，它把查找位置写进可执行文件：
+
+```{.cmake filename="CMakeLists.txt"}
+# 运行 app 时从 build/bin/../lib 查找动态库。
+set_target_properties(app PROPERTIES BUILD_RPATH "$ORIGIN/../lib")
+```
+
+`BUILD_RPATH` 设置 RPATH（程序内部记录的库查找位置）。`$ORIGIN` 表示可执行文件所在目录，`$ORIGIN/../lib` 就是 `build/bin` 旁边的 `build/lib`。程序无论从哪里启动，都按自身位置找到库，不依赖当前目录，也不依赖全局配置。
+
+## 用临时查找路径排查
+
+RPATH 已经写进 `app`，直接运行即可。排查库问题时，可以给单条命令临时追加查找路径：
+
+```{.bash filename="Ubuntu Bash（工程根目录）"}
+# 给这一条命令临时追加 build/lib，命令结束后设置即失效
+env LD_LIBRARY_PATH="$PWD/build/lib" ./build/bin/app
+```
+
+`LD_LIBRARY_PATH` 是动态加载器在标准位置之外追加查找路径的环境变量。`env` 只在命令运行期间设置它，不改动任何持久配置。
+
+教学工程以 RPATH 为主路径，这种一次性变量用于排查。不要把 `LD_LIBRARY_PATH` 写进 `~/.bashrc` 或系统配置，也不要用 `ldconfig` 注册工程产物。全局改动会影响所有程序，出错时也更难定位。
+
+## 构建、运行并检查
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
 # 配置工程，并生成 Ninja 使用的构建规则
@@ -47,21 +73,25 @@ cmake --build build
 Hello, World!
 ```
 
-构建产物是 `build/lib/libgreeting.so` 和 `build/bin/app`。
-
-## 检查动态库
+构建产物是 `build/lib/libgreeting.so` 和 `build/bin/app`。用 `ldd`（列出程序运行时依赖的动态库）确认 `app` 找到的库位置：
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
 ldd build/bin/app | grep libgreeting
 ```
 
-输出会显示 `libgreeting.so` 的查找结果。移动或删除这个 `.so` 后，程序将无法启动。
+输出显示 `libgreeting.so` 已解析到完整路径：
+
+```{.text filename="输出"}
+libgreeting.so => /…/cpp-notes/code/getting-started/shared-library/build/bin/../lib/libgreeting.so (0x0000799516b60000)
+```
+
+前半段是工程在你机器上的路径，关键在结尾：`build/bin/../lib/` 正是 `$ORIGIN/../lib` 的解析结果。移动或删除这个 `.so` 后，程序将无法启动。
 
 ## 常见错误
 
 ### 运行时找不到 libgreeting.so
 
-先确认 `build/lib/libgreeting.so` 已生成，再检查顶层规则是否包含 `BUILD_RPATH "$ORIGIN/../lib"`。补回后重新配置和构建：
+直接运行 `./build/bin/app` 报 “error while loading shared libraries: libgreeting.so”。先确认 `build/lib/libgreeting.so` 已生成，再检查顶层规则是否包含 `set_target_properties(app PROPERTIES BUILD_RPATH "$ORIGIN/../lib")`。补回后重新配置和构建：
 
 ```{.bash filename="Ubuntu Bash（工程根目录）"}
 # 重新配置，让 RPATH 写入新构建的 app
@@ -72,6 +102,14 @@ cmake --build build
 ldd build/bin/app | grep libgreeting
 ```
 
+### 只有带上临时变量才能运行
+
+加 `env LD_LIBRARY_PATH=...` 能运行，去掉就失败，说明查找路径没有写进 `app`。这是 RPATH 缺失的症状，处理方式与上一条相同：把 `BUILD_RPATH` 写回顶层规则，重新配置和构建，再不加临时变量直接运行验证。
+
+### 查找路径被写进了全局配置
+
+换一个终端就找不到库，或者卸载工程后其他程序也受影响。原因通常是之前把 `LD_LIBRARY_PATH` 写进了 `~/.bashrc`，或用 `ldconfig` 注册过工程产物。打开 `~/.bashrc` 删除自己追加的行，重新打开终端后按本章方案验证：只依赖 RPATH，`app` 应当直接运行。
+
 ## 自测问题
 
 先自己回答，再展开核对。
@@ -80,6 +118,12 @@ ldd build/bin/app | grep libgreeting
 
    ::: {.answer}
    构建阶段只证明链接器记录了动态库依赖。运行阶段还需要动态加载器找到匹配的 `.so`。如果库文件不在搜索路径中，或 `RPATH` 没有指向 `build/lib/`，程序就无法启动。
+   :::
+
+2. RPATH 与临时 `LD_LIBRARY_PATH` 各解决什么问题？
+
+   ::: {.answer}
+   RPATH 把查找路径写进可执行文件，是程序的长期主路径。临时 `LD_LIBRARY_PATH` 只包住单条命令，用于排查和对照验证。两者都不改动全局配置。
    :::
 
 ## 本章回顾

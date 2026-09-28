@@ -1,0 +1,15 @@
+---
+title: "语言进阶"
+description: "在语言基础之上，引入更精细的类型组织手段。"
+number-sections: false
+body-classes: index-page
+---
+
+语言基础分册建立了类型、常量与值语义。实际项目还会要求“同一底层类型的值在不同领域里不能混用”，本分册记录这类更精细的类型组织手段，并随项目实践继续扩展。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [强类型包装](strong-types.qmd)
+用轻量包装区分同为 `double` 的距离与时长，让混用变成编译错误。
+:::
+:::

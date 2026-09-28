@@ -53,7 +53,7 @@ int remaining{count};
 
 ```{.cpp filename="片段：全局作用域与块作用域"}
 // 片段
-int defaultLimit{1};  // 全局作用域：示例中的共享值
+int default_limit{1};  // 全局作用域：示例中的共享值
 
 int main() {
   int count{12};      // main 的块作用域

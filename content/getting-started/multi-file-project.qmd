@@ -21,7 +21,7 @@ multi-file-project/
 
 ## 阅读源码
 
-`greeting.h` 声明 `makeGreeting()`，让其他源文件知道这个函数如何使用。
+`greeting.h` 声明 `MakeGreeting()`，让其他源文件知道这个函数如何使用。
 
 ```{.cpp filename="include/greeting.h"}
 {{< include /code/getting-started/multi-file-project/include/greeting.h >}}
@@ -76,7 +76,7 @@ Hello, World!
 
 确认 `CMakeLists.txt` 包含 `target_include_directories(app PRIVATE include)`，再重新配置并构建。
 
-### 链接器找不到 makeGreeting()
+### 链接器找不到 MakeGreeting()
 
 确认 `src/greeting.cpp` 存在，且文件后缀是 `.cpp`，因为收集规则只包含 `src/` 直属的 `.cpp` 文件。修正后重新配置并构建：
 

@@ -35,8 +35,8 @@ int main() {
 unsigned int value{std::numeric_limits<unsigned int>::max()};
 ++value;  // 回绕到 0，有定义
 
-// int signedValue{std::numeric_limits<int>::max()};
-// ++signedValue;  // 有符号溢出：未定义行为，不要运行
+// int signed_value{std::numeric_limits<int>::max()};
+// ++signed_value;  // 有符号溢出：未定义行为，不要运行
 ```
 
 数组越界、空指针解引用和读取未初始化变量同样属于未定义行为。它不是“每次随机”，而是编译器可以假设这条路径不会发生。
@@ -48,8 +48,8 @@ unsigned int value{std::numeric_limits<unsigned int>::max()};
 ```{.cpp filename="片段：显式转换"}
 // 片段
 double value{19.99};
-int wholeValue{static_cast<int>(value)};  // 截断为 19
-double ratio{static_cast<double>(wholeValue)};
+int whole_value{static_cast<int>(value)};  // 截断为 19
+double ratio{static_cast<double>(whole_value)};
 ```
 
 大整数转小整数可能截断，浮点转整数会丢掉小数部分。避免 `(int)value` 这种 C 风格强转，因为它隐藏了转换类别。
@@ -66,9 +66,9 @@ double ratio{static_cast<double>(wholeValue)};
 #include <iostream>
 
 double a{0.1 + 0.2};
-bool closeEnough{std::abs(a - 0.3) < 1e-9};
+bool close_enough{std::abs(a - 0.3) < 1e-9};
 bool enabled{static_cast<bool>(2)};  // 非 0 转为 true
-std::cout << std::boolalpha << closeEnough << " " << enabled << "\n";
+std::cout << std::boolalpha << close_enough << " " << enabled << "\n";
 ```
 
 默认输出 `bool` 是 `1` 或 `0`；`std::boolalpha` 才会输出 `true` 或 `false`。
