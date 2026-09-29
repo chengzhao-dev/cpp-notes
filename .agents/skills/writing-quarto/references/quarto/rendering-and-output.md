@@ -88,7 +88,7 @@
 
 - **处置顺序**：先看 Actions 是否成功（失败查日志）→ 分支部署核对分支与目录（如 `main` + `/docs`）→ `gh-pages` 方式确认推送成功且远端存在该分支 → 用 `GET /repos/:repo/pages` 核对 Pages 源配置（404 = 源从未配置，线上就是 404）→ 最后才考虑缓存或 CDN 延迟（等几分钟或强刷新）。
 - **发布前拦截**：`pages.yml` 必须先跑 `run.py check --profile fast`（编码）与渲染后 `--profile full`（含 `check_book_output.py` 的产物 smoke：首页、charset、乱码特征、sitemap）。渲染成功不代表线上可读。
-- **错误必须阻断**：workflow 以**读回判定**收口——`POST`/`PUT /pages` 尽力而为（`PUT` 成功返回 204），最后 `GET` 读回 source，不是 `gh-pages` `/` 即 `exit 1`。`GITHUB_TOKEN` 首次创建可能 403，需一次性用 PAT 或手动启用；未认证 `GET` 恒 404，不作「未启用」判据。
+- **错误必须阻断**：workflow 以**读回判定**收口——`POST`/`PUT /pages` 尽力而为，最后 `GET` 读回 source，非 `gh-pages` `/` 即 `exit 1`；`GITHUB_TOKEN` 首建/改配置可能 403，需 PAT 或手动启用。发布架构：Actions 推 `_book/` 到 `gh-pages`，legacy 源 = `gh-pages /`，漂移只检测不自愈。
 
 ### 8. 文档关键词速查（避免幻觉 YAML）
 
