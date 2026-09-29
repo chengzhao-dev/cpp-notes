@@ -26,16 +26,17 @@ jobs:
       # config.toml 的 python 字段是仓库唯一解释器来源；CI 把它指到 runner 的 python3
       - name: Point config.toml python at the runner interpreter
         run: sed -i 's|^python = .*|python = "/usr/bin/python3"|' config.toml
-      # 渲染前先跑编码与文档规则：content/ 的乱码在这里被硬性拦下，而不是发到线上
+      # 渲染前先跑编码与文档规则：content/ 的乱码在这里被硬性拦下，而不是发到线上。
+      # run.py 校验启动解释器必须等于 config.toml 的 python，故显式用 /usr/bin/python3
       - name: Pre-render checks
-        run: python3 .agents/skills/governing-agents/scripts/run.py check --profile fast
+        run: /usr/bin/python3 .agents/skills/governing-agents/scripts/run.py check --profile fast
       # 渲染整本 Book 到 _book/
       - run: quarto render
       # 把 mermaid 图改为懒加载，减小首屏体积（本地 render 不自动跑，故 CI 必须执行）
       - run: python3 .agents/skills/maintaining-python/scripts/render/defer_mermaid.py
       # 渲染后全量校验：qmd 规则 + 布局/提示框/页面结构 + 发布产物 smoke（首页/编码/sitemap）
       - name: Post-render checks
-        run: python3 .agents/skills/governing-agents/scripts/run.py check --profile full
+        run: /usr/bin/python3 .agents/skills/governing-agents/scripts/run.py check --profile full
       - name: Publish _book to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
