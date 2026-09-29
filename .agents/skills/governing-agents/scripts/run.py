@@ -109,6 +109,7 @@ CHECKS = [
     ("layout", ".agents/skills/designing-theme/scripts/check_layout.py", True, ()),
     ("callouts", ".agents/skills/writing-quarto/scripts/check_callouts.py", True, ()),
     ("dom", ".agents/skills/governing-agents/scripts/check_dom_contracts.py", True, ()),
+    ("book-output", ".agents/skills/writing-quarto/scripts/check_book_output.py", True, ()),
     ("size", ".agents/skills/governing-agents/scripts/check_skill_size.py", False, ()),
     ("ascii", ".agents/skills/writing-quarto/scripts/check_ascii_names.py", False, ()),
     ("links", ".agents/skills/writing-quarto/scripts/check_skill_links.py", False, ()),
@@ -124,7 +125,7 @@ PROFILE_CHECKS = {
     "fast": {
         "encoding", "agent-controls", "size", "ascii", "links", "docs", "tasks",
     },
-    "book": {"layout", "callouts", "dom"},
+    "book": {"layout", "callouts", "dom", "book-output"},
     "knowledge": {"kb", "kb-eval", "conflict"},
     "python": {"scaffold"},
 }
@@ -138,6 +139,7 @@ CHECK_LABELS = {
     "layout": "布局",
     "callouts": "提示框",
     "dom": "页面结构",
+    "book-output": "发布产物",
     "size": "上下文体量",
     "ascii": "文件名",
     "links": "链接",
