@@ -29,7 +29,7 @@
 │       └── scripts/
 ├── knowledge/
 │   ├── KNOWLEDGE.md              # 领域路由
-│   └── <domain>/<subdomain>/<topic>.md
+│   └── <domain>/<subdomain>/<topic>.md   # 正反对照固定放 <domain>/cases/（其 appendix/ 不进索引）
 ├── memory/
 │   ├── MEMORY.md
 │   └── domains/<domain>/{index.md,<topic>.md}
@@ -82,9 +82,12 @@
 | `kb_id` 前缀 | 一律 `cpp-*` | 一律 `bg-*` | 跨仓只链 GitHub，索引与 eval 各认各的前缀 |
 | C++ 技能 | `writing-cpp`（语言机制系统讲解） | `cpp-development`（工程用法）+ `game-design` + `python-tooling` | 教学内容互补：本仓讲语言机制，board-games 讲工程用法 |
 | 任务路由 | 任务矩阵（本仓 `writing-cpp` 技能按 part 分册的任务表），`scope.py` 解析 part/chapter，另有 `check_task_matrix.py` | 阶段路由表（board-games 的 `cpp-development` 技能按 game 分册的阶段表），`scope.py` 解析 game/stage | 互不移植对方的路由形态 |
-| C++ 验证 | `verify_examples.py`，`run.py verify`，CI 不编译 | 各阶段 `build-and-run.sh`，`run.py build <game>/<stage>` 进 WSL | 验证入口不同，`scope` 输出的读取边界语义一致 |
-| `run.py` 子命令 | check/verify/render/scope/build/status/kb-* | 同名同义 | `verify` 在本仓包装 verify_examples，在 board-games 包装 verify_content |
+| C++ 验证 | `verify_examples.py`（`--style` 含 format 硬门槛与致命检查集），`run.py verify`，CI 不编译 | 各阶段 `build-and-run.sh`（配置、编译、格式与静态检查、CTest、运行），`run.py build <game>/<stage>` 进 WSL | 验证入口不同，`scope` 输出的读取边界语义一致 |
+| `run.py` 子命令 | check/verify/render/preview/scope/build/status/kb-* | 同名同义 | `verify` 在本仓包装 verify_examples，在 board-games 包装 verify_content；`preview` 均注入 `QUARTO_PYTHON` |
 | Python 来源 | 根 `config.toml` 的 `python`，最低 3.12，失败即停 | 同左 | CI 用 `sed` 把该字段指向 runner 的 python3 |
 | 体量阈值 | L0/L1/L2/listing 厂商与分层硬约束；L3 教学体量为本仓建议（WARN，`--strict` 失败） | L0/listing 硬约束；L1/L2/catalog 均为本仓建议 | 落点表与「预算按仓可调」原则见各自 `refactor-guidelines.md` |
 | C++ 命名 | Google C++ Style Guide 为主标准：函数与类型 PascalCase、变量 snake_case、常量与枚举子 `k` 前缀；偏离白名单（`#pragma once`、`.cpp`/`.h`、C++20、异常边界、LLVM 横幅、不强制 cpplint），权威见 `cpp-naming-format-v1` | 同构：同一主标准与白名单，权威见 `bg-google-cpp-style-v1` | 两仓同步废止小驼峰选型；`.clang-tidy` 命名配置一致 |
+| 算术括号与枚举行尾 | 混合优先级算术显式括号，`readability-math-missing-parentheses` 在 `verify --style` 致命检查集内计失败；同一 `enum` 内不自明成员行尾齐全、自明成员不写，且语义结果优先；`readability-*` 禁止 NOLINT 掩盖；权威见 `cpp-naming-format-v1` 与 `cpp-teaching-source-comments-v1` | 同构：权威见 `bg-google-cpp-style-v1` 与 `bg-comment-style-v1`，阶段脚本 format+tidy 全绿 | 两仓同步新增；闸门入口不同 |
+| 跨仓外链句式 | 默认零条；禁「依据见 / 机制见 …」+ cpp-board-games；可选尾置「若要系统阅读…」；`check_forbidden_terms.py` 闸门 | 同构指向 cpp-notes；`verify_content.py` 闸门 | 两仓对称；细则见各自 `chapter-writing.md` |
+| 工具配置 YAML 注释 | .clang-format / .clang-tidy / .clangd：短 LLVM 文件头 + 邻接/单行分组；禁政策头与 kb 指针；权威见 cpp-teaching-source-comments-v1「工具配置 YAML」 | 同构：权威见 bg-comment-style-v1 同名专节 | 两仓同步；示例工程与模板外观一致 |
 | 主题资产 | 同一套 GitHub palette 与组件 CSS | 同左 | `check_layout.py` 环境变量前缀 `CPP_MEMO_*` vs `BOARD_GAMES_*` |

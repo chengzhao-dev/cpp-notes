@@ -7,7 +7,7 @@ tags: [cpp, language_basics, types, variables, constants, auto, scope, initializ
 level_range: [0, 4]
 dependencies: ["cpp-agent-context-budget-v1", "cpp-list-initialization-v1", "cpp-tooling-build-chain-v2"]
 created: "2026-09-16"
-updated: "2026-09-28"
+updated: "2026-09-30"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 760
 ---
@@ -32,15 +32,23 @@ estimated_tokens: 760
 
 初始化、赋值、`auto` 和初始化列表推导单独成页，基础类型页只保留变量与作用域的心智模型。普通变量初始化默认使用 `{}`，`auto` 初始化统一使用 `auto value = expression;`，避免把初始化列表的特殊规则误当成常规写法。
 
-## 常量与不可变值
+## 常量的四页拆分
 
-### 为什么先讲 const
+### 为什么先讲 const 变量
 
-`const` 解决的是“这个值不应通过该名字被修改”。先讲命名常量对可读性的帮助，再讲必须在创建时初始化、后续赋值会被编译器拒绝。
+`const` 解决的是“这个值不应通过该名字被修改”。先讲命名常量对可读性的帮助，再讲必须在创建时初始化、后续赋值会被编译器拒绝。`const-variables` 页不展开 `constexpr` 与 `inline`，文末链到下一页；原 `const` 页已更名为 `const-variables`，与后续 `const-member-functions` 页区分开（更名记录见 frontmatter updated）。
 
-### constexpr 的推迟边界
+### constexpr 页的边界
 
-`constexpr` 适合编译期可确定的值。基础页只保留一个尺寸或比例的短例子，模板、常量表达式和编译期求值细节留到后续主题。
+`constexpr` 独立成页，承担编译期确定要求、头文件公共常量的 `inline constexpr` 写法（具名命名空间、内部链接对照）与 C++11→17→20 演化短表，并附极简 `constexpr` 谓词函数。模板与重度编译期求值仍后置到后续主题；“基础页只保留短 constexpr”的旧政策由本页边界取代。
+
+### 对比页承载选型
+
+`constant-keywords` 页用对照表比较 `const`、`constexpr`、`consteval`、`constinit` 与宏，只解决“什么时候用哪个”，不设独立示例，长示例复用前两页。
+
+### 成员函数 const 页的边界
+
+`const-member-functions` 页插在 `structs-and-value-types` 之后：教学上必须先有类型与对象，成员函数尾部的 `const` 才有承诺对象。页内为成员函数语法只给最小上下文（`对象.函数名(实参)` 调用与逐成员读写），完整函数语法仍由函数章展开；尾部 const、返回类型、参数与局部变量四处 `const` 用一张对照表收拢。依据见标识 `cpp-const-member-functions-v1` 的知识文件。
 
 ## 语言基础的页面与构建边界
 
@@ -50,19 +58,23 @@ estimated_tokens: 760
 
 ## 语言基础路线
 
-语言基础按“基础类型与变量 → 初始化与推断 → 常量 → 数值安全 → 枚举与命名空间 → 结构体与值类型 → 运算 → 控制 → 函数 → 复合数据 → 自定义类型”推进：
+语言基础按“基础类型与变量 → 编写并调用函数 → switch 与 for → 初始化与推断 → const 变量 → constexpr → 常量关键词对比 → 数值安全 → 枚举 → 枚举类 → 命名空间 → 结构体与值类型 → 成员函数上的 const → 引用使用场景 → 指针使用场景 → ★ 传参选型速查 → ★ 返回值选型速查 → nodiscard → 把数据与操作放进类”推进。没有 `code/` 示例的课不写进这条顺序，也不在索引里预告。
 
-1. 运算符与表达式。
-2. 条件、循环和代码块。
-3. 函数、参数和返回值。
-4. 字符串、数组和常用容器入口。
-5. 自定义类型、类与引用。
+1. 函数紧跟基础类型，`switch` 与 `for` 紧跟函数。类放在 `nodiscard` 之后；简单项目设计章接着用值类型、类与输入输出边界组织最小项目。
+2. 引用与指针先讲场景选型：按现行 Google「Inputs and Outputs」规则建立“怎么选传参”的心智。
+3. 每章先改任务矩阵状态再写正文；没有示例的课不注册进 `_quarto.yml`。
+
+## 与主流教材的取舍
+
+Learn C++ 与这本笔记一样，先写只按值传递整数的函数，再写 `switch` 与 `for`。*C++ Primer* 把语句放在函数前面；这里不跟着改，因为现有函数课用不到分支。SG20 建议先教 `enum class`。本笔记保留「先看普通枚举的两个问题，再写枚举类」，因为这一页的任务就是指出泄漏，不把普通枚举当成要用的工具。指针运算仍留在待办，不插进当前路径。`std::string` 与 `std::vector` 属于下一课，类型页继续不讲 `string`。
+
+进阶与内存两条支线的次序：进阶由 language-advanced 分册承接（strong-types 已有，可续模板等）；内存按“stack-heap → raii → smart-pointers → move-semantics”推进，次序登记在对应任务矩阵。
 
 新章节只在任务矩阵登记后创建，一次只引入一个主要变化。前一章已经演示过的语法不再复制完整示例，只保留理解当前规则所需的最短上下文。
 
 ## 值类型与分组章节的最小边界
 
-`enums-and-namespaces` 与 `structs-and-value-types` 插在数值安全之后、运算之前，为姊妹仓库 cpp-board-games 的项目值类型建模（如井字棋状态模型）提供最小语言集。枚举章只讲 `enum class` 声明、限定名访问、与整数的显式转换和命名空间分组，不讲位掩码与 `using enum`；结构体章只讲聚合初始化、成员默认值与值语义复制，成员函数、访问控制与引用留给原定章节。
+`enums`、`enum-class`、`namespaces` 与 `structs-and-value-types` 插在数值安全之后、运算之前，为姊妹仓库 cpp-board-games 的项目值类型建模（如井字棋状态模型）提供最小语言集。枚举拆两页：`enums` 讲普通 `enum` 的两个问题，`enum-class` 讲限定名访问、与整数的显式转换、底层类型、成员注释写法与按值传参返回，两页都不讲位掩码与 `using enum`；命名空间章只讲分组、限定名与头文件禁用 `using namespace`；结构体章只讲聚合初始化、成员默认值与值语义复制，成员函数的 `const` 承诺单独进 `const-member-functions` 页，访问控制与引用留给原定章节。两张 ★ 速查（传参、返回值）插在指针场景章之后，按机制归并选型，细节回链场景章；`nodiscard` 页跟在返回值速查之后，用属性标注把“结果不能无视”变成编译期检查（依据见标识 `cpp-nodiscard-v1` 的知识文件）。
 
 ## 扩展与验证约束
 

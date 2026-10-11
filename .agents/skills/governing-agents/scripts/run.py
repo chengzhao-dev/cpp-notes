@@ -10,6 +10,7 @@
   check   按 fast|book|knowledge|python|full profile 运行校验（默认 full；缺少 _book 时显示跳过）
   verify  编译校验 C++ 示例（Windows 自动经 WSL2，可 --changed 增量校验）
   render  渲染 Book 并自动跑产物校验（合并为 1 轮）
+  install-quarto-deps  用 config.toml 安装 Quarto 可执行单元依赖
   scope   解析任务作用域，输出范围、单元、读取和禁止清单
   build   在 WSL 中跑某章节示例的一键构建（按需启动默认 Ubuntu，供 clangd 生成编译数据库）
   status  精简 git 状态：默认折叠用户既有改动，只看本次相关
@@ -64,15 +65,18 @@ def python_version(candidate):
         return None
 
 
+def load_config():
+    """读取根目录工具配置；配置错误由调用方显示为明确失败。"""
+    import tomllib
+
+    return tomllib.loads(CONFIG.read_text(encoding="utf-8"))
+
+
 def select_python():
     """只使用根目录 config.toml 的 python 字段且满足最低版本的解释器。"""
     try:
-        import tomllib
-    except ImportError:  # pragma: no cover - Python < 3.11
-        return None
-    try:
-        config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+        config = load_config()
+    except (ImportError, OSError, UnicodeDecodeError, ValueError):
         return None
     candidate = str(config.get("python") or "").strip()
     if not candidate or not Path(candidate).is_file():
@@ -81,6 +85,19 @@ def select_python():
     if version and version >= MIN_PYTHON:
         return candidate
     return None
+
+
+def quarto_python_packages():
+    """返回 config.toml 声明的 Quarto 可执行单元运行时依赖。"""
+    try:
+        packages = load_config().get("quarto_python_packages", [])
+    except (OSError, UnicodeDecodeError, ValueError) as exc:
+        raise ValueError(f"无法读取 config.toml：{exc}") from exc
+    if not isinstance(packages, list) or any(
+        not isinstance(package, str) or not package.strip() for package in packages
+    ):
+        raise ValueError("config.toml 的 quarto_python_packages 必须是非空字符串数组")
+    return [package.strip() for package in packages]
 
 
 PY = select_python()
@@ -114,6 +131,12 @@ CHECKS = [
     ("ascii", ".agents/skills/writing-quarto/scripts/check_ascii_names.py", False, ()),
     ("links", ".agents/skills/writing-quarto/scripts/check_skill_links.py", False, ()),
     ("docs", ".agents/skills/governing-agents/scripts/check_docs.py", False, ()),
+    ("content-budget", ".agents/skills/writing-quarto/scripts/check_content_budget.py", False, ()),
+    ("forbidden-words", ".agents/skills/writing-quarto/scripts/check_forbidden_terms.py", False, ()),
+    ("content", ".agents/skills/writing-quarto/scripts/verify_content.py", False, ()),
+    ("content-selftest", ".agents/skills/writing-quarto/scripts/test_verify_content.py", False, ()),
+    ("zh-lint", ".agents/skills/governing-agents/scripts/check_zh_lint.py", False, ()),
+    ("zh-lint-selftest", ".agents/skills/governing-agents/scripts/test_check_zh_lint.py", False, ()),
     ("tasks", ".agents/skills/governing-agents/scripts/check_task_matrix.py", False, ()),
     ("scaffold", ".agents/skills/maintaining-python/scripts/test_scaffold_projects.py", False, ()),
     ("kb", ".agents/skills/maintaining-python/scripts/check_health.py", False, ("--gate",)),
@@ -124,6 +147,8 @@ CHECKS = [
 PROFILE_CHECKS = {
     "fast": {
         "encoding", "agent-controls", "size", "ascii", "links", "docs", "tasks",
+        "content-budget", "forbidden-words",
+        "content", "content-selftest", "zh-lint", "zh-lint-selftest",
     },
     "book": {"layout", "callouts", "dom", "book-output"},
     "knowledge": {"kb", "kb-eval", "conflict"},
@@ -145,6 +170,7 @@ CHECK_LABELS = {
     "links": "链接",
     "docs": "文档",
     "tasks": "任务矩阵",
+    "forbidden-words": "禁用词",
     "scaffold": "脚手架",
     "kb": "知识库",
     "kb-eval": "知识库评测",
@@ -191,6 +217,9 @@ def run(argv, cwd=ROOT, env=None):
     child_env = dict(os.environ if env is None else env)
     if PY and Path(command[0]).resolve() == Path(PY).resolve():
         child_env["PYTHONIOENCODING"] = "utf-8"
+    if PY:
+        # Quarto 的 jupyter 引擎经 QUARTO_PYTHON 定位解释器；本仓仍只认 config.toml 的 python。
+        child_env["QUARTO_PYTHON"] = PY
     proc = subprocess.run(command, cwd=str(cwd), env=child_env, stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
     text = proc.stdout.decode("utf-8", errors="replace")
@@ -409,6 +438,45 @@ def cmd_render(args):
     return 0
 
 
+def cmd_install_quarto_deps(args):
+    """用 config.toml 的受控解释器安装 Quarto 可执行单元依赖。"""
+    try:
+        packages = quarto_python_packages()
+    except ValueError as exc:
+        print(f"失败  Quarto Python 依赖：{exc}")
+        return 1
+    if not packages:
+        print("通过  Quarto Python 依赖：未声明依赖，跳过安装")
+        return 0
+    rc, text = run([PY, "-m", "pip", "install", *packages])
+    if rc != 0:
+        print(f"失败  Quarto Python 依赖（退出码 {rc}）")
+        for ln in tail(text, 12):
+            print(f"      {ln}")
+        return rc
+    print(f"通过  Quarto Python 依赖：已安装 {len(packages)} 项")
+    return 0
+
+
+def cmd_preview(args):
+    """本地 preview：注入 QUARTO_PYTHON 后调用 quarto preview（须在仓库根目录）。"""
+    cmd = ["quarto", "preview"]
+    if args.target:
+        cmd.append(args.target)
+    if args.port is not None:
+        cmd.extend(["--port", str(args.port)])
+    # preview 为长驻进程；直接交给子进程，不捕获输出。
+    child_env = os.environ.copy()
+    if PY:
+        child_env["PYTHONIOENCODING"] = "utf-8"
+        child_env["QUARTO_PYTHON"] = PY
+    try:
+        return subprocess.call(cmd, cwd=ROOT, env=child_env)
+    except FileNotFoundError:
+        print("失败  未找到 quarto，请先安装 Quarto CLI")
+        return 1
+
+
 def cmd_scope(args):
     argv = [PY, str(ROOT / ".agents/skills/governing-agents/scripts/scope.py")]
     if args.list:
@@ -581,6 +649,11 @@ def main():
     p.add_argument("--skip-check", action="store_true", help="渲染后不跑校验")
     p.add_argument("--require-browser", action="store_true",
                    help="浏览器布局检查未执行时失败")
+    p = subs.add_parser("preview", parents=[common], help="本地 preview（注入 QUARTO_PYTHON）")
+    p.add_argument("target", nargs="?", help="可选：单个 .qmd 路径")
+    p.add_argument("--port", type=int, help="可选：preview 端口")
+    subs.add_parser("install-quarto-deps", parents=[common],
+                    help="用 config.toml 安装 Quarto 可执行单元依赖")
     p = subs.add_parser("scope", parents=[common], help="输出任务作用域清单")
     p.add_argument("target", nargs="?")
     p.add_argument("--list", action="store_true")
@@ -607,7 +680,9 @@ def main():
     elif extra:
         parser.error("未识别的参数: " + " ".join(extra))
     handlers = {"check": cmd_check, "verify": cmd_verify, "render": cmd_render,
-                "scope": cmd_scope, "build": cmd_build, "status": cmd_status,
+                "preview": cmd_preview,
+                "install-quarto-deps": cmd_install_quarto_deps, "scope": cmd_scope,
+                "build": cmd_build, "status": cmd_status,
                 "kb-index": cmd_kb_index, "kb-search": cmd_kb_search,
                 "kb-check": cmd_kb_check, "kb-eval": cmd_kb_eval}
     try:

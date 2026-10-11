@@ -3,11 +3,11 @@ kb_id: "cpp-agent-context-budget-v1"
 title: "内容增量与上下文预算治理"
 domain: "agent-workspace"
 subdomain: "context"
-tags: [context_budget, token_budget, qmd, skill, knowledge, page_split, include, progressive_disclosure]
+tags: [context_budget, token_budget, qmd, skill, knowledge, page_split, progressive_disclosure, code_inline]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-codex-context-v1", "cpp-agent-repository-navigation-v1"]
 created: "2026-09-16"
-updated: "2026-09-16"
+updated: "2026-09-29"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 900
 ---
@@ -28,9 +28,9 @@ estimated_tokens: 900
 
 ## 代码与正文的预算边界
 
-5000 有效字符排除围栏代码和 `{{< include >}}` 行。完整示例源码由 `code/` 单独维护、独立校验并按任务登记，如果再次计入页面字符会造成重复计量，也会迫使正文删掉必要的解释。长代码必须下沉到 `code/`，页面只保留真实文件名对应的 include。
+5000 有效字符排除围栏代码全文（含内联完整源码）。`code/` 单独维护、独立编译校验并按任务登记，**只服务验证**，不向 qmd 做 `{{< include >}}` 或按文件名嵌入；正文需要展示源码时必须内联进带语言标注的代码围栏。若把 `code/` 字节再计入页面有效字符，会造成重复计量并迫使正文删掉必要解释。
 
-行数仍按 QMD 原始源码计算，防止用超长内联代码块绕过页面预算。页面宏、标题、正文、列表、Callout 和行内代码仍计入有效字符，因为这些内容会随页面一起直接进入上下文。
+行数仍按 QMD 原始源码计算，防止用超长内联代码块绕过页面预算；超限时先按读者任务拆页或缩短示例，而不是改回 include。页面宏、标题、正文、列表、Callout 和行内代码仍计入有效字符，因为这些内容会随页面一起直接进入上下文。
 
 ## 增量准入
 

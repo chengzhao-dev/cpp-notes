@@ -171,23 +171,23 @@ def main() -> int:
         "code/getting-started/multi-file-project/src/main.cpp",
         "code/getting-started/multi-file-project/include/greeting.h",
         "code/getting-started/multi-file-project/CMakeLists.txt",
-        "code/getting-started/static-library/greeting/src/greeting.cpp",
-        "code/getting-started/shared-library/CMakeLists.txt",
+        "code/practice/static-library/greeting/src/greeting.cpp",
+        "code/practice/shared-library/CMakeLists.txt",
     ]
     assert set(runner.relevant_cpp_paths(changed_cpp)) == set(changed_cpp)
     assert runner.relevant_cpp_paths(["index.qmd"]) == []
     projects = verify.find_cmake_projects(str(ROOT / "code"))
     assert str(ROOT / "code" / "getting-started" / "multi-file-project") in projects
     assert str(ROOT / "code" / "getting-started" / "cmake-project") in projects
-    assert str(ROOT / "code" / "getting-started" / "static-library") in projects
-    assert str(ROOT / "code" / "getting-started" / "shared-library") in projects
+    assert str(ROOT / "code" / "practice" / "static-library") in projects
+    assert str(ROOT / "code" / "practice" / "shared-library") in projects
     assert (ROOT / "code" / "getting-started" / "first-program" / "build-and-run.sh").is_file()
     for name in ("main.cpp", "greeting.h", "greeting.cpp", "build-and-run.sh"):
         assert (ROOT / "code" / "getting-started" / "minimal-program-structure" / name).is_file()
     library_unit = scope.find_chapter_by_code_path(
         ROOT
         / "code"
-        / "getting-started"
+        / "practice"
         / "shared-library"
         / "greeting"
         / "src"

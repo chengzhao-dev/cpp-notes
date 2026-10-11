@@ -2,7 +2,7 @@
 
 本文件是 Quarto Book 项目结构、YAML front matter、章节标题约定的**规范唯一出处**。其他文件（authoring.md、rendering-and-output.md）提到这些约定时一律引用本文件，不重复陈述。`format: html` 的选项语义与失效边界归 `.agents/knowledge/quarto-writing/output/html-output.md`，本项目现行取值归 `rendering-and-output.md`，本文件不复制。
 
-> 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节
+> 速查：`.qmd` = YAML front matter + Markdown 正文 · `title:` 与 `# H1` 二选一 · `index.qmd` 必须存在 · Book 输出 `_book/` · `part:` 分组章节。存在计算型页面时，根 `_freeze/` 提交为执行快照，`.quarto/` 仍是忽略的本地状态。
 
 ## 目录
 
@@ -62,6 +62,7 @@ quarto publish gh-pages           # 渲染并发布到 GitHub Pages
 ```yaml
 project:
   type: book
+  output-dir: _book
 
 book:
   title: "C++ 学习轨迹笔记"
@@ -85,7 +86,7 @@ format:
 - 章节可放子目录（如 `content/getting-started/setup-wsl2.qmd`），在 `chapters` 写相对路径。
 - **`part:` 分组**：可用标题字符串（`part: "标题"`）或指向索引页（如 `part: content/getting-started/index.qmd`，本项目在用），产生分卷/分部标题。索引页的 `.hero-eyebrow` 是可选视觉组件，只在正文真的写了该 div 时生效，与 `part:` 的写法无关，不构成索引页的硬性要求。
 - 章节间交叉引用用 `@sec-...`、`@tbl-...`、`@fig-...`。
-- 渲染：`quarto render`，Book **默认输出到 `_book/`**（区别于 website 的 `_site/`）。
+- 渲染：`quarto render`，Book 输出到根 `_quarto.yml` 的 `project.output-dir`（本仓为 `_book/`；区别于 website 的 `_site/`）。
 
 ### 根首页与部分首页的链接边界
 

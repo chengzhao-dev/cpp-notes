@@ -4,7 +4,6 @@ description: 编写结构清晰、可验证、适合 HTML 阅读的 Quarto 中�
 metadata:
   short-description: 编写可验证的中文 Quarto 文档
 ---
-
 # Skill: writing-quarto
 负责页面结构、中文表达与多文件协作。C++ 语义交给 `writing-cpp`，主题样式交给 `designing-theme`。按路由只读所需 reference，不整包加载。
 ## 适用场景
@@ -19,21 +18,20 @@ metadata:
 | --- | --- |
 | 所有中文文档任务（最高优先） | `references/zh/writing-principles.md` |
 | 章节组织、页面骨架与新手术语门槛 | `references/zh/chapter-writing.md` |
-| 正文结构、文档元素与终端命令块 | `references/quarto/authoring.md`、`references/quarto/terminal-validation.md` |
-| 小节密度、Callout 和排错结构 | `references/zh/section-focus-and-density.md` |
+| 正文结构、文档元素与终端命令块 | `references/quarto/authoring.md`、`references/quarto/terminal-validation.md`；递进片段合并等元素细则见知识 `cpp-quarto-qmd-element-cases-v1` |
+| 小节密度、Callout 和排错结构 | 知识 `cpp-quarto-section-density-v1` |
 | Book 结构、front matter、标题层级与 H2/H3 判定 | `references/quarto/basics.md` |
 | HTML 取值与渲染排错（编号索引，按症状定位） | `references/quarto/rendering-and-output.md` |
-| 页面组织与措辞依据（为什么这么排） | `run.py kb-search "页面结构 措辞" --domain quarto-writing` |
+| 页面组织、措辞、预算与全仓重构 | `run.py kb-search "页面结构 措辞" --domain quarto-writing`；预算见 `cpp-quarto-chapter-structure-v1`「分层上限」，全仓流程见 `references/quarto/repository-wide-refactor.md`。 |
 
 ## P0 硬约束
 1. 标题只由 YAML `title:` 提供，页面内不再写同文本 `# H1`。小节从 `##` 开始，不手填序号，`##`/`###` 前不写 `---` 水平线。
-2. 代码块用属性围栏 `{.cpp filename="main.cpp"}`。`filename` 写运行环境或真实文件名，正文不重复环境说明。复杂关系若确需 Mermaid 才使用 `{mermaid}` 围栏。`{{< include >}}` 同样放进带 `filename` 的属性围栏。
-3. Callout 只用内置 5 类，自定义类会被静默丢弃。正文只承诺实际提供且能验证的内容，标题后第一句直接兑现承诺。
+2. 代码块用属性围栏 `{.cpp filename="main.cpp"}`。`filename` 写运行环境或真实文件名，正文不重复环境说明。完整源码必须直接内联在正文的带语言标注代码围栏中，禁止使用 `{{< include >}}`；`code/` 只供编译验证，不向 qmd 嵌入。递进依赖的同源片段必须合并为一个围栏；「片段 + 完整示例」成对与多源文件各一块是显式豁免，判定见知识 `cpp-quarto-qmd-element-cases-v1`。复杂关系若确需 Mermaid 才使用 `{mermaid}` 围栏；坐标轴类网格图仅当用户明确指定时走绘图助手加 `{python}` 单元（口径见知识 `cpp-coords-diagram-v1`），不用 Mermaid 硬画。
+3. Callout 只用内置 5 类，自定义类会被静默丢弃。正文只承诺实际提供且能验证的内容，标题后第一句直接兑现承诺；一段只推进一个对象，对象切换必须新起段并用一句关系衔接。
 4. 中文 `.qmd`、Skill 与主题 CSS 使用 UTF-8 无 BOM、LF，改后先跑编码检查。正文只呈现正确流程，warning/error 移入专门章节或短 callout。常见错误的完整格式以 `references/quarto/terminal-validation.md` 为准，本文件不复制三步模板。
-5. `##` 下不强制写导语，首个段落或 `###` 可以直接开始任务，导语不得复述标题。代码块前的完整动作句用 `。`，使用“如下、以下、例如”直接引出块内容时用 `：`。
-6. `## 自测问题` 独立成节，位置固定在 `## 常见错误` 之后、`## 本章回顾` 之前，回顾不再承载问题。每章保留 0–7 道面试式“为什么”问题，只检验关键因果关系、阶段边界或成功判据；没有高价值问题时不添加。答案使用 `.answer` 就地折叠。
-7. Mermaid 只用于辅助解释复杂关系，不替代实际命令、输出和验证。路线图不是默认产物，只有用户明确指定路线图的内容、范围或节点时才生成。
-8. 英文 QMD 文件名使用稳定、语义化的 ASCII `kebab-case`，不添加数字前缀；中文 `title` 使用简短、可执行、面向读者任务的单行标题。文件名负责稳定路径和主题语义，标题负责阅读表达，两者不要求逐字翻译。
+5. `##` 下不强制写导语，首个段落或 `###` 可以直接开始任务，导语不得复述标题。代码块前的完整动作句用 `。`，使用“如下、以下、例如”直接引出块内容时用 `：`；围栏内 `//` / `#` 注释已写明的意图，块后正文不得同义复述，只写注释没覆盖的新信息（对照见知识 `cpp-quarto-chinese-style-v1`）。节导语与引用块限额由 `check_content_budget.py` 按知识 `cpp-quarto-chapter-structure-v1`「分层上限」执行。
+6. 代码块与 `{mermaid}`/`{python}` 图之间必须有桥接正文（固定序列见 `references/quarto/authoring.md`「代码与图的桥接」）；有项目解释时解释紧跟代码块，不得插队到图后。图遵守一图一事、同主题相邻、不承载新信息，主题错位拆 `###`。正文写可观察对象与完整主谓句，禁用「契约链」「状态外壳」「地基」「闭环」「消费」等压缩隐喻与电报省略（对照见知识 `cpp-quarto-chinese-style-v1`）。
+7. 跨仓外链默认零条：禁止「写法依据见」等突兀句挂 cpp-board-games；可选尾置「若要系统阅读…」（细则见 `references/zh/chapter-writing.md`）。正文禁课堂类比与「公共头」缩略，头文件指称写具体对象或「库对外头文件」（细则见同文件「叙事边界」）。
 
 ## 工作流程
 

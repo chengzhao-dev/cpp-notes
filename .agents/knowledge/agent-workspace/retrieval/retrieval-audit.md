@@ -13,7 +13,7 @@ estimated_tokens: 700
 
 # Agent 资源职责与检索统一审计
 
-日期：2026-09-24
+日期：见 frontmatter created
 
 ## 结论
 

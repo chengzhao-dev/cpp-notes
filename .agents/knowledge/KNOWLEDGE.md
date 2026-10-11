@@ -11,8 +11,11 @@
 │   ├── context/
 │   ├── navigation/
 │   └── retrieval/
-├── cpp-teaching/                  # 按 path、style、toolchain、types 等性质归档（技能：writing-cpp）
+├── cpp-teaching/                  # 按 path、style、toolchain、types、stl 等性质归档（技能：writing-cpp）
+│   └── cases/                     # 正反对照（正确/不佳/改写）；appendix/ 不进索引
+│   # style/ 含命名、异常文案等；stl/ 含下标与 at 等
 ├── quarto-writing/                # 按 output、rendering、writing 等性质归档（技能：writing-quarto）
+│   └── cases/                     # 正反对照（正确/不佳/改写）；appendix/ 不进索引
 ├── visual-theme/                  # 主题令牌、布局几何与响应式行为（技能：designing-theme）
 │   ├── layout/
 │   └── navigation/
@@ -20,6 +23,8 @@
     ├── hygiene/
     └── publishing/
 ```
+
+`cases/` 放正反对照，一条对照的检索单元是「正确 + 不佳 + 改写」；规范条文与依据留在 style、types 等条文叶子。`cases/appendix/` 是低频人审附录：索引、检索、评测与校验全部跳过，仅人审或用户点名时读。
 
 按性质创建子目录，不创建空目录。文件名与目录名一律纯 ASCII。
 
@@ -29,7 +34,7 @@ frontmatter 字段：
 
 | 字段 | 必填 | 作用 |
 |---|---|---|
-| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-pattern-v1`），历史 id 保持不改名，改名等于新建知识 |
+| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-structure-v1`），历史 id 保持不改名，改名等于新建知识 |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
 | `domain` | 是 | 检索预过滤维度，取同名领域目录值 |
 | `subdomain` | 建议 | 同一技能内的主题筛选，取同名子域目录值 |
@@ -74,8 +79,8 @@ frontmatter 字段：
 ```
 
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/maintaining-python/scripts/`：
-`kb_common.py` 公共工具、`chunker.py` 语义分块、`indexer.py` FTS5、向量与图谱索引、
-`retriever.py` 混合检索与 Parent 回溯、`evaluator.py` 与 `eval_set.py` 评测、`check_health.py` 体检、
+`kb_common.py` 公共工具，`chunker.py` 语义分块，`indexer.py` 建 FTS5、向量与图谱索引，
+`retriever.py` 混合检索与 Parent 回溯，`evaluator.py` 与 `eval_set.py` 评测，`check_health.py` 体检，
 `test_conflict_detection.py` 锁住「重合度 → 检索降权」链路（已接入 `check --profile knowledge`）。
 
 ## 新增知识的最小闭环

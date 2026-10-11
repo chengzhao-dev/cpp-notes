@@ -5,7 +5,7 @@ domain: "quarto-writing"
 subdomain: "writing"
 tags: [practice, landing, part_page, callout, answer_disclosure, page_layering]
 level_range: [0, 9]
-dependencies: ["cpp-quarto-chapter-pattern-v1"]
+dependencies: ["cpp-quarto-chapter-structure-v1"]
 created: "2026-09-16"
 updated: "2026-09-16"
 estimated_tokens: 350

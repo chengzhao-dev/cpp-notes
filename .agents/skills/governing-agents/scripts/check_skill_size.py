@@ -59,7 +59,7 @@ def read(path):
 
 
 def stat(path):
-    """"返回 (行数, 字符数, 字节数)。"""
+    """返回 (行数, 字符数, 字节数)。"""
     raw = read(path)
     return len(raw.splitlines()), len(raw), len(raw.encode("utf-8"))
 

@@ -3,11 +3,11 @@ kb_id: "cpp-tooling-quarto-render-v2"
 title: "Quarto 渲染行为与失效模式"
 domain: "quarto-writing"
 subdomain: "rendering"
-tags: [quarto, render, yaml, callout, include, encoding, troubleshooting, grid_width, reading_width, gutter, viewport_target, sidebar_width, margin_width, sidebar_collapse, collapse_level, text_wrap, code_block_border, code_title, filename, toc_indent, typography, line_height, font_stack, webfont_subset, fixel_text, lxgw_wenkai_screen, lxgw_bright_code, monaspace_argon, code_followup_gap, reference_sites, homepage_hero, marketing_layout]
+tags: [quarto, render, yaml, callout, encoding, troubleshooting, grid_width, reading_width, gutter, viewport_target, sidebar_width, margin_width, sidebar_collapse, collapse_level, text_wrap, code_block_border, code_title, filename, toc_indent, typography, line_height, font_stack, webfont_subset, fixel_text, lxgw_wenkai_screen, lxgw_bright_code, monaspace_argon, code_followup_gap, reference_sites, homepage_hero, marketing_layout]
 level_range: [0, 9]
 dependencies: ["cpp-tooling-build-chain-v2"]
 created: "2026-09-09"
-updated: "2026-09-19"
+updated: "2026-09-29"
 chunk_strategy: "semantic_heading"
 estimated_tokens: 2500
 ---
@@ -20,9 +20,9 @@ estimated_tokens: 2500
 
 Book 默认输出 `_book/`，发布产物路径必须与项目类型匹配。YAML 层级、缩进或作用域错误可能不报错而静默失效。修改后应渲染并检查生成页面。
 
-## 提示框与包含文件
+## 提示框与代码围栏
 
-Quarto 只识别内置提示框类型。自定义提示框类可能退化为普通章节。包含真实代码文件时使用带语言标记的代码围栏，否则代码中的 Markdown 字符会被当作正文解析。
+Quarto 只识别内置提示框类型。自定义提示框类可能退化为普通章节。正文禁止 `{{< include >}}`；展示源码时把全文内联进带语言标记的代码围栏，否则代码中的 Markdown 字符会被当作正文解析。`code/` 只供编译验证。
 
 ## 三栏宽度预算
 

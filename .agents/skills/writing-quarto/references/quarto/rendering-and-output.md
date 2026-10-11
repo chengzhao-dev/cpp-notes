@@ -48,7 +48,7 @@
 `& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<症状关键词>"` 取用
 （可加 `--domain quarto-writing --subdomain rendering`）。本文件不重复解释根因，只保留编号、症状与处置。
 
-> 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · `{{< include >}}` 必须包在带语言名的围栏里
+> 速查：内嵌资源用 `embed-resources` 且必须嵌在 `format: html:` 下 · 路径用相对、纯 ASCII · 拿不准 YAML 先查官方 `llms.txt` · callout 只用内置 5 类 · 正文禁止 `{{< include >}}`，完整源码内联进带语言名的围栏
 
 ### 1. `self-contained` 已弃用
 
@@ -124,7 +124,7 @@ $d = Get-ChildItem -LiteralPath "D:\Github" -Force
 - **处置**：只用内置 `note`/`tip`/`warning`/`important`/`caution` 五类，标题写成 `::: {.callout-note title="中文标题"}`，块内不再写 `##` 标题。「最佳实践 / 关键洞察 / 深入」三层语义到内置类型的映射见 `authoring.md`「Callout 提示框」。
 - **自检**：渲染后跑 `run.ps1 check --profile book`，`callouts` 项会扫描 `_book/**/*.html`，出现退化的 `<section class="levelN … callout-…">` 即返回退出码 1。
 
-### 13. `{{< include >}}` 引用代码文件未加属性围栏 → 乱码式排版、目录被污染
+### 13. 正文出现 `{{< include >}}` → DOC-E25 失败
 
-- **症状**：渲染出的脚本失去高亮与等宽底色，`#` 注释行变成大号标题，含 `*`、`_` 的行变成斜体或粗体，右侧目录多出假标题。
-- **处置**：`{{< include >}}` 整体放进 `{.cpp filename="main.cpp"}` 形式的属性围栏，按扩展名选语言并把 `filename` 写成真实文件名，**没有一个例外**。规则见 `authoring.md`「代码块」。
+- **症状**：`content/**/*.qmd` 含 `{{< include ... >}}`。
+- **处置**：禁止 include。完整源码直接写入属性围栏（如 `{.cpp filename="main.cpp"}`）。`code/` 只做编译验证。DOC-E25 对 `{{< include` 直接失败。

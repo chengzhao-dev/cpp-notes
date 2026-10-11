@@ -415,6 +415,11 @@ def check(path):
     if kind == "qmd" and rel.startswith("content/"):
         errors.extend(check_answer_disclosures(rel, lines))
         errors.extend(check_callout_placement(rel, lines))
+        for number, line in enumerate(lines, 1):
+            if "{{<" in line and re.search(r"\binclude\b", line):
+                errors.append(
+                    f"{rel}:{number}: DOC-E25 content 正文禁止使用 include，完整源码必须内联在代码围栏中"
+                )
         front_end = 0
         if lines and lines[0].strip() == "---":
             for index in range(1, len(lines)):
@@ -483,17 +488,80 @@ def check(path):
         target = local_path(path, match.group(2))
         if target and not target.is_file() and kind != "readme":
             errors.append(f"{rel}: DOC-E9 图片不存在：{match.group(2)}")
+    fenced_lines = set()
+    in_fence = False
+    for number, line in enumerate(lines, 1):
+        if re.match(r"^\s*(```|~~~)", line):
+            in_fence = not in_fence
+            fenced_lines.add(number)
+        elif in_fence:
+            fenced_lines.add(number)
     for match in LINK.finditer(text):
+        line_number = text.count("\n", 0, match.start()) + 1
+        if line_number in fenced_lines:
+            continue
         target = local_path(path, match.group(1))
         if target and not target.exists():
             errors.append(f"{rel}: DOC-E10 本地链接不存在：{match.group(1)}")
     colon_count = sum(line.count("：") for line in lines if line.strip() and not line.lstrip().startswith(("#", "-", "```")))
     if colon_count >= 8:
         notices.append(f"{rel}: DOC-N6 正文冒号较密，请确认是否可改为完整句子")
+    if kind == "qmd":
+        notices.extend(check_progressive_fences(rel, headings, blocks))
     spacing_errors, spacing_notices = check_link_spacing(rel, lines, blocks)
     errors.extend(spacing_errors)
     notices.extend(spacing_notices)
     return errors, notices
+
+
+def check_progressive_fences(rel, headings, blocks):
+    """同一小节内同源 cpp/cmake 围栏多次出现且中间无图时记 NOTICE。
+
+    递进依赖的同源片段应合并为一个围栏（口径见标识
+    cpp-quarto-qmd-element-cases-v1 的知识文件）；递进语义无法可靠自动
+    判定，只提示人审。「片段」标记、「片段 + 完整示例」成对、多源文件
+    各一块与 {python}/{mermaid} 打断的小节不提示。
+    """
+    notices = []
+    markers = [(number, level, title) for number, level, title in headings if level in (2, 3)]
+
+    def section_of(start):
+        h2 = h3 = None
+        for number, level, title in markers:
+            if number >= start:
+                break
+            if level == 2:
+                h2, h3 = title, None
+            else:
+                h3 = title
+        return h2, h3
+
+    def interrupted(previous_start, current_start):
+        for start, _end, info in blocks:
+            if start <= previous_start:
+                continue
+            if start >= current_start:
+                break
+            if info.startswith("{python") or info.startswith("{mermaid"):
+                return True
+        return False
+
+    last = {}
+    for start, _end, info in blocks:
+        language, attributes, _error = parse_fence_info(info)
+        if language not in {"cpp", "cmake"}:
+            continue
+        filename = attributes.get("filename") or ""
+        if not filename or "片段" in filename or " " in filename or "（" in filename:
+            continue
+        key = (*section_of(start), language, filename)
+        if key in last and not interrupted(last[key], start):
+            notices.append(
+                f"{rel}:{last[key]}: DOC-N11 同一小节内 filename={filename} 的 "
+                f"{language} 围栏多次出现且中间无图，检查是否递进依赖应合并"
+            )
+        last[key] = start
+    return notices
 
 
 def has_purpose_comment(path, lines):

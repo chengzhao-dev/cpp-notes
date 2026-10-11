@@ -7,9 +7,9 @@ tags: [cpp, primitive_types, variables, integer, floating_point, bool, conversio
 level_range: [0, 4]
 dependencies: ["cpp-language-basics-path-v1", "cpp-list-initialization-v1"]
 created: "2026-09-19"
-updated: "2026-09-19"
+updated: "2026-09-30"
 chunk_strategy: "semantic_heading"
-estimated_tokens: 1200
+estimated_tokens: 1600
 ---
 
 # C++ 基础类型与数值安全
@@ -59,3 +59,31 @@ C++ 标准只规定基础整数类型的最小范围，不保证 `int` 永远是
 ## 基础类型的教学取舍
 
 金额优先保存为最小货币单位的整数，例如“分”，避免二进制浮点舍入进入结算核心。折扣率、比例和物理量可以使用 `double`，但必须说明误差和比较策略。类型安全的目标不是消灭所有转换，而是让范围、单位、符号和精度成为可检查的设计信息。
+
+## 两仓工程代码的定宽整型约定
+
+姊妹仓库 cpp-board-games 的工程代码有一条比本文件更严的约定，按角色分层：
+
+| 角色 | 类型 | 理由 |
+| --- | --- | --- |
+| 领域坐标与尺寸（`kRows` / `kCols`、`Position::row` / `col`、循环下标） | `std::int32_t` | 参与有符号边界判定，与坐标同一有符号族 |
+| 容器长度与下标（`kCellCount`、`std::array` 长度、`CellIndex` 返回值） | `std::size_t` | 容器 / NTTP 侧，与 STL 一致 |
+| 封闭状态码枚举底层 | `std::uint8_t` | 唯一的小无符号用途：取值集合与布局，不是算术尺寸 |
+
+选型按场景论证：边界判定要能表达越界输入（如负坐标），有符号类型才表达得了，也避开 `size_t` 与负数比较的隐式转换陷阱；否决更小无符号（`uint8_t` / `uint16_t` 作坐标）——负坐标无法表达、与 `int` / `size_t` 混算触发整数提升、省字节收益为零；不用裸 `int` 是为跨平台宽度可预测。依据与偏离说明见姊妹仓库标识 `bg-google-cpp-style-v1` 的知识文件「整型与枚举底层类型」；notes 教学示例正文仍按本章讲解 `int` 的范围与转换语义，练习代码触及工程边界时跟随该约定。
+
+### 有符号乘法进入容器前的隐式拓宽
+
+有符号领域的乘法在 `std::int32_t` 完成后才隐式拓宽为 `std::size_t`，`3 * 3` 这类不会溢出的乘法同样会触发 `bugprone-implicit-widening-of-multiplication-result` 报警。正反例：
+
+```text
+不佳（int32 乘积先算完，再隐式拓宽成数组长度）：
+std::array<Mark, kRows * kCols> cells_;
+
+改写（操作数先显式拓宽，乘法直接在 size_t 完成）：
+inline constexpr std::size_t kCellCount =
+    static_cast<std::size_t>(kRows) * static_cast<std::size_t>(kCols);
+std::array<Mark, kCellCount> cells_;
+```
+
+下标换算同理：工程代码提供 `CellIndex(Position)` 返回 `std::size_t`，函数内先 `static_cast<std::size_t>` 各操作数再乘加；不关闭该检查，也不把领域坐标改成 `size_t`。

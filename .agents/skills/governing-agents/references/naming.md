@@ -7,6 +7,7 @@
 - 默认 **kebab-case**：全小写 + 连字符，如 `writing-readme`。
 - 固定入口文件用大写：`AGENTS.md`、`SKILL.md`、`KNOWLEDGE.md`、`MEMORY.md`、`INDEX.md`、`README.md`。
 - 名称有语义：能看出「是什么」或「做什么」，禁用 `utils`、`misc`、`temp`、`new`、`final`。
+- 路径遵守技能规范的连字符与固定入口；已经能看懂的英文名不为了和中文标题一样短而改写。
 - 技能目录名 ≤ 20 字符，动作 + 对象（如 `shipping-github`）。
 - 字符集仅 `a-z`、`0-9`、`-`、`_`、`.`；禁止连续连字符；文档路径一律纯 ASCII，中文只出现在文件内容里。
 - 技能内可导入 Python 用 `snake_case`（`check_health.py`）；Shell 用 kebab-case（`run-xxx.sh`）。
@@ -20,7 +21,7 @@
 | 记忆 / 事故领域 | 领域名词 kebab-case | `quarto-render`、`git-github` |
 | 普通 Markdown | kebab-case + `.md` | `retrieval-governance.md` |
 | 领域索引 | `<domain>/index.md` | `agent-workspace/index.md` |
-| 每日记忆 | `daily/YYYY-MM-DD.md` | `2026-09-24.md` |
+| 每日记忆 | `daily/YYYY-MM-DD.md` | `daily/<date>.md`（示例格式） |
 | 技能内参考 | `<topic>.md`，可按性质分子夹 | `.agents/skills/writing-quarto/references/zh/writing-principles.md` |
 | Python 脚本 | `<action>_<target>.py` | `check_health.py` |
 

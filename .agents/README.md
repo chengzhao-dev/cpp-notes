@@ -38,11 +38,12 @@
 
 ## 运行入口
 
-统一入口是 `skills/governing-agents/scripts/run.ps1`，Python 解释器唯一来源是根目录 `config.toml` 的 `python`。常用命令：
+统一入口是 `skills/governing-agents/scripts/run.ps1`，Python 解释器唯一来源是根目录 `config.toml` 的 `python`；Quarto 可执行单元依赖由同一文件的 `quarto_python_packages` 声明。常用命令：
 
 ```powershell
 & .agents/skills/governing-agents/scripts/run.ps1 scope <目标>
 & .agents/skills/governing-agents/scripts/run.ps1 check --profile fast|knowledge|python|full
+& .agents/skills/governing-agents/scripts/run.ps1 install-quarto-deps
 & .agents/skills/governing-agents/scripts/run.ps1 kb-index [--rebuild]
 & .agents/skills/governing-agents/scripts/run.ps1 kb-search <查询>
 ```

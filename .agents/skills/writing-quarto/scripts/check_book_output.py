@@ -63,7 +63,7 @@ def main() -> int:
     if "file:///" in index_text:
         problems.append("index.html 引用 file:/// 本地绝对路径，发布后必然失效")
 
-    # Book 项目渲染产物是 sitemap.xml（site-url 缺失时不生成），条目必须是绝对 URL
+    # Book 项目渲染产物中有 sitemap.xml（site-url 缺失时不生成），条目必须是绝对 URL
     sitemap = book / "sitemap.xml"
     if not sitemap.is_file():
         problems.append("缺少 sitemap.xml：通常是 _quarto.yml 的 book.site-url 未配置")
