@@ -1,0 +1,121 @@
+---
+title: "引用使用场景"
+---
+
+`struct` 的实例按值复制，函数之间传递数据时同样面临选择：复制一份，还是让函数直接使用调用者的对象。本章给出按场景选型的参数表，先说明引用适合的场景。可空与所有权的场景由下一章的指针接手。
+
+## 传递方式
+
+下表来自 [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html#Inputs_and_Outputs) 的 Inputs and Outputs 一节，是这份笔记与姊妹仓库工程代码共同的传参依据：
+
+| 场景 | 推荐方式 | 说明 |
+| --- | --- | --- |
+| 只读小对象（`int`、`double`、小 `struct`） | 按值 | 拷贝廉价，调用处清晰 |
+| 只读大对象（`string`、`vector`、大结构） | `const T&` | 避免昂贵拷贝 |
+| 需要修改且必须存在 | 非 `const` 引用 `T&` | 非可选输出用引用，不可为空 |
+| 需要修改且可能为空 | `T*` | 可选输出用指针 |
+| 输入输出且必须存在 | `T&` | 同非可选输出 |
+| 输入输出且可能为空 | `T*` | 可选输入输出 |
+| “本该是引用”的可选只读输入 | `const T*` | 可空输入 |
+| 转移所有权 | `std::unique_ptr<T>` 按值 | 所有权随参数转移 |
+| 共享所有权 | `std::shared_ptr<T>` | 按值或 `const&`，视引用计数而定 |
+
+许多旧文与 cpplint 时代的检查建议输出参数一律用指针。现行指南改为：不可为空的输出用非 `const` 引用，只有“可选”才交给指针。选型先问三件事：只读还是修改，对象大不大，可不可以为空。
+
+## 只读与必改
+
+完整示例覆盖表中的前三类参数场景，一个函数对应一种传递方式：
+
+```{.cpp filename="reference-usage-scenarios.cpp"}
+// 引用使用场景示例：按场景为参数选择按值、const 引用与非 const 引用。
+#include <iostream>
+#include <string>
+#include <vector>
+
+// 只读小对象：按值传递，拷贝廉价，调用处清晰。
+int SumCoords(int row, int col) {
+  return (row * 10) + col;
+}
+
+// 只读大对象：const 引用避免拷贝，函数承诺不修改元素。
+int TotalChars(const std::vector<std::string>& words) {
+  int total = 0;
+  for (const std::string& word : words) {
+    total += static_cast<int>(word.size());
+  }
+  return total;
+}
+
+// 需要修改且必须存在：非 const 引用承担输出，不可为空。
+void Capitalize(std::string& text) {
+  for (char& ch : text) {
+    if (ch >= 'a' && ch <= 'z') {
+      ch = static_cast<char>(ch - 'a' + 'A');
+    }
+  }
+}
+
+int main() {
+  std::vector<std::string> words{"board", "game", "grid"};
+  std::string title{"tic tac toe"};
+
+  std::cout << "坐标和: " << SumCoords(1, 2) << "\n";
+  std::cout << "总字符数: " << TotalChars(words) << "\n";
+
+  Capitalize(title);
+  std::cout << "大写标题: " << title << "\n";
+  return 0;
+}
+```
+
+运行结果：
+
+```{.text filename="运行效果"}
+坐标和: 12
+总字符数: 13
+大写标题: TIC TAC TOE
+```
+
+调用 `Capitalize(title)` 后，调用者手里的 `title` 已经变成大写，修改直接落到了原对象上。`SumCoords` 与 `TotalChars` 的结果都是单个值，函数按值返回。
+
+与返回值的取舍：结果只是一个值时优先返回，`SumCoords` 与 `TotalChars` 都是例子。需要就地修改调用者已有的对象，或一次产生多个结果时，才用非 `const` 引用承担输出。
+
+引用必须绑定到一个对象，没有“空引用”。`Capitalize` 因此不需要判空检查。“可能没有”的场景留给下一章的指针。
+
+## 常见错误
+
+### 必改参数按值传
+
+函数内修改的只是副本，对象保持原样，要让修改生效，把参数改成非 `const` 引用，并确认调用处传入的是可修改的对象。
+
+### 返回局部引用
+
+局部变量在函数结束时销毁，返回它的引用会得到悬空引用，计算结果优先按值返回，让编译器处理拷贝与移动。
+
+### 只读参数全加引用
+
+`int`、`double` 这类小对象按值传递更清晰，`const T&` 只为较大的对象省拷贝，照表选型，不把单一写法套到所有参数上。
+
+## 自测问题
+
+1. `TotalChars` 的参数为什么是 `const std::vector<std::string>&`？
+
+   ::: {.answer}
+   它只读取元素不修改，参数带 `const` 让编译器替读者守住这条承诺。`vector` 的拷贝昂贵，按引用免去整表复制。
+   :::
+
+2. `Capitalize` 为什么不返回新字符串？
+
+   ::: {.answer}
+   它的任务是改写调用者已有的对象，非 `const` 引用让修改直接生效。只产生一个新结果时才优先返回值。
+   :::
+
+3. 调用 `Capitalize` 前需要判空吗？
+
+   ::: {.answer}
+   不需要。引用必须绑定到对象，不存在空引用。“可能没有”的场景属于指针，见下一章。
+   :::
+
+## 本章回顾
+
+你现在能按场景表选择按值、`const T&` 与 `T&`。完整示例见 [reference-usage-scenarios.cpp](../../code/language-basics/reference-usage-scenarios.cpp)，由分册根 `CMakeLists.txt` 收集编译；可空输入、可选输出与所有权见下一章[指针使用场景](pointer-usage-scenarios.qmd)。

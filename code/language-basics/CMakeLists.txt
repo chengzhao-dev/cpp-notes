@@ -15,7 +15,7 @@ file(GLOB CHAPTER_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 foreach(source IN LISTS CHAPTER_SOURCES)
   get_filename_component(chapter "${source}" NAME_WE)
-  # 每章一个同名可执行目标，例如 constants.cpp 生成 constants。
+  # 每章一个同名可执行目标，例如 const.cpp 生成 const。
   add_executable(${chapter} "${source}")
   # 使用 libc++，并启用常用警告。
   target_compile_options(${chapter} PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)

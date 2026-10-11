@@ -1,0 +1,121 @@
+---
+title: "枚举类"
+---
+
+普通 `enum` 的作用域泄漏与隐式转换缺一个类型边界。`enum class` 把枚举值限定在类型名内，并与整数切断隐式转换，让“取值只限于列出的几个名字”成为编译器强制执行的规则。本章给出限定名访问、底层类型与成员注释的写法，再说明枚举类如何像普通值一样用在参数与返回值里。
+
+## 限定名访问
+
+完整示例定义多套封闭取值：对局状态、对局玩家与棋盘格子状态，并演示状态赋值、编号输出，以及由玩家得到格子状态的函数：
+
+```{.cpp filename="enum-class.cpp"}
+// 枚举类示例：封闭取值的状态类型、底层类型与按值传参。
+#include <cstdint>
+#include <iostream>
+
+// 对局状态
+enum class GameState : std::uint8_t {
+  kOngoing = 0,  // 对局尚未结束，可继续落子。
+  kWin = 1,      // 一方达成三连获胜。
+  kDraw = 2,     // 棋盘下满且无人三连。
+};
+
+// 对局玩家：kX 先手，kO 后手。
+enum class Player : std::uint8_t {
+  kX = 0,
+  kO = 1,
+};
+
+// 棋盘格子状态
+enum class CellState : std::uint8_t {
+  kEmpty = 0,  // 空格。
+  kX = 1,
+  kO = 2,
+};
+
+// 由对局玩家得到落子用的棋盘格子状态。
+CellState PlayerToCellState(Player player) {
+  return player == Player::kX ? CellState::kX : CellState::kO;
+}
+
+int main() {
+  GameState state{GameState::kOngoing};
+  std::cout << "初始状态编号: " << static_cast<int>(state) << "\n";
+  state = GameState::kWin;
+  std::cout << "当前状态编号: " << static_cast<int>(state) << "\n";
+
+  Player current{Player::kO};
+  CellState mark = PlayerToCellState(current);
+  std::cout << "当前玩家状态编号: " << static_cast<int>(mark) << "\n";
+  return 0;
+}
+```
+
+`GameState::kWin` 的 `::` 表示取 `GameState` 类型内的值。枚举值只能与同类型值比较或赋值，`state = 1;` 和把 `state` 直接赋给 `int` 都通不过编译。需要编号时用 `static_cast<int>` 写出转换意图，它只用于输出或与既有接口对接，不参与算术。
+
+## 底层类型
+
+枚举的底层整数类型默认由实现选择，显式写出后存储宽度就固定下来。这份笔记与姊妹仓库的工程代码把显式写出底层类型定为状态码类的默认约定，让对象布局可预测：
+
+- 示例中的 `enum class GameState : std::uint8_t` 用 8 位无符号整数存放三个状态；
+- Google 与 LLVM 的风格指南都不强制写底层类型，工程约定让同类代码写法一致；
+- 姊妹仓库井字棋的值类型就是这个写法，见 [board.h](https://github.com/chengzhao-dev/cpp-board-games/blob/main/games/tictactoe/01-cli-game/tictactoe/include/board.h)。
+
+成员说明写在定义上一行与行尾：不自明的成员必须全部有行尾注释，禁止半套；自明成员不加注释。多条行尾注释时 `//` 列对齐：
+
+```{.cpp filename="片段：成员注释的位置"}
+// 对局玩家：kX 先手，kO 后手。
+enum class Player : std::uint8_t {
+  kX = 0,
+  kO = 1,
+};
+```
+
+`kX` 与 `kO` 的含义从名字就能读出，都不写注释，先手规则写在类型上一行。同一枚举内不自明的成员则要全部补上行尾注释，不留下「是不是漏写了一条」的疑问。
+
+## 参数与返回值
+
+`enum class` 定义的类型和 `int` 一样是值类型：拷贝廉价、语义完整，可直接出现在函数参数与返回类型里，不需要引用或指针陪同，示例中的 `PlayerToCellState` 按值收一个 `Player`、按值返回一个 `CellState`：
+
+```{.cpp filename="片段：枚举类按值传参"}
+// 由对局玩家得到落子用的棋盘格子状态。
+CellState PlayerToCellState(Player player) {
+  return player == Player::kX ? CellState::kX : CellState::kO;
+}
+```
+
+调用处写 `PlayerToCellState(Player::kX)`，拿到的是独立的 `CellState` 值，与 `int` 参数的传递方式没有区别。什么时候该按值传、什么时候该用引用或指针，速查见 [★ 传参选型速查](parameter-passing-guide.qmd) 与 [★ 返回值选型速查](return-value-guide.qmd)。
+
+## 常见错误
+
+### 漏写 class 泄漏名字
+
+`enum Color { Red };` 的 `Red` 直接进入外层作用域，并且能与整数隐式转换，失去类型保护，统一写 `enum class`。
+
+### 枚举值当整数
+
+枚举值与 `int` 之间没有隐式转换，参与算术或存入整型变量都会编译失败，需要编号时先想清楚是否必要，再写出 `static_cast`。
+
+### 用点号访问枚举值
+
+`CellState.kX` 把类型名当成了对象，通不过编译；`clangd` 的报错指向枚举声明行，容易让人误判，枚举值要用 `CellState::kX` 访问。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. `enum class GameState : std::uint8_t` 里的 `: std::uint8_t` 起什么作用？
+
+   ::: {.answer}
+   它把枚举的底层整数类型固定为 8 位无符号整数，枚举的存储宽度不再由实现选择。风格指南不强制这样写，这份笔记与姊妹仓库的工程代码把它定为状态码类的默认约定。
+   :::
+
+2. 枚举类能像 `int` 一样按值传参和返回吗？
+
+   ::: {.answer}
+   能。`enum class` 与 `int` 同属值类型，拷贝廉价，可以直接出现在参数与返回类型里，例如 `CellState PlayerToCellState(Player player)`。什么时候选按值、引用或指针，见两张选型速查。
+   :::
+
+## 本章回顾
+
+你现在能用 `enum class` 定义封闭取值集合，按约定写底层类型与成员注释，也能让枚举类型像 `int` 一样按值进出函数。完整示例见 [enum-class.cpp](../../code/language-basics/enum-class.cpp)，下一章用命名空间给名字分组。

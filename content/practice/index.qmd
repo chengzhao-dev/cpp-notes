@@ -5,11 +5,19 @@ number-sections: false
 body-classes: index-page
 ---
 
-本分册关注 C++ 产物在真实工程中的职责。它不替代入门分册的构建练习，也不把 Android NDK、Gradle 或 JNI 实现展开成教程。
+本分册先把静态库和动态库构建出来，再用一页说明这些产物在真实工程里各自承担什么。它不把 Android NDK、Gradle 或 JNI 实现展开成教程。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [影像算法的交付形态](android-imaging.qmd)
-理解影像算法为什么先用可执行文件仿真，再以按 ABI 交付的动态库 SDK 接入 App 或系统模块。
+### [静态库](static-library.qmd)
+把库代码链接进最终程序。
+:::
+::: {.landing-card}
+### [动态库](shared-library.qmd)
+让程序在运行时查找库文件。
+:::
+::: {.landing-card}
+### [交付形态](android-imaging.qmd)
+理解影像算法为什么先用可执行文件仿真，再作为按 ABI 交付的动态库 SDK 接入 App 或系统模块。
 :::
 :::

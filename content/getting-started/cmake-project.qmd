@@ -6,7 +6,7 @@ title: "用 CMake 构建 C++ 程序"
 
 ## 查看工程文件
 
-示例工程包含三个文件：
+示例工程包含构建规则、辅助脚本和程序源码：
 
 ```{.text filename="工程目录"}
 cmake-project/
@@ -18,16 +18,41 @@ cmake-project/
 程序入口仍然只负责输出问候句，避免把语言细节和构建工具混在一起。
 
 ```{.cpp filename="main.cpp"}
-{{< include /code/getting-started/cmake-project/main.cpp >}}
+// 程序入口：向标准输出打印问候。
+#include <iostream>
+
+int main() {
+  std::cout << "Hello, World!\n";
+  return 0;
+}
 ```
 
 构建规则如下：
 
 ```{.cmake filename="CMakeLists.txt"}
-{{< include /code/getting-started/cmake-project/CMakeLists.txt >}}
+# 构建 CMakeProject 可执行目标。
+cmake_minimum_required(VERSION 3.31)
+project(CMakeProject LANGUAGES CXX)
+
+# 使用 C++20 作为语言标准。
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 可执行文件统一输出到 build/bin。
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# 编译数据库，记录每个源文件的实际编译参数。
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# 创建 app 可执行目标。
+add_executable(app main.cpp)
+
+# 编译时启用 libc++ 与常用警告。
+target_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)
+# 链接时也使用 libc++。
+target_link_options(app PRIVATE -stdlib=libc++)
 ```
 
-`project()` 设置工程名。`set()` 选择 C++20、输出目录和编译数据库。`add_executable()` 创建名为 `app` 的可执行目标，后面的 `target_compile_options()` 和 `target_link_options()` 为它设置编译与链接参数。
+`project()` 设置工程名，`set()` 选择 C++20、输出目录和编译数据库。`CMAKE_EXPORT_COMPILE_COMMANDS` 生成的 `compile_commands.json` 供 `clangd` 读取，编辑器的代码提示才能拿到真实编译参数。
 
 ## 配置工程
 
@@ -37,7 +62,7 @@ cmake-project/
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
 ```
 
-`-S .` 指定源码目录，`-B build` 指定构建目录，`-G Ninja` 选择 Ninja。只有构建规则改变时才需要重新配置。
+`-S .` 指定源码目录，`-B build` 指定构建目录，`-G Ninja` 选择 Ninja。配置命令成功后，构建目录中会保存后续构建所需的规则。
 
 ## 构建并运行
 
@@ -68,11 +93,11 @@ Hello, World!
 command -v cmake ninja clang++
 ```
 
-缺少工具时，回到[搭建 WSL2 开发环境](setup-wsl2.qmd#安装-c-工具)重新安装。
+缺少工具时，回到[准备 WSL2 C++ 开发环境](setup-wsl2.qmd#安装-c-工具)重新安装。
 
 ### 构建后找不到 app
 
-执行 `./build/bin/app` 时提示文件不存在，或构建结束后 `build/bin/app` 仍未生成。按下面的顺序定位，再重新构建并运行。
+执行 `./build/bin/app` 时提示文件不存在，或构建结束后 `build/bin/app` 仍未生成，按下面的顺序定位后重新构建并运行。
 
 1. **确认执行位置**
 
@@ -104,7 +129,7 @@ command -v cmake ninja clang++
 
 ## 自测问题
 
-先自己回答，再展开核对。
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
 
 1. 修改 `main.cpp` 后，为什么通常只需要再次执行 `cmake --build build`，而不必重新执行配置命令？
 

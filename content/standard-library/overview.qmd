@@ -1,0 +1,62 @@
+---
+title: "标准库总览"
+---
+
+读完前面几册，你已经会写类型、常量和小型接口。真实程序很快会需要「一组值」和「针对这组值的查找与排序」。C++ 标准库用容器、迭代器与算法承接这些常见需求。本章只建立阅读地图，不展开某个容器的全部 API。
+
+## 标准库的组成
+
+- **容器**：持有元素并规定插入、删除与访问成本，例如 `std::array`、`std::vector`、`std::map`。
+- **迭代器**：指向容器中位置的统一游标，算法靠它遍历半开区间 `[begin, end)`。
+- **算法**：写在 `<algorithm>` 等头文件里的通用步骤，优先「算法 + 迭代器」，少手写易错循环。
+
+选型时先问场景（固定长度还是可变、要不要按键查找），再比复杂度与失效规则，不要按字母表背 API。
+
+## 最小示例
+
+下面的程序只点名三种常用类型，确认工具链能包含标准库头文件并完成链接：
+
+```{.cpp filename="overview.cpp"}
+// overview 示例：点名几个常用标准库类型，不展开 API。
+#include <array>
+#include <iostream>
+#include <string>
+#include <vector>
+
+int main() {
+  std::array<int, 2> fixed{1, 2};
+  std::vector<int> dynamic{3, 4};
+  std::string label = "stl";
+
+  std::cout << "array size=" << fixed.size() << '\n';
+  std::cout << "vector size=" << dynamic.size() << '\n';
+  std::cout << "string=" << label << '\n';
+  return 0;
+}
+```
+
+预期输出：
+
+```{.text filename="终端输出"}
+array size=2
+vector size=2
+string=stl
+```
+
+## 自测问题
+
+1. 标准库学习为什么要同时看容器、迭代器与算法？
+
+   ::: {.answer}
+   容器决定元素怎么存；迭代器提供统一访问位置；算法在迭代器上工作。三块合在一起才是标准库的常用工作方式。
+   :::
+
+2. 本章为什么不立刻展开 `vector` 的全部成员函数？
+
+   ::: {.answer}
+   先建立地图与选型问题，避免一上来陷入 API 清单。后续章按读者任务展开具体容器。
+   :::
+
+## 本章回顾
+
+你现在能说出标准库的组成，并运行一个点名 `array` / `vector` / `string` 的最小示例。下一章用 `std::array` 分开「不检查」与「检查后抛异常」，并列出同类容器。

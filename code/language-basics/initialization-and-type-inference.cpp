@@ -6,9 +6,9 @@ int main() {
   int limit{100};
   count = 80;
 
-  auto value = 1200;
-  auto ratio = 4.5;
-  auto enabled = true;
+  auto value = 1200;      // int
+  auto ratio = 4.5;       // double
+  auto enabled = true;    // bool
   auto values = {10, 20, 30};
 
   value -= 100;

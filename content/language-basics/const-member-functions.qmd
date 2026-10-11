@@ -1,0 +1,105 @@
+---
+title: "成员函数上的 const"
+---
+
+结构体把相关的数据收进一个类型之后，下一步是让类型带上行为：`struct` 可以把函数直接定义在成员声明之后，这类函数通过 `对象.函数名(实参)` 调用，读写的是自己这个实例的成员。本章只讲这类函数身上的 `const` 写在哪里、承诺什么。完整函数语法由后面的函数章展开。
+
+## 尾部 const
+
+成员函数的 `const` 写在参数列表末尾。它的承诺对象不是某个参数，而是函数所属的实例本身：
+
+```{.cpp filename="片段：查询与修改两类成员函数"}
+// 查询函数：尾部 const。
+CellState GetCellState(Position position) const;
+
+// 修改函数：没有尾部 const，允许改写成员。
+PlaceResult Place(Move move);
+```
+
+`GetCellState` 只读取棋盘数据，尾部 const 把它标成查询；`Place` 要写入格子状态，不能标。误标的函数会在编译期被指出“const 函数里不能修改成员”，调用方不需要阅读实现就能信任这个承诺。
+
+完整示例用一个棋盘格子演示两类函数：
+
+```{.cpp filename="const-member-functions.cpp"}
+// 成员函数上的 const 示例：查询函数与修改函数的承诺不同。
+#include <cstdint>
+#include <iostream>
+
+// 棋盘格子状态
+enum class CellState : std::uint8_t {
+  kEmpty = 0,  // 空格。
+  kX = 1,
+  kO = 2,
+};
+
+// 一个棋盘格子：查询用尾部 const，落子要写入成员。
+struct Cell {
+  CellState state{CellState::kEmpty};
+
+  // 查询函数：尾部 const 承诺不修改实例。
+  CellState GetCellState() const {
+    return state;
+  }
+
+  // 修改函数：没有尾部 const，允许写入成员。
+  void Place(CellState new_state) {
+    state = new_state;
+  }
+};
+
+int main() {
+  Cell cell;
+  cell.Place(CellState::kX);
+  std::cout << "格子状态编号: " << static_cast<int>(cell.GetCellState()) << "\n";
+  return 0;
+}
+```
+
+## 四处 const 各管一段
+
+`const` 写在不同位置，管住的承诺不同。下面把成员函数相关场景放在一起对照：
+
+| 位置 | 写法 | 管住什么 |
+| --- | --- | --- |
+| 成员函数尾部 | `CellState GetCellState(Position) const` | 不修改实例自身 |
+| 返回类型 | `const CellState&` | 调用方拿到只读访问，不能借返回值修改 |
+| 参数 | `const Position&` | 函数内不能通过该参数修改外部对象 |
+| 局部变量 | `const CellState state{...};` | 创建之后不能通过这个名字赋值 |
+
+同一份只读数据往往在几个位置同时出现 `const`：参数标一个，函数体里的局部量标一个，尾部再标一个。它们各管一段，不互相替代。引用记号 `&` 的传参选型由下一章展开，这里只需认识“加了 `const` 的引用是只读借用”。
+
+## 常见错误
+
+### 修改型函数漏标 const
+
+`Place` 要写入棋盘成员，标了尾部 const 编译器直接拒绝，判断标准是函数是否会改写成员，而不是函数“感觉上”重不重要。
+
+### 实例不变的误解
+
+尾部 const 只约束经由本函数的调用不改写成员，不承诺对象在所有路径上不可变，成员仍可被其他修改函数改写。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. `CellState GetCellState(Position position) const;` 末尾的 `const` 承诺什么？
+
+   ::: {.answer}
+   承诺这个函数不修改自己所属的实例，只读取成员。调用方可以在 const 实例上放心调用它。
+   :::
+
+2. 为什么 `Place` 不能标尾部 const？
+
+   ::: {.answer}
+   它要写入棋盘成员，尾部 const 会把这种写入挡在编译期，编译器报“const 函数里不能修改成员”。
+   :::
+
+3. 参数上的 `const` 和成员函数尾部的 `const` 有什么区别？
+
+   ::: {.answer}
+   参数上的 `const` 管住“函数内不能通过该参数修改外部对象”，尾部的 `const` 管住“函数不修改实例自身成员”，两处承诺互不替代。
+   :::
+
+## 本章回顾
+
+你现在能读出成员函数尾部 `const` 的承诺，并把参数、返回值与局部变量的 `const` 放进同一张表区分。完整示例见 [const-member-functions.cpp](../../code/language-basics/const-member-functions.cpp)，对照与选型见 [常量关键词](constant-keywords.qmd)。

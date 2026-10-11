@@ -1,0 +1,110 @@
+---
+title: "[[nodiscard]]"
+---
+
+返回值选型速查把成败信息装进结果类型，按值交还调用方。但设计得再好的返回值，也挡不住调用方拿到后随手丢弃。`[[nodiscard]]` 是一个属性标注：编译器对“标注函数的返回值被丢弃”发出警告，把“结果不能无视”从文档约定变成可检查的规则。
+
+## 忽略返回值
+
+两类函数的返回值最值得标注：
+
+```{.cpp filename="片段：值得标注的两类函数"}
+// 查询函数的返回值就是函数的全部意义，丢弃等于没调用。
+[[nodiscard]] CellState GetCellState(Position position) const;
+
+// 结果类型承载成败，忽略拒绝会埋下逻辑错误。
+[[nodiscard]] PlaceResult Place(Move move);
+```
+
+`GetCellState` 不修改实例，调它的唯一目的就是拿返回值；`Place` 的 `PlaceResult` 告诉调用方落子是否被接受，忽略拒绝继续对局，错误要到很晚才会暴露。姊妹仓库的工程代码对这两类 API 一律标注。类的写法见[类与封装](classes.qmd)。`modernize-use-nodiscard` 可为部分可标注接口给出建议，但是否标注仍按返回值是否承载不可忽略的信息判断。
+
+完整示例演示“拿到结果就处理”的调用方式：
+
+```{.cpp filename="nodiscard.cpp"}
+// nodiscard 示例：标注过的返回值要处理，不能随手丢弃。
+#include <cstdint>
+#include <iostream>
+
+// 落子结果：接受或拒绝。
+enum class ApplyResult : std::uint8_t {
+  kAccepted,  // 接受落子，格子已标记。
+  kRejected,  // 拒绝落子，格子保持原样。
+};
+
+// 一个棋盘格子：重复落子会被拒绝。
+struct Cell {
+  bool filled{false};
+
+  // 落子结果承载成败，标注后丢弃会得到编译器警告。
+  [[nodiscard]] ApplyResult Place() {
+    if (filled) {
+      return ApplyResult::kRejected;
+    }
+    filled = true;
+    return ApplyResult::kAccepted;
+  }
+};
+
+int main() {
+  Cell cell;
+  ApplyResult first = cell.Place();
+  ApplyResult second = cell.Place();
+  std::cout << "第一次落子编号: " << static_cast<int>(first) << "\n";
+  std::cout << "第二次落子编号: " << static_cast<int>(second) << "\n";
+  return 0;
+}
+```
+
+## 加与不加
+
+标注面向“结果携带信息、忽略会出错”的函数，不是所有非 void 函数：
+
+- **加**：查询型成员函数（`GetCellState`、`Status`），结果类型的 API（`Place`）。
+- **不加**：结果没有信息量的函数，以及调用方明确只需要副作用的场景。无差别铺开会让警告淹没真正重要的提示。
+
+## 有意丢弃
+
+确实不需要返回值时，用 `static_cast<void>` 写出丢弃意图：
+
+```{.cpp filename="片段：有意的丢弃"}
+// 明确表达“我知道有返回值，这个场景不使用它”。
+static_cast<void>(cell.Place());
+```
+
+裸调用虽然不报错，但读者分不清是疏忽还是有意。`static_cast<void>` 一行就把意图写进了代码，也向评审说明这里不需要补错误处理。
+
+## 常见错误
+
+### 全局关闭警告
+
+丢弃结果被警告，说明调用流程值得复查；关掉检查等于丢掉“结果不能无视”的约定，应处理结果或用 `static_cast<void>` 有意丢弃。
+
+### 无差别加标注
+
+标注的价值来自稀缺，查询与结果类型之外的函数不加，让警告始终指向真正不能无视的返回值。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. `[[nodiscard]]` 加在函数声明上的作用是什么？
+
+   ::: {.answer}
+   编译器在该函数的返回值被丢弃时发出警告，把“结果不能无视”变成编译期可检查的规则。
+   :::
+
+2. 确实不需要返回值时怎么写？
+
+   ::: {.answer}
+   用 `static_cast<void>(调用)` 写出有意的丢弃，读者与评审都能看出这不是疏忽。
+   :::
+
+3. 哪两类函数最值得标注？
+
+   ::: {.answer}
+   查询型成员函数（返回值就是调用目的）和结果类型的 API（忽略拒绝会埋下逻辑错误）。
+   :::
+
+## 本章回顾
+
+你现在能给查询与结果类型函数标注 `[[nodiscard]]`，理解警告指向的流程问题，并用 `static_cast<void>` 表达有意丢弃。完整示例见 [nodiscard.cpp](../../code/language-basics/nodiscard.cpp)，返回值的选型见 [★ 返回值选型速查](return-value-guide.qmd)。

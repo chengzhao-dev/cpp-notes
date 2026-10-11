@@ -1,0 +1,67 @@
+---
+title: "类与封装"
+---
+
+[\[\[nodiscard\]\]](nodiscard.qmd)要求调用方处理查询结果。这一课把计数和修改它的操作放进同一个类，查询函数带 `const`。示例在 [classes.cpp](../../code/language-basics/classes.cpp)。
+
+## 类与封装
+
+`Counter` 的 `value_` 是私有的。外面只能通过构造函数和 `Add` 改变它。
+
+```{.cpp filename="classes.cpp"}
+class Counter {
+ public:
+  explicit Counter(int start) : value_{start} {}
+
+  [[nodiscard]] int Value() const {
+    return value_;
+  }
+
+  void Add(int delta) {
+    value_ += delta;
+  }
+
+ private:
+  int value_;
+};
+```
+
+井字棋的 `Board` 也是这种类：格子数据留在类里，查询用 `GetCellState`，见[实现棋盘存储](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/03-board.qmd)。
+
+## 用 const 查询
+
+`Value` 带尾部 `const`，只返回当前计数。`main` 从 `2` 开始，加上 `3`，打印 `计数: 5`。
+
+```{.cpp filename="classes.cpp"}
+  Counter counter{2};
+  counter.Add(3);
+  std::cout << "计数: " << counter.Value() << "\n";
+```
+
+## 常见错误
+
+### 类外改私有数据
+
+`value_` 写在 `private` 里，`main` 不能写 `counter.value_ = 0`。
+
+- 需要改变计数时调用 `Add`。
+
+### 查询函数漏掉尾部 const
+
+`Value` 不修改计数，漏掉 `const` 之后常量对象上就不能调用它。
+
+- 只读取数据的成员函数写上尾部 `const`。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. 为什么 `Value` 可以标成 `const`，`Add` 不行？
+
+   ::: {.answer}
+   `Value` 只返回 `value_`。`Add` 要修改 `value_`，尾部 `const` 会拒绝这次写入。
+   :::
+
+## 本章回顾
+
+你已经能类与封装，用 `const` 成员函数查询，并用另一个成员函数修改它。下一章[简单项目设计](simple-project-design.qmd)说明如何让类、值类型和输入输出边界一起服务一个小项目。

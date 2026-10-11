@@ -1,0 +1,88 @@
+---
+title: "★ 传参选型速查"
+---
+
+[引用使用场景](reference-usage-scenarios.qmd) 与 [指针使用场景](pointer-usage-scenarios.qmd) 已按场景展开了完整示例。本页把两张总表按机制归并成速查：函数参数只有按值、引用、指针三种传递机制，类型（`enum class`、小 `struct`、`string`）只是各机制下的选型对象。
+
+::: {.callout-important}
+## 选型总表
+
+先在心里回答每节的决策问句，再对照推荐方式。完整代码与场景展开回链各场景章。
+:::
+
+## 赋值传参
+
+决策问句：函数只读这个参数，它又足够小吗？两个都满足就按值传递。
+
+```{.cpp filename="片段：按值传参的正例"}
+// 参数按值收一个 Player，返回值按值给出一个 CellState。
+CellState PlayerToCellState(Player player) {
+  return player == Player::kX ? CellState::kX : CellState::kO;
+}
+```
+
+明确推荐按值传递的类型：`enum class` 定义的封闭取值（`Player`、`CellState`）、小 `struct`（坐标 `Position`、落子动作 `Move`）、定宽整数（`std::int32_t`）。它们与 `int` 一样拷贝廉价，调用处读到的就是独立的值，不涉及别名。反例是只读大对象按值传：`std::string`、`std::vector` 的拷贝可能昂贵，改用引用传参的 `const T&`。本节的依据是现行 [Google Inputs and Outputs](https://google.github.io/styleguide/cppguide.html#Inputs_and_Outputs) 与 LLVM 对小值拷贝的同一习惯。
+
+## 引用传参
+
+决策问句：对象大、拷贝贵但只读，改用 `const T&`；函数要修改它且调用处保证对象存在，用非 `const` 引用 `T&`。
+
+```{.cpp filename="片段：引用传参的正反例"}
+// 正例：大对象只读，const 引用避免拷贝。
+void PrintBanner(const std::string& title);
+
+// 正例：必改且非空，非 const 引用承担输出。
+void ResetCounter(int& count);
+
+// 反例：引用可能不存在的“可选输出”——引用没有空值，改用指针。
+void FindToken(std::string& result);
+```
+
+不可为空的输出用非 `const` 引用，是现行指南的口径。许多旧文与 cpplint 时代“输出一律指针”的建议已被指南取代，只有“可选”才交给指针。引用传参的完整示例见 [引用使用场景](reference-usage-scenarios.qmd)。
+
+## 指针传参
+
+决策问句：这个参数可以为空吗？可空的只读输入用 `const T*`，可选的输出用 `T*`，调用处的 `&` 与 `nullptr` 让“可能为空”在代码里可见。
+
+```{.cpp filename="片段：指针传参的正反例"}
+// 正例：可空输入，找不到时传 nullptr。
+void SetAlias(const std::string* name);
+
+// 正例：可选输出，调用方不关心结果时传 nullptr。
+void CurrentTime(std::chrono::seconds* elapsed);
+
+// 反例：指针在这里没有可空语义，必改且必存在应改用 T&。
+void AddOne(int* value);
+```
+
+所有权指针（`std::unique_ptr` 按值转移、`std::shared_ptr` 共享）是另一类决策，入口见 [指针使用场景](pointer-usage-scenarios.qmd)。
+
+## 常见错误
+
+### 大对象按值传递
+
+`std::string`、`std::vector` 参数默认写 `const T&`，按值拷贝再只读使用的写法把开销藏进了函数调用。
+
+### 引用表达可空输出
+
+引用没有空值，可选输出写 `T*`，调用处传 `nullptr` 才能表达“这次不要结果”。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. 输出参数什么时候用引用，什么时候用指针？
+
+   ::: {.answer}
+   调用处保证对象存在时用非 `const` 引用 `T&`。输出可选、调用方可能不关心结果时用 `T*`，由 `nullptr` 表达“不要结果”。
+   :::
+
+2. `enum class` 参数该按值传吗？
+
+   ::: {.answer}
+   该。`enum class` 与 `int` 同属值类型，拷贝廉价，按值传递调用处最清晰，例如 `CellState PlayerToCellState(Player player)`。
+   :::
+
+## 本章回顾
+
+你现在能按机制回答传参问题：只读小对象按值，大只读用 `const T&`，必改且非空用 `T&`，可空与可选交给指针。返回值的选择见下一张速查。

@@ -1,0 +1,216 @@
+---
+title: "constexpr"
+---
+
+`const` 只保证不能通过这个名字修改，值仍可以到运行时才确定。`constexpr` 进一步要求初始化结果能够在编译期确定，适合表达数组长度、棋盘尺寸和固定阈值等规则值。本章还会比较普通 `constexpr` 与头文件中的 `inline constexpr`，并说清 `constexpr` 函数的定义为何要放头文件、哪些函数才值得这么写。
+
+## 编译期规则
+
+`constexpr` 变量创建后不可修改，初始化结果必须在编译期确定，是比 `const` 更严的常量：`const` 的修改限制同样满足，另加编译期确定一条。运行时才能确定的值只能用 `const`：
+
+```{.cpp filename="片段：编译期与运行时的分界"}
+// 片段
+int input{};
+std::cin >> input;
+const int kLimit{input};        // 运行时才知道，const 足够
+constexpr int kThreshold{5000}; // 编译期确定
+
+// constexpr int kMax{kLimit};  // 编译失败：kLimit 编译期未知
+```
+
+数组长度这类要求编译期常量的位置只能接受 `constexpr`。完整示例还包含一个极简谓词函数，输入落在区间内就返回 `true`：
+
+```{.cpp filename="constexpr.cpp"}
+#include <iostream>
+
+constexpr bool IsInRange(int value, int low, int high) {
+  return value >= low && value <= high;
+}
+
+int main() {
+  constexpr int kThreshold{5000};
+  constexpr double kRatio{0.90};
+
+  std::cout << "阈值: " << kThreshold << "\n";
+  std::cout << "比例: " << kRatio << "\n";
+  std::cout << std::boolalpha
+            << "4200 在区间内: " << IsInRange(4200, 0, kThreshold) << "\n";
+  return 0;
+}
+```
+
+## 头文件常量
+
+项目公共常量通常写在头文件里，供多个 `.cpp` 包含。常规写法是具名命名空间加 `inline constexpr`：
+
+```{.cpp filename="片段：头文件中的共享常量"}
+// 片段：board_constants.h
+namespace board {
+  inline constexpr int kRows{3};
+  inline constexpr int kCols{3};
+}
+// 包含该头文件的每个 .cpp 里都写 board::kRows，
+// 多份包含不会产生重复定义
+```
+
+命名空间的分组规则见[命名空间](namespaces.qmd)。`tictactoe::kRows` 是带限定名的共享常量。命名空间作用域的 `const` 与 `constexpr` 变量默认内部链接，每个 `.cpp` 各有一份拷贝，通常无害但地址不共享。`inline`（C++17 起可用于变量）把多份拷贝合并成一个。局部 `constexpr` 不参与链接，不能加 `inline`。
+
+推荐次序是：项目公共常量放在具名命名空间里加 `inline constexpr`，只在单个 `.cpp` 使用的常量就近放在函数内或该文件的匿名命名空间里，裸的全局常量尽量不用。
+
+井字棋工程的行数采用同一写法，见 [board.h](https://github.com/chengzhao-dev/cpp-board-games/blob/main/games/tictactoe/01-cli-game/tictactoe/include/board.h) 里的 `kRows`。
+
+## 常量与函数
+
+头文件里常量与函数对 `inline` 的要求不同。一句话规则：常量要显式 `inline`，函数写 `constexpr` 就够。
+
+::: {.compact-table}
+| 实体 | `constexpr` 是否隐含 `inline` | 头文件写法 |
+| --- | --- | --- |
+| 命名空间作用域常量 | 否 | 显式写 `inline constexpr` |
+| 自由函数 | 是，首次声明即隐式 | 只写 `constexpr` |
+| 类内 `static constexpr` 数据成员 | 是，C++17 起隐式 | 只写 `static constexpr` |
+
+: {tbl-colwidths="[30,34,36]"}
+:::
+
+三种写法放在同一个头文件里对照：
+
+```{.cpp filename="片段：常量与函数的 inline 写法对照"}
+// 片段：board_constants.h
+namespace board {
+  // constexpr int kRows{3};      // 不佳：缺 inline，每个 .cpp 各有一份拷贝
+  inline constexpr int kRows{3};  // 正确：多份包含共享同一实体
+
+  constexpr bool IsValid(int row, int col);  // 正确：函数隐式 inline
+
+  struct Board {
+    static constexpr int kSize{9};  // 正确：static constexpr 成员隐式 inline
+  };
+}
+```
+
+类内 `static constexpr` 成员与命名空间变量不要混为一谈：前者随 `constexpr` 隐式 `inline`，后者必须显式写出。选型依据的完整对照见[常量关键字对照表](constant-keywords.qmd)。
+
+### inline 的取舍
+
+`constexpr` 常量加不加 `inline`，编译都能通过，差别在使用中显现：
+
+- 不加 `inline`：每个 `.cpp` 一份拷贝，值相同、地址不同。只读取值时没有影响。取地址或绑定引用跨翻译单元使用时，同一常量有多个地址。
+- 加 `inline`：所有翻译单元共享同一个实体，地址唯一，多份包含不产生重复定义。
+- 普通（非 const、非 inline）全局变量写在头文件里，缺了 `inline` 会在链接期报重复定义。编译往往还能通过，问题推迟到链接期才出现，排查时先想到这一层。
+
+需要跨翻译单元共享同一实体时，显式写 `inline constexpr`。
+
+### 自由函数与 inline
+
+头文件中的 `constexpr` 自由函数隐式 `inline`，可直接放在头文件供多个 `.cpp` 包含；函数内常量不能也不必写 `inline`，典型形态是谓词：
+
+```{.cpp filename="片段：头文件中的谓词"}
+// 片段：board_constants.h
+namespace board {
+  inline constexpr int kRows{3};
+  inline constexpr int kCols{3};
+
+  struct Position {
+    int row;
+    int col;
+  };
+
+  constexpr bool IsValid(Position position) {
+    return position.row >= 0 && position.row < kRows && position.col >= 0 &&
+           position.col < kCols;
+  }
+}
+// 谓词是隐式 inline 的函数，多份包含不会产生重复定义
+```
+
+### 定义在头文件
+
+`constexpr` 函数要在编译期求值，调用点必须看得到完整函数体。定义放在 `.cpp` 里时，其他 `.cpp` 只看到声明，编译期调用直接失败：
+
+```{.cpp filename="片段：定义放错位置的 constexpr 函数"}
+// 片段：math_utils.h
+constexpr int Square(int n);  // 只有声明
+
+// 片段：math_utils.cpp
+constexpr int Square(int n) {
+  return n * n;
+}
+
+// 片段：main.cpp
+#include "math_utils.h"
+
+constexpr int kArea{Square(3)};  // 编译失败：调用点看不到函数体
+```
+
+普通函数拆成「头文件声明、`.cpp` 定义」没有问题：编译器先记住有这个函数，链接器再把调用接到定义上。编译期求值发生在编译单个 `.cpp` 的时候，编译器只看得到本文件，定义必须随头文件进入每个用到它的翻译单元。
+
+定义跟着头文件会产生多份拷贝，`constexpr` 函数隐式 `inline`，链接阶段只保留一份，不会重复定义；前文的 `IsValid` 谓词正是这样放进头文件的。
+
+值得放进头文件的是需要编译期求值的函数：编译期查表、单位换算，以及井字棋工程里由 `Player` 得到 `CellState` 的简单映射（见 [game.h](https://github.com/chengzhao-dev/cpp-board-games/blob/main/games/tictactoe/01-cli-game/tictactoe/include/game.h) 里的 `PlayerToCellState`）。
+
+## 标准演化
+
+能力随标准逐步扩展，遇到旧代码时知道关键节点即可：
+
+::: {.compact-table}
+| 标准节点 | 与常量相关的变化 |
+| --- | --- |
+| C++11 | 引入变量与函数形式，函数限制很严 |
+| C++14 | 放宽函数能写的语句 |
+| C++17 | 引入 `inline` 变量，头文件里 `inline constexpr` 成为公共常量的常规写法，类内 `static constexpr` 数据成员隐式 `inline` |
+| C++17 之前 | 头文件常量常靠枚举、宏或只在一个 `.cpp` 里定义来规避链接问题 |
+| C++20 | 新增 `consteval` 与 `constinit`，对比细节见下一章 |
+
+: {tbl-colwidths="[22,78]"}
+:::
+
+## 常见错误
+
+### 头文件全局变量
+
+头文件会被多个 `.cpp` 包含，普通全局变量在链接时报重复定义，共享常量写成 `inline constexpr`。
+
+### 函数内常量加 inline
+
+`inline` 描述跨翻译单元共享，只用于命名空间或类作用域，写在函数体内会直接编译失败，局部常量写 `constexpr` 就够。
+
+### 函数全部 constexpr
+
+头文件里的函数体每改一次，所有包含它的 `.cpp` 都要重新编译，普通运行期函数不要跟着搬。
+
+## 自测问题
+
+1. 运行时才能确定的输入为什么不能写成 `constexpr`？
+
+   ::: {.answer}
+   `constexpr` 要求初始化结果在编译期确定，运行时输入的值没有编译期答案，只能用 `const`。
+   :::
+
+2. 头文件里的公共常量为什么写成 `inline constexpr`？
+
+   ::: {.answer}
+   `constexpr` 保证编译期确定且不可修改，`inline` 让所有翻译单元共享同一个实体，多份包含不会重复定义。
+   :::
+
+3. C++17 的 `inline` 变量解决了什么问题？
+
+   ::: {.answer}
+   在此之前头文件常量要靠枚举、宏或“只在一个 `.cpp` 里定义”规避链接问题。`inline` 变量让定义直接写在头文件里且只保留一份实体。
+   :::
+
+4. 头文件里的 `constexpr` 谓词要不要显式写 `inline`？
+
+   ::: {.answer}
+   不需要。`constexpr` 函数隐式 `inline`，定义放进头文件供多个 `.cpp` 包含也不会重复定义。显式写出不算错误，只是冗余。
+   :::
+
+5. `constexpr` 函数的定义放在头文件里和放在 `.cpp` 里有什么区别？
+
+   ::: {.answer}
+   头文件里的定义让每个包含它的 `.cpp` 都看到完整函数体，调用能在编译期求值，也便于编译器内联；多份副本由隐式 `inline` 在链接期合并，不重复定义。放在 `.cpp` 里时，其他 `.cpp` 只有声明，编译期调用直接编译失败。代价是头文件函数体每改一次，所有包含它的 `.cpp` 都要重新编译。
+   :::
+
+## 本章回顾
+
+你已经能区分 `const` 与 `constexpr` 的适用条件，把共享常量与简单谓词放进头文件，并说出 `constexpr` 函数定义放头文件的原因。示例见 [constexpr.cpp](../../code/language-basics/constexpr.cpp)，下一章把同族关键词放进一张对照表。

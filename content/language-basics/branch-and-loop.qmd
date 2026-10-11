@@ -1,0 +1,70 @@
+---
+title: "分支和循环"
+---
+
+[函数](functions.qmd)已经能把计算结果交还调用方。这一课按 `0`、`1`、`2` 选择一句输出，并用循环打印一行。示例在 [branch-and-loop.cpp](../../code/language-basics/branch-and-loop.cpp)。
+
+## 用 switch 选择一支
+
+`code` 等于 `1` 时，`switch` 进入 `case 1`，打印 `一`，然后 `break`。
+
+```{.cpp filename="branch-and-loop.cpp"}
+  int code{1};
+  switch (code) {
+    case 0:
+      std::cout << "空\n";
+      break;
+    case 1:
+      std::cout << "一\n";
+      break;
+    case 2:
+      std::cout << "二\n";
+      break;
+    default:
+      std::cout << "其他\n";
+      break;
+  }
+```
+
+井字棋按终局状态选择「进行中」「平局」「X 获胜」或「O 获胜」，见[实现对局规则](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/04-game.qmd)。
+
+## 用 for 打印一行
+
+循环从 `0` 走到 `2`，数字之间加一个空格。终端第二行是 `0 1 2`。
+
+```{.cpp filename="branch-and-loop.cpp"}
+  for (int column = 0; column < 3; ++column) {
+    std::cout << column;
+    if (column < 2) {
+      std::cout << ' ';
+    }
+  }
+```
+
+## 常见错误
+
+### case 后面漏掉 break
+
+没有 `break` 时，执行会掉进下一个 `case`，一次输入会打出两句。
+
+- 每个 `case` 打印之后写 `break`。
+
+### 循环条件多写等号
+
+`column < 3` 打印 `0 1 2`，写成 `column <= 3` 会多打一个 `3`。
+
+- 上界用「小于个数」，不要用「小于等于最后一个下标」除非那就是你要的范围。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. `code` 为 `1` 时，为什么不会打印 `空`？
+
+   ::: {.answer}
+   `switch` 只进入匹配的 `case 1`。`case 0` 的条件不成立。
+   :::
+
+## 本章回顾
+
+你已经能用 `switch` 在 `0`、`1`、`2` 里选一支，并用 `for` 打印一行。下一课[初始化与推断](initialization-and-type-inference.qmd)区分创建变量和后来改值。

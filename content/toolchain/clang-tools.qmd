@@ -1,0 +1,106 @@
+---
+title: "Clang 工具"
+---
+
+本章把“代码能编译”和“工具检查了正确范围”分开。你会以 `code/toolchain/clang-tools.cpp` 为入口生成 `compile_commands.json`，让 `clangd` 和 `clang-tidy` 使用同一组编译参数；再区分项目源文件与第三方依赖，避免把系统库的模板实例化数量误读成自己的错误。
+
+## 查看工程结构
+
+本章对应的示例是一个单文件工程，源文件位于 `code/toolchain/clang-tools.cpp`。它只负责提供可构建的入口；静态检查的范围由命令行显式传入，不会去不存在的 `include/` 目录读取文件。
+
+## 编译数据库
+
+```{.cmake filename="code/toolchain/CMakeLists.txt"}
+# 生成 clang-tools 示例的编译数据库。
+cmake_minimum_required(VERSION 3.31)
+project(ClangTools LANGUAGES CXX)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_executable(clang-tools clang-tools.cpp)
+target_compile_features(clang-tools PRIVATE cxx_std_20)
+target_compile_options(clang-tools PRIVATE -Wall -Wextra -Werror)
+```
+
+配置并构建：
+
+```{.bash filename="工程根目录"}
+cmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++
+cmake --build build
+```
+
+`build/compile_commands.json` 记录 `clang-tools.cpp` 的标准、包含目录和编译选项。它是工具读取工程上下文的依据，不是“数据库里出现的每个文件都要检查”的清单。
+
+## 检查范围
+
+日常检查使用明确的项目源文件：
+
+```{.bash filename="工程根目录"}
+clang-format --dry-run --Werror src/main.cpp include/index.h
+clang-tidy -p build \
+  --header-filter='^.*/clang-tools/include/' \
+  --exclude-header-filter='(^|/)build/_deps/' \
+  src/main.cpp
+```
+
+这条命令没有 `--system-headers`。该参数会额外显示标准库头文件中的诊断，适合依赖审计，不适合日常项目门禁。`--header-filter='.*'` 也过宽：它可能把第三方头文件的诊断带进输出。真正的边界先由源文件列表确定，再由项目文件过滤器补充。
+
+如果工程通过 `FetchContent` 引入测试框架，测试框架的源码可以出现在编译数据库中，但不应因此把它们加入项目 `clang-tidy` 的输入列表。第三方 include 应由 `CMake` target 以 system include 传播；项目自己的 include 保持普通 `PRIVATE` 或 `PUBLIC`，这样项目头文件仍会被发现。
+
+## 诊断数量
+
+看到类似下面的汇总时，不要先把它称为系统库错误：
+
+```{.text filename="clang-tidy 汇总"}
+27786 warnings generated.
+Suppressed 27750 warnings (27720 in non-user code, 30 NOLINT).
+```
+
+先查看真正的诊断行：
+
+1. 路径是否位于项目源文件；
+2. 检查名是什么；
+3. 是否带有 `--system-headers`；
+4. 是否来自编译器，而不是 clang-tidy。
+
+汇总数字通常包含宏展开和模板实例化路径，不能直接当成独立缺陷数量。
+
+## 边界访问
+
+下面的公共查询接口不能把非法坐标直接换算成 `std::size_t`：
+
+```{.cpp filename="查询接口"}
+CellState Board::GetCellState(Position position) const {
+  if (!IsValidPosition(position)) {
+    throw std::out_of_range("GetCellState: position is outside the board");
+  }
+  return cells_.at(ToFlatIndex(position));
+}
+```
+
+`cppcoreguidelines-pro-bounds-constant-array-index` 报告的是动态 `operator[]` 缺少工具可见的边界证明，不是编译错误。公共查询接口应先验证坐标，再使用 `std::array::at`（或项目明确的边界辅助函数）；不要在 `.clang-tidy` 里全局关闭该检查。只有经过验证的局部例外才使用紧贴表达式的 `NOLINT`。
+
+`[]` 与 `at` 在多种容器上的共性见[下标与 at](../standard-library/subscript-and-at.qmd)；本章只讲静态检查怎么读诊断。
+
+## 验证
+
+```{.bash filename="工程根目录"}
+ctest --test-dir build --output-on-failure
+clang-tidy -p build clang-tools.cpp
+```
+
+成功条件是工程构建、测试和静态检查都通过，并且诊断路径只落在项目源文件或项目头文件。若输出出现标准库或第三方路径，先检查源文件列表、`--header-filter`、`CMake` include 类型和是否误用了 `--system-headers`。
+
+## 自测问题
+
+1. `compile_commands.json` 为什么不能直接作为 clang-tidy 的项目文件清单？
+2. `--system-headers` 是收窄检查范围还是扩大检查范围？
+3. 为什么关闭动态下标检查不能替代 `GetCellState` 的边界验证？
+
+   ::: {.answer}
+   编译数据库记录所有目标的编译参数，可能包含依赖目标；项目门禁仍应只传入自己的源文件。`--system-headers` 会扩大诊断范围。关闭规则只能隐藏一类诊断，不能阻止非法坐标转换后访问数组。
+   :::
+
+## 本章回顾
+
+你已经能用编译数据库统一工具参数，并用源文件清单与项目文件过滤器控制静态检查范围。动态下标问题要先修公共接口的边界处理，再决定是否需要局部豁免。

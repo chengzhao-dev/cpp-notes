@@ -1,42 +1,110 @@
 ---
 title: "语言基础"
-description: "从基础类型、变量和常量开始，逐步建立 C++ 语言基础。"
+description: "用可编译示例说明类型、函数、分支和类。"
 number-sections: false
 body-classes: index-page
 ---
 
-入门与构建已经完成了从源码到工程的基本闭环。实际程序会记录数量、比例、状态和限制条件；本分册先用这些常见数据说明 C++ 的语言规则，再逐步扩展到运算、控制流和更复杂的类型。
+这一组分册的示例都放在 `code/language-basics/`。第一课用 `int`、`double`、`bool` 和 `char` 保存一个小程序里的数量和正误。后面的课分别调用函数、选择路径，并类与封装。
 
 ::: {.feature-grid}
 ::: {.landing-card}
-### [基础类型与变量](types-and-variables.qmd)
+### [类型与变量](types-and-variables.qmd)
 用 `int`、`double`、`bool` 和 `char` 表达常见数据，并理解变量、类型和作用域。
 :::
 
 ::: {.landing-card}
-### [初始化与类型推断](initialization-and-type-inference.qmd)
-区分初始化与赋值，掌握列表初始化、`auto` 和初始化列表推导。
+### [函数](functions.qmd)
+按值传入一个整数，按值取回计算结果。
 :::
 
 ::: {.landing-card}
-### [常量与配置](constants.qmd)
-用 `const` 和 `constexpr` 表达不会随流程改变的值。
+### [分支和循环](branch-and-loop.qmd)
+用 `switch` 选择一支输出，用 `for` 打印一行数字。
 :::
 
 ::: {.landing-card}
-### [类型安全与数值边界](type-safety-and-numeric-bounds.qmd)
+### [初始化与推断](initialization-and-type-inference.qmd)
+初始化与赋值，掌握列表初始化、`auto` 和初始化列表推导。
+:::
+
+::: {.landing-card}
+### [const 变量](const-variables.qmd)
+用 `const` 表达不会随流程改变的值，理解常量的初始化与命名。
+:::
+
+::: {.landing-card}
+### [constexpr](constexpr.qmd)
+用 `constexpr` 编译期规则，把公共常量写成头文件里的 `inline constexpr`。
+:::
+
+::: {.landing-card}
+### [常量关键词](constant-keywords.qmd)
+在 `const`、`constexpr`、`consteval` 和 `constinit` 之间按场景选型。
+:::
+
+::: {.landing-card}
+### [类型与边界](type-safety-and-numeric-bounds.qmd)
 检查类型范围、溢出、转换、浮点精度、`bool` 和 `std::size_t` 的常见陷阱。
 :::
 
 ::: {.landing-card}
-### [枚举与命名空间](enums-and-namespaces.qmd)
-用 `enum class` 表达封闭的取值集合，用命名空间给名字分组。
+### [普通枚举](enums.qmd)
+看清普通 `enum` 的作用域泄漏与隐式转换，理解为什么需要类型边界。
 :::
 
 ::: {.landing-card}
-### [结构体与值类型](structs-and-value-types.qmd)
-用 `struct` 聚合相关的数据，理解按值复制带来的独立性。
-:::
+### [枚举类](enum-class.qmd)
+用 `enum class` 表达封闭的取值集合，指定底层类型、放置成员注释并按值传参。
 :::
 
-后续章节会继续补充运算、控制流、函数、字符串和自定义类型。
+::: {.landing-card}
+### [命名空间](namespaces.qmd)
+用命名空间把相关的名字分组存放，用限定名区分同名实体。
+:::
+
+::: {.landing-card}
+### [结构与值类型](structs-and-value-types.qmd)
+用 `struct` 聚合相关的数据，理解按值复制带来的独立性。
+:::
+
+::: {.landing-card}
+### [成员函数上的 const](const-member-functions.qmd)
+读出成员函数尾部 `const` 的承诺，区分参数、返回值与局部变量身上的 `const`。
+:::
+
+::: {.landing-card}
+### [引用使用场景](reference-usage-scenarios.qmd)
+按场景为参数选择按值、`const` 引用与非 `const` 引用，理解非空约定。
+:::
+
+::: {.landing-card}
+### [指针使用场景](pointer-usage-scenarios.qmd)
+用指针表达可空输入与可选输出，建立所有权选择的入口。
+:::
+
+::: {.landing-card}
+### [★ 传参选型速查](parameter-passing-guide.qmd)
+按赋值、引用、指针三种机制归并传参选型，类型只作机制下的例子。
+:::
+
+::: {.landing-card}
+### [★ 返回值选型速查](return-value-guide.qmd)
+按返回方式归并选型，让结果类型而不用异常。
+:::
+
+::: {.landing-card}
+### [\[\[nodiscard\]\]](nodiscard.qmd)
+给不能无视的返回值加标注，用 `static_cast<void>` 表达有意的丢弃。
+:::
+
+::: {.landing-card}
+### [类与封装](classes.qmd)
+用类保存计数，查询函数带 `const`。
+:::
+
+::: {.landing-card}
+### [简单项目设计](simple-project-design.qmd)
+用值类型、类和外层适配组织小项目，避免过早拆分和抽象。
+:::
+:::

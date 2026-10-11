@@ -1,0 +1,100 @@
+---
+title: "简单项目设计"
+---
+
+前面的章节已经分别说明 `struct`、`enum class` 和类。把它们放进小项目时，重点不是对象数量，而是每个对象是否有清楚、可验证的职责。完整示例在 [simple-project-design.cpp](../../code/language-basics/simple-project-design.cpp)。
+
+## 对象守住状态
+
+棋盘的格子状态和不可覆盖落子的规则一起变化，所以放进 `Board`。调用方只能通过 `Place` 改变状态，不能直接改数组。
+
+```{.cpp filename="simple-project-design.cpp"}
+// 一个 3×3 棋盘。
+// 负责保存格子状态，并拒绝无效或重复的落子。
+class Board {
+public:
+  // 尝试在指定坐标落子。
+  // 坐标无效、状态为空或格子已占用时返回 false。
+  [[nodiscard]] bool Place(CellPosition position, CellState state) {
+    }
+};
+```
+
+这不是因为所有数据都必须藏进类，而是因为格子状态和落子规则必须始终一致。`Place` 的返回值把“是否接受这一步”交给调用方处理。
+
+## 值类型传数据
+
+格子状态是固定集合，用 `enum class` 表达。一个位置只包含行和列，没有独立的不变量，用 `CellPosition` 这样的 `struct` 按值传递。
+
+```{.cpp filename="simple-project-design.cpp"}
+// 棋盘格子的状态。
+enum class CellState : std::uint8_t {
+  kEmpty = 0,
+  kCross = 1,
+  kNought = 2,
+};
+
+// 棋盘格子的行列坐标，行和列从 0 开始。
+struct CellPosition {
+  int row;
+  int col;
+};
+```
+
+类型名称让调用处知道一组数据代表什么，类则负责那些必须保持成立的规则。不要只因两个值经常一起出现，就马上增加 setter、继承层或单独的管理器。
+
+## 不拆单次模块
+
+示例中的 `ToIndex` 只把已经验证的坐标变成 `Board` 的内部下标。它没有第二个调用方，也不表达独立业务规则，因此留在 `Board` 的 private 区域。
+
+```{.cpp filename="simple-project-design.cpp"}
+private:
+  // 将已验证的坐标转换为行优先下标。
+  [[nodiscard]] static constexpr std::size_t ToIndex(CellPosition position) {
+    return static_cast<std::size_t>((position.row * kCols) + position.col);
+  }
+```
+
+把它拆成 `Indexer`、`Validator` 或通用工具文件，会让读者必须在更多文件之间跳转，却没有增加复用。出现第二处真实、稳定且语义相同的需求后，再考虑提取公共接口。
+
+## 外层输入输出
+
+`Board` 不打印棋盘，也不读取终端。外层程序决定如何显示 `CellState`，再调用 `Place`，同一份规则就能被终端、测试或其他适配方式复用。
+
+## 常见错误
+
+### 每个动作一个类
+
+`ToIndex` 只属于 `Board` 的存储方式，做成独立类只会增加名称、文件和依赖。
+
+- 先把只服务一个对象的辅助逻辑留在该对象内部。
+
+### 核心对象读终端
+
+`Board` 一旦直接读写终端，测试规则时就必须准备输入输出环境。
+
+- 让核心对象返回结果。由外层决定怎样读取和显示。
+
+## 自测问题
+
+1. 为什么 `CellPosition` 适合用 `struct`？
+
+   ::: {.answer}
+   它只组合行和列，按值传递即可表达一个位置。它不需要自行管理资源或维护复杂规则。
+   :::
+
+2. 为什么 `ToIndex` 不需要独立文件？
+
+   ::: {.answer}
+   它只服务 `Board` 的内部数组布局，没有第二个真实调用方。保留在 private 区域可以缩小外部接口。
+   :::
+
+3. 为什么 `Board` 不直接打印棋盘？
+
+   ::: {.answer}
+   打印属于输入输出适配。把它留在外层，规则可以直接由测试或不同界面复用。
+   :::
+
+## 本章回顾
+
+你已经能用值类型传递数据、用类守住不变量、外层输入输出，并在真实重复出现时才增加抽象。运行 [simple-project-design.cpp](../../code/language-basics/simple-project-design.cpp) 可以看到一次中心格落子。

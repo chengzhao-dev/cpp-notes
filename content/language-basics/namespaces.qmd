@@ -1,0 +1,77 @@
+---
+title: "命名空间"
+---
+
+封闭取值的类型有了，工程里还会遇到另一类组织问题：不同模块出现同名实体，调用处需要分清一个名字来自哪个分组。命名空间把相关的常量、类型和函数收在一个名字下。本章在 [枚举类](enum-class.qmd) 的类型手段之外补上这一分组手段。
+
+## 同名常量
+
+命名空间用限定名区分同名实体，片段里的两个 `kSize` 互不冲突：
+
+```{.cpp filename="片段：同名常量放在不同命名空间"}
+namespace board {
+constexpr int kSize{3};
+}
+
+namespace config {
+constexpr int kSize{16};
+}
+// 访问时写 board::kSize 与 config::kSize，两个同名常量互不冲突
+```
+
+限定名说明了值来自哪个分组，同一工程的不同模块因此可以各自拥有同名实体。完整示例把两个分组放进一个程序并分别输出：
+
+```{.cpp filename="namespaces.cpp"}
+// 命名空间示例：同名常量放在不同命名空间并分别输出。
+#include <iostream>
+
+namespace board {
+constexpr int kSize{3};
+}
+
+namespace config {
+constexpr int kSize{16};
+}
+
+int main() {
+  std::cout << "棋盘尺寸: " << board::kSize << "\n";
+  std::cout << "配置尺寸: " << config::kSize << "\n";
+  return 0;
+}
+```
+
+## 分组约定
+
+项目代码把同一游戏的类型收进一个命名空间，如井字棋值类型定义在 `tictactoe` 命名空间中：
+
+- 常量名按约定用 `k` 加大驼峰，头文件里供多个 `.cpp` 共享的常量还要加 `inline`，写法见 [constexpr](constexpr.qmd)；
+- 命名空间本身用小写加下划线命名，名字表达分组的内容，不表达“utils”“helpers”这类笼统职责。
+
+## 常见错误
+
+### 在头文件里写 using namespace
+
+`using namespace board;` 会把整个分组的名字倒进包含它的文件，同名实体重新变得难以分辨：
+
+- 头文件被多处包含时影响面更大，头文件里不要写；
+- 需要频繁使用某个分组时，把 `using` 限定在 `.cpp` 文件内部，或直接写限定名。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. 命名空间解决什么问题？
+
+   ::: {.answer}
+   它把相关的名字分组，避免不同模块的同名实体冲突，调用处用限定名选择具体分组。
+   :::
+
+2. 为什么头文件里不写 `using namespace`？
+
+   ::: {.answer}
+   它把整个分组的名字倒进包含它的文件，同名冲突重新出现。头文件被多处包含时影响面最大，需要时把 `using` 限定在 `.cpp` 内部。
+   :::
+
+## 本章回顾
+
+你现在能用命名空间给名字分组，用限定名区分同名实体。完整示例见 [namespaces.cpp](../../code/language-basics/namespaces.cpp)，下一章用 `struct` 把相关的数据组合成值类型。

@@ -1,5 +1,5 @@
 ---
-title: "用 CMake 管理多文件工程"
+title: "多文件工程"
 ---
 
 代码变多后，把接口、实现和程序入口放在同一个文件中会很难阅读。本章把 `Hello, World!` 示例拆成三个源文件，再由 `CMake` 构建成一个程序。
@@ -17,26 +17,46 @@ multi-file-project/
     └── main.cpp      # 程序入口
 ```
 
-`include/` 放头文件，`src/` 放实现和程序入口。
+新增头文件放入 `include/`，新增源文件放入 `src/`，构建规则按这两个目录查找。
 
 ## 阅读源码
 
-`greeting.h` 声明 `MakeGreeting()`，让其他源文件知道这个函数如何使用。
+`greeting.h` 声明 `MakeGreeting()`。声明放在头文件里，供其他源文件在编译时核对调用写法。
 
 ```{.cpp filename="include/greeting.h"}
-{{< include /code/getting-started/multi-file-project/include/greeting.h >}}
+// 问候接口：声明 MakeGreeting()，供其他源文件调用。
+#pragma once
+
+#include <string>
+
+std::string MakeGreeting();
 ```
 
-`greeting.cpp` 实现这个函数。
+`greeting.cpp` 先包含自己的头文件，编译器据此检查函数定义与声明一致。
 
 ```{.cpp filename="src/greeting.cpp"}
-{{< include /code/getting-started/multi-file-project/src/greeting.cpp >}}
+// 实现 greeting.h 中声明的 MakeGreeting()。
+#include "greeting.h"
+
+#include <string>
+
+std::string MakeGreeting() {
+  return "Hello, World!";
+}
 ```
 
-`main.cpp` 调用函数并输出结果。
+`main.cpp` 只包含 `greeting.h`，不需要知道函数实现在哪个文件，链接器会把两者接在一起。
 
 ```{.cpp filename="src/main.cpp"}
-{{< include /code/getting-started/multi-file-project/src/main.cpp >}}
+// 程序入口：调用 MakeGreeting() 并输出结果。
+#include <iostream>
+
+#include "greeting.h"
+
+int main() {
+  std::cout << MakeGreeting() << "\n";
+  return 0;
+}
 ```
 
 编译 `main.cpp` 时，编译器只需要看到函数声明。链接阶段再把 `main.cpp` 和 `greeting.cpp` 连成一个程序。
@@ -44,12 +64,37 @@ multi-file-project/
 ## 查看构建规则
 
 ```{.cmake filename="CMakeLists.txt"}
-{{< include /code/getting-started/multi-file-project/CMakeLists.txt >}}
+# 构建 MultiFileProject 可执行目标。
+cmake_minimum_required(VERSION 3.31)
+project(MultiFileProject LANGUAGES CXX)
+
+# 使用 C++20 作为语言标准。
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 可执行文件统一输出到 build/bin。
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# 编译数据库，记录每个源文件的实际编译参数。
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# 收集 src/ 下的直属源文件，新增 .cpp 后重新构建即可进入目标。
+file(GLOB APP_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+
+# 创建 app 可执行目标，源文件来自 src/ 的收集结果。
+add_executable(app ${APP_SOURCES})
+
+# 让 app 找到 include/ 中的头文件。
+target_include_directories(app PRIVATE include)
+
+# 编译时启用 libc++ 与常用警告。
+target_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)
+# 链接时也使用 libc++。
+target_link_options(app PRIVATE -stdlib=libc++)
 ```
 
-`file(GLOB ...)` 收集 `src/` 下的源文件，`add_executable()` 用收集结果创建 `app`。`CONFIGURE_DEPENDS` 让 `Ninja` 在构建前检查目录变化：新增 `.cpp` 后不必修改 `CMakeLists.txt`，直接重新构建就会进入目标。`target_include_directories()` 让 `app` 能从 `include/` 找到 `greeting.h`。
+`CONFIGURE_DEPENDS` 让 `Ninja` 在构建前检查目录变化：新增 `.cpp` 后不必修改 `CMakeLists.txt`，直接重新构建，新文件就会进入目标。
 
-收集规则只覆盖 `src/` 直属的 `.cpp`。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。
+这个收集规则有一个边界：只覆盖 `src/` 直属的 `.cpp`。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。
 
 ## 构建并运行
 
@@ -89,12 +134,12 @@ cmake --build build
 
 ## 自测问题
 
-先自己回答，再展开核对。
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
 
 1. `target_include_directories(app PRIVATE include)` 和源文件收集规则分别解决什么问题？
 
    ::: {.answer}
-   `target_include_directories` 让目标知道到哪里查找头文件，解决声明的可见性。源文件收集规则决定哪些 `.cpp` 会进入目标并参与编译，解决实现是否进入构建和后续链接。
+   `target_include_directories` 让目标知道到哪里查找头文件，解决声明的可见性。源文件收集规则决定哪些 `.cpp` 会进入目标并参与编译，解决实现是否进入构建和后续链接的问题。
    :::
 
 ## 本章回顾

@@ -1,0 +1,57 @@
+---
+title: "函数"
+---
+
+[类型与变量](types-and-variables.qmd)用 `int` 保存数量。这一课把一次计算写成函数，调用后在终端看到结果。示例在 [functions.cpp](../../code/language-basics/functions.cpp)。
+
+## 按值传入整数
+
+`DoubleOf` 按值接收一个 `int`。函数里的 `value` 是调用方那个数的副本，改它不会改调用方的变量。
+
+```{.cpp filename="functions.cpp"}
+int DoubleOf(int value) {
+  return value * 2;
+}
+```
+
+井字棋里的 `PlayerToCellState` 也是按值接收、按值返回，见[实现对局规则](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/04-game.qmd)。
+
+## 按值返回结果
+
+`main` 把 `21` 交给 `DoubleOf`，把返回值放进 `result`，再打印。
+
+```{.cpp filename="functions.cpp"}
+  int input{21};
+  int result = DoubleOf(input);
+  std::cout << "结果: " << result << "\n";
+```
+
+运行后终端出现 `结果: 42`。
+
+## 常见错误
+
+### 声明未调用
+
+写出 `DoubleOf` 之后如果 `main` 不调用它，终端不会出现 `结果: 42`。
+
+- 在 `main` 里调用，并把返回值交给输出。
+
+### 忘记返回计算结果
+
+函数声明返回 `int`，却没有 `return`，程序没有可依赖的结果。
+
+- 用 `return` 把算好的整数交还调用方。
+
+## 自测问题
+
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
+
+1. 为什么 `DoubleOf` 里修改 `value` 不会改掉 `main` 里的 `input`？
+
+   ::: {.answer}
+   参数按值传递。`value` 是 `input` 的副本，两边各有自己的整数。
+   :::
+
+## 本章回顾
+
+你已经能编写一个按值接收整数、按值返回整数的函数，并打印调用结果。下一课[分支和循环](branch-and-loop.qmd)按编号选择一句输出，并打印一行数字。

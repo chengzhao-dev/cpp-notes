@@ -1,15 +1,21 @@
 ---
-title: "编译并运行第一个 C++ 程序"
+title: "第一个程序"
 ---
 
-本章用一个源文件走通“写代码、编译、运行”这条最短路径。完成后，终端会输出 `Hello, World!`。下一章再拆开多文件程序的结构。完整示例见 [first-program 示例目录](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)。
+本章用一个源文件完成从写代码到运行程序的最短路径。完成后，终端会输出 `Hello, World!`。下一章再拆开多文件程序的结构。完整示例见 [first-program 示例目录](https://github.com/chengzhao-dev/cpp-notes/tree/main/code/getting-started/first-program)。
 
 ## 创建源文件
 
 新建 `first-program.cpp`，输入下面的代码。
 
 ```{.cpp filename="first-program.cpp"}
-{{< include /code/getting-started/first-program/first-program.cpp >}}
+// 程序入口：向标准输出打印问候。
+#include <iostream>
+
+int main() {
+  std::cout << "Hello, World!\n";
+  return 0;
+}
 ```
 
 `main()` 是程序入口，后面的花括号 `{}` 组成函数体。不必现在记住其他细节，先按下面的步骤得到结果。
@@ -85,7 +91,7 @@ bash build-and-run.sh
 
 ### 编译出现 error
 
-编译器会在输出中给出文件名、行号和第一条错误原因。按下面的顺序修复后重新运行。
+编译器会在输出中给出文件名、行号和第一条错误原因，按下面的顺序修复后重新运行。
 
 1. **定位错误**
 
@@ -101,9 +107,9 @@ bash build-and-run.sh
 
 ## 自测问题
 
-先自己回答，再展开核对。
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
 
-1. 单文件程序从源码到终端输出，中间经过哪些步骤？
+1. 单文件程序从源码到终端输出，中间经过的步骤是什么？
 
    ::: {.answer}
    `clang++` 读取源文件，完成编译和链接，生成可执行文件。运行该文件后，程序把 `Hello, World!` 写到终端。

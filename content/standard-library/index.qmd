@@ -1,0 +1,20 @@
+---
+title: "标准库"
+description: "从容器与元素访问开始，认识 C++ 标准库里最常用的工具。"
+number-sections: false
+body-classes: index-page
+---
+
+语言基础已经能表达类型与接口。标准库提供现成的容器与算法，本分册先建立总览与「下标 / at」的检查边界，再按容器展开。
+
+::: {.feature-grid}
+::: {.landing-card}
+### [标准库总览](overview.qmd)
+分清标准库由容器、迭代器与算法组成的结构，知道下一章要解决什么问题。
+:::
+
+::: {.landing-card}
+### [下标与 at](subscript-and-at.qmd)
+用 `std::array` 看清 `[]` 与 `at` 的差异，并列出同类容器。
+:::
+:::

@@ -1,0 +1,88 @@
+---
+title: "下标与 at"
+---
+
+许多容器都能用下标或键取出元素。同一容器上常有访问路径：一条假设调用方已经保证位置合法，另一条在运行期检查并在失败时抛异常。本章只用 `std::array` 演示，并把同类容器点名列清。
+
+## 访问路径
+
+- **`operator[]`（下标）**：快速路径。调用方必须已经保证下标合法；越界是未定义行为（在实现启用 C++26 硬化检查之前）。
+- **`at`**：检查路径。位置不合法时抛 `std::out_of_range`，可用 `try` / `catch` 观察到失败。
+
+语法先分清：`cells_.[i]` 不是合法写法，`clangd` 会报语法错误；正确的下标是 `cells_[i]`。语法通过之后，才谈越界语义。
+
+## 只用 std::array 演示
+
+```{.cpp filename="subscript-and-at.cpp"}
+// subscript-and-at 示例：用 std::array 演示 [] 与 at。
+#include <array>
+#include <iostream>
+#include <stdexcept>
+
+int main() {
+  std::array<int, 3> cells{10, 20, 30};
+
+  // 合法下标：[] 与 at 读到同一格。
+  std::cout << "cells[1]=" << cells[1] << '\n';
+  std::cout << "cells.at(1)=" << cells.at(1) << '\n';
+
+  try {
+    // 非法下标：at 抛出 std::out_of_range。
+    std::cout << cells.at(3) << '\n';
+  } catch (const std::out_of_range& ex) {
+    std::cout << "caught: " << ex.what() << '\n';
+  }
+
+  // 故意不演示越界 cells[3]：那是未定义行为，不是可依赖的报错。
+  return 0;
+}
+```
+
+预期输出（`what()` 的具体措辞随标准库实现略有差异，但类型仍是 `std::out_of_range`）：
+
+```{.text filename="终端输出"}
+cells[1]=20
+cells.at(1)=20
+caught: array::at: __n (which is 3) >= _Nm (which is 3)
+```
+
+合法下标时，`[]` 与 `at` 读到同一格。非法下标只演示 `at`：故意不写 `cells[3]`，因为那是未定义行为，不能当成可依赖的报错手段。
+
+## 同类容器
+
+下列容器与 `std::array` 一样：按下标访问时，越界的 `[]` 是未定义行为，`at` 抛 `std::out_of_range`。
+
+- `std::vector`
+- `std::deque`
+- `std::basic_string` / `std::string`
+- `std::basic_string_view` / `std::string_view`
+
+`std::span` 在本仓库锁定的 C++20 下以 `[]` 为主；`span::at` 自 C++26 才进入标准，这里不假装 C++20 已经有它。
+
+## map 按键取值
+
+`map` / `unordered_map` 的 `[]` 会在缺键时插入默认值；`at` 缺键则抛。这一族的按键访问语义与 `array` 的下标语义不同，不要混为一谈。
+
+## 常见错误
+
+1. 把越界 `[]` 当成「会抛异常」。不会；那是未定义行为。
+2. 写成 `cells_.[i]`。这是语法错误，与越界无关。
+3. 用异常表达「业务上拒绝一次落子」。业务拒绝用结果类型；`at` / `out_of_range` 留给检查路径与前置条件失败。
+
+## 自测问题
+
+1. 对 `std::array`，`[]` 与 `at` 在越界时分别会怎样？
+
+   ::: {.answer}
+   `[]` 越界是未定义行为；`at` 抛 `std::out_of_range`。
+   :::
+
+2. 与 `std::array` 同属「下标 + at」一族的常用容器有什么？
+
+   ::: {.answer}
+   `vector`、`deque`、`string`、`string_view`（以及 C++26 起的 `span::at`）。`map` / `unordered_map` 的 `[]` 是插入语义，另算一族。
+   :::
+
+## 本章回顾
+
+你现在能用 `std::array` 区分 `[]` 与 `at`，并说出同类容器。井字棋先用坐标判断范围，再用 `at` 读取格子，见[实现棋盘存储](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/03-board.qmd)。

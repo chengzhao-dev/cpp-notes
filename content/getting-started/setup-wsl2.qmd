@@ -49,7 +49,7 @@ sudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-
 只有默认软件源下载明显过慢时才需要更换来源。更换软件源只影响软件下载位置，不改变编译器和构建工具。可以参考[清华 Ubuntu 软件源帮助](https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/)。
 :::
 
-## 检查工具命令是否可定位
+## 工具检查
 
 执行下面的命令，确认当前 Ubuntu 的 `PATH` 中可以找到这些工具。
 
@@ -109,7 +109,7 @@ command -v clang++ clangd lldb cmake ninja
 
 ## 自测问题
 
-先自己回答，再展开核对。
+先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。
 
 1. `command -v clang++` 能列出路径，是否就能证明 `clang++` 已经可以成功编译程序？为什么？
 

@@ -1,0 +1,113 @@
+---
+title: "指针使用场景"
+---
+
+上一章的引用不可为空，参数必须绑定到一个对象。但“有没有这项信息”常常由调用者决定，参数需要能表达“没有”。本章沿同一张场景表展开指针的场景，并给出所有权选择的入口。
+
+## 指针的场景
+
+| 场景 | 推荐方式 | 说明 |
+| --- | --- | --- |
+| “本该是引用”的可选只读输入 | `const T*` | 传 `nullptr` 表示没有 |
+| 需要修改且可能为空（可选输出） | 非 `const` 指针 `T*` | 调用处可见 `&` |
+| 可选按值输入 | `std::optional<T>` | 现行指南的首选写法 |
+| 转移所有权 | `std::unique_ptr<T>` 按值 | 所有权随参数转移 |
+| 共享所有权 | `std::shared_ptr<T>` | 按值或 `const&`，视引用计数而定 |
+
+指针与引用的分界只有一条：参数可不可以为空。必须存在就用引用，可能没有才用指针。调用处由此一眼看出哪些参数可以不提供。
+
+## 可空与可选
+
+完整示例覆盖表中前两个场景：
+
+```{.cpp filename="pointer-usage-scenarios.cpp"}
+// 指针使用场景示例：可空输入、可选输出与判空约定。
+#include <iostream>
+#include <string>
+
+// 可选的只读输入：const 指针，传 nullptr 表示没有这项信息。
+void PrintTask(const std::string& title, const std::string* note) {
+  std::cout << "任务: " << title << "\n";
+  if (note != nullptr) {
+    std::cout << "备注: " << *note << "\n";
+  }
+}
+
+// 可选输出：非 const 指针；找到首个数字时写入并返回 true。
+bool TryFirstDigit(const std::string& text, int* digit_out) {
+  for (char ch : text) {
+    if (ch >= '0' && ch <= '9') {
+      *digit_out = ch - '0';
+      return true;
+    }
+  }
+  return false;
+}
+
+int main() {
+  const std::string note{"每周重开一局"};
+  PrintTask("井字棋", &note);
+  PrintTask("自由练习", nullptr);
+
+  int digit = 0;
+  if (TryFirstDigit("第 3 局", &digit)) {
+    std::cout << "首个数字: " << digit << "\n";
+  }
+  if (!TryFirstDigit("残局", &digit)) {
+    std::cout << "残局不含数字\n";
+  }
+  return 0;
+}
+```
+
+运行结果：
+
+```{.text filename="运行效果"}
+任务: 井字棋
+备注: 每周重开一局
+任务: 自由练习
+首个数字: 3
+残局不含数字
+```
+
+`PrintTask` 在解引用前先判空。`TryFirstDigit` 找不到数字也属正常结果，不是错误。调用处写 `&digit`，取地址的 `&` 让“这个参数会被写入”在调用行可见。
+
+堆对象的所有权要移交时，用 `std::unique_ptr<T>` 按值传参。多处共享同一对象时，用 `std::shared_ptr<T>`。两者的语法与生命周期管理见内存分册。
+
+## 常见错误
+
+### 解引用前不判空
+
+指针参数的约定是“可能为空”，解引用前先用 `p != nullptr` 确认，跳过判空时程序在空指针上直接崩溃。
+
+### 指针传必存参数
+
+调用者可能误传 `nullptr`，函数内被迫防御判空，接口约定反而模糊，必须存在的参数按上一章的表用 `T&` 或 `const T&`。
+
+### 对象传给指针
+
+调用 `PrintTask(title, note)` 少写一个 `&`，编译器直接报类型错误，指针参数在调用处写 `&对象`，取地址本身就是接口约定的一部分。
+
+## 自测问题
+
+1. `PrintTask` 的 `note` 参数为什么用 `const std::string*` 而不是 `const std::string&`？
+
+   ::: {.answer}
+   备注是可选信息，调用者要能表达“没有”。指针允许传 `nullptr`，引用必须绑定到对象。
+   :::
+
+2. `TryFirstDigit` 为什么返回 `bool` 还要一个 `int*` 参数？
+
+   ::: {.answer}
+   找不到首个数字是正常结果，`bool` 报告成败，`int*` 只在成功时写入。这就是可选输出的场景。
+   :::
+
+3. 转移堆对象的所有权应该用什么参数？
+
+   ::: {.answer}
+   `std::unique_ptr<T>` 按值传参，所有权随参数移交。多处共享才用 `std::shared_ptr<T>`。
+   :::
+
+## 本章回顾
+
+你现在能用指针表达可空输入与可选输出，并记住先判空再解引用。完整示例见 [pointer-usage-scenarios.cpp](../../code/language-basics/pointer-usage-scenarios.cpp)，由分册目录下的 `CMakeLists.txt` 收集编译；所有权与生命周期见内存分册。
