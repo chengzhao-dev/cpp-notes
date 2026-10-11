@@ -41,6 +41,8 @@
 | `& .agents/skills/governing-agents/scripts/run.ps1 scope <目标>` | 输出最小读取作用域 |
 | `& .agents/skills/governing-agents/scripts/run.ps1 check --profile fast|book|knowledge|python|full` | 按改动域运行校验，默认 `full` |
 | `& .agents/skills/governing-agents/scripts/run.ps1 render` | 渲染 Book，并运行 `book` profile |
+| `& .agents/skills/governing-agents/scripts/run.ps1 preview [路径.qmd]` | 本地 preview（注入 `config.toml` 的 `QUARTO_PYTHON`） |
+| `& .agents/skills/governing-agents/scripts/run.ps1 install-quarto-deps` | 按 `config.toml` 安装 Quarto 可执行单元依赖 |
 | `& .agents/skills/governing-agents/scripts/run.ps1 verify --changed` | 增量校验 C++ 示例 |
 | `& .agents/skills/governing-agents/scripts/run.ps1 build <part>/<chapter>` | 在 WSL 构建单章示例 |
 | `& .agents/skills/governing-agents/scripts/run.ps1 kb-index [--rebuild]` | 构建知识库索引 |
@@ -49,7 +51,7 @@
 ## 读取、编辑与验收边界
 
 1. 每次任务先运行 `scope`，只读「单元」「读取」和必要 reference。不整包读取 references。
-2. 永不读取或索引 `_book/**`、`code/**/build/**`、`.quarto/**`、`.cache/**`、`.tmp/**`。产物检查交给脚本。
+2. 永不读取或索引 `_book/**`、`code/**/build/**`、`.quarto/**`、`.cache/**`、`.tmp/**`。`_book/` 是忽略的 Pages 发布物；只有存在计算型页面时，根 `_freeze/` 才作为可提交快照，`.quarto/_freeze/` 仍属本地缓存。产物检查交给脚本。
 3. 预计读取超过 8 个文件或需要全仓检索时才派侦察代理。编辑回主线程完成。
 4. 中文文件使用 UTF-8 无 BOM、LF。修改 `.qmd`、skill 或主题 CSS 后先跑编码检查。QMD 正文标点和句长遵循 `writing-quarto/references/zh/writing-principles.md`。
 5. 修改 `.agents/skills/designing-theme/assets/theme/**` 或 `_quarto.yml` 会触发整本渲染。确认代价后运行 `render`；需要四档视口和明暗矩阵时运行 `render --require-browser`。
@@ -59,7 +61,7 @@
 
 ## Python 运行时
 
-所有仓库脚本直接读取根目录 `config.toml` 中的 `python`。Skills、MCP 与维护命令不得另行读取 `CPP_MEMO_PYTHON`、`runtime.json.python`、PATH 或 `sys.executable` 作为项目 Python 来源。MCP 配置仍指向 `.agents/mcp/server.py`，由该 server 读取同一字段。
+所有仓库脚本直接读取根目录 `config.toml` 中的 `python`。`quarto_python_packages` 是 Quarto 可执行单元依赖的唯一声明，依赖由 `run.ps1 install-quarto-deps` 安装；Skills、MCP 与维护命令不得另行读取 `CPP_MEMO_PYTHON`、`runtime.json.python`、PATH 或 `sys.executable` 作为项目 Python 来源。MCP 配置仍指向 `.agents/mcp/server.py`，由该 server 读取同一字段。
 
 ## 初始化兼容
 

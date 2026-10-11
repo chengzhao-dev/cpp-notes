@@ -4,3 +4,7 @@
 # Python 解释器，本仓库脚本与 MCP 统一用解释器的完整路径运行；留空或缺失时
 # 脚本立即失败，不回退 PATH。换机器或升级环境时只改这里。
 python = "D:/ProgramData/miniforge3/python.exe"
+
+# Quarto {python} / Jupyter 可执行单元的运行时依赖。当前正文没有此类单元，
+# 保持空数组；首次加入时在此声明，CI 与本地均由 run.py 读取。
+quarto_python_packages = []

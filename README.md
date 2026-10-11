@@ -12,18 +12,21 @@
 按下面的顺序阅读，每页都在上一页的基础上增加一个概念：
 
 1. [准备 WSL2 C++ 开发环境](content/getting-started/setup-wsl2.qmd)
-2. [编译并运行第一个 C++ 程序](content/getting-started/first-program.qmd)
-3. [拆分最小 C++ 程序结构](content/getting-started/minimal-program-structure.qmd)
+2. [第一个程序](content/getting-started/first-program.qmd)
+3. [最小程序结构](content/getting-started/minimal-program-structure.qmd)
 4. [用 CMake 构建 C++ 程序](content/getting-started/cmake-project.qmd)
-5. [用 CMake 管理多文件工程](content/getting-started/multi-file-project.qmd)
-6. [构建静态库并链接程序](content/getting-started/static-library.qmd)
-7. [构建动态库并运行程序](content/getting-started/shared-library.qmd)
-8. [类型与变量](content/language-basics/types-and-variables.qmd)
-9. [常量与不可变值](content/language-basics/constants.qmd)
+5. [多文件工程](content/getting-started/multi-file-project.qmd)
+6. [类型与变量](content/language-basics/types-and-variables.qmd)
+7. [函数](content/language-basics/functions.qmd)
+8. [分支和循环](content/language-basics/branch-and-loop.qmd)
+9. [const 变量](content/language-basics/const-variables.qmd)
+10. [constexpr](content/language-basics/constexpr.qmd)
+11. [常量关键词](content/language-basics/constant-keywords.qmd)
+12. [类与封装](content/language-basics/classes.qmd)
 
-语言机制的工程用法见姊妹仓库 [cpp-board-games](https://github.com/chengzhao-dev/cpp-board-games)，其中的[棋盘与状态](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tic-tac-toe/03-board-and-state.qmd)把枚举、结构体与命名空间用在游戏状态模型上。
+语言机制的工程用法见姊妹仓库 [cpp-board-games](https://github.com/chengzhao-dev/cpp-board-games)。[实现棋盘存储](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/03-board.qmd)用 `CellState` 保存每一格，[实现对局规则](https://github.com/chengzhao-dev/cpp-board-games/blob/main/content/tictactoe/04-game.qmd)拒绝非法落子并判定胜负与平局。
 
-[工程应用分册](content/practice/index.qmd)从真实项目视角说明构建产物的交付职责，其中的[影像算法的交付形态](content/practice/android-imaging.qmd)可以随时阅读。
+[工程应用分册](content/practice/index.qmd)接着构建[静态库](content/practice/static-library.qmd)和[动态库](content/practice/shared-library.qmd)，其中的[交付形态](content/practice/android-imaging.qmd)说明这些产物在真实项目里的职责。
 
 建议边读边输入命令。章节示例放在 `code/getting-started/` 和 `code/language-basics/`，可以直接运行，也可以修改后重新构建。
 
