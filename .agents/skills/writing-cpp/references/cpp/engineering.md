@@ -8,7 +8,7 @@
 
 ## 项目布局
 
-多文件可执行工程的公共头文件和源文件放在顶层：
+多文件可执行工程的头文件和源文件放在顶层：
 
 ```
 project/
@@ -54,7 +54,7 @@ static-library/
 ## 示例与章节落点
 
 - 工程章正文落 `content/toolchain/cmake-targets.qmd`、`project-layout.qmd`。
-- 需要重复编译运行的章节使用 `code/<part>/<chapter>/`，至少包含源码和一个 `build-and-run.sh`。直接编译脚本调用 `clang++`，CMake 工程脚本执行配置、构建和运行。只有不进入重复构建流程的片段或无工程文件可省略脚本。
+- 需要重复编译运行的章节使用 `code/<part>/<chapter>/`，至少包含源码和一个 `build-and-run.sh`。直接编译脚本调用 `clang++`，CMake 工程脚本执行配置、构建和运行。只有不进入重复构建流程的片段，或没有工程文件的章节，才可省略脚本。
 - 多文件工程落 `code/<part>/<chapter>/`，库示例允许同一章节登记多个独立工程目录，并在任务矩阵中全部列出。
 - 工程章示例至少包含 `CMakeLists.txt` 与一个可运行目标，禁止只给伪配置。
 - 单文件、多文件和库工程分别用 `init_project.py --layout single|multi|static-library|shared-library` 生成。库工程生成根 `main.cpp` 与 `greeting/`，模板源在 `writing-cpp/templates/projects/`。

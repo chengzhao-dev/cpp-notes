@@ -33,9 +33,21 @@
 源文件直接使用某个标准库类型时，必须包含对应头文件，不能依赖其他头文件的传递包含。
 实现文件包含自身接口后，仍应直接包含它使用的标准库头文件。
 
+项目头用引号加相对 PUBLIC include 根的裸文件名（如 `#include "greeting.h"`），不建 `include/<namespace>/` 子目录。
+
+## 特殊成员
+
+需要用户声明的默认构造、拷贝/移动或析构时，头文件只写声明；`Type::Type() = default;` 放在对应 `.cpp`。有函数体的成员定义一律在 `.cpp`。平凡析构不声明。`explicit` 只约束单参构造；零参不加。依据见标识 `cpp-declaration-order-v1`「C. `.cpp` 定义顺序」。
+
 ## 初始化
 
 初始化默认使用列表初始化 `{}`，例如 `int age{18};`。`=` 只保留三种位置：与 `{}` 做形式对比、`auto` 的初始化和赋值语句。`auto` 配合花括号会牵出 `initializer_list` 等额外细节，`auto score = 95.5;` 能让推断来源一眼可见。
+
+## 表达式与枚举行尾
+
+`*` / `/` / `%` 与 `+` / `-`（或位运算）混用在同一表达式时，给高优先级子表达式显式加括号（如 `(row * 10) + col`）；比较与 `&&` 的括号不强制。clang-tidy `readability-math-missing-parentheses` 在 `verify --style` 中计失败，改代码消警告，不关闭检查。依据见标识 `cpp-naming-format-v1` 的知识文件「混合优先级算术括号」。
+
+枚举行尾注释只写给不自明的成员，且同一 `enum` 内不自明成员必须齐全、禁止半套；自明成员（如 `Player::kX` / `kO`）不写，先手等语义放类型上一行。行尾**语义结果优先**（先写「平局」「进行中」等结果词，判定条件可选跟冒号后）。写法依据见标识 `cpp-teaching-source-comments-v1` 的知识文件「枚举与常量行尾注释」。
 
 ## 工具
 
@@ -51,11 +63,11 @@
 检查 C++ 格式：
 
 ```bash
-# 追加 clang-format 与 clang-tidy 检查
+# 追加 clang-format 与 clang-tidy 检查（致命检查集内的 tidy 警告计失败）
 & .agents/skills/governing-agents/scripts/run.ps1 verify --style
 ```
 
-clang 配置源位于 `.agents/skills/writing-cpp/assets/config/`，由 `.agents/skills/maintaining-python/scripts/scaffold/init_project.py` 复制到独立工程根目录。
+clang 配置源位于 `.agents/skills/writing-cpp/assets/config/`，由 `.agents/skills/maintaining-python/scripts/scaffold/init_project.py` 复制到独立工程根目录。静态检查的项目边界、`--header-filter` 与 `--system-headers` 的区别见知识文件 `cpp-static-analysis-boundaries-v1`。日常 clang-tidy 只传入项目源文件，不把 `compile_commands.json` 中的第三方编译单元当作项目门禁。
 `single` 与 `multi` 工程模板位于 `.agents/skills/writing-cpp/templates/projects/`，示例工程应与模板结构保持一致。
 
 Windows 下的编译校验会自动通过 WSL2 执行。日常修改后运行一次 `& .agents/skills/governing-agents/scripts/run.ps1 verify`。单章节构建使用 `& .agents/skills/governing-agents/scripts/run.ps1 build <part>/<chapter>`。默认只输出结论，失败时再追加 `--verbose` 查看诊断，避免无意义地展开完整编译日志。
@@ -87,7 +99,8 @@ inline `cpp`、`bash`、`powershell` 和 `cmake` 代码块仍按 `writing-quarto
 `terminal-validation.md` 控制总注释与子注释，不为满足文件合同机械增加注释。
 `{{< include /code/... >}}` 引用的真实文件则按本节的独立阅读标准维护。注释只解释学习重点，
 不引入正文尚未出现的比较对象。复杂原理、参数边界和背景放到正文或标识
-`cpp-teaching-source-comments-v1` 的知识文件。
+`cpp-teaching-source-comments-v1` 的知识文件。该知识是注释的唯一权威，本节不复述其细则；迁移后的新增合同：
+库对外头文件的公开声明用 `///` Doxygen（概述、空 `///`、`@param`），`.cpp` 函数定义的上一行不写操作摘要（契约在头文件 `///`，实现注释只补契约没写的要点）；注释自己把对象写出，禁用无对象的「该／这个」和「行：」式词条冒号；返回 `bool` 的局部 lambda 用 `is_` / `has_` / `are_` 前缀；函数体内同性质语句贴紧、换一种检查才空一行。
 
 代码和终端输出左对齐，保留必要缩进，字段名与说明的对齐交给表格。Shell、CMake 和 C++ 示例禁止把长解释写成行尾注释。中文说明使用完整句子，代码语法中的标点不受正文标点规则影响。
 
@@ -95,4 +108,8 @@ inline `cpp`、`bash`、`powershell` 和 `cmake` 代码块仍按 `writing-quarto
 
 ## 异常
 
-默认启用异常。构造失败抛异常。可预期失败用 `optional`/`expected`。资源靠 RAII。
+默认启用异常。构造失败可抛异常。可预期的业务失败优先用结果类型 / `optional` / `expected`，不要用异常表达正常分支。契约违反（越界 `at`、缺失键的 `at`）抛 `std::out_of_range` 等标准异常；`what()` 英文句式与「不用日志框架讲课」见标识 `cpp-exception-message-format-v1` 的知识文件。资源靠 RAII。`[]` 与 `at` 的容器共性见标识 `cpp-subscript-and-at-v1` 的知识文件。
+
+## 工具配置 YAML
+
+`.clang-format` / `.clang-tidy` / `.clangd` 注释外形见标识 `cpp-teaching-source-comments-v1` 的知识文件「工具配置 YAML」：短横幅 + 邻接；禁止政策头与知识库 id 指针。

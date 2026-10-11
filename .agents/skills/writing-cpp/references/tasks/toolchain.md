@@ -21,5 +21,5 @@
 | ID | 章节 | 状态 | 前置 | 正文 | 示例 | 专项必读 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `TASK-TOOL-001` | cmake-targets | todo | `TASK-ENV-005` | `content/toolchain/cmake-targets.qmd` | `code/toolchain/cmake-targets.cpp` | `.agents/skills/writing-cpp/references/cpp/engineering.md` | — |
-| `TASK-TOOL-002` | clang-tools | todo | `TASK-TOOL-001` | `content/toolchain/clang-tools.qmd` | `code/toolchain/clang-tools.cpp` | `.agents/skills/writing-cpp/references/cpp/code-style.md` | — |
+| `TASK-TOOL-002` | clang-tools | done | `TASK-TOOL-001` | `content/toolchain/clang-tools.qmd` | `code/toolchain/clang-tools.cpp` | `.agents/skills/writing-cpp/references/cpp/code-style.md` | 静态检查边界、编译数据库与动态下标诊断已补充 |
 | `TASK-TOOL-003` | project-layout | todo | `TASK-TOOL-001` | `content/toolchain/project-layout.qmd` | `code/toolchain/project-layout.cpp` | `.agents/skills/writing-cpp/references/cpp/engineering.md` | — |

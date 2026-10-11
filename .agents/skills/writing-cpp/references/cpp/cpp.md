@@ -24,6 +24,8 @@
 | zh.cppreference.com | 译名、标准措辞、复杂度（`## 深入` 引标准时以此为准） |
 | CMake 官方文档 | 构建章节的 command/variable 语义与注释措辞 |
 | Google C++ Style Guide | include 顺序、排版与全套标识符命名 |
+| A Tour of C++ (Stroustrup) | 语言整体观 |
+| Effective C++ | 可执行的惯用法与规则 |
 
 本项目以 Google 的 include 顺序和 `clang-format` 为排版基底，标识符命名整体按 Google 执行：函数与类型大驼峰，变量、参数和成员 snake_case，常量与枚举子 `kPascalCase`。**例外：本仓库启用异常**，不采用 Google
 的异常限制。完整取舍见标识 `cpp-naming-format-v1`。

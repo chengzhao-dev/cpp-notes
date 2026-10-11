@@ -20,7 +20,8 @@ Windows 下使用仓库配置的 Python 3.12 运行：
   3. content/**/*.qmd 内嵌完整示例
 风格阶段（仅 --style，规范见 references/cpp/code-style.md）：
   S1. clang-format --dry-run -Werror 检查 code/**.cpp（硬门槛）
-  S2. clang-tidy 检查 code/**.cpp（仅输出报告，不计失败）
+  S2. clang-tidy 检查 code/**.cpp：FATAL_TIDY_CHECKS 内的警告计失败，
+      其余仅报告（教学示例保留刻意的简单写法）
   配置显式指向 .agents/skills/writing-cpp/assets/config/（.clang-format、.clang-tidy）。
   clang 工具缺失/过旧时降级为警告。编译始终是硬门槛。
 """
@@ -33,6 +34,10 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# 致命检查集：这些 clang-tidy 检查的警告视为失败；修代码，不关检查。
+# 扩充集合时同步 references/cpp/code-style.md 与知识库 cpp-naming-format-v1。
+FATAL_TIDY_CHECKS = ("readability-math-missing-parentheses",)
 
 BLOCK_RE = re.compile(r"`{3}(?:\{\.cpp[^`]*\}|cpp)\r?\n(.*?)`{3}", re.S)
 MAIN_RE = re.compile(r"int\s+main\s*\(")
@@ -372,7 +377,7 @@ def main():
         for path in unmatched:
             print(f"  FAIL {os.path.relpath(path, repo_root)}")
 
-    # ---------- 风格阶段：clang-format（硬门槛）+ clang-tidy（报告） ----------
+    # ---------- 风格阶段：clang-format（硬门槛）+ clang-tidy（致命集） ----------
     if args.style:
         print()
         print("=== Style check: clang-format + clang-tidy (per references/cpp/code-style.md) ===")
@@ -404,7 +409,7 @@ def main():
                         print(f"    {line}")
             for f in style_targets:
                 rel = os.path.relpath(f, repo_root)
-                print(f"tidy: {rel} (informational)")
+                print(f"tidy: {rel}")
                 build_dir = compile_database(f)
                 if build_dir:
                     result = sh(
@@ -416,9 +421,18 @@ def main():
                                 f"-- -std=c++20 -stdlib=libc++ 2>&1")
                 out = "\n".join((result.stdout or "").splitlines() + (result.stderr or "").splitlines())
                 diagnostics = tidy_diagnostics(out, repo_root)
-                for line in diagnostics:
+                fatal = [d for d in diagnostics
+                         if any(name in d for name in FATAL_TIDY_CHECKS)]
+                other = [d for d in diagnostics if d not in fatal]
+                for line in fatal:
                     print(f"    {line}")
-                if not diagnostics and result.returncode == 0:
+                for line in other:
+                    print(f"    (informational) {line}")
+                if fatal:
+                    fail += 1
+                    print(f"    FAIL: 致命检查集内的 clang-tidy 警告（"
+                          f"{'、'.join(FATAL_TIDY_CHECKS)}），修代码，不关检查。")
+                elif not diagnostics and result.returncode == 0:
                     print("  clean")
                 elif not diagnostics:
                     print("    tidy did not complete (informational)")

@@ -47,7 +47,7 @@ add_executable(app ${APP_SOURCES})
 
 库章节先让读者看懂可执行文件由 `main()` 和项目代码组成，再分别构建静态库与动态库。每个入门工程只保留一个库目标和一个消费它的 `app`。静态库与动态库拆成两个独立工程，避免同时引入多个中心。
 
-静态工程在 `greeting/CMakeLists.txt` 使用 `add_library(greeting STATIC ${LIBRARY_SOURCES})`。库的公共头文件目录使用 `target_include_directories(greeting PUBLIC include)`，让消费者通过目标依赖获得接口目录。顶层 `CMakeLists.txt` 用 `add_subdirectory(greeting)` 加载库，再创建 `app` 并调用 `target_link_libraries(app PRIVATE greeting)`。动态工程使用 `SHARED`，并为构建树中的 `app` 设置 `BUILD_RPATH "$ORIGIN/../lib"`。教学时先展示顶层如何组合项目，再展示库文件如何定义自身目标；链接边界与运行期查找的原因检索 `cpp-library-and-executable-linking-v1`。
+静态工程在 `greeting/CMakeLists.txt` 使用 `add_library(greeting STATIC ${LIBRARY_SOURCES})`。库对外头文件的目录使用 `target_include_directories(greeting PUBLIC include)`，让消费者通过目标依赖获得接口目录。顶层 `CMakeLists.txt` 用 `add_subdirectory(greeting)` 加载库，再创建 `app` 并调用 `target_link_libraries(app PRIVATE greeting)`。动态工程使用 `SHARED`，并为构建树中的 `app` 设置 `BUILD_RPATH "$ORIGIN/../lib"`。教学时先展示顶层如何组合项目，再展示库文件如何定义自身目标；链接边界与运行期查找的原因检索 `cpp-library-and-executable-linking-v1`。
 
 可执行文件输出到 `build/bin/`，静态库和动态库输出到 `build/lib/`，分别使用 `CMAKE_ARCHIVE_OUTPUT_DIRECTORY` 与 `CMAKE_LIBRARY_OUTPUT_DIRECTORY`。
 
