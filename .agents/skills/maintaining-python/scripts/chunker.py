@@ -119,6 +119,7 @@ def split_doc(path: Path) -> tuple[dict, list[dict]]:
     for chunk in chunks:
         chunk["content_hash"] = kb.content_hash(chunk["content"])
         chunk["token_count"] = kb.estimate_tokens(chunk["content"])
+        chunk["zone"] = kb.zone_for(path)
     # order 记录块在文档里的先后，检索的滑动窗口靠它取「下一节」
     for position, chunk in enumerate(chunks):
         chunk["order"] = position
@@ -135,6 +136,7 @@ def split_doc(path: Path) -> tuple[dict, list[dict]]:
         "supersedes": str(meta.get("supersedes") or ""),
         "updated": str(meta["updated"]),
         "chunk_strategy": str(meta.get("chunk_strategy") or STRATEGY),
+        "zone": kb.zone_for(path),
         "source_tokens": kb.estimate_tokens(body),
         "source_hash": kb.content_hash(text),
     }
