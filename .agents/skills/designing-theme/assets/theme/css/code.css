@@ -10,6 +10,7 @@ pre {
   line-height: var(--code-line-height);
   font-weight: 400;
   overflow-x: auto;
+  font-variant-ligatures: none;
   tab-size: 4;
   -moz-tab-size: 4;
   margin: 0;
@@ -95,6 +96,8 @@ div.sourceCode code {
  */
 .code-with-filename .code-with-filename-file {
   margin: 0;
+  min-width: 0;
+  overflow: hidden;
   padding: var(--code-title-padding);
   padding-right: 3rem;
   background-color: var(--code-title-bg);
@@ -118,11 +121,18 @@ body.quarto-dark .code-with-filename .code-with-filename-file {
 }
 
 .code-with-filename .code-with-filename-file strong {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--code-title-fg);
   font-family: var(--mono-font);
   font-size: var(--code-title-font-size);
   font-weight: 600;
   line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .code-with-filename div.sourceCode,

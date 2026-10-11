@@ -20,14 +20,14 @@
 | surface-raised / code / card | `#2D333B` |
 | 代码标题条 | `#373E47` |
 | 边框 | `#444C56` |
-| 正文 / 次要文字 | `#ADBAC7` / `#768390` |
+| 正文 / 次要文字 | `#CDD9E5` / `#B1BAC4` |
 | 链接 | `#539BF5` |
 
 2026-09 软化：暗色自 Dark Default 迁至 Dimmed；圆角抬升（sm 8px / md·lg 12px / 代码块 8px）；首页卡片亮色加轻阴影；正文与代码行高 1.75；表头去大写；品牌与卡片标题 700→600。
 
 ## 切换
 
-生产固定本 pack，不做第二套色板。若未来换 pack：在 `_quarto.yml` 中把 theme SCSS、palette tokens 与 `highlight-style` 改成目标 pack；共享 `css/*.css`、字体与 includes 不动，并同步 `check_layout.py` 的 `PALETTE_VALUE_CHECKS`。
+生产固定本 pack，不做第二套色板。若未来换 pack：在 `_quarto.yml` 中把 theme SCSS、palette tokens 与 `highlight-style` 改成目标 pack；共享 `css/*.css`、字体与 includes 不动。
 
 ## 来源
 
