@@ -1,0 +1,2501 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "C++ 学习轨迹笔记",
+    "section": "",
+    "text": "开始阅读\n先进入“入门与构建”，按页面顺序完成多文件工程。再从“语言基础”学习类型和变量。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 学习轨迹笔记</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#开始阅读",
+    "href": "index.html#开始阅读",
+    "title": "C++ 学习轨迹笔记",
+    "section": "",
+    "text": "入门与构建\n从 WSL2 开始，经过直接编译、最小程序结构、CMake 和多文件工程。静态库与动态库在工程应用里继续。\n查看内容 →\n\n\n语言基础\n学习类型、变量、常量，以及后续语言概念。\n查看内容 →\n\n\n语言进阶\n用强类型包装区分看起来相同、含义不同的数值。\n查看内容 →\n\n\n标准库\n从容器总览与下标 / at 开始，建立标准库阅读地图。\n查看内容 →",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 学习轨迹笔记</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#继续阅读",
+    "href": "index.html#继续阅读",
+    "title": "C++ 学习轨迹笔记",
+    "section": "继续阅读",
+    "text": "继续阅读\n工具链检查已经能写的程序。工程应用接着构建静态库和动态库。\n\n\n工具链\n让构建工具、编译数据库和静态检查一起工作。\n查看内容 →\n\n\n工程应用\n先构建静态库和动态库，再看它们在真实工程里的交付职责。\n查看内容 →",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>C++ 学习轨迹笔记</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/index.html",
+    "href": "content/getting-started/index.html",
+    "title": "入门与构建",
+    "section": "",
+    "text": "按顺序阅读即可。每页只完成一个目标，并为下一页留下可以继续使用的文件。\n\n\n准备 WSL2 C++ 开发环境\n在 Windows 上准备 Ubuntu 和 C++ 工具。\n\n\n第一个程序\n直接编译一个源文件并运行。\n\n\n最小程序结构\n分清入口、声明、实现、编译和链接。\n\n\n用 CMake 构建 C++ 程序\n用构建规则重复生成程序。\n\n\n多文件工程\n把接口、实现和程序入口拆开。\n\n\n\n\n\n\n\n\n注意统一开发环境\n\n\n\n本笔记的命令默认在 WSL2 Ubuntu 中执行。先完成准备 WSL2 C++ 开发环境，再按页面顺序继续学习。",
+    "crumbs": [
+      "入门与构建"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html",
+    "href": "content/getting-started/setup-wsl2.html",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "",
+    "text": "安装 WSL2 和 Ubuntu\n本章在 Windows 上准备后续 C++ 学习所需的 Ubuntu 环境。WSL2 提供运行 Linux 的环境，Ubuntu 是本章使用的 Linux 发行版。完成后，你能在 Ubuntu 中安装并定位 C++ 开发工具。\n以管理员身份打开 Windows PowerShell，执行下面的命令安装 WSL2 和默认的 Ubuntu 发行版。\n命令完成后按提示重启 Windows。重启后从开始菜单首次启动 Ubuntu，并按顺序完成初始化：\n以后可以从 Windows 开始菜单启动 Ubuntu，也可以在 PowerShell 或 Windows Terminal 中执行 wsl 进入默认发行版。再次看到 Ubuntu 提示符后，继续执行 Ubuntu 命令。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#安装-wsl2-和-ubuntu",
+    "href": "content/getting-started/setup-wsl2.html#安装-wsl2-和-ubuntu",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "",
+    "text": "PowerShell（管理员）\n\n# 安装 WSL2 和默认的 Ubuntu 发行版\nwsl --install\n\n\n\n创建 Linux 用户名和密码。输入密码时终端不会显示字符，这是正常现象。\n等待初始化完成，直到看到类似 user@host:~$ 的提示符。\n从看到该提示符开始，本章后续命令都在这个 Ubuntu 终端中执行。\n\n\n\n\n\n\n\n\n注意认识 Ubuntu 提示符\n\n\n\n\nuser 是 Linux 用户名。\nhost 是计算机名。\n~ 表示当前用户的主目录。\n末尾的 $ 表示普通用户提示符。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#安装-c-工具",
+    "href": "content/getting-started/setup-wsl2.html#安装-c-工具",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "安装 C++ 工具",
+    "text": "安装 C++ 工具\n先更新软件包索引并升级已安装的软件，再安装后续需要的开发工具。\n\n\nUbuntu Bash\n\n# 更新软件包索引\nsudo apt update\n\n# 升级已安装的软件包\nsudo apt upgrade -y\n\n# 安装 C++ 开发工具\nsudo apt install -y clang clangd llvm lldb libc++-dev libc++abi-dev cmake ninja-build\n\nclang 提供编译器，clangd 提供代码提示，lldb 提供调试器，CMake 和 Ninja 负责构建，libc++ 相关包提供 C++ 标准库。\n\n\n\n\n\n\n提示下载较慢时再更换软件源\n\n\n\n只有默认软件源下载明显过慢时才需要更换来源。更换软件源只影响软件下载位置，不改变编译器和构建工具。可以参考清华 Ubuntu 软件源帮助。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#工具检查",
+    "href": "content/getting-started/setup-wsl2.html#工具检查",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "工具检查",
+    "text": "工具检查\n执行下面的命令，确认当前 Ubuntu 的 PATH 中可以找到这些工具。\n\n\nUbuntu Bash\n\ncommand -v clang++ clangd lldb cmake ninja\n\n输出顺序与命令中的工具顺序一致，实际路径可能因 Ubuntu 环境不同而变化。下面是一个输出示例：\n\n\n输出示例\n\n/usr/bin/clang++\n/usr/bin/clangd\n/usr/bin/lldb\n/usr/bin/cmake\n/usr/bin/ninja\n\n只要每项都输出非空路径，就说明对应命令已经安装并且可以被 Shell 定位，不要求路径与示例完全一致。这项检查不能证明编译、构建、调试或代码提示功能正常。后续 Hello World 程序会通过实际编译和运行验证最小编译链。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#常见错误",
+    "href": "content/getting-started/setup-wsl2.html#常见错误",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "常见错误",
+    "text": "常见错误\n\nWSL2 安装失败\n如果提示“虚拟机平台未启用”，按下面的顺序检查系统设置，再重新安装。\n\n定位虚拟化设置\n在电脑启动设置或任务管理器中确认 CPU 虚拟化已经开启。\n启用 WSL 功能\n在“启用或关闭 Windows 功能”中启用“虚拟机平台”和“适用于 Linux 的 Windows 子系统”，然后重启 Windows。\n验证安装\n重新执行 wsl --install，并在重启后确认能够进入 Ubuntu 提示符。\n\n\n\n找不到工具\n如果某个工具显示 command not found，按下面的顺序恢复到检查步骤。\n\n定位缺失命令\n\n\nUbuntu Bash\n\ncommand -v clang++\n\n没有输出时，确认终端位于 Ubuntu，而不是 Windows PowerShell。\n重新安装工具\n在 Ubuntu 中重新执行本章的 sudo apt install 命令。\n验证命令定位\n重新执行 command -v clang++ clangd lldb cmake ninja，每项都应输出非空路径。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#自测问题",
+    "href": "content/getting-started/setup-wsl2.html#自测问题",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\ncommand -v clang++ 能列出路径，是否就能证明 clang++ 已经可以成功编译程序？为什么？\n\n查看答案\n不能。它只证明 Shell 能在当前 PATH 中找到命令。还需要实际编译并运行一个程序，才能验证编译链的功能。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/setup-wsl2.html#本章回顾",
+    "href": "content/getting-started/setup-wsl2.html#本章回顾",
+    "title": "准备 WSL2 C++ 开发环境",
+    "section": "本章回顾",
+    "text": "本章回顾\n看到 Ubuntu 提示符，并且 command -v 能列出全部工具路径，说明这些命令已经可以被 Shell 定位。下一章会创建第一个源文件，通过实际编译和运行继续验证 clang++。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>准备 WSL2 C++ 开发环境</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html",
+    "href": "content/getting-started/first-program.html",
+    "title": "第一个程序",
+    "section": "",
+    "text": "创建源文件\n本章用一个源文件完成从写代码到运行程序的最短路径。完成后，终端会输出 Hello, World!。下一章再拆开多文件程序的结构。完整示例见 first-program 示例目录。\n新建 first-program.cpp，输入下面的代码。\nmain() 是程序入口，后面的花括号 {} 组成函数体。不必现在记住其他细节，先按下面的步骤得到结果。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#创建源文件",
+    "href": "content/getting-started/first-program.html#创建源文件",
+    "title": "第一个程序",
+    "section": "",
+    "text": "first-program.cpp\n\n// 程序入口：向标准输出打印问候。\n#include &lt;iostream&gt;\n\nint main() {\n  std::cout &lt;&lt; \"Hello, World!\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#编译并运行",
+    "href": "content/getting-started/first-program.html#编译并运行",
+    "title": "第一个程序",
+    "section": "编译并运行",
+    "text": "编译并运行\n在源码所在目录执行下面的命令。\n\n\nUbuntu Bash（first-program 目录）\n\n# 创建构建目录\nmkdir -p build\n\n# 编译并链接源文件\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program\n\n# 运行程序\n./build/first-program\n\n程序输出如下：\n\n\n输出\n\nHello, World!\n\nclang++ 先编译源码，再把程序需要的运行代码链接起来。-o build/first-program 指定可执行文件的输出路径，./ 表示运行当前目录中的文件。看到 Hello, World!，说明这个单文件程序已经完成编译、链接并运行。\n\n\n\n\n\n\n注意编译选项\n\n\n\n\n-std=c++20 选择 C++20 标准。\n-stdlib=libc++ 选择 libc++ 标准库。\n-Wall -Wextra -Werror 打开常见警告，并让警告阻止构建。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#修改后验证",
+    "href": "content/getting-started/first-program.html#修改后验证",
+    "title": "第一个程序",
+    "section": "修改后验证",
+    "text": "修改后验证\n把源码中的 Hello, World! 改成其他文字，再执行下面的命令。\n\n\nUbuntu Bash（first-program 目录）\n\n# 重新编译\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror first-program.cpp -o build/first-program\n# 运行程序\n./build/first-program\n\n终端显示修改后的文字，说明源码改变后重新编译并运行成功。源码改变后必须重新编译。\n示例目录中的 build-and-run.sh 会依次完成创建目录、编译和运行：\n\n\nUbuntu Bash（first-program 目录）\n\n# 编译并运行当前示例\nbash build-and-run.sh",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#常见错误",
+    "href": "content/getting-started/first-program.html#常见错误",
+    "title": "第一个程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n找不到 clang++\n如果提示 command not found: clang++，先检查当前 Ubuntu 终端能否定位编译器。\n\n定位工具\n\n\nUbuntu Bash\n\ncommand -v clang++\n\n修复环境\n没有输出时，回到上一章重新安装 C++ 工具，并确认命令是在 Ubuntu 中执行。\n验证编译\n回到本章的编译命令，程序成功输出 Hello, World! 后再继续。\n\n\n\n编译出现 error\n编译器会在输出中给出文件名、行号和第一条错误原因，按下面的顺序修复后重新运行。\n\n定位错误\n查看第一条 error: 前后的文件名和行号。\n修复源码\n修改对应位置，保留 main() 和输出语句的完整结构。\n验证结果\n重新执行编译和运行命令，终端应显示源码中的问候文字。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#自测问题",
+    "href": "content/getting-started/first-program.html#自测问题",
+    "title": "第一个程序",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n单文件程序从源码到终端输出，中间经过的步骤是什么？\n\n查看答案\nclang++ 读取源文件，完成编译和链接，生成可执行文件。运行该文件后，程序把 Hello, World! 写到终端。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/first-program.html#本章回顾",
+    "href": "content/getting-started/first-program.html#本章回顾",
+    "title": "第一个程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把一个源文件编译成可执行程序。下一章会拆开这个最小程序，说明入口、头文件、声明、定义和链接各自为什么存在。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>第一个程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html",
+    "href": "content/getting-started/minimal-program-structure.html",
+    "title": "最小程序结构",
+    "section": "",
+    "text": "查看工程文件\n上一章的程序只有一个源文件。本章把同一个问候程序拆成入口、接口和实现文件。你将先阅读目录和源码，再通过编译与链接确认它们如何协作。\n编译器分别处理两个 .cpp 文件，链接器再把它们的结果组合成一个可执行程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#查看工程文件",
+    "href": "content/getting-started/minimal-program-structure.html#查看工程文件",
+    "title": "最小程序结构",
+    "section": "",
+    "text": "工程目录\n\nminimal-program-structure/\n├── main.cpp          # 程序入口，调用问候接口并输出结果\n├── greeting.h        # 声明 MakeGreeting()\n├── greeting.cpp      # 定义 MakeGreeting()\n└── build-and-run.sh  # 一次完成创建目录、编译和链接",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#阅读文件结构",
+    "href": "content/getting-started/minimal-program-structure.html#阅读文件结构",
+    "title": "最小程序结构",
+    "section": "阅读文件结构",
+    "text": "阅读文件结构\n按“入口 → 接口 → 实现”的顺序阅读下面的源码。\n\nmain.cpp 如何看到声明\nmain() 是程序入口，操作系统从它的第一条语句开始执行，花括号 {} 之间是函数体。\n\n\nmain.cpp\n\n// 程序入口：调用 MakeGreeting() 并输出结果。\n#include &lt;iostream&gt;\n\n#include \"greeting.h\"\n\nint main() {\n  std::cout &lt;&lt; MakeGreeting() &lt;&lt; \"\\n\";\n  return 0;\n}\n\nmain() 最后返回 0，表示程序正常结束。std::cout 是标准输出流，字符串末尾的 \\n 表示换行。\nmain.cpp 通过 #include \"greeting.h\" 看到 MakeGreeting() 的声明，因此能在调用点做类型检查。#include 只把头文件内容放进当前翻译单元，不会把 greeting.cpp 的实现链接进程序。\n\n\ngreeting.h 如何声明接口\n下面的头文件声明返回 std::string 的函数，声明末尾必须有分号，也没有函数体：\n\n\ngreeting.h\n\n// 问候接口：声明 MakeGreeting()，供其他源文件调用。\n#pragma once\n\n#include &lt;string&gt;\n\nstd::string MakeGreeting();\n\n#pragma once 是广泛支持的实现扩展，不是 ISO C++ 标准保证。本项目用它防止同一个头文件在一次编译中重复包含。#include &lt;string&gt; 提供 std::string 的声明。尖括号和引号表达不同的查找意图，具体搜索路径由编译器和编译参数决定。\n\n\ngreeting.cpp 如何提供定义\n实现文件包含自己的头文件，并提供与声明完全一致的函数定义：\n\n\ngreeting.cpp\n\n// 实现 greeting.h 中声明的 MakeGreeting()。\n#include \"greeting.h\"\n\nstd::string MakeGreeting() {\n  return \"Hello, World!\";\n}\n\n实现只在一个源文件中出现，避免重复定义。头文件和实现的返回类型、函数名与参数必须一致，否则调用点看到的接口和链接输入就不再是同一个函数。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#编译并链接",
+    "href": "content/getting-started/minimal-program-structure.html#编译并链接",
+    "title": "最小程序结构",
+    "section": "编译并链接",
+    "text": "编译并链接\n编译产出 build/ 下的两个目标文件，链接器再把它们合成可执行程序。\n\n编译\n预处理器先把头文件声明放进 main.cpp 对应的翻译单元，编译器再把每个翻译单元转换为目标文件，-c 表示只编译不链接：\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\n# 创建构建目录\nmkdir -p build\n# 分别生成两个目标文件\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c main.cpp -o build/main.o\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -c greeting.cpp -o build/greeting.o\n\n命令成功后，build/main.o 和 build/greeting.o 应该存在。目标文件还不是可以直接运行的程序。\n\n\n链接\n链接器把两个目标文件中的入口、调用关系和函数实现组合起来，解析 main.cpp 对 MakeGreeting() 的引用，并生成最终可执行文件。\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\nclang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror \\\n  build/main.o build/greeting.o -o build/minimal-program-structure\n\n链接成功后会生成 build/minimal-program-structure。如果省略 build/greeting.o，编译阶段仍可能成功，但链接器会报告 undefined reference to MakeGreeting()。\n\n\n运行\n运行可执行文件，确认加载和执行阶段也成功；也可以运行 bash build-and-run.sh，让脚本一次完成创建目录、编译和链接。\n\n\nUbuntu Bash（minimal-program-structure 目录）\n\n./build/minimal-program-structure\n\n输出如下：\n\n\n输出\n\nHello, World!",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#常见错误",
+    "href": "content/getting-started/minimal-program-structure.html#常见错误",
+    "title": "最小程序结构",
+    "section": "常见错误",
+    "text": "常见错误\n\nundefined reference to MakeGreeting\n这个错误说明编译器看到了声明，但链接器没有找到 MakeGreeting() 的实现，按下面的顺序恢复。\n\n定位缺失定义\n查看链接命令是否包含 greeting.cpp 或 build/greeting.o。\n修复链接输入\n把缺失的 greeting.cpp 加回编译和链接命令。\n验证链接结果\n重新执行本章的编译、链接和运行命令，终端应输出 Hello, World!。\n\n\n\n找不到 greeting.h\n编译器提示找不到 greeting.h 时，按下面的顺序检查头文件位置。\n\n定位当前目录\n先用 pwd 确认当前目录，再用 ls main.cpp greeting.cpp greeting.h 确认入口、接口和实现文件都在。命令没有列出文件时，说明执行位置不对。\n修复包含路径\n回到示例目录再执行命令。文件位于其他目录时，用 -I 告诉编译器头文件路径。\n验证编译\n重新执行本章的编译和链接命令，两个源文件都应成功生成目标文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#自测问题",
+    "href": "content/getting-started/minimal-program-structure.html#自测问题",
+    "title": "最小程序结构",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n为什么先把 main.cpp 和 greeting.cpp 分别编译成目标文件，而不是只执行一次链接命令？\n\n查看答案\n每个源文件先独立编译，编译器才能分别检查各自的翻译单元并生成可复用的目标文件，链接阶段再组合这些目标文件。这样修改一个源文件时，构建系统可以只重新编译受影响的部分。\n\n为什么链接命令必须包含 greeting.cpp 或 build/greeting.o？\n\n查看答案\ngreeting.h 只提供 MakeGreeting() 的声明，真正的函数定义在 greeting.cpp 中。链接输入缺少该定义时，调用点虽然通过了编译，链接器仍无法解析符号。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/minimal-program-structure.html#本章回顾",
+    "href": "content/getting-started/minimal-program-structure.html#本章回顾",
+    "title": "最小程序结构",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能区分程序入口、声明、实现、编译和链接。下一章用 CMake 把这套命令保存成可重复的工程规则。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>最小程序结构</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html",
+    "href": "content/getting-started/cmake-project.html",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "",
+    "text": "查看工程文件\n上一章每次修改后都要手动执行编译命令。本章把编译参数写进 CMakeLists.txt，再用 CMake 和 Ninja 重复构建。\n示例工程包含构建规则、辅助脚本和程序源码：\n程序入口仍然只负责输出问候句，避免把语言细节和构建工具混在一起。\n构建规则如下：\nproject() 设置工程名，set() 选择 C++20、输出目录和编译数据库。CMAKE_EXPORT_COMPILE_COMMANDS 生成的 compile_commands.json 供 clangd 读取，编辑器的代码提示才能拿到真实编译参数。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#查看工程文件",
+    "href": "content/getting-started/cmake-project.html#查看工程文件",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "",
+    "text": "工程目录\n\ncmake-project/\n├── CMakeLists.txt    # 构建规则\n├── build-and-run.sh  # 一键配置、构建并运行\n└── main.cpp          # 程序源码\n\n\n\n\nmain.cpp\n\n// 程序入口：向标准输出打印问候。\n#include &lt;iostream&gt;\n\nint main() {\n  std::cout &lt;&lt; \"Hello, World!\\n\";\n  return 0;\n}\n\n\n\n\nCMakeLists.txt\n\n# 构建 CMakeProject 可执行目标。\ncmake_minimum_required(VERSION 3.31)\nproject(CMakeProject LANGUAGES CXX)\n\n# 使用 C++20 作为语言标准。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\n# 可执行文件统一输出到 build/bin。\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n\n# 编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 创建 app 可执行目标。\nadd_executable(app main.cpp)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n# 链接时也使用 libc++。\ntarget_link_options(app PRIVATE -stdlib=libc++)",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#配置工程",
+    "href": "content/getting-started/cmake-project.html#配置工程",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "配置工程",
+    "text": "配置工程\n在工程根目录执行下面的命令。CMake 会读取构建规则，并生成 Ninja 使用的文件。\n\n\nUbuntu Bash（工程根目录）\n\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n\n-S . 指定源码目录，-B build 指定构建目录，-G Ninja 选择 Ninja。配置命令成功后，构建目录中会保存后续构建所需的规则。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#构建并运行",
+    "href": "content/getting-started/cmake-project.html#构建并运行",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 编译并链接 app\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\nCMake 生成 build/bin/app，Ninja 负责实际编译和链接。修改 main.cpp 后再次执行 cmake --build build 即可。\n也可以直接运行 bash build-and-run.sh，依次完成配置、构建和运行。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#常见错误",
+    "href": "content/getting-started/cmake-project.html#常见错误",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "常见错误",
+    "text": "常见错误\n\n配置时找不到 Ninja\n先检查命令是否安装：\n\n\nUbuntu Bash\n\ncommand -v cmake ninja clang++\n\n缺少工具时，回到准备 WSL2 C++ 开发环境重新安装。\n\n\n构建后找不到 app\n执行 ./build/bin/app 时提示文件不存在，或构建结束后 build/bin/app 仍未生成，按下面的顺序定位后重新构建并运行。\n\n确认执行位置\n当前目录不是工程根目录时，build/ 会指向错误位置。用根目录特征文件确认位置：\n\n\nUbuntu Bash\n\nls CMakeLists.txt\n\n输出包含 CMakeLists.txt，说明当前位于工程根目录。否则先用 cd 进入示例工程目录。\n重新构建并定位失败来源\n重新构建并显示每条实际执行的编译命令：\n\n\nUbuntu Bash（工程根目录）\n\ncmake --build build --verbose\n\n错误通常来自第一条编译信息，按文件名和行号修正源码后重新构建。\n确认产物已生成\n\n\nUbuntu Bash（工程根目录）\n\nls -l build/bin/app\n\n命令列出 app 文件后，运行 ./build/bin/app，确认输出仍为 Hello, World!。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#自测问题",
+    "href": "content/getting-started/cmake-project.html#自测问题",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n修改 main.cpp 后，为什么通常只需要再次执行 cmake --build build，而不必重新执行配置命令？\n\n查看答案\n配置阶段已经把 CMakeLists.txt 转换成构建规则。修改源文件只影响构建阶段，cmake --build build 会根据依赖关系重新编译并链接。只有构建规则、生成器或编译器配置改变时，才需要重新配置。\n\ncmake -S . -B build 和 cmake --build build 分别负责什么？\n\n查看答案\n前者读取项目配置并生成构建规则，后者执行这些规则，实际调用编译器和链接器生成程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/cmake-project.html#本章回顾",
+    "href": "content/getting-started/cmake-project.html#本章回顾",
+    "title": "用 CMake 构建 C++ 程序",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用 CMake 保存构建规则，并通过 cmake --build 构建 app。下一章会把代码拆成多个文件。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>用 CMake 构建 C++ 程序</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html",
+    "href": "content/getting-started/multi-file-project.html",
+    "title": "多文件工程",
+    "section": "",
+    "text": "查看工程结构\n代码变多后，把接口、实现和程序入口放在同一个文件中会很难阅读。本章把 Hello, World! 示例拆成三个源文件，再由 CMake 构建成一个程序。\n新增头文件放入 include/，新增源文件放入 src/，构建规则按这两个目录查找。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#查看工程结构",
+    "href": "content/getting-started/multi-file-project.html#查看工程结构",
+    "title": "多文件工程",
+    "section": "",
+    "text": "工程目录\n\nmulti-file-project/\n├── CMakeLists.txt    # 构建规则\n├── build-and-run.sh  # 一键构建并运行\n├── include/\n│   └── greeting.h    # 接口声明\n└── src/\n    ├── greeting.cpp  # 接口实现\n    └── main.cpp      # 程序入口",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#阅读源码",
+    "href": "content/getting-started/multi-file-project.html#阅读源码",
+    "title": "多文件工程",
+    "section": "阅读源码",
+    "text": "阅读源码\ngreeting.h 声明 MakeGreeting()。声明放在头文件里，供其他源文件在编译时核对调用写法。\n\n\ninclude/greeting.h\n\n// 问候接口：声明 MakeGreeting()，供其他源文件调用。\n#pragma once\n\n#include &lt;string&gt;\n\nstd::string MakeGreeting();\n\ngreeting.cpp 先包含自己的头文件，编译器据此检查函数定义与声明一致。\n\n\nsrc/greeting.cpp\n\n// 实现 greeting.h 中声明的 MakeGreeting()。\n#include \"greeting.h\"\n\n#include &lt;string&gt;\n\nstd::string MakeGreeting() {\n  return \"Hello, World!\";\n}\n\nmain.cpp 只包含 greeting.h，不需要知道函数实现在哪个文件，链接器会把两者接在一起。\n\n\nsrc/main.cpp\n\n// 程序入口：调用 MakeGreeting() 并输出结果。\n#include &lt;iostream&gt;\n\n#include \"greeting.h\"\n\nint main() {\n  std::cout &lt;&lt; MakeGreeting() &lt;&lt; \"\\n\";\n  return 0;\n}\n\n编译 main.cpp 时，编译器只需要看到函数声明。链接阶段再把 main.cpp 和 greeting.cpp 连成一个程序。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#查看构建规则",
+    "href": "content/getting-started/multi-file-project.html#查看构建规则",
+    "title": "多文件工程",
+    "section": "查看构建规则",
+    "text": "查看构建规则\n\n\nCMakeLists.txt\n\n# 构建 MultiFileProject 可执行目标。\ncmake_minimum_required(VERSION 3.31)\nproject(MultiFileProject LANGUAGES CXX)\n\n# 使用 C++20 作为语言标准。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\n# 可执行文件统一输出到 build/bin。\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n\n# 编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 收集 src/ 下的直属源文件，新增 .cpp 后重新构建即可进入目标。\nfile(GLOB APP_SOURCES CONFIGURE_DEPENDS \"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp\")\n\n# 创建 app 可执行目标，源文件来自 src/ 的收集结果。\nadd_executable(app ${APP_SOURCES})\n\n# 让 app 找到 include/ 中的头文件。\ntarget_include_directories(app PRIVATE include)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n# 链接时也使用 libc++。\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\nCONFIGURE_DEPENDS 让 Ninja 在构建前检查目录变化：新增 .cpp 后不必修改 CMakeLists.txt，直接重新构建，新文件就会进入目标。\n这个收集规则有一个边界：只覆盖 src/ 直属的 .cpp。分层目录、多个目标或需要精确控制依赖时，改用显式列出源文件，让工程关系保持可见。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#构建并运行",
+    "href": "content/getting-started/multi-file-project.html#构建并运行",
+    "title": "多文件工程",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译并链接 app\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n也可以运行 bash build-and-run.sh。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#常见错误",
+    "href": "content/getting-started/multi-file-project.html#常见错误",
+    "title": "多文件工程",
+    "section": "常见错误",
+    "text": "常见错误\n\n找不到 greeting.h\n确认 CMakeLists.txt 包含 target_include_directories(app PRIVATE include)，再重新配置并构建。\n\n\n链接器找不到 MakeGreeting()\n确认 src/greeting.cpp 存在，且文件后缀是 .cpp，因为收集规则只包含 src/ 直属的 .cpp 文件。修正后重新配置并构建：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让收集规则重新读取 src/ 下的源文件\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译并链接 app\ncmake --build build",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#自测问题",
+    "href": "content/getting-started/multi-file-project.html#自测问题",
+    "title": "多文件工程",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\ntarget_include_directories(app PRIVATE include) 和源文件收集规则分别解决什么问题？\n\n查看答案\ntarget_include_directories 让目标知道到哪里查找头文件，解决声明的可见性。源文件收集规则决定哪些 .cpp 会进入目标并参与编译，解决实现是否进入构建和后续链接的问题。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/getting-started/multi-file-project.html#本章回顾",
+    "href": "content/getting-started/multi-file-project.html#本章回顾",
+    "title": "多文件工程",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把接口、实现和程序入口拆开。下一章会把可复用实现构建成静态库。",
+    "crumbs": [
+      "入门与构建",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>多文件工程</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/index.html",
+    "href": "content/language-basics/index.html",
+    "title": "语言基础",
+    "section": "",
+    "text": "这一组分册的示例都放在 code/language-basics/。第一课用 int、double、bool 和 char 保存一个小程序里的数量和正误。后面的课分别调用函数、选择路径，并类与封装。\n\n\n类型与变量\n用 int、double、bool 和 char 表达常见数据，并理解变量、类型和作用域。\n\n\n函数\n按值传入一个整数，按值取回计算结果。\n\n\n分支和循环\n用 switch 选择一支输出，用 for 打印一行数字。\n\n\n初始化与推断\n初始化与赋值，掌握列表初始化、auto 和初始化列表推导。\n\n\nconst 变量\n用 const 表达不会随流程改变的值，理解常量的初始化与命名。\n\n\nconstexpr\n用 constexpr 编译期规则，把公共常量写成头文件里的 inline constexpr。\n\n\n常量关键词\n在 const、constexpr、consteval 和 constinit 之间按场景选型。\n\n\n类型与边界\n检查类型范围、溢出、转换、浮点精度、bool 和 std::size_t 的常见陷阱。\n\n\n普通枚举\n看清普通 enum 的作用域泄漏与隐式转换，理解为什么需要类型边界。\n\n\n枚举类\n用 enum class 表达封闭的取值集合，指定底层类型、放置成员注释并按值传参。\n\n\n命名空间\n用命名空间把相关的名字分组存放，用限定名区分同名实体。\n\n\n结构与值类型\n用 struct 聚合相关的数据，理解按值复制带来的独立性。\n\n\n成员函数上的 const\n读出成员函数尾部 const 的承诺，区分参数、返回值与局部变量身上的 const。\n\n\n引用使用场景\n按场景为参数选择按值、const 引用与非 const 引用，理解非空约定。\n\n\n指针使用场景\n用指针表达可空输入与可选输出，建立所有权选择的入口。\n\n\n★ 传参选型速查\n按赋值、引用、指针三种机制归并传参选型，类型只作机制下的例子。\n\n\n★ 返回值选型速查\n按返回方式归并选型，让结果类型而不用异常。\n\n\n[[nodiscard]]\n给不能无视的返回值加标注，用 static_cast&lt;void&gt; 表达有意的丢弃。\n\n\n类与封装\n用类保存计数，查询函数带 const。\n\n\n简单项目设计\n用值类型、类和外层适配组织小项目，避免过早拆分和抽象。",
+    "crumbs": [
+      "语言基础"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html",
+    "href": "content/language-basics/types-and-variables.html",
+    "title": "类型与变量",
+    "section": "",
+    "text": "选择基础类型\n程序需要保存数量、比例、状态和字符。类型说明一份数据能表示什么，变量则给这份数据一个可以在代码中使用的名字。本章讨论 C++ 内置类型与变量，字符串等文本类型由字符串章节承担。\n常见基础类型可以先这样理解：\n类型不是装饰：它会影响可表示的值、允许的运算和编译器能发现的错误。double 不是“更大的 int”，bool 也不是只能保存任意整数的容器。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#选择基础类型",
+    "href": "content/language-basics/types-and-variables.html#选择基础类型",
+    "title": "类型与变量",
+    "section": "",
+    "text": "类型\n适合表示\n示例\n\n\n\n\nint\n整数\ncount\n\n\ndouble\n近似小数\nratio\n\n\nbool\n真或假\nenabled\n\n\nchar\n单个字符\ngrade\n\n\n\n\n\ntypes-and-variables.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  int count{12};\n  double ratio{0.85};\n  bool enabled{true};\n  char grade{'A'};\n\n  std::cout &lt;&lt; \"数量: \" &lt;&lt; count &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; ratio &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; std::boolalpha &lt;&lt; \"已启用: \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"等级: \" &lt;&lt; grade &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#初始化与赋值",
+    "href": "content/language-basics/types-and-variables.html#初始化与赋值",
+    "title": "类型与变量",
+    "section": "初始化与赋值",
+    "text": "初始化与赋值\n声明变量时要写类型和名字，初始化则是在创建时给它第一个值，赋值是修改已经存在的变量：\n\n\n片段：声明、初始化与赋值\n\n// 片段\nint count{12};\ncount = count - 3;\nint remaining{count};\n\n变量的类型在创建后不会改变。需要表达数量时使用整数，需要表达是否成立时使用 bool，不要把所有数据都塞进 double 或 int。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#作用域",
+    "href": "content/language-basics/types-and-variables.html#作用域",
+    "title": "类型与变量",
+    "section": "作用域",
+    "text": "作用域\n写在函数外的名字处于全局作用域，整个翻译单元都可能看见它。写在一对花括号内的名字处于块作用域，离开代码块后就不能再使用：\n\n\n片段：全局作用域与块作用域\n\n// 片段\nint default_limit{1};  // 全局作用域：示例中的共享值\n\nint main() {\n  int count{12};      // main 的块作用域\n  {\n    int increment{3}; // 内层块作用域\n    count += increment;\n  }\n  // increment 在这里已经不可见。\n}\n\n全局可见不等于应该到处修改。可变全局状态会让代码难以测试。后续 const、constexpr 和自定义类型章节会继续说明更稳妥的组织方式。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#常见错误",
+    "href": "content/language-basics/types-and-variables.html#常见错误",
+    "title": "类型与变量",
+    "section": "常见错误",
+    "text": "常见错误\n\n字符当文本\nchar 用单引号表示一个字符，例如 'A'，多个字符的文本属于字符串主题。\n\n\n使用前没有初始化\n局部自动变量写成 int count; 后直接读取，没有可依赖的初始值，属于未定义行为，创建时使用 {} 或明确的初始值。\n\n\n过度使用全局变量\n全局作用域用于少量真正共享的值即可，会变化的状态优先放在更小的作用域中。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#自测问题",
+    "href": "content/language-basics/types-and-variables.html#自测问题",
+    "title": "类型与变量",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么比例适合用 double，数量适合用 int？\n全局作用域和块作用域的可见范围有什么不同？\ncount = 500; 与 int count{500}; 分别是什么动作？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/types-and-variables.html#本章回顾",
+    "href": "content/language-basics/types-and-variables.html#本章回顾",
+    "title": "类型与变量",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用 int、double、bool 和 char 表达基础数据，并能区分初始化、赋值以及全局和块作用域。可运行示例见 types-and-variables.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>类型与变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html",
+    "href": "content/language-basics/functions.html",
+    "title": "函数",
+    "section": "",
+    "text": "按值传入整数\n类型与变量用 int 保存数量。这一课把一次计算写成函数，调用后在终端看到结果。示例在 functions.cpp。\nDoubleOf 按值接收一个 int。函数里的 value 是调用方那个数的副本，改它不会改调用方的变量。\n井字棋里的 PlayerToCellState 也是按值接收、按值返回，见实现对局规则。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html#按值传入整数",
+    "href": "content/language-basics/functions.html#按值传入整数",
+    "title": "函数",
+    "section": "",
+    "text": "functions.cpp\n\nint DoubleOf(int value) {\n  return value * 2;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html#按值返回结果",
+    "href": "content/language-basics/functions.html#按值返回结果",
+    "title": "函数",
+    "section": "按值返回结果",
+    "text": "按值返回结果\nmain 把 21 交给 DoubleOf，把返回值放进 result，再打印。\n\n\nfunctions.cpp\n\n  int input{21};\n  int result = DoubleOf(input);\n  std::cout &lt;&lt; \"结果: \" &lt;&lt; result &lt;&lt; \"\\n\";\n\n运行后终端出现 结果: 42。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html#常见错误",
+    "href": "content/language-basics/functions.html#常见错误",
+    "title": "函数",
+    "section": "常见错误",
+    "text": "常见错误\n\n声明未调用\n写出 DoubleOf 之后如果 main 不调用它，终端不会出现 结果: 42。\n\n在 main 里调用，并把返回值交给输出。\n\n\n\n忘记返回计算结果\n函数声明返回 int，却没有 return，程序没有可依赖的结果。\n\n用 return 把算好的整数交还调用方。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html#自测问题",
+    "href": "content/language-basics/functions.html#自测问题",
+    "title": "函数",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n为什么 DoubleOf 里修改 value 不会改掉 main 里的 input？\n\n查看答案\n参数按值传递。value 是 input 的副本，两边各有自己的整数。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/functions.html#本章回顾",
+    "href": "content/language-basics/functions.html#本章回顾",
+    "title": "函数",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能编写一个按值接收整数、按值返回整数的函数，并打印调用结果。下一课分支和循环按编号选择一句输出，并打印一行数字。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>函数</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html",
+    "href": "content/language-basics/branch-and-loop.html",
+    "title": "分支和循环",
+    "section": "",
+    "text": "用 switch 选择一支\n函数已经能把计算结果交还调用方。这一课按 0、1、2 选择一句输出，并用循环打印一行。示例在 branch-and-loop.cpp。\ncode 等于 1 时，switch 进入 case 1，打印 一，然后 break。\n井字棋按终局状态选择「进行中」「平局」「X 获胜」或「O 获胜」，见实现对局规则。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html#用-switch-选择一支",
+    "href": "content/language-basics/branch-and-loop.html#用-switch-选择一支",
+    "title": "分支和循环",
+    "section": "",
+    "text": "branch-and-loop.cpp\n\n  int code{1};\n  switch (code) {\n    case 0:\n      std::cout &lt;&lt; \"空\\n\";\n      break;\n    case 1:\n      std::cout &lt;&lt; \"一\\n\";\n      break;\n    case 2:\n      std::cout &lt;&lt; \"二\\n\";\n      break;\n    default:\n      std::cout &lt;&lt; \"其他\\n\";\n      break;\n  }",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html#用-for-打印一行",
+    "href": "content/language-basics/branch-and-loop.html#用-for-打印一行",
+    "title": "分支和循环",
+    "section": "用 for 打印一行",
+    "text": "用 for 打印一行\n循环从 0 走到 2，数字之间加一个空格。终端第二行是 0 1 2。\n\n\nbranch-and-loop.cpp\n\n  for (int column = 0; column &lt; 3; ++column) {\n    std::cout &lt;&lt; column;\n    if (column &lt; 2) {\n      std::cout &lt;&lt; ' ';\n    }\n  }",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html#常见错误",
+    "href": "content/language-basics/branch-and-loop.html#常见错误",
+    "title": "分支和循环",
+    "section": "常见错误",
+    "text": "常见错误\n\ncase 后面漏掉 break\n没有 break 时，执行会掉进下一个 case，一次输入会打出两句。\n\n每个 case 打印之后写 break。\n\n\n\n循环条件多写等号\ncolumn &lt; 3 打印 0 1 2，写成 column &lt;= 3 会多打一个 3。\n\n上界用「小于个数」，不要用「小于等于最后一个下标」除非那就是你要的范围。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html#自测问题",
+    "href": "content/language-basics/branch-and-loop.html#自测问题",
+    "title": "分支和循环",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\ncode 为 1 时，为什么不会打印 空？\n\n查看答案\nswitch 只进入匹配的 case 1。case 0 的条件不成立。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/branch-and-loop.html#本章回顾",
+    "href": "content/language-basics/branch-and-loop.html#本章回顾",
+    "title": "分支和循环",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用 switch 在 0、1、2 里选一支，并用 for 打印一行。下一课初始化与推断区分创建变量和后来改值。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>分支和循环</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html",
+    "href": "content/language-basics/initialization-and-type-inference.html",
+    "title": "初始化与推断",
+    "section": "",
+    "text": "初始化与赋值\n创建对象时，初始值必须有明确来源。初始化发生在变量诞生时，赋值发生在变量已经存在之后。auto 则让编译器从初始化表达式推断类型。本章使用 C++11 引入的列表初始化和类型推断，并按 C++20 的规则观察结果。\n优先使用花括号初始化。空花括号会把基础类型初始化为零或对应的值，也能拒绝许多窄化转换：\n局部自动变量若只写 int count; 就直接读取，其值是不确定的，这类读取属于未定义行为。不要为了“看看会输出什么”而运行这种代码。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#初始化与赋值",
+    "href": "content/language-basics/initialization-and-type-inference.html#初始化与赋值",
+    "title": "初始化与推断",
+    "section": "",
+    "text": "片段：初始化与赋值\n\n// 片段\nint count{};            // 值初始化为 0\nint limit{100};         // 创建时得到 100\ncount = 80;             // 修改已有变量\n\n// int level{3.5};      // 编译失败：窄化转换\nint truncated = 3.5;    // 可编译，但结果为 3，不推荐",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#类型推断",
+    "href": "content/language-basics/initialization-and-type-inference.html#类型推断",
+    "title": "初始化与推断",
+    "section": "类型推断",
+    "text": "类型推断\nauto 不是动态类型。编译器在编译期根据初始化表达式确定类型，变量创建后仍保持该类型：\n\n\ninitialization-and-type-inference.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  int count{};\n  int limit{100};\n  count = 80;\n\n  auto value = 1200;      // int\n  auto ratio = 4.5;       // double\n  auto enabled = true;    // bool\n\n  value -= 100;\n  std::cout &lt;&lt; \"数量: \" &lt;&lt; count &lt;&lt; \"/\" &lt;&lt; limit &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"值: \" &lt;&lt; value &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; ratio &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; std::boolalpha &lt;&lt; \"已启用: \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n  return 0;\n}\n\n当右侧类型一眼可见时，auto 能减少重复，当类型本身就是接口意图时，显式写出类型更清楚。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#列表推导",
+    "href": "content/language-basics/initialization-and-type-inference.html#列表推导",
+    "title": "初始化与推断",
+    "section": "列表推导",
+    "text": "列表推导\nC++11 的 auto 与花括号组合有特殊规则。C++20 中，多个元素会推导为 std::initializer_list&lt;T&gt;，单个元素的直接列表初始化推导为该元素类型：\n\n\n片段：初始化列表推导\n\n// 片段\nauto one_value{10};           // int\nauto many_values{10, 20, 30}; // std::initializer_list&lt;int&gt;\nauto same_type = {10, 20};    // std::initializer_list&lt;int&gt;\n// auto mixed{10, 2.5};       // 编译失败：元素类型无法统一\n\nauto 仍然需要初始化表达式。auto value; 没有推断来源，会编译失败。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#常见错误",
+    "href": "content/language-basics/initialization-and-type-inference.html#常见错误",
+    "title": "初始化与推断",
+    "section": "常见错误",
+    "text": "常见错误\n\n初始化当赋值\n初始化只发生一次，之后的 = 是赋值，区分二者能避免误判对象何时获得第一个有效值。\n\n\n漏掉窄化检查\n列表初始化拒绝可能丢失信息的转换，遇到编译错误时先确认目标类型和数值范围，而不是马上改回 C 风格强转。\n\n\n误以为 auto 会改变类型\nauto 只在编译期推断一次，不会让变量在运行时从 int 变成 double。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#自测问题",
+    "href": "content/language-basics/initialization-and-type-inference.html#自测问题",
+    "title": "初始化与推断",
+    "section": "自测问题",
+    "text": "自测问题\n\ncount{} 和 count = 80 分别发生在什么时机？\nauto many_values{10, 20, 30}; 为什么不是一个 int？\n什么情况下显式类型比 auto 更能表达接口意图？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/initialization-and-type-inference.html#本章回顾",
+    "href": "content/language-basics/initialization-and-type-inference.html#本章回顾",
+    "title": "初始化与推断",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用列表初始化建立安全的初始值，并能解释 C++11 auto 与初始化列表的推导边界。示例见 initialization-and-type-inference.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>初始化与推断</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html",
+    "href": "content/language-basics/const-variables.html",
+    "title": "const 变量",
+    "section": "",
+    "text": "固定运行时值\n初始化与推断已经解决了“值从哪里来”。程序中的上限、比例和阈值通常是规则，而不是运行时随意修改的状态。把它们写成常量，可以让名字表达意图，也让编译器阻止误修改。本章把运行时固定的值写成 const 常量，编译期确定的规则值和头文件共享由下一章的 constexpr 承担。\nconst 变量必须在创建时初始化，创建后不能再赋值：\nconst 表示“不能通过这个名字修改”，不等于对象在所有路径上永远不可变。先问这个值是否代表规则或不应变化的事实，再决定是否使用它。运行时才知道的配置仍然适用：例如从配置文件读入之后不再修改的限值，写成 const 就能防止后续误改。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html#固定运行时值",
+    "href": "content/language-basics/const-variables.html#固定运行时值",
+    "title": "const 变量",
+    "section": "",
+    "text": "片段：常量的初始化与赋值\n\n// 片段\nint current_value{12};\nconst int kMaxCount{5};\n\n// kMaxCount = 6;  // 编译失败\ncurrent_value = 13; // 普通变量仍可修改",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html#命名常量",
+    "href": "content/language-basics/const-variables.html#命名常量",
+    "title": "const 变量",
+    "section": "命名常量",
+    "text": "命名常量\n完整示例输出两个常量的值：\n\n\nconst-variables.cpp\n\n#include &lt;iostream&gt;\n\nint main() {\n  const int kMaxCount{5};\n  const int kTimeoutMs{3000};\n\n  std::cout &lt;&lt; \"最大数量: \" &lt;&lt; kMaxCount &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"超时毫秒数: \" &lt;&lt; kTimeoutMs &lt;&lt; \"\\n\";\n  return 0;\n}\n\n项目约定常量使用 k 加大驼峰，例如 kMaxCount。名字应说明含义和单位：kTimeoutMs 的 Ms 表明单位是毫秒，使用者不必再查文档确认 3000 是秒还是毫秒。比例、时间等带单位的数值都适合把单位写进名字。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html#常见错误",
+    "href": "content/language-basics/const-variables.html#常见错误",
+    "title": "const 变量",
+    "section": "常见错误",
+    "text": "常见错误\n\n只声明不初始化 const\nconst int limit; 没有可用的初始值，会编译失败，常量的值必须在创建时给出。\n\n\n浮点用于精确比较\n需要精确计数或比较时优先使用合适的整数单位，比例等测量值才考虑 double，并在数值安全章节学习容差比较。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html#自测问题",
+    "href": "content/language-basics/const-variables.html#自测问题",
+    "title": "const 变量",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么 const 变量必须在创建时初始化？\n\n查看答案\n没有初始值就没有获得值的机会，之后也不能通过赋值补救，这样的变量没有可用状态，编译器直接拒绝。\n\nconst 保证对象在所有路径上永远不可变吗？\n\n查看答案\n不保证。const 只约束“不能通过这个名字修改”，对象仍可能通过其他途径改变。先判断值是否代表规则，再决定是否使用。\n\nkTimeoutMs 比 kTimeout 好在哪里？\n\n查看答案\n单位写进了名字，使用者不必查文档确认 3000 的含义，也降低了把秒当毫秒使用的概率。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-variables.html#本章回顾",
+    "href": "content/language-basics/const-variables.html#本章回顾",
+    "title": "const 变量",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能把不会改变的值写成有意义的 const 常量，并理解初始化要求。示例见 const-variables.cpp，下一章说明 constexpr 与多个 .cpp 共享的头文件常量。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>const 变量</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html",
+    "href": "content/language-basics/constexpr.html",
+    "title": "constexpr",
+    "section": "",
+    "text": "编译期规则\nconst 只保证不能通过这个名字修改，值仍可以到运行时才确定。constexpr 进一步要求初始化结果能够在编译期确定，适合表达数组长度、棋盘尺寸和固定阈值等规则值。本章还会比较普通 constexpr 与头文件中的 inline constexpr，并说清 constexpr 函数的定义为何要放头文件、哪些函数才值得这么写。\nconstexpr 变量创建后不可修改，初始化结果必须在编译期确定，是比 const 更严的常量：const 的修改限制同样满足，另加编译期确定一条。运行时才能确定的值只能用 const：\n数组长度这类要求编译期常量的位置只能接受 constexpr。完整示例还包含一个极简谓词函数，输入落在区间内就返回 true：",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#编译期规则",
+    "href": "content/language-basics/constexpr.html#编译期规则",
+    "title": "constexpr",
+    "section": "",
+    "text": "片段：编译期与运行时的分界\n\n// 片段\nint input{};\nstd::cin &gt;&gt; input;\nconst int kLimit{input};        // 运行时才知道，const 足够\nconstexpr int kThreshold{5000}; // 编译期确定\n\n// constexpr int kMax{kLimit};  // 编译失败：kLimit 编译期未知\n\n\n\n\nconstexpr.cpp\n\n#include &lt;iostream&gt;\n\nconstexpr bool IsInRange(int value, int low, int high) {\n  return value &gt;= low && value &lt;= high;\n}\n\nint main() {\n  constexpr int kThreshold{5000};\n  constexpr double kRatio{0.90};\n\n  std::cout &lt;&lt; \"阈值: \" &lt;&lt; kThreshold &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"比例: \" &lt;&lt; kRatio &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; std::boolalpha\n            &lt;&lt; \"4200 在区间内: \" &lt;&lt; IsInRange(4200, 0, kThreshold) &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#头文件常量",
+    "href": "content/language-basics/constexpr.html#头文件常量",
+    "title": "constexpr",
+    "section": "头文件常量",
+    "text": "头文件常量\n项目公共常量通常写在头文件里，供多个 .cpp 包含。常规写法是具名命名空间加 inline constexpr：\n\n\n片段：头文件中的共享常量\n\n// 片段：board_constants.h\nnamespace board {\n  inline constexpr int kRows{3};\n  inline constexpr int kCols{3};\n}\n// 包含该头文件的每个 .cpp 里都写 board::kRows，\n// 多份包含不会产生重复定义\n\n命名空间的分组规则见命名空间。tictactoe::kRows 是带限定名的共享常量。命名空间作用域的 const 与 constexpr 变量默认内部链接，每个 .cpp 各有一份拷贝，通常无害但地址不共享。inline（C++17 起可用于变量）把多份拷贝合并成一个。局部 constexpr 不参与链接，不能加 inline。\n推荐次序是：项目公共常量放在具名命名空间里加 inline constexpr，只在单个 .cpp 使用的常量就近放在函数内或该文件的匿名命名空间里，裸的全局常量尽量不用。\n井字棋工程的行数采用同一写法，见 board.h 里的 kRows。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#常量与函数",
+    "href": "content/language-basics/constexpr.html#常量与函数",
+    "title": "constexpr",
+    "section": "常量与函数",
+    "text": "常量与函数\n头文件里常量与函数对 inline 的要求不同。一句话规则：常量要显式 inline，函数写 constexpr 就够。\n\n\n\n\n\n\n\n\n\n实体\nconstexpr 是否隐含 inline\n头文件写法\n\n\n\n\n命名空间作用域常量\n否\n显式写 inline constexpr\n\n\n自由函数\n是，首次声明即隐式\n只写 constexpr\n\n\n类内 static constexpr 数据成员\n是，C++17 起隐式\n只写 static constexpr\n\n\n\n\n三种写法放在同一个头文件里对照：\n\n\n片段：常量与函数的 inline 写法对照\n\n// 片段：board_constants.h\nnamespace board {\n  // constexpr int kRows{3};      // 不佳：缺 inline，每个 .cpp 各有一份拷贝\n  inline constexpr int kRows{3};  // 正确：多份包含共享同一实体\n\n  constexpr bool IsValid(int row, int col);  // 正确：函数隐式 inline\n\n  struct Board {\n    static constexpr int kSize{9};  // 正确：static constexpr 成员隐式 inline\n  };\n}\n\n类内 static constexpr 成员与命名空间变量不要混为一谈：前者随 constexpr 隐式 inline，后者必须显式写出。选型依据的完整对照见常量关键字对照表。\n\ninline 的取舍\nconstexpr 常量加不加 inline，编译都能通过，差别在使用中显现：\n\n不加 inline：每个 .cpp 一份拷贝，值相同、地址不同。只读取值时没有影响。取地址或绑定引用跨翻译单元使用时，同一常量有多个地址。\n加 inline：所有翻译单元共享同一个实体，地址唯一，多份包含不产生重复定义。\n普通（非 const、非 inline）全局变量写在头文件里，缺了 inline 会在链接期报重复定义。编译往往还能通过，问题推迟到链接期才出现，排查时先想到这一层。\n\n需要跨翻译单元共享同一实体时，显式写 inline constexpr。\n\n\n自由函数与 inline\n头文件中的 constexpr 自由函数隐式 inline，可直接放在头文件供多个 .cpp 包含；函数内常量不能也不必写 inline，典型形态是谓词：\n\n\n片段：头文件中的谓词\n\n// 片段：board_constants.h\nnamespace board {\n  inline constexpr int kRows{3};\n  inline constexpr int kCols{3};\n\n  struct Position {\n    int row;\n    int col;\n  };\n\n  constexpr bool IsValid(Position position) {\n    return position.row &gt;= 0 && position.row &lt; kRows && position.col &gt;= 0 &&\n           position.col &lt; kCols;\n  }\n}\n// 谓词是隐式 inline 的函数，多份包含不会产生重复定义\n\n\n\n定义在头文件\nconstexpr 函数要在编译期求值，调用点必须看得到完整函数体。定义放在 .cpp 里时，其他 .cpp 只看到声明，编译期调用直接失败：\n\n\n片段：定义放错位置的 constexpr 函数\n\n// 片段：math_utils.h\nconstexpr int Square(int n);  // 只有声明\n\n// 片段：math_utils.cpp\nconstexpr int Square(int n) {\n  return n * n;\n}\n\n// 片段：main.cpp\n#include \"math_utils.h\"\n\nconstexpr int kArea{Square(3)};  // 编译失败：调用点看不到函数体\n\n普通函数拆成「头文件声明、.cpp 定义」没有问题：编译器先记住有这个函数，链接器再把调用接到定义上。编译期求值发生在编译单个 .cpp 的时候，编译器只看得到本文件，定义必须随头文件进入每个用到它的翻译单元。\n定义跟着头文件会产生多份拷贝，constexpr 函数隐式 inline，链接阶段只保留一份，不会重复定义；前文的 IsValid 谓词正是这样放进头文件的。\n值得放进头文件的是需要编译期求值的函数：编译期查表、单位换算，以及井字棋工程里由 Player 得到 CellState 的简单映射（见 game.h 里的 PlayerToCellState）。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#标准演化",
+    "href": "content/language-basics/constexpr.html#标准演化",
+    "title": "constexpr",
+    "section": "标准演化",
+    "text": "标准演化\n能力随标准逐步扩展，遇到旧代码时知道关键节点即可：\n\n\n\n\n\n\n\n\n标准节点\n与常量相关的变化\n\n\n\n\nC++11\n引入变量与函数形式，函数限制很严\n\n\nC++14\n放宽函数能写的语句\n\n\nC++17\n引入 inline 变量，头文件里 inline constexpr 成为公共常量的常规写法，类内 static constexpr 数据成员隐式 inline\n\n\nC++17 之前\n头文件常量常靠枚举、宏或只在一个 .cpp 里定义来规避链接问题\n\n\nC++20\n新增 consteval 与 constinit，对比细节见下一章",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#常见错误",
+    "href": "content/language-basics/constexpr.html#常见错误",
+    "title": "constexpr",
+    "section": "常见错误",
+    "text": "常见错误\n\n头文件全局变量\n头文件会被多个 .cpp 包含，普通全局变量在链接时报重复定义，共享常量写成 inline constexpr。\n\n\n函数内常量加 inline\ninline 描述跨翻译单元共享，只用于命名空间或类作用域，写在函数体内会直接编译失败，局部常量写 constexpr 就够。\n\n\n函数全部 constexpr\n头文件里的函数体每改一次，所有包含它的 .cpp 都要重新编译，普通运行期函数不要跟着搬。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#自测问题",
+    "href": "content/language-basics/constexpr.html#自测问题",
+    "title": "constexpr",
+    "section": "自测问题",
+    "text": "自测问题\n\n运行时才能确定的输入为什么不能写成 constexpr？\n\n查看答案\nconstexpr 要求初始化结果在编译期确定，运行时输入的值没有编译期答案，只能用 const。\n\n头文件里的公共常量为什么写成 inline constexpr？\n\n查看答案\nconstexpr 保证编译期确定且不可修改，inline 让所有翻译单元共享同一个实体，多份包含不会重复定义。\n\nC++17 的 inline 变量解决了什么问题？\n\n查看答案\n在此之前头文件常量要靠枚举、宏或“只在一个 .cpp 里定义”规避链接问题。inline 变量让定义直接写在头文件里且只保留一份实体。\n\n头文件里的 constexpr 谓词要不要显式写 inline？\n\n查看答案\n不需要。constexpr 函数隐式 inline，定义放进头文件供多个 .cpp 包含也不会重复定义。显式写出不算错误，只是冗余。\n\nconstexpr 函数的定义放在头文件里和放在 .cpp 里有什么区别？\n\n查看答案\n头文件里的定义让每个包含它的 .cpp 都看到完整函数体，调用能在编译期求值，也便于编译器内联；多份副本由隐式 inline 在链接期合并，不重复定义。放在 .cpp 里时，其他 .cpp 只有声明，编译期调用直接编译失败。代价是头文件函数体每改一次，所有包含它的 .cpp 都要重新编译。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constexpr.html#本章回顾",
+    "href": "content/language-basics/constexpr.html#本章回顾",
+    "title": "constexpr",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能区分 const 与 constexpr 的适用条件，把共享常量与简单谓词放进头文件，并说出 constexpr 函数定义放头文件的原因。示例见 constexpr.cpp，下一章把同族关键词放进一张对照表。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>constexpr</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html",
+    "href": "content/language-basics/constant-keywords.html",
+    "title": "常量关键词",
+    "section": "",
+    "text": "关键词对照\n前两章分别讲了 const 和 constexpr。C++ 还提供 consteval 与 constinit，历史代码里也会遇到用宏和枚举定义的常量。本章把同族关键词放进一张表，解决“什么时候用哪个”的选型问题。\nC++11 之前，枚举值承担过整型常量的角色。如今这个角色首选仍是 constexpr。consteval 与 constinit 各自解决更专门的问题，遇到时按上表定位。头文件里常量与函数对 inline 要求不同的完整对照，见 constexpr 的「常量与函数」。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html#关键词对照",
+    "href": "content/language-basics/constant-keywords.html#关键词对照",
+    "title": "常量关键词",
+    "section": "",
+    "text": "关键词\n可变性\n求值时机\n链接与共享\n典型场景\n\n\n\n\nconst\n不可通过该名字修改\n允许运行时确定\n命名空间作用域默认内部链接\n运行时配置、读入后不再修改的值\n\n\nconstexpr\n同 const，并要求编译期确定\n编译期\n头文件共享用 inline constexpr\n尺寸、阈值等编译期规则\n\n\nconsteval\n修饰函数：调用必须发生在编译期\n强制编译期\n修饰函数而非变量\n只在编译期使用的计算\n\n\nconstinit\n初始化在编译期完成，对象本身仍可修改\n编译期初始化\n常与全局变量配合\n保证静态变量启动时已初始化\n\n\n#define\n无类型、文本替换\n预处理期\n无作用域、无类型\n历史代码，新代码不用于常量",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html#场景选型",
+    "href": "content/language-basics/constant-keywords.html#场景选型",
+    "title": "常量关键词",
+    "section": "场景选型",
+    "text": "场景选型\n选型只看值从哪里来、放在哪里：\n\n运行时才知道的配置用 const。\n编译期规则或尺寸用 constexpr，写在供多个 .cpp 共享的头文件里时加 inline。\n只在编译期完成的计算用 consteval。\n需要保证静态存储期变量在启动时完成初始化的场景用 constinit。\n有类型的常量不用 #define。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html#常见错误",
+    "href": "content/language-basics/constant-keywords.html#常见错误",
+    "title": "常量关键词",
+    "section": "常见错误",
+    "text": "常见错误\n\nconst 与 constexpr 混同\n二者都阻止通过该名字修改，但 constexpr 还要求初始化结果在编译期确定，运行时才知道的配置仍然使用 const。\n\n\n用 #define 定义有类型常量\n#define kMaxCount 5 没有类型和作用域，替换发生在预处理期，报错也难读；写成 constexpr int kMaxCount{5}; 后，类型检查和作用域规则全部生效。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html#自测问题",
+    "href": "content/language-basics/constant-keywords.html#自测问题",
+    "title": "常量关键词",
+    "section": "自测问题",
+    "text": "自测问题\n\n运行时读入的配置值选 const 还是 constexpr？\n\n查看答案\n选 const。值在编译期未知，不满足 constexpr 的编译期要求，读入后不再修改正是 const 的场景。\n\n供多个 .cpp 共享的头文件里的棋盘尺寸常量应该怎么写？\n\n查看答案\n放在具名命名空间里写成 inline constexpr，例如 board::kRows，所有包含该头文件的 .cpp 共享同一个实体。\n\n为什么新代码不用 #define 定义有类型常量？\n\n查看答案\n宏没有类型和作用域，只是预处理期的文本替换。constexpr 变量保留类型检查、作用域规则和更好的错误信息。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/constant-keywords.html#本章回顾",
+    "href": "content/language-basics/constant-keywords.html#本章回顾",
+    "title": "常量关键词",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能按“值从哪里来、放在哪里”做常量关键词选型。用 const-variables.cpp 和 constexpr.cpp 练习判断每个常量的选法，下一章进入类型与边界。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>常量关键词</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html",
+    "title": "类型与边界",
+    "section": "",
+    "text": "大小与范围\n数量、测量值和索引都会遇到边界：类型大小不够会溢出，浮点数会有舍入误差，混合有符号和无符号也可能改变比较结果。本章把这些高频问题整理成可检查的规则。\n标准不保证 int 永远是 32 位，也不保证 long 一定比 int 大。大小用 sizeof(T) 查看，范围用 &lt;limits&gt; 查询；需要明确宽度时选 &lt;cstdint&gt; 的 std::int32_t 等定宽类型。\nsizeof 的结果类型是 std::size_t。浮点类型的有效数字、最小正值和最大值也应从 std::numeric_limits&lt;float&gt; 或 double 查询，而不是凭记忆猜测。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#大小与范围",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#大小与范围",
+    "title": "类型与边界",
+    "section": "",
+    "text": "type-safety-and-numeric-bounds.cpp\n\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n#include &lt;limits&gt;\n\nint main() {\n  std::cout &lt;&lt; \"int 字节数: \" &lt;&lt; sizeof(int) &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"int 最大值: \" &lt;&lt; std::numeric_limits&lt;int&gt;::max() &lt;&lt; \"\\n\";\n  std::int32_t value{1000};\n  std::cout &lt;&lt; \"明确宽度的值: \" &lt;&lt; value &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#符号与溢出",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#符号与溢出",
+    "title": "类型与边界",
+    "section": "符号与溢出",
+    "text": "符号与溢出\nint、long 默认有符号，加上 unsigned 后只能表示非负值。无符号溢出按 2^N 回绕、有定义，有符号溢出是未定义行为，编译器可能激进优化，不要为“装更多正数”改成 unsigned，也不要混用两者。\n\n\n片段：安全观察无符号边界\n\n// 片段\n#include &lt;limits&gt;\n\nunsigned int value{std::numeric_limits&lt;unsigned int&gt;::max()};\n++value;  // 回绕到 0，有定义\n\n// int signed_value{std::numeric_limits&lt;int&gt;::max()};\n// ++signed_value;  // 有符号溢出：未定义行为，不要运行\n\n数组越界、空指针解引用和读取未初始化变量同样属于未定义行为。它不是“每次随机”，而是意味着编译器可以假设这条路径不会发生。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#定宽整数",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#定宽整数",
+    "title": "类型与边界",
+    "section": "定宽整数",
+    "text": "定宽整数\n标准只保证 int 的最小范围，工程代码不让读者假设它的宽度，宽度或符号是接口约定的一部分时，直接选定 &lt;cstdint&gt; 的定宽有符号类型：\n\n棋盘坐标是典型场景：玩家输入可能越界到负数行列，边界判定需要识别非法输入，有符号类型才表达得了；\n棋盘尺寸、kCellCount、行列坐标与循环下标因此统一用 std::int32_t。kCellCount 就是行数乘列数，乘积不再拓宽。std::size_t 只在把已经算好的下标交给 std::array::at 时出现一次；\n这组约定的用法见姊妹仓库的实现棋盘存储。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#显式转换",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#显式转换",
+    "title": "类型与边界",
+    "section": "显式转换",
+    "text": "显式转换\n隐式转换可能悄悄发生，例如 int 转 double、double 转 int，或有符号转无符号。需要转换时优先写出意图：\n\n\n片段：显式转换\n\n// 片段\ndouble value{19.99};\nint whole_value{static_cast&lt;int&gt;(value)};  // 截断为 19\ndouble ratio{static_cast&lt;double&gt;(whole_value)};\n\n大整数转小整数可能截断，浮点转整数会丢掉小数部分。避免 (int)value 这种 C 风格强转，因为它隐藏了转换类别。\n两个整数相除时，结果会向零截断，例如 7 / 2 得到 3，余数用 % 获取。整数除以零仍是未定义行为，计算前要验证除数。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#浮点与-bool",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#浮点与-bool",
+    "title": "类型与边界",
+    "section": "浮点与 bool",
+    "text": "浮点与 bool\n二进制浮点数通常不能精确表示十进制小数，所以 0.1 + 0.2 不应直接与 0.3 用 == 比较，比较时使用与问题尺度匹配的容差，还要识别 NaN 和无穷大。浮点除以零产生 inf 或 nan，同样不应忽略。\n\n\n片段：浮点与 bool\n\n// 片段\n#include &lt;cmath&gt;\n#include &lt;iostream&gt;\n\ndouble a{0.1 + 0.2};\nbool close_enough{std::abs(a - 0.3) &lt; 1e-9};\nbool enabled{static_cast&lt;bool&gt;(2)};  // 非 0 转为 true\nstd::cout &lt;&lt; std::boolalpha &lt;&lt; close_enough &lt;&lt; \" \" &lt;&lt; enabled &lt;&lt; \"\\n\";\n\n默认输出 bool 是 1 或 0，std::boolalpha 才会输出 true 或 false。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#其他边界",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#其他边界",
+    "title": "类型与边界",
+    "section": "其他边界",
+    "text": "其他边界\n\nchar 是否带符号由实现决定，存文本字符时不要把它当成固定范围的有符号整数。\n整数文字量的类型由后缀和能容纳它的候选类型决定，需要明确宽度时写出目标类型并检查转换。\nstd::size_t 常用于大小和下标。它是无符号类型，与 int 比较前先统一类型，避免负数转换成很大的正数。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#常见错误",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#常见错误",
+    "title": "类型与边界",
+    "section": "常见错误",
+    "text": "常见错误\n\n等号比较浮点数\n改用容差，并先处理 NaN、无穷大和单位尺度。\n\n\n无符号当安全整数\n无符号只改变范围和溢出规则，不能防止越界、错误比较或逻辑错误。\n\n\n强转压掉警告\n先确认范围、单位和符号，再选择 static_cast 或修改数据模型。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#自测问题",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#自测问题",
+    "title": "类型与边界",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么要用 &lt;limits&gt; 和 &lt;cstdint&gt;，而不是假定 int 为 32 位？\n无符号回绕和有符号溢出的标准语义有什么不同？\n为什么 std::size_t 与 int 混合比较可能隐藏错误？",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/type-safety-and-numeric-bounds.html#本章回顾",
+    "href": "content/language-basics/type-safety-and-numeric-bounds.html#本章回顾",
+    "title": "类型与边界",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能查询基础类型的真实边界，区分有定义回绕与未定义行为，并对转换、浮点和 bool 使用安全写法。示例见 type-safety-and-numeric-bounds.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>类型与边界</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enums.html",
+    "href": "content/language-basics/enums.html",
+    "title": "普通枚举",
+    "section": "",
+    "text": "enum 的边界\n对局状态、配置档位这类数据只取有限的几个值。用 int 编号表达它们时，任何整数都是合法赋值，类型系统帮不上忙。从 C 语言继承的普通 enum 迈出了第一步，但留下作用域和转换两个缺口，本章把它们看清楚，下一章再引入 enum class 补上。\n普通 enum 沿袭 C 语言的规则：枚举名直接进入外层作用域，并且能向整数隐式转换：\n隐式转换让“误赋一个无关整数”通过编译，外层作用域则让 Red 这类短名字容易与其它名字冲突。两个问题同根同源：枚举值在编译器眼里仍然是整数，没有自己的类型边界。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>普通枚举</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enums.html#enum-的边界",
+    "href": "content/language-basics/enums.html#enum-的边界",
+    "title": "普通枚举",
+    "section": "",
+    "text": "片段：普通 enum 的两个问题\n\nenum Color { Red, Green };\nint value = Red;  // 枚举值隐式转换成 int，编译器不报错",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>普通枚举</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enums.html#类型边界",
+    "href": "content/language-basics/enums.html#类型边界",
+    "title": "普通枚举",
+    "section": "类型边界",
+    "text": "类型边界\n想要的安全性质：取值只限于列出的几个名字，赋错值编译失败，枚举名不污染外层作用域。普通 enum 给不了这些，enum class 能给全：枚举值限定在类型名内，与整数切断隐式转换。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>普通枚举</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enums.html#自测问题",
+    "href": "content/language-basics/enums.html#自测问题",
+    "title": "普通枚举",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n普通 enum 有哪两个问题？\n\n查看答案\n枚举名直接进入外层作用域，短名字容易冲突。枚举值能向整数隐式转换，误赋无关整数也能通过编译。\n\n为什么说这两个问题同根同源？\n\n查看答案\n两者都源于普通 enum 的枚举值在类型层面仍是整数：编译器不做类型边界检查，作用域规则也停留在 C 语言的整型常量时代。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>普通枚举</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enums.html#本章回顾",
+    "href": "content/language-basics/enums.html#本章回顾",
+    "title": "普通枚举",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能识别普通 enum 的作用域泄漏与隐式转换两个问题。下一章用 enum class 补上类型边界，并给出底层类型、成员注释与按值传参的写法。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>普通枚举</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html",
+    "href": "content/language-basics/enum-class.html",
+    "title": "枚举类",
+    "section": "",
+    "text": "限定名访问\n普通 enum 的作用域泄漏与隐式转换缺一个类型边界。enum class 把枚举值限定在类型名内，并与整数切断隐式转换，让“取值只限于列出的几个名字”成为编译器强制执行的规则。本章给出限定名访问、底层类型与成员注释的写法，再说明枚举类如何像普通值一样用在参数与返回值里。\n完整示例定义多套封闭取值：对局状态、对局玩家与棋盘格子状态，并演示状态赋值、编号输出，以及由玩家得到格子状态的函数：\nGameState::kWin 的 :: 表示取 GameState 类型内的值。枚举值只能与同类型值比较或赋值，state = 1; 和把 state 直接赋给 int 都通不过编译。需要编号时用 static_cast&lt;int&gt; 写出转换意图，它只用于输出或与既有接口对接，不参与算术。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#限定名访问",
+    "href": "content/language-basics/enum-class.html#限定名访问",
+    "title": "枚举类",
+    "section": "",
+    "text": "enum-class.cpp\n\n// 枚举类示例：封闭取值的状态类型、底层类型与按值传参。\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n\n// 对局状态\nenum class GameState : std::uint8_t {\n  kOngoing = 0,  // 对局尚未结束，可继续落子。\n  kWin = 1,      // 一方达成三连获胜。\n  kDraw = 2,     // 棋盘下满且无人三连。\n};\n\n// 对局玩家：kX 先手，kO 后手。\nenum class Player : std::uint8_t {\n  kX = 0,\n  kO = 1,\n};\n\n// 棋盘格子状态\nenum class CellState : std::uint8_t {\n  kEmpty = 0,  // 空格。\n  kX = 1,\n  kO = 2,\n};\n\n// 由对局玩家得到落子用的棋盘格子状态。\nCellState PlayerToCellState(Player player) {\n  return player == Player::kX ? CellState::kX : CellState::kO;\n}\n\nint main() {\n  GameState state{GameState::kOngoing};\n  std::cout &lt;&lt; \"初始状态编号: \" &lt;&lt; static_cast&lt;int&gt;(state) &lt;&lt; \"\\n\";\n  state = GameState::kWin;\n  std::cout &lt;&lt; \"当前状态编号: \" &lt;&lt; static_cast&lt;int&gt;(state) &lt;&lt; \"\\n\";\n\n  Player current{Player::kO};\n  CellState mark = PlayerToCellState(current);\n  std::cout &lt;&lt; \"当前玩家状态编号: \" &lt;&lt; static_cast&lt;int&gt;(mark) &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#底层类型",
+    "href": "content/language-basics/enum-class.html#底层类型",
+    "title": "枚举类",
+    "section": "底层类型",
+    "text": "底层类型\n枚举的底层整数类型默认由实现选择，显式写出后存储宽度就固定下来。这份笔记与姊妹仓库的工程代码把显式写出底层类型定为状态码类的默认约定，让对象布局可预测：\n\n示例中的 enum class GameState : std::uint8_t 用 8 位无符号整数存放三个状态；\nGoogle 与 LLVM 的风格指南都不强制写底层类型，工程约定让同类代码写法一致；\n姊妹仓库井字棋的值类型就是这个写法，见 board.h。\n\n成员说明写在定义上一行与行尾：不自明的成员必须全部有行尾注释，禁止半套；自明成员不加注释。多条行尾注释时 // 列对齐：\n\n\n片段：成员注释的位置\n\n// 对局玩家：kX 先手，kO 后手。\nenum class Player : std::uint8_t {\n  kX = 0,\n  kO = 1,\n};\n\nkX 与 kO 的含义从名字就能读出，都不写注释，先手规则写在类型上一行。同一枚举内不自明的成员则要全部补上行尾注释，不留下「是不是漏写了一条」的疑问。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#参数与返回值",
+    "href": "content/language-basics/enum-class.html#参数与返回值",
+    "title": "枚举类",
+    "section": "参数与返回值",
+    "text": "参数与返回值\nenum class 定义的类型和 int 一样是值类型：拷贝廉价、语义完整，可直接出现在函数参数与返回类型里，不需要引用或指针陪同，示例中的 PlayerToCellState 按值收一个 Player、按值返回一个 CellState：\n\n\n片段：枚举类按值传参\n\n// 由对局玩家得到落子用的棋盘格子状态。\nCellState PlayerToCellState(Player player) {\n  return player == Player::kX ? CellState::kX : CellState::kO;\n}\n\n调用处写 PlayerToCellState(Player::kX)，拿到的是独立的 CellState 值，与 int 参数的传递方式没有区别。什么时候该按值传、什么时候该用引用或指针，速查见 ★ 传参选型速查 与 ★ 返回值选型速查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#常见错误",
+    "href": "content/language-basics/enum-class.html#常见错误",
+    "title": "枚举类",
+    "section": "常见错误",
+    "text": "常见错误\n\n漏写 class 泄漏名字\nenum Color { Red }; 的 Red 直接进入外层作用域，并且能与整数隐式转换，失去类型保护，统一写 enum class。\n\n\n枚举值当整数\n枚举值与 int 之间没有隐式转换，参与算术或存入整型变量都会编译失败，需要编号时先想清楚是否必要，再写出 static_cast。\n\n\n用点号访问枚举值\nCellState.kX 把类型名当成了对象，通不过编译；clangd 的报错指向枚举声明行，容易让人误判，枚举值要用 CellState::kX 访问。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#自测问题",
+    "href": "content/language-basics/enum-class.html#自测问题",
+    "title": "枚举类",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\nenum class GameState : std::uint8_t 里的 : std::uint8_t 起什么作用？\n\n查看答案\n它把枚举的底层整数类型固定为 8 位无符号整数，枚举的存储宽度不再由实现选择。风格指南不强制这样写，这份笔记与姊妹仓库的工程代码把它定为状态码类的默认约定。\n\n枚举类能像 int 一样按值传参和返回吗？\n\n查看答案\n能。enum class 与 int 同属值类型，拷贝廉价，可以直接出现在参数与返回类型里，例如 CellState PlayerToCellState(Player player)。什么时候选按值、引用或指针，见两张选型速查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/enum-class.html#本章回顾",
+    "href": "content/language-basics/enum-class.html#本章回顾",
+    "title": "枚举类",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能用 enum class 定义封闭取值集合，按约定写底层类型与成员注释，也能让枚举类型像 int 一样按值进出函数。完整示例见 enum-class.cpp，下一章用命名空间给名字分组。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>枚举类</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html",
+    "href": "content/language-basics/namespaces.html",
+    "title": "命名空间",
+    "section": "",
+    "text": "同名常量\n封闭取值的类型有了，工程里还会遇到另一类组织问题：不同模块出现同名实体，调用处需要分清一个名字来自哪个分组。命名空间把相关的常量、类型和函数收在一个名字下。本章在 枚举类 的类型手段之外补上这一分组手段。\n命名空间用限定名区分同名实体，片段里的两个 kSize 互不冲突：\n限定名说明了值来自哪个分组，同一工程的不同模块因此可以各自拥有同名实体。完整示例把两个分组放进一个程序并分别输出：",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html#同名常量",
+    "href": "content/language-basics/namespaces.html#同名常量",
+    "title": "命名空间",
+    "section": "",
+    "text": "片段：同名常量放在不同命名空间\n\nnamespace board {\nconstexpr int kSize{3};\n}\n\nnamespace config {\nconstexpr int kSize{16};\n}\n// 访问时写 board::kSize 与 config::kSize，两个同名常量互不冲突\n\n\n\n\nnamespaces.cpp\n\n// 命名空间示例：同名常量放在不同命名空间并分别输出。\n#include &lt;iostream&gt;\n\nnamespace board {\nconstexpr int kSize{3};\n}\n\nnamespace config {\nconstexpr int kSize{16};\n}\n\nint main() {\n  std::cout &lt;&lt; \"棋盘尺寸: \" &lt;&lt; board::kSize &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"配置尺寸: \" &lt;&lt; config::kSize &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html#分组约定",
+    "href": "content/language-basics/namespaces.html#分组约定",
+    "title": "命名空间",
+    "section": "分组约定",
+    "text": "分组约定\n项目代码把同一游戏的类型收进一个命名空间，如井字棋值类型定义在 tictactoe 命名空间中：\n\n常量名按约定用 k 加大驼峰，头文件里供多个 .cpp 共享的常量还要加 inline，写法见 constexpr；\n命名空间本身用小写加下划线命名，名字表达分组的内容，不表达“utils”“helpers”这类笼统职责。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html#常见错误",
+    "href": "content/language-basics/namespaces.html#常见错误",
+    "title": "命名空间",
+    "section": "常见错误",
+    "text": "常见错误\n\n在头文件里写 using namespace\nusing namespace board; 会把整个分组的名字倒进包含它的文件，同名实体重新变得难以分辨：\n\n头文件被多处包含时影响面更大，头文件里不要写；\n需要频繁使用某个分组时，把 using 限定在 .cpp 文件内部，或直接写限定名。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html#自测问题",
+    "href": "content/language-basics/namespaces.html#自测问题",
+    "title": "命名空间",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n命名空间解决什么问题？\n\n查看答案\n它把相关的名字分组，避免不同模块的同名实体冲突，调用处用限定名选择具体分组。\n\n为什么头文件里不写 using namespace？\n\n查看答案\n它把整个分组的名字倒进包含它的文件，同名冲突重新出现。头文件被多处包含时影响面最大，需要时把 using 限定在 .cpp 内部。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/namespaces.html#本章回顾",
+    "href": "content/language-basics/namespaces.html#本章回顾",
+    "title": "命名空间",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能用命名空间给名字分组，用限定名区分同名实体。完整示例见 namespaces.cpp，下一章用 struct 把相关的数据组合成值类型。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>命名空间</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html",
+    "href": "content/language-basics/structs-and-value-types.html",
+    "title": "结构与值类型",
+    "section": "",
+    "text": "组合数据\n单个 int 或 double 表达不了“一个位置”这种成组出现的数据。struct 把几个相关的值收进一个类型，实例之间按值复制、互不影响。本章建立聚合与值语义的心智模型，成员函数和访问控制留给后面的自定义类型章节。\nstruct 逐个声明成员并给出默认值，完整示例表达棋盘上的两个位置：\nPosition start{1, 2}; 按成员声明顺序初始化 x 和 y，省略的成员使用默认值，例如 Position corner{2}; 的 y 是 0。访问成员用 .，例如 start.x。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html#组合数据",
+    "href": "content/language-basics/structs-and-value-types.html#组合数据",
+    "title": "结构与值类型",
+    "section": "",
+    "text": "structs-and-value-types.cpp\n\n// 结构体与值类型示例：用 struct 聚合坐标成员并逐个输出。\n#include &lt;iostream&gt;\n\nstruct Position {\n  int x{0};\n  int y{0};\n};\n\nint main() {\n  Position start{1, 2};\n  Position finish{2, 2};\n  std::cout &lt;&lt; \"起点: \" &lt;&lt; start.x &lt;&lt; \",\" &lt;&lt; start.y &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"终点: \" &lt;&lt; finish.x &lt;&lt; \",\" &lt;&lt; finish.y &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html#复制的是值",
+    "href": "content/language-basics/structs-and-value-types.html#复制的是值",
+    "title": "结构与值类型",
+    "section": "复制的是值",
+    "text": "复制的是值\n\n\n片段：复制后的两个独立对象\n\n// 片段\nPosition a{1, 2};\nPosition b = a;  // 复制 a 的全部成员\nb.x = 9;         // 只修改 b\n// a.x 仍是 1\n\n把结构体赋给新变量会复制全部成员的值，修改其中一个不影响另一个，这是值类型的行为。想让两个名字指向同一份数据，需要引用或指针，选型方式见下一章引用使用场景。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html#常见错误",
+    "href": "content/language-basics/structs-and-value-types.html#常见错误",
+    "title": "结构与值类型",
+    "section": "常见错误",
+    "text": "常见错误\n\n初始化值顺序错\n聚合初始化按声明顺序对应成员，{1, 2} 与 {2, 1} 是两个不同位置，成员多时在初始化旁注释各值，或拆成更小的类型。\n\n\n以为复制共享成员\n结构体变量各自持有独立的成员值，把“复制后还联动”的期待留给引用与指针章节处理。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html#自测问题",
+    "href": "content/language-basics/structs-and-value-types.html#自测问题",
+    "title": "结构与值类型",
+    "section": "自测问题",
+    "text": "自测问题\n\nPosition p{2}; 之后 p.y 是什么？\n\n查看答案\n是 0：初始化列表只提供 x 的值，y 使用成员声明里的默认值。\n\n把 a 赋给 b 之后修改 b.x，a.x 会跟着变吗？\n\n查看答案\n不会。赋值复制了全部成员，两个对象互不影响，这是值类型的语义。\n\n什么时候应该把数据组合成 struct？\n\n查看答案\n几个值总是作为整体出现、一起传递和比较时，例如位置由横纵坐标组成。单个值能表达清楚时不强行包装。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/structs-and-value-types.html#本章回顾",
+    "href": "content/language-basics/structs-and-value-types.html#本章回顾",
+    "title": "结构与值类型",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能用 struct 聚合相关的数据并理解按值复制的独立性。完整示例见 structs-and-value-types.cpp。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>结构与值类型</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html",
+    "href": "content/language-basics/const-member-functions.html",
+    "title": "成员函数上的 const",
+    "section": "",
+    "text": "尾部 const\n结构体把相关的数据收进一个类型之后，下一步是让类型带上行为：struct 可以把函数直接定义在成员声明之后，这类函数通过 对象.函数名(实参) 调用，读写的是自己这个实例的成员。本章只讲这类函数身上的 const 写在哪里、承诺什么。完整函数语法由后面的函数章展开。\n成员函数的 const 写在参数列表末尾。它的承诺对象不是某个参数，而是函数所属的实例本身：\nGetCellState 只读取棋盘数据，尾部 const 把它标成查询；Place 要写入格子状态，不能标。误标的函数会在编译期被指出“const 函数里不能修改成员”，调用方不需要阅读实现就能信任这个承诺。\n完整示例用一个棋盘格子演示两类函数：",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html#尾部-const",
+    "href": "content/language-basics/const-member-functions.html#尾部-const",
+    "title": "成员函数上的 const",
+    "section": "",
+    "text": "片段：查询与修改两类成员函数\n\n// 查询函数：尾部 const。\nCellState GetCellState(Position position) const;\n\n// 修改函数：没有尾部 const，允许改写成员。\nPlaceResult Place(Move move);\n\n\n\n\n\nconst-member-functions.cpp\n\n// 成员函数上的 const 示例：查询函数与修改函数的承诺不同。\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n\n// 棋盘格子状态\nenum class CellState : std::uint8_t {\n  kEmpty = 0,  // 空格。\n  kX = 1,\n  kO = 2,\n};\n\n// 一个棋盘格子：查询用尾部 const，落子要写入成员。\nstruct Cell {\n  CellState state{CellState::kEmpty};\n\n  // 查询函数：尾部 const 承诺不修改实例。\n  CellState GetCellState() const {\n    return state;\n  }\n\n  // 修改函数：没有尾部 const，允许写入成员。\n  void Place(CellState new_state) {\n    state = new_state;\n  }\n};\n\nint main() {\n  Cell cell;\n  cell.Place(CellState::kX);\n  std::cout &lt;&lt; \"格子状态编号: \" &lt;&lt; static_cast&lt;int&gt;(cell.GetCellState()) &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html#四处-const-各管一段",
+    "href": "content/language-basics/const-member-functions.html#四处-const-各管一段",
+    "title": "成员函数上的 const",
+    "section": "四处 const 各管一段",
+    "text": "四处 const 各管一段\nconst 写在不同位置，管住的承诺不同。下面把成员函数相关场景放在一起对照：\n\n\n\n\n\n\n\n\n位置\n写法\n管住什么\n\n\n\n\n成员函数尾部\nCellState GetCellState(Position) const\n不修改实例自身\n\n\n返回类型\nconst CellState&\n调用方拿到只读访问，不能借返回值修改\n\n\n参数\nconst Position&\n函数内不能通过该参数修改外部对象\n\n\n局部变量\nconst CellState state{...};\n创建之后不能通过这个名字赋值\n\n\n\n同一份只读数据往往在几个位置同时出现 const：参数标一个，函数体里的局部量标一个，尾部再标一个。它们各管一段，不互相替代。引用记号 & 的传参选型由下一章展开，这里只需认识“加了 const 的引用是只读借用”。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html#常见错误",
+    "href": "content/language-basics/const-member-functions.html#常见错误",
+    "title": "成员函数上的 const",
+    "section": "常见错误",
+    "text": "常见错误\n\n修改型函数漏标 const\nPlace 要写入棋盘成员，标了尾部 const 编译器直接拒绝，判断标准是函数是否会改写成员，而不是函数“感觉上”重不重要。\n\n\n实例不变的误解\n尾部 const 只约束经由本函数的调用不改写成员，不承诺对象在所有路径上不可变，成员仍可被其他修改函数改写。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html#自测问题",
+    "href": "content/language-basics/const-member-functions.html#自测问题",
+    "title": "成员函数上的 const",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\nCellState GetCellState(Position position) const; 末尾的 const 承诺什么？\n\n查看答案\n承诺这个函数不修改自己所属的实例，只读取成员。调用方可以在 const 实例上放心调用它。\n\n为什么 Place 不能标尾部 const？\n\n查看答案\n它要写入棋盘成员，尾部 const 会把这种写入挡在编译期，编译器报“const 函数里不能修改成员”。\n\n参数上的 const 和成员函数尾部的 const 有什么区别？\n\n查看答案\n参数上的 const 管住“函数内不能通过该参数修改外部对象”，尾部的 const 管住“函数不修改实例自身成员”，两处承诺互不替代。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/const-member-functions.html#本章回顾",
+    "href": "content/language-basics/const-member-functions.html#本章回顾",
+    "title": "成员函数上的 const",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能读出成员函数尾部 const 的承诺，并把参数、返回值与局部变量的 const 放进同一张表区分。完整示例见 const-member-functions.cpp，对照与选型见 常量关键词。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>成员函数上的 const</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html",
+    "href": "content/language-basics/reference-usage-scenarios.html",
+    "title": "引用使用场景",
+    "section": "",
+    "text": "传递方式\nstruct 的实例按值复制，函数之间传递数据时同样面临选择：复制一份，还是让函数直接使用调用者的对象。本章给出按场景选型的参数表，先说明引用适合的场景。可空与所有权的场景由下一章的指针接手。\n下表来自 Google C++ Style Guide 的 Inputs and Outputs 一节，是这份笔记与姊妹仓库工程代码共同的传参依据：\n许多旧文与 cpplint 时代的检查建议输出参数一律用指针。现行指南改为：不可为空的输出用非 const 引用，只有“可选”才交给指针。选型先问三件事：只读还是修改，对象大不大，可不可以为空。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html#传递方式",
+    "href": "content/language-basics/reference-usage-scenarios.html#传递方式",
+    "title": "引用使用场景",
+    "section": "",
+    "text": "场景\n推荐方式\n说明\n\n\n\n\n只读小对象（int、double、小 struct）\n按值\n拷贝廉价，调用处清晰\n\n\n只读大对象（string、vector、大结构）\nconst T&\n避免昂贵拷贝\n\n\n需要修改且必须存在\n非 const 引用 T&\n非可选输出用引用，不可为空\n\n\n需要修改且可能为空\nT*\n可选输出用指针\n\n\n输入输出且必须存在\nT&\n同非可选输出\n\n\n输入输出且可能为空\nT*\n可选输入输出\n\n\n“本该是引用”的可选只读输入\nconst T*\n可空输入\n\n\n转移所有权\nstd::unique_ptr&lt;T&gt; 按值\n所有权随参数转移\n\n\n共享所有权\nstd::shared_ptr&lt;T&gt;\n按值或 const&，视引用计数而定",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html#只读与必改",
+    "href": "content/language-basics/reference-usage-scenarios.html#只读与必改",
+    "title": "引用使用场景",
+    "section": "只读与必改",
+    "text": "只读与必改\n完整示例覆盖表中的前三类参数场景，一个函数对应一种传递方式：\n\n\nreference-usage-scenarios.cpp\n\n// 引用使用场景示例：按场景为参数选择按值、const 引用与非 const 引用。\n#include &lt;iostream&gt;\n#include &lt;string&gt;\n#include &lt;vector&gt;\n\n// 只读小对象：按值传递，拷贝廉价，调用处清晰。\nint SumCoords(int row, int col) {\n  return (row * 10) + col;\n}\n\n// 只读大对象：const 引用避免拷贝，函数承诺不修改元素。\nint TotalChars(const std::vector&lt;std::string&gt;& words) {\n  int total = 0;\n  for (const std::string& word : words) {\n    total += static_cast&lt;int&gt;(word.size());\n  }\n  return total;\n}\n\n// 需要修改且必须存在：非 const 引用承担输出，不可为空。\nvoid Capitalize(std::string& text) {\n  for (char& ch : text) {\n    if (ch &gt;= 'a' && ch &lt;= 'z') {\n      ch = static_cast&lt;char&gt;(ch - 'a' + 'A');\n    }\n  }\n}\n\nint main() {\n  std::vector&lt;std::string&gt; words{\"board\", \"game\", \"grid\"};\n  std::string title{\"tic tac toe\"};\n\n  std::cout &lt;&lt; \"坐标和: \" &lt;&lt; SumCoords(1, 2) &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"总字符数: \" &lt;&lt; TotalChars(words) &lt;&lt; \"\\n\";\n\n  Capitalize(title);\n  std::cout &lt;&lt; \"大写标题: \" &lt;&lt; title &lt;&lt; \"\\n\";\n  return 0;\n}\n\n运行结果：\n\n\n运行效果\n\n坐标和: 12\n总字符数: 13\n大写标题: TIC TAC TOE\n\n调用 Capitalize(title) 后，调用者手里的 title 已经变成大写，修改直接落到了原对象上。SumCoords 与 TotalChars 的结果都是单个值，函数按值返回。\n与返回值的取舍：结果只是一个值时优先返回，SumCoords 与 TotalChars 都是例子。需要就地修改调用者已有的对象，或一次产生多个结果时，才用非 const 引用承担输出。\n引用必须绑定到一个对象，没有“空引用”。Capitalize 因此不需要判空检查。“可能没有”的场景留给下一章的指针。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html#常见错误",
+    "href": "content/language-basics/reference-usage-scenarios.html#常见错误",
+    "title": "引用使用场景",
+    "section": "常见错误",
+    "text": "常见错误\n\n必改参数按值传\n函数内修改的只是副本，对象保持原样，要让修改生效，把参数改成非 const 引用，并确认调用处传入的是可修改的对象。\n\n\n返回局部引用\n局部变量在函数结束时销毁，返回它的引用会得到悬空引用，计算结果优先按值返回，让编译器处理拷贝与移动。\n\n\n只读参数全加引用\nint、double 这类小对象按值传递更清晰，const T& 只为较大的对象省拷贝，照表选型，不把单一写法套到所有参数上。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html#自测问题",
+    "href": "content/language-basics/reference-usage-scenarios.html#自测问题",
+    "title": "引用使用场景",
+    "section": "自测问题",
+    "text": "自测问题\n\nTotalChars 的参数为什么是 const std::vector&lt;std::string&gt;&？\n\n查看答案\n它只读取元素不修改，参数带 const 让编译器替读者守住这条承诺。vector 的拷贝昂贵，按引用免去整表复制。\n\nCapitalize 为什么不返回新字符串？\n\n查看答案\n它的任务是改写调用者已有的对象，非 const 引用让修改直接生效。只产生一个新结果时才优先返回值。\n\n调用 Capitalize 前需要判空吗？\n\n查看答案\n不需要。引用必须绑定到对象，不存在空引用。“可能没有”的场景属于指针，见下一章。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/reference-usage-scenarios.html#本章回顾",
+    "href": "content/language-basics/reference-usage-scenarios.html#本章回顾",
+    "title": "引用使用场景",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能按场景表选择按值、const T& 与 T&。完整示例见 reference-usage-scenarios.cpp，由分册根 CMakeLists.txt 收集编译；可空输入、可选输出与所有权见下一章指针使用场景。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>引用使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html",
+    "href": "content/language-basics/pointer-usage-scenarios.html",
+    "title": "指针使用场景",
+    "section": "",
+    "text": "指针的场景\n上一章的引用不可为空，参数必须绑定到一个对象。但“有没有这项信息”常常由调用者决定，参数需要能表达“没有”。本章沿同一张场景表展开指针的场景，并给出所有权选择的入口。\n指针与引用的分界只有一条：参数可不可以为空。必须存在就用引用，可能没有才用指针。调用处由此一眼看出哪些参数可以不提供。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html#指针的场景",
+    "href": "content/language-basics/pointer-usage-scenarios.html#指针的场景",
+    "title": "指针使用场景",
+    "section": "",
+    "text": "场景\n推荐方式\n说明\n\n\n\n\n“本该是引用”的可选只读输入\nconst T*\n传 nullptr 表示没有\n\n\n需要修改且可能为空（可选输出）\n非 const 指针 T*\n调用处可见 &\n\n\n可选按值输入\nstd::optional&lt;T&gt;\n现行指南的首选写法\n\n\n转移所有权\nstd::unique_ptr&lt;T&gt; 按值\n所有权随参数转移\n\n\n共享所有权\nstd::shared_ptr&lt;T&gt;\n按值或 const&，视引用计数而定",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html#可空与可选",
+    "href": "content/language-basics/pointer-usage-scenarios.html#可空与可选",
+    "title": "指针使用场景",
+    "section": "可空与可选",
+    "text": "可空与可选\n完整示例覆盖表中前两个场景：\n\n\npointer-usage-scenarios.cpp\n\n// 指针使用场景示例：可空输入、可选输出与判空约定。\n#include &lt;iostream&gt;\n#include &lt;string&gt;\n\n// 可选的只读输入：const 指针，传 nullptr 表示没有这项信息。\nvoid PrintTask(const std::string& title, const std::string* note) {\n  std::cout &lt;&lt; \"任务: \" &lt;&lt; title &lt;&lt; \"\\n\";\n  if (note != nullptr) {\n    std::cout &lt;&lt; \"备注: \" &lt;&lt; *note &lt;&lt; \"\\n\";\n  }\n}\n\n// 可选输出：非 const 指针；找到首个数字时写入并返回 true。\nbool TryFirstDigit(const std::string& text, int* digit_out) {\n  for (char ch : text) {\n    if (ch &gt;= '0' && ch &lt;= '9') {\n      *digit_out = ch - '0';\n      return true;\n    }\n  }\n  return false;\n}\n\nint main() {\n  const std::string note{\"每周重开一局\"};\n  PrintTask(\"井字棋\", &note);\n  PrintTask(\"自由练习\", nullptr);\n\n  int digit = 0;\n  if (TryFirstDigit(\"第 3 局\", &digit)) {\n    std::cout &lt;&lt; \"首个数字: \" &lt;&lt; digit &lt;&lt; \"\\n\";\n  }\n  if (!TryFirstDigit(\"残局\", &digit)) {\n    std::cout &lt;&lt; \"残局不含数字\\n\";\n  }\n  return 0;\n}\n\n运行结果：\n\n\n运行效果\n\n任务: 井字棋\n备注: 每周重开一局\n任务: 自由练习\n首个数字: 3\n残局不含数字\n\nPrintTask 在解引用前先判空。TryFirstDigit 找不到数字也属正常结果，不是错误。调用处写 &digit，取地址的 & 让“这个参数会被写入”在调用行可见。\n堆对象的所有权要移交时，用 std::unique_ptr&lt;T&gt; 按值传参。多处共享同一对象时，用 std::shared_ptr&lt;T&gt;。两者的语法与生命周期管理见内存分册。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html#常见错误",
+    "href": "content/language-basics/pointer-usage-scenarios.html#常见错误",
+    "title": "指针使用场景",
+    "section": "常见错误",
+    "text": "常见错误\n\n解引用前不判空\n指针参数的约定是“可能为空”，解引用前先用 p != nullptr 确认，跳过判空时程序在空指针上直接崩溃。\n\n\n指针传必存参数\n调用者可能误传 nullptr，函数内被迫防御判空，接口约定反而模糊，必须存在的参数按上一章的表用 T& 或 const T&。\n\n\n对象传给指针\n调用 PrintTask(title, note) 少写一个 &，编译器直接报类型错误，指针参数在调用处写 &对象，取地址本身就是接口约定的一部分。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html#自测问题",
+    "href": "content/language-basics/pointer-usage-scenarios.html#自测问题",
+    "title": "指针使用场景",
+    "section": "自测问题",
+    "text": "自测问题\n\nPrintTask 的 note 参数为什么用 const std::string* 而不是 const std::string&？\n\n查看答案\n备注是可选信息，调用者要能表达“没有”。指针允许传 nullptr，引用必须绑定到对象。\n\nTryFirstDigit 为什么返回 bool 还要一个 int* 参数？\n\n查看答案\n找不到首个数字是正常结果，bool 报告成败，int* 只在成功时写入。这就是可选输出的场景。\n\n转移堆对象的所有权应该用什么参数？\n\n查看答案\nstd::unique_ptr&lt;T&gt; 按值传参，所有权随参数移交。多处共享才用 std::shared_ptr&lt;T&gt;。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/pointer-usage-scenarios.html#本章回顾",
+    "href": "content/language-basics/pointer-usage-scenarios.html#本章回顾",
+    "title": "指针使用场景",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能用指针表达可空输入与可选输出，并记住先判空再解引用。完整示例见 pointer-usage-scenarios.cpp，由分册目录下的 CMakeLists.txt 收集编译；所有权与生命周期见内存分册。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>指针使用场景</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html",
+    "href": "content/language-basics/parameter-passing-guide.html",
+    "title": "★ 传参选型速查",
+    "section": "",
+    "text": "赋值传参\n引用使用场景 与 指针使用场景 已按场景展开了完整示例。本页把两张总表按机制归并成速查：函数参数只有按值、引用、指针三种传递机制，类型（enum class、小 struct、string）只是各机制下的选型对象。\n决策问句：函数只读这个参数，它又足够小吗？两个都满足就按值传递。\n明确推荐按值传递的类型：enum class 定义的封闭取值（Player、CellState）、小 struct（坐标 Position、落子动作 Move）、定宽整数（std::int32_t）。它们与 int 一样拷贝廉价，调用处读到的就是独立的值，不涉及别名。反例是只读大对象按值传：std::string、std::vector 的拷贝可能昂贵，改用引用传参的 const T&。本节的依据是现行 Google Inputs and Outputs 与 LLVM 对小值拷贝的同一习惯。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#赋值传参",
+    "href": "content/language-basics/parameter-passing-guide.html#赋值传参",
+    "title": "★ 传参选型速查",
+    "section": "",
+    "text": "片段：按值传参的正例\n\n// 参数按值收一个 Player，返回值按值给出一个 CellState。\nCellState PlayerToCellState(Player player) {\n  return player == Player::kX ? CellState::kX : CellState::kO;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#引用传参",
+    "href": "content/language-basics/parameter-passing-guide.html#引用传参",
+    "title": "★ 传参选型速查",
+    "section": "引用传参",
+    "text": "引用传参\n决策问句：对象大、拷贝贵但只读，改用 const T&；函数要修改它且调用处保证对象存在，用非 const 引用 T&。\n\n\n片段：引用传参的正反例\n\n// 正例：大对象只读，const 引用避免拷贝。\nvoid PrintBanner(const std::string& title);\n\n// 正例：必改且非空，非 const 引用承担输出。\nvoid ResetCounter(int& count);\n\n// 反例：引用可能不存在的“可选输出”——引用没有空值，改用指针。\nvoid FindToken(std::string& result);\n\n不可为空的输出用非 const 引用，是现行指南的口径。许多旧文与 cpplint 时代“输出一律指针”的建议已被指南取代，只有“可选”才交给指针。引用传参的完整示例见 引用使用场景。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#指针传参",
+    "href": "content/language-basics/parameter-passing-guide.html#指针传参",
+    "title": "★ 传参选型速查",
+    "section": "指针传参",
+    "text": "指针传参\n决策问句：这个参数可以为空吗？可空的只读输入用 const T*，可选的输出用 T*，调用处的 & 与 nullptr 让“可能为空”在代码里可见。\n\n\n片段：指针传参的正反例\n\n// 正例：可空输入，找不到时传 nullptr。\nvoid SetAlias(const std::string* name);\n\n// 正例：可选输出，调用方不关心结果时传 nullptr。\nvoid CurrentTime(std::chrono::seconds* elapsed);\n\n// 反例：指针在这里没有可空语义，必改且必存在应改用 T&。\nvoid AddOne(int* value);\n\n所有权指针（std::unique_ptr 按值转移、std::shared_ptr 共享）是另一类决策，入口见 指针使用场景。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#常见错误",
+    "href": "content/language-basics/parameter-passing-guide.html#常见错误",
+    "title": "★ 传参选型速查",
+    "section": "常见错误",
+    "text": "常见错误\n\n大对象按值传递\nstd::string、std::vector 参数默认写 const T&，按值拷贝再只读使用的写法把开销藏进了函数调用。\n\n\n引用表达可空输出\n引用没有空值，可选输出写 T*，调用处传 nullptr 才能表达“这次不要结果”。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#自测问题",
+    "href": "content/language-basics/parameter-passing-guide.html#自测问题",
+    "title": "★ 传参选型速查",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n输出参数什么时候用引用，什么时候用指针？\n\n查看答案\n调用处保证对象存在时用非 const 引用 T&。输出可选、调用方可能不关心结果时用 T*，由 nullptr 表达“不要结果”。\n\nenum class 参数该按值传吗？\n\n查看答案\n该。enum class 与 int 同属值类型，拷贝廉价，按值传递调用处最清晰，例如 CellState PlayerToCellState(Player player)。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/parameter-passing-guide.html#本章回顾",
+    "href": "content/language-basics/parameter-passing-guide.html#本章回顾",
+    "title": "★ 传参选型速查",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能按机制回答传参问题：只读小对象按值，大只读用 const T&，必改且非空用 T&，可空与可选交给指针。返回值的选择见下一张速查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>22</span>  <span class='chapter-title'>★ 传参选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html",
+    "href": "content/language-basics/return-value-guide.html",
+    "title": "★ 返回值选型速查",
+    "section": "",
+    "text": "按值返回\n函数把结果交还调用方的方式与传参一一对应：按值、引用或指针。本页按返回方式归并选型。把结果装进返回值优先于增设输出参数，这是现行 Google Inputs and Outputs 的总口径。\n默认方式。结果是新算出来的值时按值返回：int、double、enum class（GameStatus、CellState）、小结果类型（PlaceResult）都与按值传参同类，拷贝廉价，调用处无需管理生命周期。\n按值返回优先于输出参数：能用返回值表达的，就不要再设计一个 T& 出参。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#按值返回",
+    "href": "content/language-basics/return-value-guide.html#按值返回",
+    "title": "★ 返回值选型速查",
+    "section": "",
+    "text": "片段：按值返回的正例\n\n// 由对局玩家得到棋盘格子状态，按值返回。\nCellState PlayerToCellState(Player player);\n\n// 落子按值返回结果类型，成败信息随值交还调用方。\nPlaceResult TryPlace(Move move);",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#引用返回",
+    "href": "content/language-basics/return-value-guide.html#引用返回",
+    "title": "★ 返回值选型速查",
+    "section": "引用返回",
+    "text": "引用返回\n结果早已存在且函数只是提供访问入口时返回引用，例如容器元素的访问器。前提是对象生命周期明确：调用方使用返回值的期间，被引用的对象必须仍然存活。\n\n\n片段：引用返回的正反例\n\n// 正例：返回已存在的元素，生命周期由容器保证。\nconst std::string& Entry(std::size_t index) const;\n\n// 反例：局部变量在函数结束时销毁，返回它的引用是悬空引用。\nconst std::string& Greeting() {\n  std::string local = \"hello\";\n  return local;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#指针返回",
+    "href": "content/language-basics/return-value-guide.html#指针返回",
+    "title": "★ 返回值选型速查",
+    "section": "指针返回",
+    "text": "指针返回\n结果可能不存在时返回指针，用 nullptr 表达“没有找到”，调用方先判空再使用。堆上的所有权结果不用裸指针表达，用智能指针按值返回，所有权随返回值交还调用方。\n\n\n片段：指针返回的正例\n\n// 可空结果：找不到时返回 nullptr。\nconst Player* FindWinner(const Board& board);",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#结果类型",
+    "href": "content/language-basics/return-value-guide.html#结果类型",
+    "title": "★ 返回值选型速查",
+    "section": "结果类型",
+    "text": "结果类型\n业务操作的成败信息装进结果类型按值返回，例如 PlaceResult 表达“接受写入还是拒绝”，GameStatus 报告对局是否结束，这类信息属于正常业务路径，不用异常表达：\n\n异常留给构造失败、越界 at 等前置条件失败或无法继续的硬边界；\nwhat() 用英文短句（如 GetCellState: position is outside the board），不用日志框架拼消息；\n姊妹仓库的规则核心与可测试 API 也按这一口径选型。\n\n容器上 [] 与 at 的检查差异见下标与 at。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#常见错误",
+    "href": "content/language-basics/return-value-guide.html#常见错误",
+    "title": "★ 返回值选型速查",
+    "section": "常见错误",
+    "text": "常见错误\n\n返回局部引用\n局部变量随函数结束销毁，引用它的代码全部悬空，结果是新算出来的值就按值返回。\n\n\n异常表达业务结果\n落子被拒绝、查找失败是正常分支，用结果类型或 nullptr 表达，异常只留给真正的边界故障。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#自测问题",
+    "href": "content/language-basics/return-value-guide.html#自测问题",
+    "title": "★ 返回值选型速查",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n返回引用需要满足什么前提？\n\n查看答案\n被引用的对象在调用方使用返回值期间必须仍然存活。引用返回只用于访问已存在的对象，禁止返回局部变量。\n\n业务操作的失败为什么用结果类型表达而不是异常？\n\n查看答案\n被拒绝的落子、未找到的查找是正常业务路径，调用方需要逐个处理。结果类型让成败随返回值交还，异常只留给无法继续的边界故障。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/return-value-guide.html#本章回顾",
+    "href": "content/language-basics/return-value-guide.html#本章回顾",
+    "title": "★ 返回值选型速查",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能按返回方式选型：新算出的值按值返回，访问已有对象用引用返回，可空结果用指针返回，成败信息装进结果类型。传参一侧的选择见 ★ 传参选型速查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>23</span>  <span class='chapter-title'>★ 返回值选型速查</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html",
+    "href": "content/language-basics/nodiscard.html",
+    "title": "[[nodiscard]]",
+    "section": "",
+    "text": "忽略返回值\n返回值选型速查把成败信息装进结果类型，按值交还调用方。但设计得再好的返回值，也挡不住调用方拿到后随手丢弃。[[nodiscard]] 是一个属性标注：编译器对“标注函数的返回值被丢弃”发出警告，把“结果不能无视”从文档约定变成可检查的规则。\n两类函数的返回值最值得标注：\nGetCellState 不修改实例，调它的唯一目的就是拿返回值；Place 的 PlaceResult 告诉调用方落子是否被接受，忽略拒绝继续对局，错误要到很晚才会暴露。姊妹仓库的工程代码对这两类 API 一律标注。类的写法见类与封装。modernize-use-nodiscard 可为部分可标注接口给出建议，但是否标注仍按返回值是否承载不可忽略的信息判断。\n完整示例演示“拿到结果就处理”的调用方式：",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#忽略返回值",
+    "href": "content/language-basics/nodiscard.html#忽略返回值",
+    "title": "[[nodiscard]]",
+    "section": "",
+    "text": "片段：值得标注的两类函数\n\n// 查询函数的返回值就是函数的全部意义，丢弃等于没调用。\n[[nodiscard]] CellState GetCellState(Position position) const;\n\n// 结果类型承载成败，忽略拒绝会埋下逻辑错误。\n[[nodiscard]] PlaceResult Place(Move move);\n\n\n\n\n\nnodiscard.cpp\n\n// nodiscard 示例：标注过的返回值要处理，不能随手丢弃。\n#include &lt;cstdint&gt;\n#include &lt;iostream&gt;\n\n// 落子结果：接受或拒绝。\nenum class ApplyResult : std::uint8_t {\n  kAccepted,  // 接受落子，格子已标记。\n  kRejected,  // 拒绝落子，格子保持原样。\n};\n\n// 一个棋盘格子：重复落子会被拒绝。\nstruct Cell {\n  bool filled{false};\n\n  // 落子结果承载成败，标注后丢弃会得到编译器警告。\n  [[nodiscard]] ApplyResult Place() {\n    if (filled) {\n      return ApplyResult::kRejected;\n    }\n    filled = true;\n    return ApplyResult::kAccepted;\n  }\n};\n\nint main() {\n  Cell cell;\n  ApplyResult first = cell.Place();\n  ApplyResult second = cell.Place();\n  std::cout &lt;&lt; \"第一次落子编号: \" &lt;&lt; static_cast&lt;int&gt;(first) &lt;&lt; \"\\n\";\n  std::cout &lt;&lt; \"第二次落子编号: \" &lt;&lt; static_cast&lt;int&gt;(second) &lt;&lt; \"\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#加与不加",
+    "href": "content/language-basics/nodiscard.html#加与不加",
+    "title": "[[nodiscard]]",
+    "section": "加与不加",
+    "text": "加与不加\n标注面向“结果携带信息、忽略会出错”的函数，不是所有非 void 函数：\n\n加：查询型成员函数（GetCellState、Status），结果类型的 API（Place）。\n不加：结果没有信息量的函数，以及调用方明确只需要副作用的场景。无差别铺开会让警告淹没真正重要的提示。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#有意丢弃",
+    "href": "content/language-basics/nodiscard.html#有意丢弃",
+    "title": "[[nodiscard]]",
+    "section": "有意丢弃",
+    "text": "有意丢弃\n确实不需要返回值时，用 static_cast&lt;void&gt; 写出丢弃意图：\n\n\n片段：有意的丢弃\n\n// 明确表达“我知道有返回值，这个场景不使用它”。\nstatic_cast&lt;void&gt;(cell.Place());\n\n裸调用虽然不报错，但读者分不清是疏忽还是有意。static_cast&lt;void&gt; 一行就把意图写进了代码，也向评审说明这里不需要补错误处理。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#常见错误",
+    "href": "content/language-basics/nodiscard.html#常见错误",
+    "title": "[[nodiscard]]",
+    "section": "常见错误",
+    "text": "常见错误\n\n全局关闭警告\n丢弃结果被警告，说明调用流程值得复查；关掉检查等于丢掉“结果不能无视”的约定，应处理结果或用 static_cast&lt;void&gt; 有意丢弃。\n\n\n无差别加标注\n标注的价值来自稀缺，查询与结果类型之外的函数不加，让警告始终指向真正不能无视的返回值。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#自测问题",
+    "href": "content/language-basics/nodiscard.html#自测问题",
+    "title": "[[nodiscard]]",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n[[nodiscard]] 加在函数声明上的作用是什么？\n\n查看答案\n编译器在该函数的返回值被丢弃时发出警告，把“结果不能无视”变成编译期可检查的规则。\n\n确实不需要返回值时怎么写？\n\n查看答案\n用 static_cast&lt;void&gt;(调用) 写出有意的丢弃，读者与评审都能看出这不是疏忽。\n\n哪两类函数最值得标注？\n\n查看答案\n查询型成员函数（返回值就是调用目的）和结果类型的 API（忽略拒绝会埋下逻辑错误）。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/nodiscard.html#本章回顾",
+    "href": "content/language-basics/nodiscard.html#本章回顾",
+    "title": "[[nodiscard]]",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能给查询与结果类型函数标注 [[nodiscard]]，理解警告指向的流程问题，并用 static_cast&lt;void&gt; 表达有意丢弃。完整示例见 nodiscard.cpp，返回值的选型见 ★ 返回值选型速查。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>24</span>  <span class='chapter-title'>[[nodiscard]]</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html",
+    "href": "content/language-basics/classes.html",
+    "title": "类与封装",
+    "section": "",
+    "text": "类与封装\n[[nodiscard]]要求调用方处理查询结果。这一课把计数和修改它的操作放进同一个类，查询函数带 const。示例在 classes.cpp。\nCounter 的 value_ 是私有的。外面只能通过构造函数和 Add 改变它。\n井字棋的 Board 也是这种类：格子数据留在类里，查询用 GetCellState，见实现棋盘存储。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html#类与封装",
+    "href": "content/language-basics/classes.html#类与封装",
+    "title": "类与封装",
+    "section": "",
+    "text": "classes.cpp\n\nclass Counter {\n public:\n  explicit Counter(int start) : value_{start} {}\n\n  [[nodiscard]] int Value() const {\n    return value_;\n  }\n\n  void Add(int delta) {\n    value_ += delta;\n  }\n\n private:\n  int value_;\n};",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html#用-const-查询",
+    "href": "content/language-basics/classes.html#用-const-查询",
+    "title": "类与封装",
+    "section": "用 const 查询",
+    "text": "用 const 查询\nValue 带尾部 const，只返回当前计数。main 从 2 开始，加上 3，打印 计数: 5。\n\n\nclasses.cpp\n\n  Counter counter{2};\n  counter.Add(3);\n  std::cout &lt;&lt; \"计数: \" &lt;&lt; counter.Value() &lt;&lt; \"\\n\";",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html#常见错误",
+    "href": "content/language-basics/classes.html#常见错误",
+    "title": "类与封装",
+    "section": "常见错误",
+    "text": "常见错误\n\n类外改私有数据\nvalue_ 写在 private 里，main 不能写 counter.value_ = 0。\n\n需要改变计数时调用 Add。\n\n\n\n查询函数漏掉尾部 const\nValue 不修改计数，漏掉 const 之后常量对象上就不能调用它。\n\n只读取数据的成员函数写上尾部 const。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html#自测问题",
+    "href": "content/language-basics/classes.html#自测问题",
+    "title": "类与封装",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n为什么 Value 可以标成 const，Add 不行？\n\n查看答案\nValue 只返回 value_。Add 要修改 value_，尾部 const 会拒绝这次写入。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/classes.html#本章回顾",
+    "href": "content/language-basics/classes.html#本章回顾",
+    "title": "类与封装",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能类与封装，用 const 成员函数查询，并用另一个成员函数修改它。下一章简单项目设计说明如何让类、值类型和输入输出边界一起服务一个小项目。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>25</span>  <span class='chapter-title'>类与封装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html",
+    "href": "content/language-basics/simple-project-design.html",
+    "title": "简单项目设计",
+    "section": "",
+    "text": "对象守住状态\n前面的章节已经分别说明 struct、enum class 和类。把它们放进小项目时，重点不是对象数量，而是每个对象是否有清楚、可验证的职责。完整示例在 simple-project-design.cpp。\n棋盘的格子状态和不可覆盖落子的规则一起变化，所以放进 Board。调用方只能通过 Place 改变状态，不能直接改数组。\n这不是因为所有数据都必须藏进类，而是因为格子状态和落子规则必须始终一致。Place 的返回值把“是否接受这一步”交给调用方处理。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#对象守住状态",
+    "href": "content/language-basics/simple-project-design.html#对象守住状态",
+    "title": "简单项目设计",
+    "section": "",
+    "text": "simple-project-design.cpp\n\n// 一个 3×3 棋盘。\n// 负责保存格子状态，并拒绝无效或重复的落子。\nclass Board {\npublic:\n  // 尝试在指定坐标落子。\n  // 坐标无效、状态为空或格子已占用时返回 false。\n  [[nodiscard]] bool Place(CellPosition position, CellState state) {\n    }\n};",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#值类型传数据",
+    "href": "content/language-basics/simple-project-design.html#值类型传数据",
+    "title": "简单项目设计",
+    "section": "值类型传数据",
+    "text": "值类型传数据\n格子状态是固定集合，用 enum class 表达。一个位置只包含行和列，没有独立的不变量，用 CellPosition 这样的 struct 按值传递。\n\n\nsimple-project-design.cpp\n\n// 棋盘格子的状态。\nenum class CellState : std::uint8_t {\n  kEmpty = 0,\n  kCross = 1,\n  kNought = 2,\n};\n\n// 棋盘格子的行列坐标，行和列从 0 开始。\nstruct CellPosition {\n  int row;\n  int col;\n};\n\n类型名称让调用处知道一组数据代表什么，类则负责那些必须保持成立的规则。不要只因两个值经常一起出现，就马上增加 setter、继承层或单独的管理器。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#不拆单次模块",
+    "href": "content/language-basics/simple-project-design.html#不拆单次模块",
+    "title": "简单项目设计",
+    "section": "不拆单次模块",
+    "text": "不拆单次模块\n示例中的 ToIndex 只把已经验证的坐标变成 Board 的内部下标。它没有第二个调用方，也不表达独立业务规则，因此留在 Board 的 private 区域。\n\n\nsimple-project-design.cpp\n\nprivate:\n  // 将已验证的坐标转换为行优先下标。\n  [[nodiscard]] static constexpr std::size_t ToIndex(CellPosition position) {\n    return static_cast&lt;std::size_t&gt;((position.row * kCols) + position.col);\n  }\n\n把它拆成 Indexer、Validator 或通用工具文件，会让读者必须在更多文件之间跳转，却没有增加复用。出现第二处真实、稳定且语义相同的需求后，再考虑提取公共接口。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#外层输入输出",
+    "href": "content/language-basics/simple-project-design.html#外层输入输出",
+    "title": "简单项目设计",
+    "section": "外层输入输出",
+    "text": "外层输入输出\nBoard 不打印棋盘，也不读取终端。外层程序决定如何显示 CellState，再调用 Place，同一份规则就能被终端、测试或其他适配方式复用。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#常见错误",
+    "href": "content/language-basics/simple-project-design.html#常见错误",
+    "title": "简单项目设计",
+    "section": "常见错误",
+    "text": "常见错误\n\n每个动作一个类\nToIndex 只属于 Board 的存储方式，做成独立类只会增加名称、文件和依赖。\n\n先把只服务一个对象的辅助逻辑留在该对象内部。\n\n\n\n核心对象读终端\nBoard 一旦直接读写终端，测试规则时就必须准备输入输出环境。\n\n让核心对象返回结果。由外层决定怎样读取和显示。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#自测问题",
+    "href": "content/language-basics/simple-project-design.html#自测问题",
+    "title": "简单项目设计",
+    "section": "自测问题",
+    "text": "自测问题\n\n为什么 CellPosition 适合用 struct？\n\n查看答案\n它只组合行和列，按值传递即可表达一个位置。它不需要自行管理资源或维护复杂规则。\n\n为什么 ToIndex 不需要独立文件？\n\n查看答案\n它只服务 Board 的内部数组布局，没有第二个真实调用方。保留在 private 区域可以缩小外部接口。\n\n为什么 Board 不直接打印棋盘？\n\n查看答案\n打印属于输入输出适配。把它留在外层，规则可以直接由测试或不同界面复用。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-basics/simple-project-design.html#本章回顾",
+    "href": "content/language-basics/simple-project-design.html#本章回顾",
+    "title": "简单项目设计",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用值类型传递数据、用类守住不变量、外层输入输出，并在真实重复出现时才增加抽象。运行 simple-project-design.cpp 可以看到一次中心格落子。",
+    "crumbs": [
+      "语言基础",
+      "<span class='chapter-number'>26</span>  <span class='chapter-title'>简单项目设计</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/index.html",
+    "href": "content/language-advanced/index.html",
+    "title": "语言进阶",
+    "section": "",
+    "text": "语言基础分册建立了类型、常量与值语义。实际项目还会要求“同一底层类型的值在不同领域里不能混用”，本分册记录这类更精细的类型组织手段，并随项目实践继续扩展。\n\n\n强类型包装\n用轻量包装区分同为 double 的距离与时长，让混用变成编译错误。",
+    "crumbs": [
+      "语言进阶"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html",
+    "href": "content/language-advanced/strong-types.html",
+    "title": "强类型包装",
+    "section": "",
+    "text": "包装类型\n距离和时长都能用 double 保存，但把 100 米当成 9.58 秒传下去时编译器毫无察觉——它只看到两个 double。强类型包装用轻量结构体给基础值加上领域含义，让“不该混用”变成编译错误。本章沿用语言基础的聚合与值语义，不引入新的语言机制。\n取用数值时写出 .value，类型本身挡住了单位混用。这层小小的摩擦就是包装的成本，也是它换来的检查。",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html#包装类型",
+    "href": "content/language-advanced/strong-types.html#包装类型",
+    "title": "强类型包装",
+    "section": "",
+    "text": "strong-types.cpp\n\n// 强类型包装示例：用两个包装类型区分距离与时长。\n#include &lt;iostream&gt;\n\nstruct Meters {\n  double value{0};\n};\n\nstruct Seconds {\n  double value{0};\n};\n\nint main() {\n  Meters distance{100.0};\n  Seconds duration{9.58};\n  // distance 与 duration 类型不同，互相赋值会被编译器拒绝\n  std::cout &lt;&lt; \"距离: \" &lt;&lt; distance.value &lt;&lt; \" 米\\n\";\n  std::cout &lt;&lt; \"时长: \" &lt;&lt; duration.value &lt;&lt; \" 秒\\n\";\n  return 0;\n}",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html#包装的边界",
+    "href": "content/language-advanced/strong-types.html#包装的边界",
+    "title": "强类型包装",
+    "section": "包装的边界",
+    "text": "包装的边界\n普通聚合包装依赖约定：成员公开，Meters{9.58} 仍能凭空构造，杜绝误用需要构造函数与不变量，留待自定义类型章节。取值封闭的领域值（方向、状态、档位）直接用 enum class。",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html#常见错误",
+    "href": "content/language-advanced/strong-types.html#常见错误",
+    "title": "强类型包装",
+    "section": "常见错误",
+    "text": "常见错误\n\n用注释区分单位\ndouble distance; // 米 依赖读代码的人记住单位，复制粘贴时约束就丢了，包装让编译器参与检查。\n\n\n处处拆包取值\n计算始终在同类间进行时，逻辑先留在包装类型内部（需要成员函数，留给自定义类型章节），不在调用点反复写 .value。",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html#自测问题",
+    "href": "content/language-advanced/strong-types.html#自测问题",
+    "title": "强类型包装",
+    "section": "自测问题",
+    "text": "自测问题\n\ndistance = duration; 为什么通不过编译？\n\n查看答案\nMeters 与 Seconds 是两个独立类型，之间没有定义转换，类型系统因此拦下了单位混用。\n\n普通 struct 包装能防止的误用与防不了的误用各是什么？\n\n查看答案\n能防止不同包装类型之间的赋值与传参混用，不能防止凭空构造一个不合理的值。更强的保证需要构造函数与不变量。",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/language-advanced/strong-types.html#本章回顾",
+    "href": "content/language-advanced/strong-types.html#本章回顾",
+    "title": "强类型包装",
+    "section": "本章回顾",
+    "text": "本章回顾\n你能用轻量包装区分同底层类型的领域值，也知道它的边界。完整示例见 strong-types.cpp。",
+    "crumbs": [
+      "语言进阶",
+      "<span class='chapter-number'>27</span>  <span class='chapter-title'>强类型包装</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/index.html",
+    "href": "content/standard-library/index.html",
+    "title": "标准库",
+    "section": "",
+    "text": "语言基础已经能表达类型与接口。标准库提供现成的容器与算法，本分册先建立总览与「下标 / at」的检查边界，再按容器展开。\n\n\n标准库总览\n分清标准库由容器、迭代器与算法组成的结构，知道下一章要解决什么问题。\n\n\n下标与 at\n用 std::array 看清 [] 与 at 的差异，并列出同类容器。",
+    "crumbs": [
+      "标准库"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/overview.html",
+    "href": "content/standard-library/overview.html",
+    "title": "标准库总览",
+    "section": "",
+    "text": "标准库的组成\n读完前面几册，你已经会写类型、常量和小型接口。真实程序很快会需要「一组值」和「针对这组值的查找与排序」。C++ 标准库用容器、迭代器与算法承接这些常见需求。本章只建立阅读地图，不展开某个容器的全部 API。\n选型时先问场景（固定长度还是可变、要不要按键查找），再比复杂度与失效规则，不要按字母表背 API。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>28</span>  <span class='chapter-title'>标准库总览</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/overview.html#标准库的组成",
+    "href": "content/standard-library/overview.html#标准库的组成",
+    "title": "标准库总览",
+    "section": "",
+    "text": "容器：持有元素并规定插入、删除与访问成本，例如 std::array、std::vector、std::map。\n迭代器：指向容器中位置的统一游标，算法靠它遍历半开区间 [begin, end)。\n算法：写在 &lt;algorithm&gt; 等头文件里的通用步骤，优先「算法 + 迭代器」，少手写易错循环。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>28</span>  <span class='chapter-title'>标准库总览</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/overview.html#最小示例",
+    "href": "content/standard-library/overview.html#最小示例",
+    "title": "标准库总览",
+    "section": "最小示例",
+    "text": "最小示例\n下面的程序只点名三种常用类型，确认工具链能包含标准库头文件并完成链接：\n\n\noverview.cpp\n\n// overview 示例：点名几个常用标准库类型，不展开 API。\n#include &lt;array&gt;\n#include &lt;iostream&gt;\n#include &lt;string&gt;\n#include &lt;vector&gt;\n\nint main() {\n  std::array&lt;int, 2&gt; fixed{1, 2};\n  std::vector&lt;int&gt; dynamic{3, 4};\n  std::string label = \"stl\";\n\n  std::cout &lt;&lt; \"array size=\" &lt;&lt; fixed.size() &lt;&lt; '\\n';\n  std::cout &lt;&lt; \"vector size=\" &lt;&lt; dynamic.size() &lt;&lt; '\\n';\n  std::cout &lt;&lt; \"string=\" &lt;&lt; label &lt;&lt; '\\n';\n  return 0;\n}\n\n预期输出：\n\n\n终端输出\n\narray size=2\nvector size=2\nstring=stl",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>28</span>  <span class='chapter-title'>标准库总览</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/overview.html#自测问题",
+    "href": "content/standard-library/overview.html#自测问题",
+    "title": "标准库总览",
+    "section": "自测问题",
+    "text": "自测问题\n\n标准库学习为什么要同时看容器、迭代器与算法？\n\n查看答案\n容器决定元素怎么存；迭代器提供统一访问位置；算法在迭代器上工作。三块合在一起才是标准库的常用工作方式。\n\n本章为什么不立刻展开 vector 的全部成员函数？\n\n查看答案\n先建立地图与选型问题，避免一上来陷入 API 清单。后续章按读者任务展开具体容器。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>28</span>  <span class='chapter-title'>标准库总览</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/overview.html#本章回顾",
+    "href": "content/standard-library/overview.html#本章回顾",
+    "title": "标准库总览",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能说出标准库的组成，并运行一个点名 array / vector / string 的最小示例。下一章用 std::array 分开「不检查」与「检查后抛异常」，并列出同类容器。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>28</span>  <span class='chapter-title'>标准库总览</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html",
+    "href": "content/standard-library/subscript-and-at.html",
+    "title": "下标与 at",
+    "section": "",
+    "text": "访问路径\n许多容器都能用下标或键取出元素。同一容器上常有访问路径：一条假设调用方已经保证位置合法，另一条在运行期检查并在失败时抛异常。本章只用 std::array 演示，并把同类容器点名列清。\n语法先分清：cells_.[i] 不是合法写法，clangd 会报语法错误；正确的下标是 cells_[i]。语法通过之后，才谈越界语义。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#访问路径",
+    "href": "content/standard-library/subscript-and-at.html#访问路径",
+    "title": "下标与 at",
+    "section": "",
+    "text": "operator[]（下标）：快速路径。调用方必须已经保证下标合法；越界是未定义行为（在实现启用 C++26 硬化检查之前）。\nat：检查路径。位置不合法时抛 std::out_of_range，可用 try / catch 观察到失败。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#只用-stdarray-演示",
+    "href": "content/standard-library/subscript-and-at.html#只用-stdarray-演示",
+    "title": "下标与 at",
+    "section": "只用 std::array 演示",
+    "text": "只用 std::array 演示\n\n\nsubscript-and-at.cpp\n\n// subscript-and-at 示例：用 std::array 演示 [] 与 at。\n#include &lt;array&gt;\n#include &lt;iostream&gt;\n#include &lt;stdexcept&gt;\n\nint main() {\n  std::array&lt;int, 3&gt; cells{10, 20, 30};\n\n  // 合法下标：[] 与 at 读到同一格。\n  std::cout &lt;&lt; \"cells[1]=\" &lt;&lt; cells[1] &lt;&lt; '\\n';\n  std::cout &lt;&lt; \"cells.at(1)=\" &lt;&lt; cells.at(1) &lt;&lt; '\\n';\n\n  try {\n    // 非法下标：at 抛出 std::out_of_range。\n    std::cout &lt;&lt; cells.at(3) &lt;&lt; '\\n';\n  } catch (const std::out_of_range& ex) {\n    std::cout &lt;&lt; \"caught: \" &lt;&lt; ex.what() &lt;&lt; '\\n';\n  }\n\n  // 故意不演示越界 cells[3]：那是未定义行为，不是可依赖的报错。\n  return 0;\n}\n\n预期输出（what() 的具体措辞随标准库实现略有差异，但类型仍是 std::out_of_range）：\n\n\n终端输出\n\ncells[1]=20\ncells.at(1)=20\ncaught: array::at: __n (which is 3) &gt;= _Nm (which is 3)\n\n合法下标时，[] 与 at 读到同一格。非法下标只演示 at：故意不写 cells[3]，因为那是未定义行为，不能当成可依赖的报错手段。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#同类容器",
+    "href": "content/standard-library/subscript-and-at.html#同类容器",
+    "title": "下标与 at",
+    "section": "同类容器",
+    "text": "同类容器\n下列容器与 std::array 一样：按下标访问时，越界的 [] 是未定义行为，at 抛 std::out_of_range。\n\nstd::vector\nstd::deque\nstd::basic_string / std::string\nstd::basic_string_view / std::string_view\n\nstd::span 在本仓库锁定的 C++20 下以 [] 为主；span::at 自 C++26 才进入标准，这里不假装 C++20 已经有它。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#map-按键取值",
+    "href": "content/standard-library/subscript-and-at.html#map-按键取值",
+    "title": "下标与 at",
+    "section": "map 按键取值",
+    "text": "map 按键取值\nmap / unordered_map 的 [] 会在缺键时插入默认值；at 缺键则抛。这一族的按键访问语义与 array 的下标语义不同，不要混为一谈。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#常见错误",
+    "href": "content/standard-library/subscript-and-at.html#常见错误",
+    "title": "下标与 at",
+    "section": "常见错误",
+    "text": "常见错误\n\n把越界 [] 当成「会抛异常」。不会；那是未定义行为。\n写成 cells_.[i]。这是语法错误，与越界无关。\n用异常表达「业务上拒绝一次落子」。业务拒绝用结果类型；at / out_of_range 留给检查路径与前置条件失败。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#自测问题",
+    "href": "content/standard-library/subscript-and-at.html#自测问题",
+    "title": "下标与 at",
+    "section": "自测问题",
+    "text": "自测问题\n\n对 std::array，[] 与 at 在越界时分别会怎样？\n\n查看答案\n[] 越界是未定义行为；at 抛 std::out_of_range。\n\n与 std::array 同属「下标 + at」一族的常用容器有什么？\n\n查看答案\nvector、deque、string、string_view（以及 C++26 起的 span::at）。map / unordered_map 的 [] 是插入语义，另算一族。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/standard-library/subscript-and-at.html#本章回顾",
+    "href": "content/standard-library/subscript-and-at.html#本章回顾",
+    "title": "下标与 at",
+    "section": "本章回顾",
+    "text": "本章回顾\n你现在能用 std::array 区分 [] 与 at，并说出同类容器。井字棋先用坐标判断范围，再用 at 读取格子，见实现棋盘存储。",
+    "crumbs": [
+      "标准库",
+      "<span class='chapter-number'>29</span>  <span class='chapter-title'>下标与 at</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/index.html",
+    "href": "content/toolchain/index.html",
+    "title": "工具链",
+    "section": "",
+    "text": "本部分介绍如何让构建工具、编译数据库和静态检查协同工作。",
+    "crumbs": [
+      "工具链"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html",
+    "href": "content/toolchain/clang-tools.html",
+    "title": "Clang 工具",
+    "section": "",
+    "text": "查看工程结构\n本章把“代码能编译”和“工具检查了正确范围”分开。你会以 code/toolchain/clang-tools.cpp 为入口生成 compile_commands.json，让 clangd 和 clang-tidy 使用同一组编译参数；再区分项目源文件与第三方依赖，避免把系统库的模板实例化数量误读成自己的错误。\n本章对应的示例是一个单文件工程，源文件位于 code/toolchain/clang-tools.cpp。它只负责提供可构建的入口；静态检查的范围由命令行显式传入，不会去不存在的 include/ 目录读取文件。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#编译数据库",
+    "href": "content/toolchain/clang-tools.html#编译数据库",
+    "title": "Clang 工具",
+    "section": "编译数据库",
+    "text": "编译数据库\n\n\ncode/toolchain/CMakeLists.txt\n\n# 生成 clang-tools 示例的编译数据库。\ncmake_minimum_required(VERSION 3.31)\nproject(ClangTools LANGUAGES CXX)\n\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\nadd_executable(clang-tools clang-tools.cpp)\ntarget_compile_features(clang-tools PRIVATE cxx_std_20)\ntarget_compile_options(clang-tools PRIVATE -Wall -Wextra -Werror)\n\n配置并构建：\n\n\n工程根目录\n\ncmake -S . -B build -G Ninja -DCMAKE_CXX_COMPILER=clang++\ncmake --build build\n\nbuild/compile_commands.json 记录 clang-tools.cpp 的标准、包含目录和编译选项。它是工具读取工程上下文的依据，不是“数据库里出现的每个文件都要检查”的清单。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#检查范围",
+    "href": "content/toolchain/clang-tools.html#检查范围",
+    "title": "Clang 工具",
+    "section": "检查范围",
+    "text": "检查范围\n日常检查使用明确的项目源文件：\n\n\n工程根目录\n\nclang-format --dry-run --Werror src/main.cpp include/index.h\nclang-tidy -p build \\\n  --header-filter='^.*/clang-tools/include/' \\\n  --exclude-header-filter='(^|/)build/_deps/' \\\n  src/main.cpp\n\n这条命令没有 --system-headers。该参数会额外显示标准库头文件中的诊断，适合依赖审计，不适合日常项目门禁。--header-filter='.*' 也过宽：它可能把第三方头文件的诊断带进输出。真正的边界先由源文件列表确定，再由项目文件过滤器补充。\n如果工程通过 FetchContent 引入测试框架，测试框架的源码可以出现在编译数据库中，但不应因此把它们加入项目 clang-tidy 的输入列表。第三方 include 应由 CMake target 以 system include 传播；项目自己的 include 保持普通 PRIVATE 或 PUBLIC，这样项目头文件仍会被发现。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#诊断数量",
+    "href": "content/toolchain/clang-tools.html#诊断数量",
+    "title": "Clang 工具",
+    "section": "诊断数量",
+    "text": "诊断数量\n看到类似下面的汇总时，不要先把它称为系统库错误：\n\n\nclang-tidy 汇总\n\n27786 warnings generated.\nSuppressed 27750 warnings (27720 in non-user code, 30 NOLINT).\n\n先查看真正的诊断行：\n\n路径是否位于项目源文件；\n检查名是什么；\n是否带有 --system-headers；\n是否来自编译器，而不是 clang-tidy。\n\n汇总数字通常包含宏展开和模板实例化路径，不能直接当成独立缺陷数量。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#边界访问",
+    "href": "content/toolchain/clang-tools.html#边界访问",
+    "title": "Clang 工具",
+    "section": "边界访问",
+    "text": "边界访问\n下面的公共查询接口不能把非法坐标直接换算成 std::size_t：\n\n\n查询接口\n\nCellState Board::GetCellState(Position position) const {\n  if (!IsValidPosition(position)) {\n    throw std::out_of_range(\"GetCellState: position is outside the board\");\n  }\n  return cells_.at(ToFlatIndex(position));\n}\n\ncppcoreguidelines-pro-bounds-constant-array-index 报告的是动态 operator[] 缺少工具可见的边界证明，不是编译错误。公共查询接口应先验证坐标，再使用 std::array::at（或项目明确的边界辅助函数）；不要在 .clang-tidy 里全局关闭该检查。只有经过验证的局部例外才使用紧贴表达式的 NOLINT。\n[] 与 at 在多种容器上的共性见下标与 at；本章只讲静态检查怎么读诊断。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#验证",
+    "href": "content/toolchain/clang-tools.html#验证",
+    "title": "Clang 工具",
+    "section": "验证",
+    "text": "验证\n\n\n工程根目录\n\nctest --test-dir build --output-on-failure\nclang-tidy -p build clang-tools.cpp\n\n成功条件是工程构建、测试和静态检查都通过，并且诊断路径只落在项目源文件或项目头文件。若输出出现标准库或第三方路径，先检查源文件列表、--header-filter、CMake include 类型和是否误用了 --system-headers。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#自测问题",
+    "href": "content/toolchain/clang-tools.html#自测问题",
+    "title": "Clang 工具",
+    "section": "自测问题",
+    "text": "自测问题\n\ncompile_commands.json 为什么不能直接作为 clang-tidy 的项目文件清单？\n--system-headers 是收窄检查范围还是扩大检查范围？\n为什么关闭动态下标检查不能替代 GetCellState 的边界验证？\n\n查看答案\n编译数据库记录所有目标的编译参数，可能包含依赖目标；项目门禁仍应只传入自己的源文件。--system-headers 会扩大诊断范围。关闭规则只能隐藏一类诊断，不能阻止非法坐标转换后访问数组。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/toolchain/clang-tools.html#本章回顾",
+    "href": "content/toolchain/clang-tools.html#本章回顾",
+    "title": "Clang 工具",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能用编译数据库统一工具参数，并用源文件清单与项目文件过滤器控制静态检查范围。动态下标问题要先修公共接口的边界处理，再决定是否需要局部豁免。",
+    "crumbs": [
+      "工具链",
+      "<span class='chapter-number'>30</span>  <span class='chapter-title'>Clang 工具</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/index.html",
+    "href": "content/practice/index.html",
+    "title": "工程应用",
+    "section": "",
+    "text": "本分册先把静态库和动态库构建出来，再用一页说明这些产物在真实工程里各自承担什么。它不把 Android NDK、Gradle 或 JNI 实现展开成教程。\n\n\n静态库\n把库代码链接进最终程序。\n\n\n动态库\n让程序在运行时查找库文件。\n\n\n交付形态\n理解影像算法为什么先用可执行文件仿真，再作为按 ABI 交付的动态库 SDK 接入 App 或系统模块。",
+    "crumbs": [
+      "工程应用"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html",
+    "href": "content/practice/static-library.html",
+    "title": "静态库",
+    "section": "",
+    "text": "认识静态库\n当同一份实现要被多个程序使用时，每次复制源码会带来重复维护。本章把 greeting 构建成静态库，再链接进 app。\n静态库在 Linux 上通常使用 .a 扩展名，保存已经编译好的库代码，不能直接运行。链接 app 时，链接器会把程序实际使用的库代码放进最终可执行文件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#认识静态库",
+    "href": "content/practice/static-library.html#认识静态库",
+    "title": "静态库",
+    "section": "",
+    "text": "工程目录\n\nstatic-library/\n├── CMakeLists.txt\n├── main.cpp\n└── greeting/\n    ├── CMakeLists.txt\n    ├── include/\n    │   └── greeting.h\n    └── src/\n        └── greeting.cpp",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#查看构建规则",
+    "href": "content/practice/static-library.html#查看构建规则",
+    "title": "静态库",
+    "section": "查看构建规则",
+    "text": "查看构建规则\n顶层文件不直接编译 greeting.cpp：add_subdirectory(greeting) 会让构建系统进入库目录执行其中的规则。\n\n\nCMakeLists.txt\n\n# 构建 StaticLibrary 工程：根 main.cpp 使用 greeting/ 提供的静态库。\ncmake_minimum_required(VERSION 3.31)\nproject(StaticLibrary LANGUAGES CXX)\n\n# 使用 C++20 作为语言标准。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\n# 可执行文件输出到 build/bin。\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n# 静态库输出到 build/lib。\nset(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)\n\n# 编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 加载 greeting/CMakeLists.txt 中的静态库目标。\nadd_subdirectory(greeting)\n\n# 创建 app 可执行目标。\nadd_executable(app main.cpp)\n\n# 链接 greeting 静态库。\ntarget_link_libraries(app PRIVATE greeting)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n# 链接时也使用 libc++。\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\n库目录自己负责创建 greeting 目标。\n\n\ngreeting/CMakeLists.txt\n\n# 构建 greeting 静态库。\n\n# 声明 greeting 静态库目标：由 src/greeting.cpp 编译生成。\nadd_library(greeting STATIC src/greeting.cpp)\n\n# include/ 加入头文件搜索路径，供使用方 include。\ntarget_include_directories(greeting PUBLIC include)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(greeting PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n\nSTATIC 生成的就是静态库产物 .a 文件，构建产物为 libgreeting.a。PUBLIC 表示使用这个库的程序也能找到 include/。target_link_libraries(app PRIVATE greeting) 告诉 CMake：构建 app 时使用这个库。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#构建并运行",
+    "href": "content/practice/static-library.html#构建并运行",
+    "title": "静态库",
+    "section": "构建并运行",
+    "text": "构建并运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译库和 app，并完成链接\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n构建后会得到 build/lib/libgreeting.a 和 build/bin/app。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#静态库产物",
+    "href": "content/practice/static-library.html#静态库产物",
+    "title": "静态库",
+    "section": "静态库产物",
+    "text": "静态库产物\n\n\nUbuntu Bash（static-library 工程根目录）\n\nldd build/bin/app\n\n输出中不会出现 libgreeting.a。静态库只参与链接，需要的代码已经进入 app，运行时不再读取 .a 文件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#选择静态库",
+    "href": "content/practice/static-library.html#选择静态库",
+    "title": "静态库",
+    "section": "选择静态库",
+    "text": "选择静态库\n静态库能让程序少带一个运行时库文件，适合希望简化部署的场景。代价是库改变后，所有使用它的程序都要重新链接。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#常见错误",
+    "href": "content/practice/static-library.html#常见错误",
+    "title": "静态库",
+    "section": "常见错误",
+    "text": "常见错误\n\n链接器找不到 MakeGreeting()\n先确认顶层 CMakeLists.txt 包含 target_link_libraries(app PRIVATE greeting)。补回后重新配置并构建：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让 CMake 重新读取链接关系\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译库和 app，并完成链接\ncmake --build build",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#自测问题",
+    "href": "content/practice/static-library.html#自测问题",
+    "title": "静态库",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n为什么 ldd build/bin/app 不会列出 libgreeting.a？\n\n查看答案\n静态库只在链接阶段提供目标代码，链接器会把被使用的代码复制进 app。程序运行时不再依赖原来的 .a 文件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/static-library.html#本章回顾",
+    "href": "content/practice/static-library.html#本章回顾",
+    "title": "静态库",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能构建并链接静态库。下一章会改成动态库，观察程序运行时如何查找库文件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>31</span>  <span class='chapter-title'>静态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html",
+    "href": "content/practice/shared-library.html",
+    "title": "动态库",
+    "section": "",
+    "text": "认识动态库\n静态库的代码会进入最终程序。动态库改为在程序运行时加载，多个程序也可以共享同一个库文件。本章把上一章的 greeting 改成动态库，先介绍动态库的查找机制，再依次约定产物目录、查找路径，最后构建与运行。\n动态库在 Linux 上通常使用 .so 扩展名。构建 app 时，链接器记录它对库的依赖，不把库代码复制进程序。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#认识动态库",
+    "href": "content/practice/shared-library.html#认识动态库",
+    "title": "动态库",
+    "section": "",
+    "text": "内容\n静态库\n动态库\n\n\n\n\n文件\nlibgreeting.a\nlibgreeting.so\n\n\n链接结果\n库代码进入 app\napp 记录库依赖\n\n\n运行条件\n不再需要库文件\n必须找到匹配的 .so",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#约定产物目录",
+    "href": "content/practice/shared-library.html#约定产物目录",
+    "title": "动态库",
+    "section": "约定产物目录",
+    "text": "约定产物目录\n运行时能找到库，前提是产物位置固定。顶层规则用两行 set 约定产物目录：\n\n\nCMakeLists.txt\n\n# 构建 SharedLibrary 工程：根 main.cpp 使用 greeting/ 提供的动态库。\ncmake_minimum_required(VERSION 3.31)\nproject(SharedLibrary LANGUAGES CXX)\n\n# 使用 C++20 作为语言标准。\nset(CMAKE_CXX_STANDARD 20)\nset(CMAKE_CXX_STANDARD_REQUIRED ON)\n# 可执行文件输出到 build/bin。\nset(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)\n# 动态库输出到 build/lib。\nset(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)\n\n# 编译数据库，记录每个源文件的实际编译参数。\nset(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n\n# 加载 greeting/CMakeLists.txt 中的动态库目标。\nadd_subdirectory(greeting)\n\n# 创建 app 可执行目标。\nadd_executable(app main.cpp)\n\n# 链接 greeting 动态库。\ntarget_link_libraries(app PRIVATE greeting)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(app PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n# 链接时也使用 libc++。\ntarget_link_options(app PRIVATE -stdlib=libc++)\n\n# 运行 app 时从 build/bin/../lib 查找动态库。\nset_target_properties(app PROPERTIES BUILD_RPATH \"$ORIGIN/../lib\")\n\n其中两行 set 决定产物位置：CMAKE_RUNTIME_OUTPUT_DIRECTORY 收纳可执行文件，CMAKE_LIBRARY_OUTPUT_DIRECTORY 收纳动态库。build/lib 是构建产物目录，源码树里没有 lib/ 目录。\n在库目录中把 STATIC 改成 SHARED，其余与静态库工程相同。\n\n\ngreeting/CMakeLists.txt\n\n# 构建 greeting 动态库。\n\n# 声明 greeting 共享库目标：由 src/greeting.cpp 编译生成。\nadd_library(greeting SHARED src/greeting.cpp)\n\n# include/ 加入头文件搜索路径，供使用方 include。\ntarget_include_directories(greeting PUBLIC include)\n\n# 编译时启用 libc++ 与常用警告。\ntarget_compile_options(greeting PRIVATE -stdlib=libc++ -Wall -Wextra -Werror)\n# 链接时也使用 libc++。\ntarget_link_options(greeting PRIVATE -stdlib=libc++)\n\nSHARED 让 add_library 生成动态库 libgreeting.so，构建后出现在 build/lib/ 下。顶层规则里的 set_target_properties 行负责运行时查找，查找路径一节单独解释。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#查找路径",
+    "href": "content/practice/shared-library.html#查找路径",
+    "title": "动态库",
+    "section": "查找路径",
+    "text": "查找路径\n产物分离后，运行中的 app 需要自己找到 build/lib/ 里的库。主路径是下面这行，它把查找位置写进可执行文件：\n\n\nCMakeLists.txt\n\n# 运行 app 时从 build/bin/../lib 查找动态库。\nset_target_properties(app PROPERTIES BUILD_RPATH \"$ORIGIN/../lib\")\n\nBUILD_RPATH 设置 RPATH（程序内部记录的库查找位置）。$ORIGIN 表示可执行文件所在目录，$ORIGIN/../lib 就是 build/bin 旁边的 build/lib。程序无论从哪里启动，都按自身位置找到库，不依赖当前目录，也不依赖全局配置。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#临时查找路径",
+    "href": "content/practice/shared-library.html#临时查找路径",
+    "title": "动态库",
+    "section": "临时查找路径",
+    "text": "临时查找路径\nRPATH 已经写进 app，直接运行即可。排查库问题时，可以给单条命令临时追加查找路径：\n\n\nUbuntu Bash（工程根目录）\n\n# 给这一条命令临时追加 build/lib，命令结束后设置即失效\nenv LD_LIBRARY_PATH=\"$PWD/build/lib\" ./build/bin/app\n\nLD_LIBRARY_PATH 是动态加载器在标准位置之外追加查找路径的环境变量。env 只在命令运行期间设置它，不改动任何持久配置。\n教学工程以 RPATH 为主路径，这种一次性变量用于排查。不要把 LD_LIBRARY_PATH 写进 ~/.bashrc 或系统配置，也不要用 ldconfig 注册工程产物。全局改动会影响所有程序，出错时也更难定位。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#构建与运行",
+    "href": "content/practice/shared-library.html#构建与运行",
+    "title": "动态库",
+    "section": "构建与运行",
+    "text": "构建与运行\n\n\nUbuntu Bash（工程根目录）\n\n# 配置工程，并生成 Ninja 使用的构建规则\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 编译动态库和 app，并完成链接\ncmake --build build\n# 运行程序\n./build/bin/app\n\n输出如下：\n\n\n输出\n\nHello, World!\n\n构建产物是 build/lib/libgreeting.so 和 build/bin/app。用 ldd（列出程序运行时依赖的动态库）确认 app 找到的库位置：\n\n\nUbuntu Bash（工程根目录）\n\nldd build/bin/app | grep libgreeting\n\n输出显示 libgreeting.so 已解析到完整路径：\n\n\n输出\n\nlibgreeting.so =&gt; /…/cpp-notes/code/practice/shared-library/build/bin/../lib/libgreeting.so (0x0000799516b60000)\n\n前半段是工程在你机器上的路径，关键在结尾：build/bin/../lib/ 正是 $ORIGIN/../lib 的解析结果。移动或删除这个 .so 后，程序将无法启动。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#常见错误",
+    "href": "content/practice/shared-library.html#常见错误",
+    "title": "动态库",
+    "section": "常见错误",
+    "text": "常见错误\n\n运行时找不到 libgreeting.so\n直接运行 ./build/bin/app 报 “error while loading shared libraries: libgreeting.so”，按下面的顺序排查：\n\n\nUbuntu Bash（工程根目录）\n\n# 重新配置，让 RPATH 写入新构建的 app\ncmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++\n# 重新编译并链接\ncmake --build build\n# 查看 app 记录的库查找结果\nldd build/bin/app | grep libgreeting\n\n先确认 build/lib/libgreeting.so 已生成，再检查顶层规则是否包含 set_target_properties(app PROPERTIES BUILD_RPATH \"$ORIGIN/../lib\")，补回后重新配置和构建。\n\n\n缺临时变量不运行\n加 env LD_LIBRARY_PATH=... 能运行、去掉就失败，说明查找路径没有写进 app，处理与上一条相同：\n\n把 BUILD_RPATH 写回顶层规则；\n重新配置和构建；\n不加临时变量直接运行验证。\n\n\n\n路径写进全局配置\n换一个终端就找不到库，或卸载工程后其他程序也受影响，按下面顺序处理：\n\n原因通常是之前把 LD_LIBRARY_PATH 写进了 ~/.bashrc，或用 ldconfig 注册过工程产物；\n打开 ~/.bashrc 删除自己追加的行；\n重新打开终端后按本章方案验证：只依赖 RPATH，app 应当直接运行。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#自测问题",
+    "href": "content/practice/shared-library.html#自测问题",
+    "title": "动态库",
+    "section": "自测问题",
+    "text": "自测问题\n先不要展开答案，试着自己把回答完整说出来，再展开对照。说不出来的部分，回到对应小节对照正文。\n\n为什么动态库工程可能构建成功，但运行 app 时仍然失败？\n\n查看答案\n构建阶段只证明链接器记录了动态库依赖。运行阶段还需要动态加载器找到匹配的 .so。如果库文件不在搜索路径中，或 RPATH 没有指向 build/lib/，程序就无法启动。\n\nRPATH 与临时 LD_LIBRARY_PATH 各解决什么问题？\n\n查看答案\nRPATH 查找路径，是程序的长期主路径。临时 LD_LIBRARY_PATH 只包住单条命令，用于排查和对照验证。两者都不改动全局配置。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/shared-library.html#本章回顾",
+    "href": "content/practice/shared-library.html#本章回顾",
+    "title": "动态库",
+    "section": "本章回顾",
+    "text": "本章回顾\n你已经能构建动态库，并让程序在运行时找到它。完成本页后，入门路线中的构建页面就全部完成了。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>32</span>  <span class='chapter-title'>动态库</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html",
+    "href": "content/practice/android-imaging.html",
+    "title": "交付形态",
+    "section": "",
+    "text": "开发期产物\n本页只解释 Android 手机影像项目中两类原生（native）产物的职责，不提供 NDK、Gradle、JNI 实现或 APK 打包教程。\nAndroid 手机影像算法通常用 C++ 编写，开发阶段先把核心算法编译成可执行文件，在 PC 或设备上读取 YUV、RAW、RGBA 等图像数据或图片序列，用于检查结果与回归测试。\n设备端验证的方式：",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>33</span>  <span class='chapter-title'>交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#开发期产物",
+    "href": "content/practice/android-imaging.html#开发期产物",
+    "title": "交付形态",
+    "section": "",
+    "text": "用 adb push 将程序和测试数据放进 /data/local/tmp，再从 shell 运行；\n程序直接调用算法，不需要先接入 App，问题边界更清晰；\n验证完成后算法才会封装成动态库 SDK，仿真程序通常不是最终上线交付物。\n\n\n\n\n\n\n\n提示交付边界\n\n\n\n可执行文件服务于开发期仿真和验证。它可以随测试包进入设备，但不等于面向用户发布的 App 组件。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>33</span>  <span class='chapter-title'>交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#交付动态库",
+    "href": "content/practice/android-imaging.html#交付动态库",
+    "title": "交付形态",
+    "section": "交付动态库",
+    "text": "交付动态库\n在 Android 手机影像开发中，动态库是算法上线时的常见交付形式，算法团队把 C++ 核心按 ABI（应用二进制接口）编译成 .so：\n\n这些 .so 连同头文件、模型、配置、JNI（Java 与 C++ 的接口）封装和集成文档组成 SDK，App、相机或系统模块通过 JNI 调用，不直接接触算法源码；\n这种交付方式便于独立编译算法、复用模块、适配不同硬件，也能减少上层对源码和模型的直接依赖；\n跨语言接口通常使用 extern \"C\" 暴露稳定的 C 风格函数，并避免直接传递复杂 C++ 对象，以降低兼容风险；\n.so 通常随 APK、AAB 或系统插件发布，仍受签名和应用商店政策限制，不是无条件热更新。\n\n\n\n常见交付链路\n\nC++ 核心 → 可执行程序仿真 → 按 ABI 提供的 .so SDK → JNI 集成 → App/相机上线",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>33</span>  <span class='chapter-title'>交付形态</span>"
+    ]
+  },
+  {
+    "objectID": "content/practice/android-imaging.html#本章回顾",
+    "href": "content/practice/android-imaging.html#本章回顾",
+    "title": "交付形态",
+    "section": "本章回顾",
+    "text": "本章回顾\n可执行文件负责开发期的仿真和验证，动态库 SDK 负责上线集成。两者共用同一套 C++ 核心，但交付对象、运行方式和关注点不同。",
+    "crumbs": [
+      "工程应用",
+      "<span class='chapter-number'>33</span>  <span class='chapter-title'>交付形态</span>"
+    ]
+  }
+]
