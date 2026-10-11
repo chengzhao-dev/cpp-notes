@@ -12,6 +12,7 @@ metadata:
 ## 适用场景
 
 - 新建、合并、重构、改名或删除 skill、reference、MCP 工具与脚本入口。
+- 收录用户丢来的成段材料（按 `references/intake.md` 先出落点计划）。
 - 用 `scope` 确定读取边界，用 `check`（含 `tasks` 矩阵一致性）收口验收。
 - **不适用**：写章节正文（转 `writing-cpp` 或 `writing-quarto`）、改样式（转 `designing-theme`）。
 
@@ -22,6 +23,7 @@ metadata:
 | 改 skill 结构、上下文预算、任务矩阵格式与 ID 规则 | `references/refactor-guidelines.md` |
 | 目录关系、章节路线图、运行边界与诊断逃生舱 | `references/repository-structure.md` |
 | skill 短路由与领域分工 | `references/catalog.md` |
+| 成段材料落点计划与收录步骤 | `references/intake.md` |
 
 ## P0 硬约束
 

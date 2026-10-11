@@ -1,13 +1,14 @@
 # Agent 工作区结构规范
 
-本规范适用于 `.agents/` 及其下的 `skills/`、`knowledge/`、`memory/`、`incidents/`，以及技能内部资源目录。配套命名规范见同技能下的 `naming.md`；两者冲突时，命名以 `naming.md` 为准，结构以本文件为准。
+本规范适用于 `.agents/` 及其下的 `context/`、`skills/`、`knowledge/`、`memory/`、`incidents/`，以及技能内部资源目录。配套命名规范见同技能下的 `naming.md`；两者冲突时，命名以 `naming.md` 为准，结构以本文件为准。
 
-## 1. 四区职责
+## 1. 五区职责
 
 | 区 | 回答的问题 | 何时读 |
 | --- | --- | --- |
+| `context/` | 现在是什么、现在怎么做（现行事实与规范条文） | 按任务打开 `context/README.md` 路由的那一个文件 |
 | `skills/` | 怎么做（流程、清单、硬约束） | 命中任务时读对应 `SKILL.md` |
-| `knowledge/` | 是什么 / 为什么（稳定事实、取舍） | 需要依据时，经 `kb-search` 或 `kb_id` |
+| `knowledge/` | 为什么（取舍记录、正反例） | 需要依据时，经 `kb-search` 或 `kb_id` |
 | `memory/` | 过去哪里容易出错 | 每个任务开始时读 `MEMORY.md` 索引 |
 | `incidents/` | 这次失败有没有先例 | **仅排查失败时**读 `INDEX.md`，平时视为不存在 |
 
@@ -18,6 +19,13 @@
 ```text
 .agents/
 ├── README.md                     # 一级入口，允许
+├── context/
+│   ├── README.md                 # 任务 → 文件路由
+│   ├── project.md
+│   ├── architecture.md
+│   ├── development.md
+│   ├── glossary/<topic>.md
+│   └── conventions/[writing|rendering]/<topic>.md
 ├── skills/
 │   ├── governing-agents/         # 三级：具体技能
 │   │   ├── SKILL.md
@@ -74,7 +82,7 @@
 
 ## 6. 与 cpp-board-games 的对照表
 
-两仓 `.agents/` 同构（四区 + 同名知识领域目录），职责与落点对齐；具体数字（体量阈值、篇幅预算）按仓可调，不对齐。除下表所列差异外，同名文件语义一致，双向同步只在用户显式要求时执行。
+两仓 `.agents/` 同构（五区 + 同名知识领域目录），职责与落点对齐；`context/` 分区（目录形状、zone 检索规则、intake 流程）两仓相同，正文各写各的，`kb_id` 前缀本仓 `cpp-*`、board-games `bg-*`。具体数字（体量阈值、篇幅预算）按仓可调，不对齐。除下表所列差异外，同名文件语义一致，双向同步只在用户显式要求时执行。
 
 | 项 | 本仓（cpp-notes） | cpp-board-games | 说明 |
 | --- | --- | --- | --- |
