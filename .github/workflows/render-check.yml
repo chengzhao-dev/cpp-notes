@@ -17,6 +17,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # config.toml 的 python 字段是仓库唯一解释器来源；CI 把它指到 runner 的 python3。
+      - name: Point config.toml python at the runner interpreter
+        run: sed -i 's|^python = .*|python = "/usr/bin/python3"|' config.toml
+      # 当前没有 {python} 单元；若后续声明依赖，统一入口会按 config.toml 安装。
+      - name: Install Quarto executable-cell dependencies
+        run: /usr/bin/python3 .agents/skills/governing-agents/scripts/run.py install-quarto-deps
       # 渲染以暴露结构性错误（缺文件/引用失效等）
       - run: quarto render
       # 同时验证后处理脚本本身可用
