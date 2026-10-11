@@ -1,27 +1,27 @@
 ---
 kb_id: cpp-retrieval-governance-v1
-title: Agent 资源分层与统一检索协议
+title: 检索与分区职责边界
 domain: agent-workspace
 subdomain: retrieval
-tags: [skill, knowledge, memory, registry, retrieval, mcp]
+tags: [skill, context, knowledge, memory, registry, retrieval, mcp]
 dependencies: []
 created: 2026-09-24
-updated: 2026-09-24
+updated: 2026-10-11
 chunk_strategy: semantic_heading
 estimated_tokens: 900
 ---
 
-# Agent 资源分层与统一检索协议
+# 检索与分区职责边界
 
 ## 资源职责边界
 
-Agent 资源按回答的问题分层，而不是按文件格式分层。项目硬约束和路径边界属于 instruction；任务流程、入口、格式和可执行硬约束属于 skill/reference；稳定领域事实、设计理由、权衡与失败模式属于 knowledge；跨会话的历史经验属于 memory。生成的 registry、速查表和数据库只负责定位或加速，不能成为事实唯一来源。
+Agent 资源按回答的问题分层，而不是按文件格式分层。项目硬约束和路径边界属于 instruction；现在是什么、现在怎么做（现行事实与规范条文）属于 context；任务流程、入口、格式和可执行硬约束属于 skill/reference；为什么否决、取舍与失败模式属于 knowledge；跨会话的历史经验属于 memory。生成的 registry、速查表和数据库只负责定位或加速，不能成为事实唯一来源。
 
-当 skill 需要依据时，应通过 `kb_id` 或一次 `kb-search` 入口指向 knowledge，而不是复制知识正文。knowledge 可以解释为什么采用某个流程，但不应重新定义必须执行的命令。这样既能避免两处内容漂移，也能让检索器根据资源类型和状态过滤结果。knowledge 内的正反对照放各领域的 `cases/` 子域（一条对照 = 正确 + 不佳 + 改写），`cases/appendix/` 是低频人审附录，不进索引与检索。
+同一个知识点只允许一个出处；检索命中两处重复表述时，以带 `kb_id` 的 context 现行条文为权威，knowledge 只留取舍。context 与 knowledge 同库检索（chunk 带 `zone=context|knowledge`，默认排序 context 加权 1.2、knowledge 1.0）。当 skill 需要依据时，应通过 `kb_id` 或一次 `kb-search` 入口指向对应文件，而不是复制正文。knowledge 内的正反对照放各领域的 `cases/` 子域（一条对照 = 正确 + 不佳 + 改写），`cases/appendix/` 是低频人审附录，不进索引与检索。
 
 ## 统一检索请求
 
-两个仓库可以保留不同的领域内容和索引实现，但检索请求应表达相同的意图：`repository`、`query`、`kind`、`domain`、`scope`、`status`、`top_k`、`token_budget` 和 `explain`。未指定 `repository` 时只允许在明确的聚合入口中跨库查询；普通仓库入口必须拒绝隐式跨库，避免同名 skill 或 knowledge 互相污染。
+两个仓库可以保留不同的领域内容和索引实现，但检索请求应表达相同的意图：`repository`、`query`、`kind`、`domain`、`scope`、`status`、`zone`、`top_k`、`token_budget` 和 `explain`。`zone` 取 `all`（默认）、`context`（只查现行条文）或 `knowledge`（只查取舍与正反例）。未指定 `repository` 时只允许在明确的聚合入口中跨库查询；普通仓库入口必须拒绝隐式跨库，避免同名 skill 或 knowledge 互相污染。
 
 ## 统一检索响应
 

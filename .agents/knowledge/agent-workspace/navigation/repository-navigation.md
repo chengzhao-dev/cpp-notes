@@ -27,10 +27,10 @@ estimated_tokens: 460
 
 章节文件使用简短 kebab-case，优先写具体主题或读者任务，例如 `setup-wsl2`、`first-program`、`multi-file-project`。名称不重复父 part 已表达的类别，所以 `standard-library` 下使用 `vector`，不写 `stl-vector`。也不使用 `chapter-`、`intro-` 等没有新增信息的词。
 
-part 导航页固定为 `index.qmd`。各 part 的正文使用 `content/<part>/<chapter>.qmd`，示例使用 `code/<part>/<chapter>.cpp` 或同名工程目录。只有文件名本身无法承载章节顺序表，因此 Codex 路由和 Quarto 配置仍读取任务矩阵与 `_quarto.yml`。
+现行路径与命名约定以标识 `cpp-architecture-overview-v1` 的规范文件为准（part 导航页 `index.qmd`、正文 `content/<part>/<chapter>.qmd`、示例 `code/<part>/`）。本文件保留命名取舍依据。
 
 ## 排序与编号
 
-阅读顺序的唯一执行来源是 `_quarto.yml`，面向读者的顺序说明由各 part 的 `index.qmd` 承担。章节文件不增加 `000-` 这类数字前缀，因为数字会成为第二套顺序来源。插入、移动或合并章节时，还要同时维护文件名、链接、示例目录、任务矩阵和构建命令，容易产生与 YAML 不一致的漂移。
+现行口径（阅读顺序的唯一执行来源是 `_quarto.yml`，章节文件不使用数字前缀）以标识 `cpp-architecture-overview-v1` 的规范文件为准。这里记录为什么：数字会成为第二套顺序来源。插入、移动或合并章节时，还要同时维护文件名、链接、示例目录、任务矩阵和构建命令，容易产生与 YAML 不一致的漂移。
 
 语义文件名在跨页面链接和搜索结果中比编号更稳定。若确实需要批量排序，可以由生成脚本根据 `_quarto.yml` 输出检查结果，而不是把顺序编码进入路径。该策略让 URL 和文件身份只表达内容，让顺序表达放在唯一配置中。

@@ -2,7 +2,7 @@
 kb_id: "cpp-tooling-build-chain-v2"
 title: "C++ 构建与工具链决策依据"
 domain: "cpp-teaching"
-subdomain: "toolchain"
+subdomain: "development"
 tags: [toolchain, clang, llvm, libcxx, lldb, cmake, ninja, ninja-build, generator, compiler_flags, sanitizer, warnings, optimization, header, translation_unit, include_path, include_directories, target_include_directories, source_glob, configure_depends, project_name, multi_file, clangd, compile_commands, verification]
 level_range: [0, 9]
 created: "2026-09-09"

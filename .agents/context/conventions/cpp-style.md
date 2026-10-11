@@ -2,7 +2,7 @@
 kb_id: "cpp-naming-format-v1"
 title: "Google C++ 风格落地决策"
 domain: "cpp-teaching"
-subdomain: "style"
+subdomain: "conventions"
 tags: [google-style, naming, identifiers, headers, style-guide, clang-tidy]
 level_range: [0, 5]
 dependencies: [cpp-teaching-source-comments-v1]

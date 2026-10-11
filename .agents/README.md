@@ -1,6 +1,6 @@
 # Agent 工作区
 
-`.agents/` 是本项目 Agent 资源的唯一工作区。根目录 `AGENTS.md` 只保留项目级硬约束；本文件负责定位，不重复规则。
+`.agents/` 是本项目 Agent 资源的唯一工作区。根目录 `AGENTS.md` 只保留项目级硬约束；本文件负责定位，不重复规则。本目录结构与 cpp-board-games 仓库同构（五区 + 同名知识领域目录），统一决策与保留差异见 `skills/governing-agents/references/structure.md` 对照表。
 
 ## 按任务进入
 
@@ -13,16 +13,19 @@
 | 调整主题、布局和页面资源 | `skills/designing-theme/SKILL.md` |
 | GitHub、提交和发布边界 | `skills/shipping-github/SKILL.md` |
 | 只读代码审查 | `skills/reviewing-code/SKILL.md` |
+| 现行事实与规范条文（现在是什么、怎么做） | `context/README.md` |
+| 领域依据（为什么这样设计） | `knowledge/KNOWLEDGE.md` |
 | 跨会话教训（过去哪里易错） | `memory/MEMORY.md` |
 | 失败复盘（仅排查时） | `incidents/INDEX.md` |
 
-完整短路由见 `skills/governing-agents/references/catalog.md`。
+一次任务只读命中技能的 `SKILL.md` 与其路由指向的文件；完整短路由见 `skills/governing-agents/references/catalog.md`。
 
 ## 目录职责
 
 ```text
 .agents/
-├── knowledge/       # 稳定领域事实与“为什么”，按领域组织；入口 KNOWLEDGE.md
+├── context/         # 现行事实与规范条文；入口 README.md（任务 → 文件路由）
+├── knowledge/       # 取舍与正反例（为什么）；入口 KNOWLEDGE.md
 ├── memory/          # 跨会话教训；入口 MEMORY.md
 ├── incidents/       # 失败复盘，仅排查时读；入口 INDEX.md
 ├── mcp/             # 项目级 MCP server 与说明
@@ -34,7 +37,7 @@
 └── README.md        # 本导航
 ```
 
-四区结构与命名规范见 `skills/governing-agents/references/structure.md` 与 `naming.md`。知识库索引产物写入根目录 `temp/knowledge-index/`，不进入 `.agents/`，也不入库。不要把临时计划、构建产物或缓存放进本目录。
+规则只保留一份权威来源：流程放 `skills/`，现行事实与条文放 `context/`，取舍原因放 `knowledge/`，历史经验放 `memory/`，失败案例放 `incidents/`。知识库索引产物写入根目录 `temp/knowledge-index/`，不进入 `.agents/`，也不入库。不要把临时计划、构建产物或缓存放进本目录。
 
 ## 运行入口
 

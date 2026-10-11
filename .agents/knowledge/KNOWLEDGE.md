@@ -1,20 +1,19 @@
 # .agents/knowledge/ 知识库
 
-本目录是领域依据的唯一出处：回答「为什么这样配置、为什么这样设计、为什么会失败」。目录名是名词 kebab 领域名，与对应技能的功能域对应。
-「skill 与 knowledge 怎么分工」的权威定义在 `.agents/skills/governing-agents/references/catalog.md`「skill 与 knowledge 的分工」，本文件只引用不复制。
+本目录只保留「为什么」：取舍记录、被否决的替代方案与正反例。「现在是什么、现在怎么做」的现行条文在 `.agents/context/`，两区同库检索（chunk 带 `zone=context|knowledge`，默认排序 context 加权 1.2、knowledge 1.0）；分工定义见 `.agents/skills/governing-agents/references/catalog.md`「skill、context 与 knowledge 的分工」，本文件只引用不复制。
 
 ## 目录结构
 
 ```text
-.agents/knowledge/
+.agents/knowledge/                # 取舍与正反例；现行条文在 ../context/
 ├── agent-workspace/               # Agent 运行、检索治理、上下文与维护（技能：governing-agents）
 │   ├── context/
 │   ├── navigation/
 │   └── retrieval/
-├── cpp-teaching/                  # 按 path、style、toolchain、types、stl 等性质归档（技能：writing-cpp）
+├── cpp-teaching/                  # 语言机制与取舍：types、stl、path、design、toolchain（技能：writing-cpp）
 │   └── cases/                     # 正反对照（正确/不佳/改写）；appendix/ 不进索引
-│   # style/ 含命名、异常文案等；stl/ 含下标与 at 等
-├── quarto-writing/                # 按 output、rendering、writing 等性质归档（技能：writing-quarto）
+├── quarto-writing/                # 写作取舍与渲染 why（技能：writing-quarto）
+│   ├── output/
 │   └── cases/                     # 正反对照（正确/不佳/改写）；appendix/ 不进索引
 ├── visual-theme/                  # 主题令牌、布局几何与响应式行为（技能：designing-theme）
 │   ├── layout/
@@ -24,7 +23,7 @@
     └── publishing/
 ```
 
-`cases/` 放正反对照，一条对照的检索单元是「正确 + 不佳 + 改写」；规范条文与依据留在 style、types 等条文叶子。`cases/appendix/` 是低频人审附录：索引、检索、评测与校验全部跳过，仅人审或用户点名时读。
+`cases/` 放正反对照，一条对照的检索单元是「正确 + 不佳 + 改写」；现行规范条文在 `.agents/context/`，本目录不再保存一份相同的现行条文。`cases/appendix/` 是低频人审附录：索引、检索、评测与校验全部跳过，仅人审或用户点名时读。
 
 按性质创建子目录，不创建空目录。文件名与目录名一律纯 ASCII。
 
@@ -34,7 +33,7 @@ frontmatter 字段：
 
 | 字段 | 必填 | 作用 |
 |---|---|---|
-| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-structure-v1`），历史 id 保持不改名，改名等于新建知识 |
+| `kb_id` | 是 | 全局唯一。现行约定 `cpp-<area>-<topic>-v<N>`（如 `cpp-quarto-chapter-structure-v1`），历史 id 保持不改名，改名等于新建知识；`.agents/context/` 同一标准，前缀同为 `cpp-*` |
 | `title` | 是 | 文档级标题，也是 Parent 无 `###` 时的标题路径根 |
 | `domain` | 是 | 检索预过滤维度，取同名领域目录值 |
 | `subdomain` | 建议 | 同一技能内的主题筛选，取同名子域目录值 |
@@ -75,8 +74,10 @@ frontmatter 字段：
 & .agents/skills/governing-agents/scripts/run.ps1 kb-index --rebuild  # 改分词或结构后全量重建
 & .agents/skills/governing-agents/scripts/run.ps1 kb-check            # 格式违规、重复、孤立、断链、P95 延迟
 & .agents/skills/governing-agents/scripts/run.ps1 kb-eval             # Top-5 召回率与注入 Token 预算
-& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<查询>" --domain quarto-writing --explain
+& .agents/skills/governing-agents/scripts/run.ps1 kb-search "<查询>" --domain quarto-writing --zone context --explain
 ```
+
+`--zone` 取 `all`（默认）、`context`（只查现行条文）或 `knowledge`（只查取舍与正反例）。
 
 产物写在 `temp/knowledge-index/`（已 gitignore，缺失时自动重建）。管道代码在 `.agents/skills/maintaining-python/scripts/`：
 `kb_common.py` 公共工具，`chunker.py` 语义分块，`indexer.py` 建 FTS5、向量与图谱索引，
@@ -85,7 +86,7 @@ frontmatter 字段：
 
 ## 新增知识的最小闭环
 
-1. 建文件或更新唯一权威 → `kb-index` → `kb-check`（重复与 Parent 超限必须为 0）。
+1. 建文件或更新唯一权威（现行条文进 `.agents/context/`，取舍与正反例进本目录）→ `kb-index --rebuild` → `kb-check`（重复与 Parent 超限必须为 0）。
 2. 在 `.agents/skills/maintaining-python/scripts/eval_set.py` 补该文件的查询条目，让召回率可验证而不是自我声明。
 3. 精简对应的 skill reference，只留怎么做和一行 `kb-search` 入口；详细取舍依据留在 knowledge。
 4. 更新 `.agents/skills/governing-agents/references/catalog.md` 短路由，最后按改动域运行 `run.py check --profile ...`。

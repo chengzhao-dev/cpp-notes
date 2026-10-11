@@ -2,7 +2,7 @@
 kb_id: "cpp-exception-message-format-v1"
 title: "异常与错误文案规范"
 domain: "cpp-teaching"
-subdomain: "style"
+subdomain: "conventions"
 tags: [exceptions, error-messages, out-of-range, logging]
 level_range: [0, 5]
 dependencies: [cpp-naming-format-v1]

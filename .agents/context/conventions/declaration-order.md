@@ -2,7 +2,7 @@
 kb_id: "cpp-declaration-order-v1"
 title: "声明顺序标准"
 domain: "cpp-teaching"
-subdomain: "style"
+subdomain: "conventions"
 tags: [cpp, declaration_order, google_style, header_order, code_review]
 level_range: [0, 9]
 dependencies: ["cpp-naming-format-v1"]

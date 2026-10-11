@@ -18,7 +18,7 @@ estimated_tokens: 700
 
 ### enum class 提供的约束
 
-`enum class` 定义封闭取值集合：枚举值限定在类型名作用域内，与整数之间不发生隐式转换，同类型值之间可以 `==`、`!=` 比较和赋值；需要底层整数类型时在声明中显式指定。C++ Core Guidelines Enum.3 建议新代码使用 scoped enum；unscoped `enum` 是历史惯性与 C 兼容需要，不作教学默认。
+`enum class` 定义封闭取值集合：枚举值限定在类型名作用域内，与整数之间不发生隐式转换，同类型值之间可以 `==`、`!=` 比较和赋值；需要底层整数类型时在声明中显式指定。C++ Core Guidelines Enum.3 建议新代码使用 scoped enum；不写 `class` 的 unscoped `enum` 是历史惯性与 C 兼容需要，不作教学默认。
 
 ### 与整数的边界
 

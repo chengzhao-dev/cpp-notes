@@ -2,7 +2,7 @@
 kb_id: "cpp-teaching-source-comments-v1"
 title: "统一注释风格规范"
 domain: "cpp-teaching"
-subdomain: "style"
+subdomain: "conventions"
 tags: [comment, llvm, google-style, chinese]
 level_range: [0, 5]
 dependencies: []
